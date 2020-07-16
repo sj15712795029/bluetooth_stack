@@ -5,6 +5,9 @@
 [**购买开发板连接（点击我）**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.18.5aeb41f9OvIVgA&id=622836061708)
 <br>[**购买模组连接（点击我）**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.18.5aeb41f9OvIVgA&id=622836061708)
 
+## 视频教程：
+[**CSDN学院教程-蓝牙入门（点击我）**](https://edu.csdn.net/course/detail/30065)
+
 ## 平台介绍：
 **目前我们的蓝牙协议栈可以在STM32F103以及在Linux跑起来,蓝牙芯片是CSR8311,支持
 <br>PROTOCOL：HCI L2CAP RFCOMM SDP
