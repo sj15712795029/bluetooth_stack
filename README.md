@@ -5,8 +5,12 @@
 [**购买开发板连接（点击我）**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.18.5aeb41f9OvIVgA&id=622836061708)
 <br>[**购买模组连接（点击我）**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.18.5aeb41f9OvIVgA&id=622836061708)
 
+## 技术文章专栏：
+[**CSDN技术文章专栏（点击我）**](https://blog.csdn.net/xiaoxiaopengbo/category_10215137.html)
+
+
 ## 视频教程：
-[**CSDN学院教程-蓝牙入门（点击我）**](https://edu.csdn.net/course/detail/30065)
+[**CSDN学院教程-蓝牙协议栈教程（点击我）**](https://edu.csdn.net/lecturer/5352?spm=1002.2001.3001.4144)
 
 ## 平台介绍：
 **目前我们的蓝牙协议栈可以在STM32F103以及在Linux跑起来,蓝牙芯片是CSR8311,支持
