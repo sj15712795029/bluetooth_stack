@@ -13,21 +13,7 @@
 #include "bt_l2cap.h"
 
 
-/* Functions for interfacing with RFCOMM: */
 
-/* Lower layer interface to RFCOMM: */
-err_t rfcomm_init(void); /* Must be called first to initialize RFCOMM */
-void rfcomm_tmr(void); /* Must be called every 1s interval */
-
-/* Application program's interface: */
-struct rfcomm_pcb_t *rfcomm_new(struct l2cap_pcb_t *pcb);
-void rfcomm_close(struct rfcomm_pcb_t *pcb);
-void rfcomm_reset_all(void);
-void rfcomm_arg(struct rfcomm_pcb_t *pcb, void *arg);
-void rfcomm_recv(struct rfcomm_pcb_t *pcb, 
-		 err_t (* recv)(void *arg, struct rfcomm_pcb_t *pcb, struct bt_pbuf_t *p, err_t err));
-void rfcomm_disc(struct rfcomm_pcb_t *pcb, 
-		 err_t (* disc)(void *arg, struct rfcomm_pcb_t *pcb, err_t err));
 
 #define rfcomm_cn(pcb) ((pcb)->cn)
 #define rfcomm_cl(pcb) ((pcb)->cl)
@@ -36,25 +22,6 @@ void rfcomm_disc(struct rfcomm_pcb_t *pcb,
 #define rfcomm_fc(pcb) ((pcb)->fc)
 #define rfcomm_mfs(pcb) ((pcb)->n)
 
-err_t rfcomm_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err);
-
-err_t rfcomm_connect(struct rfcomm_pcb_t *pcb, uint8_t cn, 
-		     err_t (* connected)(void *arg, struct rfcomm_pcb_t *tpcb, err_t err));
-err_t rfcomm_disconnect(struct rfcomm_pcb_t *pcb);
-err_t rfcomm_listen(struct rfcomm_pcb_t *npcb, uint8_t cn, 
-		    err_t (* accept)(void *arg, struct rfcomm_pcb_t *pcb, err_t err));
-err_t rfcomm_pn(struct rfcomm_pcb_t *pcb,
-		err_t (* pn_rsp)(void *arg, struct rfcomm_pcb_t *pcb, err_t err));
-err_t rfcomm_test(struct rfcomm_pcb_t *pcb, 
-		  err_t (* test_rsp)(void *arg, struct rfcomm_pcb_t *tpcb, err_t err));
-err_t rfcomm_msc(struct rfcomm_pcb_t *pcb, uint8_t fc, 
-		 err_t (* msc_rsp)(void *arg, struct rfcomm_pcb_t *pcb, err_t err));
-err_t rfcomm_rpn(struct rfcomm_pcb_t *pcb, uint8_t br,
-	   err_t (* rpn_rsp)(void *arg, struct rfcomm_pcb_t *pcb, err_t err));
-err_t rfcomm_uih(struct rfcomm_pcb_t *pcb, uint8_t cn, struct bt_pbuf_t *q);
-err_t rfcomm_uih_credits(struct rfcomm_pcb_t *pcb, uint8_t credits, struct bt_pbuf_t *q);
-err_t rfcomm_issue_credits(struct rfcomm_pcb_t *pcb, uint8_t credits);
-err_t rfcomm_lp_disconnected(struct l2cap_pcb_t *pcb);
 
 
 /* Control field values */
@@ -290,6 +257,43 @@ extern struct rfcomm_pcb_t *rfcomm_tmp_pcb;      /* Only used for temporary stor
                             } \
                             npcb->next = NULL; \
                             } while(0)
+
+
+/* Functions for interfacing with RFCOMM: */
+
+/* Lower layer interface to RFCOMM: */
+err_t rfcomm_init(void); /* Must be called first to initialize RFCOMM */
+void rfcomm_tmr(void); /* Must be called every 1s interval */
+
+/* Application program's interface: */
+struct rfcomm_pcb_t *rfcomm_new(struct l2cap_pcb_t *pcb);
+void rfcomm_close(struct rfcomm_pcb_t *pcb);
+void rfcomm_reset_all(void);
+void rfcomm_arg(struct rfcomm_pcb_t *pcb, void *arg);
+void rfcomm_recv(struct rfcomm_pcb_t *pcb, 
+		 err_t (* recv)(void *arg, struct rfcomm_pcb_t *pcb, struct bt_pbuf_t *p, err_t err));
+void rfcomm_disc(struct rfcomm_pcb_t *pcb, 
+		 err_t (* disc)(void *arg, struct rfcomm_pcb_t *pcb, err_t err));
+
+err_t rfcomm_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err);
+
+err_t rfcomm_connect(struct rfcomm_pcb_t *pcb, uint8_t cn, 
+		     err_t (* connected)(void *arg, struct rfcomm_pcb_t *tpcb, err_t err));
+err_t rfcomm_disconnect(struct rfcomm_pcb_t *pcb);
+err_t rfcomm_listen(struct rfcomm_pcb_t *npcb, uint8_t cn, 
+		    err_t (* accept)(void *arg, struct rfcomm_pcb_t *pcb, err_t err));
+err_t rfcomm_pn(struct rfcomm_pcb_t *pcb,
+		err_t (* pn_rsp)(void *arg, struct rfcomm_pcb_t *pcb, err_t err));
+err_t rfcomm_test(struct rfcomm_pcb_t *pcb, 
+		  err_t (* test_rsp)(void *arg, struct rfcomm_pcb_t *tpcb, err_t err));
+err_t rfcomm_msc(struct rfcomm_pcb_t *pcb, uint8_t fc, 
+		 err_t (* msc_rsp)(void *arg, struct rfcomm_pcb_t *pcb, err_t err));
+err_t rfcomm_rpn(struct rfcomm_pcb_t *pcb, uint8_t br,
+	   err_t (* rpn_rsp)(void *arg, struct rfcomm_pcb_t *pcb, err_t err));
+err_t rfcomm_uih(struct rfcomm_pcb_t *pcb, uint8_t cn, struct bt_pbuf_t *q);
+err_t rfcomm_uih_credits(struct rfcomm_pcb_t *pcb, uint8_t credits, struct bt_pbuf_t *q);
+err_t rfcomm_issue_credits(struct rfcomm_pcb_t *pcb, uint8_t credits);
+err_t rfcomm_lp_disconnected(struct l2cap_pcb_t *pcb);
 
 #endif
 

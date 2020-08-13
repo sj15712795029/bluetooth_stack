@@ -47,13 +47,7 @@ static err_t rfcomm_disconnect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err
     return BT_ERR_OK;
 }
 
-/*
- * rfcomm_disconnected():
- *
- * Called by RFCOMM when the remote RFCOMM protocol or upper layer was disconnected.
- * Disconnects the PPP protocol.
- *
- */
+
 err_t rfcomm_disconnected(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
 {
     err_t ret = BT_ERR_OK;
@@ -75,15 +69,8 @@ static err_t rfcomm_accept(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
     return BT_ERR_OK;
 }
 
-/*-----------------------------------------------------------------------------------*/
-/*
- * rfcomm_init():
- *
- * Initializes the rfcomm layer.
- */
-/*-----------------------------------------------------------------------------------*/
-err_t
-rfcomm_init(void)
+
+err_t rfcomm_init(void)
 {
     struct l2cap_pcb_t *l2cappcb;
     struct rfcomm_pcb_t *rfcommpcb;
@@ -109,21 +96,12 @@ rfcomm_init(void)
     return BT_ERR_OK;
 
 }
-/*-----------------------------------------------------------------------------------*/
-/*
- * rfcomm_tmr():
- *
- * Called every 1s and implements the command timer that
- * removes a DLC if it has been waiting for a response enough
- * time.
- */
-/*-----------------------------------------------------------------------------------*/
-void
-rfcomm_tmr(void)
+
+void rfcomm_tmr(void)
 {
     struct rfcomm_pcb_t *pcb, *tpcb;
-    err_t ret;
-    BT_UNUSED_ARG(ret);
+    err_t ret = BT_ERR_OK;
+
     /* Step through all of the active pcbs */
     for(pcb = rfcomm_active_pcbs; pcb != NULL; pcb = pcb->next)
     {
@@ -156,16 +134,8 @@ rfcomm_tmr(void)
         }
     }
 }
-/*-----------------------------------------------------------------------------------*/
-/*
- * rfcomm_lp_disconnected():
- *
- * Called by the application to indicate that the lower protocol disconnected. Closes
- * any active PCBs in the lists
- */
-/*-----------------------------------------------------------------------------------*/
-err_t
-rfcomm_lp_disconnected(struct l2cap_pcb_t *l2cappcb)
+
+err_t rfcomm_lp_disconnected(struct l2cap_pcb_t *l2cappcb)
 {
     struct rfcomm_pcb_t *pcb, *tpcb;
     err_t ret = BT_ERR_OK;
@@ -184,16 +154,8 @@ rfcomm_lp_disconnected(struct l2cap_pcb_t *l2cappcb)
 
     return ret;
 }
-/*-----------------------------------------------------------------------------------*/
-/*
- * rfcomm_new():
- *
- * Creates a new RFCOMM protocol control block but doesn't place it on
- * any of the RFCOMM PCB lists.
- */
-/*-----------------------------------------------------------------------------------*/
-struct rfcomm_pcb_t *
-rfcomm_new(struct l2cap_pcb_t *l2cappcb)
+
+struct rfcomm_pcb_t *rfcomm_new(struct l2cap_pcb_t *l2cappcb)
 {
     struct rfcomm_pcb_t *pcb;
 
@@ -213,15 +175,8 @@ rfcomm_new(struct l2cap_pcb_t *l2cappcb)
     BT_RFCOMM_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_memp_malloc fail\n",__FILE__,__FUNCTION__,__LINE__);
     return NULL;
 }
-/*-----------------------------------------------------------------------------------*/
-/*
- * rfcomm_close():
- *
- * Closes the RFCOMM protocol control block.
- */
-/*-----------------------------------------------------------------------------------*/
-void
-rfcomm_close(struct rfcomm_pcb_t *pcb)
+
+void rfcomm_close(struct rfcomm_pcb_t *pcb)
 {
 #if RFCOMM_FLOW_QUEUEING
     if(pcb->buf != NULL)
@@ -241,15 +196,8 @@ rfcomm_close(struct rfcomm_pcb_t *pcb)
     }
     pcb = NULL;
 }
-/*-----------------------------------------------------------------------------------*/
-/*
- * rfcomm_reset_all():
- *
- * Closes all active and listening RFCOMM protocol control blocks.
- */
-/*-----------------------------------------------------------------------------------*/
-void
-rfcomm_reset_all(void)
+
+void rfcomm_reset_all(void)
 {
     struct rfcomm_pcb_t *pcb, *tpcb;
     struct rfcomm_pcb_listen_t *lpcb, *tlpcb;
@@ -270,15 +218,8 @@ rfcomm_reset_all(void)
 
     rfcomm_init();
 }
-/*-----------------------------------------------------------------------------------*/
-/*
- * rfcomm_get_multiplexer():
- *
- * Return the active PCB with the matching Bluetooth address and channel number.
- */
-/*-----------------------------------------------------------------------------------*/
-struct rfcomm_pcb_t *
-rfcomm_get_active_pcb(uint8_t cn, struct bd_addr_t *bdaddr)
+
+struct rfcomm_pcb_t *rfcomm_get_active_pcb(uint8_t cn, struct bd_addr_t *bdaddr)
 {
     struct rfcomm_pcb_t *pcb;
     for(pcb = rfcomm_active_pcbs; pcb != NULL; pcb = pcb->next)
@@ -291,15 +232,8 @@ rfcomm_get_active_pcb(uint8_t cn, struct bd_addr_t *bdaddr)
     }
     return pcb;
 }
-/*-----------------------------------------------------------------------------------*/
-/*
- * rfcomm_dm():
- *
- * Sends a RFCOMM disconnected mode frame in response to a command when disconnected.
- */
-/*-----------------------------------------------------------------------------------*/
-static err_t
-rfcomm_dm(struct l2cap_pcb_t *pcb, struct rfcomm_hdr_t *hdr)
+
+static err_t rfcomm_dm(struct l2cap_pcb_t *pcb, struct rfcomm_hdr_t *hdr)
 {
     struct bt_pbuf_t *p;
     struct rfcomm_hdr_t *rfcommhdr;
@@ -323,16 +257,8 @@ rfcomm_dm(struct l2cap_pcb_t *pcb, struct rfcomm_hdr_t *hdr)
     bt_pbuf_free(p);
     return ret;
 }
-/*-----------------------------------------------------------------------------------*/
-/*
- * rfcomm_connect():
- *
- * Sends a RFCOMM start asynchronous balanced mode frame to startup the channel. Also
- * specify the function to be called when the channel has been connected.
- */
-/*-----------------------------------------------------------------------------------*/
-err_t
-rfcomm_connect(struct rfcomm_pcb_t *pcb, uint8_t cn, err_t (* connected)(void *arg,
+
+err_t rfcomm_connect(struct rfcomm_pcb_t *pcb, uint8_t cn, err_t (* connected)(void *arg,
                struct rfcomm_pcb_t *tpcb,
                err_t err))
 {
@@ -390,15 +316,8 @@ rfcomm_connect(struct rfcomm_pcb_t *pcb, uint8_t cn, err_t (* connected)(void *a
     bt_pbuf_free(p);
     return ret;
 }
-/*-----------------------------------------------------------------------------------*/
-/*
- * rfcomm_disconnect():
- *
- * Sends a RFCOMM disconnect frame to close the channel.
- */
-/*-----------------------------------------------------------------------------------*/
-err_t
-rfcomm_disconnect(struct rfcomm_pcb_t *pcb)
+
+err_t rfcomm_disconnect(struct rfcomm_pcb_t *pcb)
 {
     struct rfcomm_hdr_t *hdr;
     struct bt_pbuf_t *p;
@@ -428,15 +347,8 @@ rfcomm_disconnect(struct rfcomm_pcb_t *pcb)
     bt_pbuf_free(p);
     return ret;
 }
-/*-----------------------------------------------------------------------------------*/
-/*
- * rfcomm_ua():
- *
- * Sends a RFCOMM unnumbered acknowledgement to respond to a connection request.
- */
-/*-----------------------------------------------------------------------------------*/
-static err_t //RESPONDER
-rfcomm_ua(struct l2cap_pcb_t *pcb, struct rfcomm_hdr_t *hdr)
+
+static err_t rfcomm_ua(struct l2cap_pcb_t *pcb, struct rfcomm_hdr_t *hdr)
 {
     struct bt_pbuf_t *p;
     struct rfcomm_hdr_t *rfcommhdr;
@@ -461,17 +373,8 @@ rfcomm_ua(struct l2cap_pcb_t *pcb, struct rfcomm_hdr_t *hdr)
     bt_pbuf_free(p);
     return ret;
 }
-/*-----------------------------------------------------------------------------------*/
-/*
- * rfcomm_pn():
- *
- * Sends a RFCOMM parameter negotiation multiplexer frame to negotiate the parameters
- * of a data link connection. Also specify the function to be called when a PN
- * response is received
- */
-/*-----------------------------------------------------------------------------------*/
-err_t
-rfcomm_pn(struct rfcomm_pcb_t *pcb,
+
+err_t rfcomm_pn(struct rfcomm_pcb_t *pcb,
           err_t (* pn_rsp)(void *arg, struct rfcomm_pcb_t *pcb, err_t err))
 {
     struct bt_pbuf_t *p;
@@ -514,15 +417,8 @@ rfcomm_pn(struct rfcomm_pcb_t *pcb,
     bt_pbuf_free(p);
     return ret;
 }
-/*-----------------------------------------------------------------------------------*/
-/*
- * rfcomm_test():
- *
- * .
- */
-/*-----------------------------------------------------------------------------------*/
-err_t
-rfcomm_test(struct rfcomm_pcb_t *pcb, err_t (* test_rsp)(void *arg, struct rfcomm_pcb_t *tpcb, err_t err))
+
+err_t rfcomm_test(struct rfcomm_pcb_t *pcb, err_t (* test_rsp)(void *arg, struct rfcomm_pcb_t *tpcb, err_t err))
 {
     struct bt_pbuf_t *p;
     struct rfcomm_msg_hdr_t *cmdhdr;
@@ -553,16 +449,8 @@ rfcomm_test(struct rfcomm_pcb_t *pcb, err_t (* test_rsp)(void *arg, struct rfcom
     bt_pbuf_free(p);
     return ret;
 }
-/*-----------------------------------------------------------------------------------*/
-/*
- * rfcomm_msc():
- *
- * Sends a RFCOMM modem status multiplexer frame. Also specify the function to be
- * called when a MSC response is received.
- */
-/*-----------------------------------------------------------------------------------*/
-err_t
-rfcomm_msc(struct rfcomm_pcb_t *pcb, uint8_t fc,
+
+err_t rfcomm_msc(struct rfcomm_pcb_t *pcb, uint8_t fc,
            err_t (* msc_rsp)(void *arg, struct rfcomm_pcb_t *pcb, err_t err))
 {
     struct bt_pbuf_t *p;
@@ -602,16 +490,8 @@ rfcomm_msc(struct rfcomm_pcb_t *pcb, uint8_t fc,
     bt_pbuf_free(p);
     return ret;
 }
-/*-----------------------------------------------------------------------------------*/
-/*
- * rfcomm_rpn():
- *
- * Sends a RFCOMM remote port negotiation multiplexer frame to set communication
- * settings at the remote end of the data link connection.
- */
-/*-----------------------------------------------------------------------------------*/
-err_t //INITIATOR
-rfcomm_rpn(struct rfcomm_pcb_t *pcb, uint8_t br,
+
+err_t rfcomm_rpn(struct rfcomm_pcb_t *pcb, uint8_t br,
            err_t (* rpn_rsp)(void *arg, struct rfcomm_pcb_t *pcb, err_t err))
 {
     struct bt_pbuf_t *p;
@@ -652,15 +532,8 @@ rfcomm_rpn(struct rfcomm_pcb_t *pcb, uint8_t br,
     bt_pbuf_free(p);
     return ret;
 }
-/*-----------------------------------------------------------------------------------*/
-/*
- * rfcomm_uih():
- *
- * Sends a RFCOMM unnumbered information frame with header check.
- */
-/*-----------------------------------------------------------------------------------*/
-err_t //RESPONDER & INITIATOR
-rfcomm_uih(struct rfcomm_pcb_t *pcb, uint8_t cn, struct bt_pbuf_t *q)
+
+err_t rfcomm_uih(struct rfcomm_pcb_t *pcb, uint8_t cn, struct bt_pbuf_t *q)
 {
     struct bt_pbuf_t *p, *r;
     err_t ret;
@@ -798,16 +671,8 @@ rfcomm_uih(struct rfcomm_pcb_t *pcb, uint8_t cn, struct bt_pbuf_t *q)
 
     return ret;
 }
-/*-----------------------------------------------------------------------------------*/
-/*
- * rfcomm_uih_credits():
- *
- * Sends a RFCOMM unnumbered information frame with header check and credit based
- * flow control.
- */
-/*-----------------------------------------------------------------------------------*/
-err_t //RESPONDER & INITIATOR
-rfcomm_uih_credits(struct rfcomm_pcb_t *pcb, uint8_t credits, struct bt_pbuf_t *q)
+
+err_t rfcomm_uih_credits(struct rfcomm_pcb_t *pcb, uint8_t credits, struct bt_pbuf_t *q)
 {
     struct bt_pbuf_t *p, *r;
     err_t ret;
@@ -982,15 +847,8 @@ err_t rfcomm_issue_credits(struct rfcomm_pcb_t *pcb, uint8_t credits)
 
     return ret;
 }
-/*-----------------------------------------------------------------------------------*/
-/*
- * rfcomm_process_msg():
- *
- * Parses the received RFCOMM message and handles it.
- */
-/*-----------------------------------------------------------------------------------*/
-void
-rfcomm_process_msg(struct rfcomm_pcb_t *pcb, struct rfcomm_hdr_t *rfcommhdr, struct l2cap_pcb_t *l2cappcb,
+
+void rfcomm_process_msg(struct rfcomm_pcb_t *pcb, struct rfcomm_hdr_t *rfcommhdr, struct l2cap_pcb_t *l2cappcb,
                    struct bt_pbuf_t *p)
 {
     struct rfcomm_msg_hdr_t *cmdhdr, *rsphdr;
@@ -1000,8 +858,7 @@ rfcomm_process_msg(struct rfcomm_pcb_t *pcb, struct rfcomm_hdr_t *rfcommhdr, str
     struct rfcomm_pcb_t *tpcb; /* Temp pcb */
     struct rfcomm_pcb_listen_t *lpcb; /* Listen pcb */
     struct bt_pbuf_t *q;
-    err_t ret;
-    BT_UNUSED_ARG(ret);
+    err_t ret = BT_ERR_OK;
     cmdhdr = p->payload;
     bt_pbuf_header(p, -RFCOMM_MSGHDR_LEN);
 
@@ -1335,16 +1192,8 @@ rfcomm_process_msg(struct rfcomm_pcb_t *pcb, struct rfcomm_hdr_t *rfcommhdr, str
         break;
     }
 }
-/*-----------------------------------------------------------------------------------*/
-/*
- * rfcomm_input():
- *
- * Called by the lower layer. Does a frame check, parses the header and forward it to
- * the upper layer or handle the command frame.
- */
-/*-----------------------------------------------------------------------------------*/
-err_t
-rfcomm_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err)
+
+err_t rfcomm_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err)
 {
     struct rfcomm_hdr_t rfcommhdr;
     struct rfcomm_pcb_t *pcb, *tpcb;
@@ -1355,8 +1204,7 @@ rfcomm_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t
     uint8_t fcs;
 
     struct bt_pbuf_t *q;
-    err_t ret;
-    BT_UNUSED_ARG(ret);
+      err_t ret = BT_ERR_OK;
 
     rfcommhdr.addr = *((uint8_t *)p->payload);
     rfcommhdr.ctrl = ((uint8_t *)p->payload)[1];
@@ -1735,58 +1583,25 @@ rfcomm_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t
     }
     return BT_ERR_OK;
 }
-/*-----------------------------------------------------------------------------------*/
-/*
- * rfcomm_arg():
- *
- * Used to specify the argument that should be passed callback functions.
- */
-/*-----------------------------------------------------------------------------------*/
-void
-rfcomm_arg(struct rfcomm_pcb_t *pcb, void *arg)
+
+void rfcomm_arg(struct rfcomm_pcb_t *pcb, void *arg)
 {
     pcb->callback_arg = arg;
 }
-/*-----------------------------------------------------------------------------------*/
-/*
- * rfcomm_recv():
- *
- * Used to specify the function that should be called when a RFCOMM connection
- * receives data.
- */
-/*-----------------------------------------------------------------------------------*/
-void
-rfcomm_recv(struct rfcomm_pcb_t *pcb,
+
+void rfcomm_recv(struct rfcomm_pcb_t *pcb,
             err_t (* recv)(void *arg, struct rfcomm_pcb_t *pcb, struct bt_pbuf_t *p, err_t err))
 {
     pcb->recv = recv;
 }
-/*-----------------------------------------------------------------------------------*/
-/*
- * rfcomm_disc():
- *
- * Used to specify the function that should be called when a RFCOMM channel is
- * disconnected
- */
-/*-----------------------------------------------------------------------------------*/
-void
-rfcomm_disc(struct rfcomm_pcb_t *pcb,
+
+void rfcomm_disc(struct rfcomm_pcb_t *pcb,
             err_t (* disc)(void *arg, struct rfcomm_pcb_t *pcb, err_t err))
 {
     pcb->disconnected = disc;
 }
-/*-----------------------------------------------------------------------------------*/
-/*
- * rfcomm_listen():
- *
- * Set the state of the connection to be LISTEN, which means that it is able to accept
- * incoming connections. The protocol control block is reallocated in order to consume
- * less memory. Setting the connection to LISTEN is an irreversible process. Also
- * specify the function that should be called when the channel has been connected.
- */
-/*-----------------------------------------------------------------------------------*/
-err_t
-rfcomm_listen(struct rfcomm_pcb_t *npcb, uint8_t cn,
+
+err_t rfcomm_listen(struct rfcomm_pcb_t *npcb, uint8_t cn,
               err_t (* accept)(void *arg, struct rfcomm_pcb_t *pcb, err_t err))
 {
     struct rfcomm_pcb_listen_t *lpcb;
@@ -1806,5 +1621,5 @@ rfcomm_listen(struct rfcomm_pcb_t *npcb, uint8_t cn,
     return BT_ERR_OK;
 }
 
-/*-----------------------------------------------------------------------------------*/
+
 
