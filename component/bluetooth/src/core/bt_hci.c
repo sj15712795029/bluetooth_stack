@@ -535,8 +535,12 @@ static void hci_init_cmd_complete_handle(uint8_t ocf, uint8_t ogf,uint8_t * payl
         hci_write_ssp_mode(pcb->ssp_enable);
     }
 
-
     if(ogf == HCI_HOST_C_N_BB && ocf == HCI_WRITE_SSP_MODE)
+    {
+        hci_write_inquiry_mode(INQUIRY_MODE_EIR);
+    }
+
+    if(ogf == HCI_HOST_C_N_BB && ocf == HCI_WRITE_INQUIRY_MODE)
     {
         hci_write_scan_enable(HCI_SCAN_EN_INQUIRY | HCI_SCAN_EN_PAGE);
     }
@@ -545,7 +549,6 @@ static void hci_init_cmd_complete_handle(uint8_t ocf, uint8_t ogf,uint8_t * payl
     {
         hci_write_le_enable(1,1);
     }
-
 
     if(ogf == HCI_HOST_C_N_BB && ocf == HCI_WRITE_LE_SUPPORT)
     {
@@ -598,6 +601,7 @@ void hci_event_input(struct bt_pbuf_t *p)
         HCI_EVENT_INQ_COMPLETE(pcb,((uint8_t *)p->payload)[0],ret);
         break;
     case HCI_INQUIRY_RESULT:
+    case HCI_EXT_INQ_RESULT:
         for(i=0; i<((uint8_t *)p->payload)[0]; i++)
         {
             resp_offset = i*14;
@@ -621,6 +625,30 @@ void hci_event_input(struct bt_pbuf_t *p)
                 inqres->psm = ((uint8_t *)p->payload)[9+resp_offset];
                 memcpy(inqres->cod, ((uint8_t *)p->payload)+10+resp_offset, 3);
                 inqres->co = *((uint16_t *)(((uint8_t *)p->payload)+13+resp_offset));
+
+                if(evhdr->code == HCI_EXT_INQ_RESULT)
+                {
+                	uint8_t temp_rssi = ((uint8_t *)p->payload)[14+resp_offset];
+			uint8_t *eir_data = ((uint8_t *)p->payload) + 15;
+			uint8_t *temp_eir_data = eir_data;
+			if(temp_rssi && 0x80) /* negative rssi */
+				inqres->rssi = ((int8_t)(temp_rssi & (~0x80)) -128)&0xff;
+			else
+				inqres->rssi = temp_rssi;
+
+			while(temp_eir_data[0] != 0)
+			{
+				uint8_t eir_element_len = temp_eir_data[0];
+				uint8_t eir_element_type = temp_eir_data[1];
+				if(eir_element_type == BT_DT_COMPLETE_LOCAL_NAME)
+				{
+					memset(inqres->remote_name,0,HCI_REMOTE_NAME_LEN);
+					memcpy(inqres->remote_name,temp_eir_data+2,eir_element_len-1);
+					break;
+				}
+				temp_eir_data += eir_element_len + 1;
+			}
+                }
                 HCI_REG(&(pcb->ires), inqres);
 
                 HCI_EVENT_INQ_RESULT(pcb,inqres,ret);
@@ -2451,6 +2479,25 @@ err_t hci_host_num_comp_packets(uint16_t conhdl, uint16_t num_complete)
     return BT_ERR_OK;
 }
 
+
+err_t hci_write_inquiry_mode(uint8_t inquiry_mode)
+{
+    struct bt_pbuf_t *p;
+    if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_W_INQUIRY_MODE_LEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_MEM;
+    }
+    /* Assembling command packet */
+    p = hci_cmd_ass(p, HCI_WRITE_INQUIRY_MODE, HCI_HOST_C_N_BB, HCI_W_INQUIRY_MODE_LEN);
+    ((uint8_t *)p->payload)[3] = inquiry_mode;
+
+    phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
+    bt_pbuf_free(p);
+
+
+    return BT_ERR_OK;
+}
 
 err_t hci_write_eir(uint8_t *eir_data)
 {

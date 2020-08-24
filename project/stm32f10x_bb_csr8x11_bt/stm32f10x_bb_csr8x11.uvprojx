@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\bsp\cortex-m3\core;..\..\bsp\cortex-m3\inc;..\..\board;..\..\board\stm32f10x;..\..\component\ringbuffer;..\..\component\bluetooth\src\include;..\..\component\bluetooth\src\include\classical;..\..\component\bluetooth\vendor;..\stm32f10x_bb_csr8x11_bt;..\..\component\bluetooth\third_party_lib\sbc</IncludePath>
+              <IncludePath>..\..\bsp\cortex-m3\core;..\..\bsp\cortex-m3\inc;..\..\board;..\..\board\stm32f10x;..\..\component\ringbuffer;..\..\component\bluetooth\src\include;..\..\component\bluetooth\src\include\classical;..\..\component\bluetooth\vendor;..\stm32f10x_bb_csr8x11_bt;..\..\component\bluetooth\third_party_lib\sbc;..\..\component\cjson</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -665,6 +665,16 @@
               <FileName>ringbuffer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\component\ringbuffer\ringbuffer.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>json</GroupName>
+          <Files>
+            <File>
+              <FileName>cJSON.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\cjson\cJSON.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -20,7 +20,8 @@ struct hci_link_t;
 struct hci_inq_res_t;
 
 #define HCI_RESET_TIMEOUT	10
-
+#define HCI_REMOTE_NAME_LEN 32
+#define HCI_INQUIRY_MAX_DEV MEMP_NUM_HCI_INQ
 
 #define HCI_EVENT_HDR_LEN 2
 #define HCI_ACL_HDR_LEN 4
@@ -342,6 +343,7 @@ struct hci_inq_res_t;
 #define HCI_W_VOICE_SETTING_PLEN 5
 #define HCI_W_FLUSHTO_PLEN 6
 #define HCI_SET_HC_TO_H_FC_PLEN 4
+#define HCI_W_INQUIRY_MODE_LEN 4
 #define HCI_WRITE_EIR_PLEN 244
 #define HCI_WRITE_SSP_MODE_PLEN 4
 #define HCI_WRITE_LE_SUPPORT_PLEN 5
@@ -383,6 +385,10 @@ struct hci_inq_res_t;
 #define IO_CAP_DISPLAY_YES_NO 0x01
 #define IO_CAP_KEYBOARD_ONLY 0x02
 #define IO_CAP_NOINPUT_OUTPUT 0x03
+
+#define INQUIRY_MODE_STANDARD 0
+#define INQUIRY_MODE_RSSI 1
+#define INQUIRY_MODE_EIR 2
 
 /**
  * SSP Authentication Requirements, see IO Capability Request Reply Commmand 
@@ -430,6 +436,9 @@ struct hci_inq_res_t
     uint8_t psrm; /* Page scan repetition mode */
     uint8_t psm; /* Page scan mode */
     uint16_t co; /* Clock offset */
+	int8_t rssi;
+	uint8_t support_carplay;
+	uint8_t remote_name[HCI_REMOTE_NAME_LEN];
 };
 
 /**
@@ -681,6 +690,7 @@ err_t hci_write_flush_timeout(struct bd_addr_t *bdaddr, uint16_t flushto);
 err_t hci_set_hc_to_h_fc(void);
 err_t hci_host_buffer_size(void);
 err_t hci_host_num_comp_packets(uint16_t conhdl, uint16_t num_complete);
+err_t hci_write_inquiry_mode(uint8_t inquiry_mode);
 err_t hci_write_eir(uint8_t *eir_data);
 err_t hci_write_ssp_mode(uint8_t ssp_mode);
 err_t hci_write_le_enable(uint8_t le_support,uint8_t simultaneous);

@@ -134,7 +134,7 @@ uint8_t shell_parse(uint8_t *shell_string)
     if(strncmp(BT_INQUIRY_CMD,(const char*)shell_string,strlen(BT_INQUIRY_CMD)) == 0)
     {
         printf("SHELL:operate bt inquiry\n");
-        bt_start_inquiry(0x30,0);
+        bt_start_inquiry(0x30,HCI_INQUIRY_MAX_DEV);
         return 0;
     }
 

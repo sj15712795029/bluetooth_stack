@@ -520,8 +520,8 @@ static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqre
             printf("ires->bdaddr %02x:%02x:%02x:%02x:%02x:%02x\n",
                    inqres->bdaddr.addr[5], inqres->bdaddr.addr[4], inqres->bdaddr.addr[3],
                    inqres->bdaddr.addr[2], inqres->bdaddr.addr[1], inqres->bdaddr.addr[0]);
-		//bt_get_remote_name(&(inqres->bdaddr));
-		//bt_cancel_get_remote_name(&(inqres->bdaddr));
+		printf("inqres->rssi %d\n",inqres->rssi);
+		printf("inqres->remote_name %s\n",inqres->remote_name);
         }
 
 	return BT_ERR_OK;
