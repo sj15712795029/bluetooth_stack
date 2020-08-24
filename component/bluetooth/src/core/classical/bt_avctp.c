@@ -78,9 +78,9 @@ BT_AVCTP_TRACE_DEBUG("avctp_input: p->len == %d p->tot_len == %d\n", p->len, p->
 
 static err_t avctp_connect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err)
 {
+	struct avctp_pcb_t *avctppcb;
 	BT_AVCTP_TRACE_DEBUG("avctp_connect_indn");
-    struct avctp_pcb_t *avctppcb;
-
+    
 	BT_AVCTP_TRACE_DEBUG("avdtp_connect_ind pcb case 1 0x%p\n",pcb);
     temp_avcrp = avctppcb = avctp_new();
     avctppcb->l2cappcb= pcb;

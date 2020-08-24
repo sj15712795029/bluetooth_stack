@@ -41,7 +41,7 @@ struct avdtp_pcb_t *avdtp_new()
         return pcb;
     }
 
-	BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_memp_malloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+    BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_memp_malloc fail\n",__FILE__,__FUNCTION__,__LINE__);
     return NULL;
 }
 
@@ -65,7 +65,7 @@ static err_t avdtp_handle_discovery(struct avdtp_pcb_t *avdtppcb,uint8_t transac
     if((p = bt_pbuf_alloc(BT_PBUF_RAW, AVDTP_SIG_HDR_SIZE, BT_PBUF_RAM)) == NULL)
     {
         /* Could not allocate memory for bt_pbuf_t */
-	BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
 
         return BT_ERR_MEM;
     }
@@ -80,7 +80,7 @@ static err_t avdtp_handle_discovery(struct avdtp_pcb_t *avdtppcb,uint8_t transac
         if((q = bt_pbuf_alloc(BT_PBUF_RAW, AVDTP_DIS_PER_EP_SIZE, BT_PBUF_RAM)) == NULL)
         {
             /* Could not allocate memory for bt_pbuf_t */
-		BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+            BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
             return BT_ERR_MEM;
         }
         cmd_resp_pos = 0;
@@ -95,7 +95,7 @@ static err_t avdtp_handle_discovery(struct avdtp_pcb_t *avdtppcb,uint8_t transac
     ret = l2cap_datawrite(avdtppcb->avdtp_signal_l2cappcb, p);
     bt_pbuf_free(p);
 
-	return BT_ERR_OK;
+    return BT_ERR_OK;
 }
 
 
@@ -110,7 +110,7 @@ static err_t avdtp_handle_get_capabilities(struct avdtp_pcb_t *avdtppcb,uint8_t 
     if((p = bt_pbuf_alloc(BT_PBUF_RAW, AVDTP_SIG_HDR_SIZE, BT_PBUF_RAM)) == NULL)
     {
         /* Could not allocate memory for bt_pbuf_t */
-	BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
 
         return BT_ERR_MEM;
     }
@@ -129,7 +129,7 @@ static err_t avdtp_handle_get_capabilities(struct avdtp_pcb_t *avdtppcb,uint8_t 
                 if((q = bt_pbuf_alloc(BT_PBUF_RAW, AVDTP_CAP_HDR_SIZE, BT_PBUF_RAM)) == NULL)
                 {
                     /* Could not allocate memory for bt_pbuf_t */
-			BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+                    BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
 
                     return BT_ERR_MEM;
                 }
@@ -146,7 +146,7 @@ static err_t avdtp_handle_get_capabilities(struct avdtp_pcb_t *avdtppcb,uint8_t 
                 if((q = bt_pbuf_alloc(BT_PBUF_RAW, AVDTP_CAP_HDR_SIZE+avdtp_tmp_sep->cap.media_codec.media_info_len, BT_PBUF_RAM)) == NULL)
                 {
                     /* Could not allocate memory for bt_pbuf_t */
-			BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+                    BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
                     return BT_ERR_MEM;
                 }
                 cmd_resp_pos = 0;
@@ -162,8 +162,8 @@ static err_t avdtp_handle_get_capabilities(struct avdtp_pcb_t *avdtppcb,uint8_t 
 
     ret = l2cap_datawrite(avdtppcb->avdtp_signal_l2cappcb, p);
     bt_pbuf_free(p);
-		
-		return BT_ERR_OK;
+
+    return BT_ERR_OK;
 }
 
 
@@ -178,7 +178,7 @@ static err_t avdtp_handle_get_all_capabilities(struct avdtp_pcb_t *avdtppcb,uint
     if((p = bt_pbuf_alloc(BT_PBUF_RAW, AVDTP_SIG_HDR_SIZE, BT_PBUF_RAM)) == NULL)
     {
         /* Could not allocate memory for bt_pbuf_t */
-	BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
 
         return BT_ERR_MEM;
     }
@@ -195,7 +195,7 @@ static err_t avdtp_handle_get_all_capabilities(struct avdtp_pcb_t *avdtppcb,uint
             if((q = bt_pbuf_alloc(BT_PBUF_RAW, AVDTP_CAP_HDR_SIZE, BT_PBUF_RAM)) == NULL)
             {
                 /* Could not allocate memory for bt_pbuf_t */
-			BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+                BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
                 return BT_ERR_MEM;
             }
             cmd_resp_pos = 0;
@@ -211,7 +211,7 @@ static err_t avdtp_handle_get_all_capabilities(struct avdtp_pcb_t *avdtppcb,uint
             if((q = bt_pbuf_alloc(BT_PBUF_RAW, AVDTP_CAP_HDR_SIZE+avdtp_tmp_sep->cap.media_codec.media_info_len, BT_PBUF_RAM)) == NULL)
             {
                 /* Could not allocate memory for bt_pbuf_t */
-			BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+                BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
 
                 return BT_ERR_MEM;
             }
@@ -227,8 +227,8 @@ static err_t avdtp_handle_get_all_capabilities(struct avdtp_pcb_t *avdtppcb,uint
 
     ret = l2cap_datawrite(avdtppcb->avdtp_signal_l2cappcb, p);
     bt_pbuf_free(p);
-		
-		return BT_ERR_OK;
+
+    return BT_ERR_OK;
 }
 
 uint8_t *avdtp_get_spec_cap_value(uint8_t category_id,uint8_t *cap,uint16_t cap_len,uint16_t *spec_cap_len)
@@ -264,7 +264,7 @@ static err_t avdtp_handle_set_configuration(struct avdtp_pcb_t *avdtppcb,uint8_t
     if((p = bt_pbuf_alloc(BT_PBUF_RAW, AVDTP_SIG_HDR_SIZE, BT_PBUF_RAM)) == NULL)
     {
         /* Could not allocate memory for bt_pbuf_t */
-	BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
         return BT_ERR_MEM;
     }
     cmd_resp = p->payload;
@@ -273,8 +273,8 @@ static err_t avdtp_handle_set_configuration(struct avdtp_pcb_t *avdtppcb,uint8_t
     cmd_resp[cmd_resp_pos++] = AVDTP_SI_SET_CONFIGURATION;
     ret = l2cap_datawrite(avdtppcb->avdtp_signal_l2cappcb, p);
     bt_pbuf_free(p);
-		
-		return BT_ERR_OK;
+
+    return BT_ERR_OK;
 }
 
 static err_t avdtp_handle_open(struct avdtp_pcb_t *avdtppcb,uint8_t transaction_label)
@@ -287,7 +287,7 @@ static err_t avdtp_handle_open(struct avdtp_pcb_t *avdtppcb,uint8_t transaction_
     if((p = bt_pbuf_alloc(BT_PBUF_RAW, AVDTP_SIG_HDR_SIZE, BT_PBUF_RAM)) == NULL)
     {
         /* Could not allocate memory for bt_pbuf_t */
-	BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
         return BT_ERR_MEM;
     }
     cmd_resp = p->payload;
@@ -297,8 +297,8 @@ static err_t avdtp_handle_open(struct avdtp_pcb_t *avdtppcb,uint8_t transaction_
     avdtp_signal_open = 1;
     ret = l2cap_datawrite(avdtppcb->avdtp_signal_l2cappcb, p);
     bt_pbuf_free(p);
-		
-		return BT_ERR_OK;
+
+    return BT_ERR_OK;
 }
 
 static err_t avdtp_handle_start(struct avdtp_pcb_t *avdtppcb,uint8_t transaction_label)
@@ -311,7 +311,7 @@ static err_t avdtp_handle_start(struct avdtp_pcb_t *avdtppcb,uint8_t transaction
     if((p = bt_pbuf_alloc(BT_PBUF_RAW, AVDTP_SIG_HDR_SIZE, BT_PBUF_RAM)) == NULL)
     {
         /* Could not allocate memory for bt_pbuf_t */
-	BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
 
         return BT_ERR_MEM;
     }
@@ -321,8 +321,8 @@ static err_t avdtp_handle_start(struct avdtp_pcb_t *avdtppcb,uint8_t transaction
     cmd_resp[cmd_resp_pos++] = AVDTP_SI_START;
     ret = l2cap_datawrite(avdtppcb->avdtp_signal_l2cappcb, p);
     bt_pbuf_free(p);
-		
-		return BT_ERR_OK;
+
+    return BT_ERR_OK;
 }
 
 static err_t avdtp_handle_suspend(struct avdtp_pcb_t *avdtppcb,uint8_t transaction_label)
@@ -335,7 +335,7 @@ static err_t avdtp_handle_suspend(struct avdtp_pcb_t *avdtppcb,uint8_t transacti
     if((p = bt_pbuf_alloc(BT_PBUF_RAW,AVDTP_SIG_HDR_SIZE, BT_PBUF_RAM)) == NULL)
     {
         /* Could not allocate memory for bt_pbuf_t */
-	BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
         return BT_ERR_MEM;
     }
     cmd_resp = p->payload;
@@ -344,8 +344,8 @@ static err_t avdtp_handle_suspend(struct avdtp_pcb_t *avdtppcb,uint8_t transacti
     cmd_resp[cmd_resp_pos++] = AVDTP_SI_SUSPEND;
     ret = l2cap_datawrite(avdtppcb->avdtp_signal_l2cappcb, p);
     bt_pbuf_free(p);
-		
-		return BT_ERR_OK;
+
+    return BT_ERR_OK;
 }
 
 struct avdtp_pcb_t *
@@ -369,7 +369,7 @@ static err_t avdtp_connect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err)
 
     if((avdtppcb = avdtp_get_active_pcb(&pcb->remote_bdaddr)) == NULL)
     {
-				BT_AVDTP_TRACE_DEBUG("avdtp_connect_ind pcb case 1 0x%p\n",pcb);
+        BT_AVDTP_TRACE_DEBUG("avdtp_connect_ind pcb case 1 0x%p\n",pcb);
 
         avdtppcb = (struct avdtp_pcb_t *)avdtp_new();
         avdtppcb->avdtp_signal_l2cappcb = pcb;
@@ -380,7 +380,7 @@ static err_t avdtp_connect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err)
     }
     else
     {
-    	BT_AVDTP_TRACE_DEBUG("avdtp_connect_ind pcb case 2 0x%p\n",pcb);
+        BT_AVDTP_TRACE_DEBUG("avdtp_connect_ind pcb case 2 0x%p\n",pcb);
         avdtppcb->avdtp_media_l2cappcb = pcb;
         l2cap_register_disconnect_ind(avdtppcb->avdtp_media_l2cappcb, avdtp_disconnect_ind);
         l2cap_register_recv(avdtppcb->avdtp_media_l2cappcb, avdtp_media_input);
@@ -392,7 +392,7 @@ static err_t avdtp_connect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err)
 
 static err_t avdtp_disconnect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err)
 {
-	BT_AVDTP_TRACE_DEBUG("avdtp_disconnect_ind psm 0x%x\n",pcb->psm);
+    BT_AVDTP_TRACE_DEBUG("avdtp_disconnect_ind psm 0x%x\n",pcb->psm);
 
     l2cap_close(pcb);
     return BT_ERR_OK;
@@ -403,6 +403,9 @@ err_t
 avdtp_media_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err)
 {
 
+    uint8_t marker,payload_type;
+    uint16_t sequence_number;
+    uint32_t timestamp,synchronization_source;
     struct avdtp_pcb_t *avdtppcb =  avdtp_get_active_pcb(&l2cappcb->remote_bdaddr);
     uint8_t *data = (uint8_t *)p->payload;
     uint8_t data_pos = 0;
@@ -411,28 +414,28 @@ avdtp_media_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, 
     uint8_t extension = (data[data_pos] >> 3)&0x1;
     uint8_t csrc_count = (data[data_pos]>>4)&0x0f;
     data_pos += 1;
-    uint8_t marker = (data[data_pos] )&0x1;
-    uint8_t payload_type = (data[data_pos] >> 1) & 0x7F;
+    marker = (data[data_pos] )&0x1;
+    payload_type = (data[data_pos] >> 1) & 0x7F;
     data_pos += 1;
 
-    uint16_t sequence_number = bt_be_read_16(data, data_pos);
+    sequence_number = bt_be_read_16(data, data_pos);
     data_pos += 2;
-    uint32_t timestamp = bt_be_read_32(data, data_pos);
+    timestamp = bt_be_read_32(data, data_pos);
     data_pos += 4;
-    uint32_t synchronization_source = bt_be_read_32(data, data_pos);
+    synchronization_source = bt_be_read_32(data, data_pos);
 
     data_pos += 4;
 
-		BT_AVDTP_TRACE_DEBUG("avdtp_media_input: p->len == %d p->tot_len == %d,data pos %d\n", p->len, p->tot_len,data_pos+4*csrc_count);
-			BT_AVDTP_TRACE_DEBUG("version %d,padding %d,extension %d,csrc_count %d,marker %d,payload_type %d\n",version,padding,extension,csrc_count,marker,payload_type);
-				BT_AVDTP_TRACE_DEBUG("sequence_number 0x%x,timestamp %d,synchronization_source %d\n",sequence_number,timestamp,synchronization_source);
+    BT_AVDTP_TRACE_DEBUG("avdtp_media_input: p->len == %d p->tot_len == %d,data pos %d\n", p->len, p->tot_len,data_pos+4*csrc_count);
+    BT_AVDTP_TRACE_DEBUG("version %d,padding %d,extension %d,csrc_count %d,marker %d,payload_type %d\n",version,padding,extension,csrc_count,marker,payload_type);
+    BT_AVDTP_TRACE_DEBUG("sequence_number 0x%x,timestamp %d,synchronization_source %d\n",sequence_number,timestamp,synchronization_source);
 
 
 
     bt_pbuf_header(p, -(data_pos));
     avdtp_media_handler(avdtppcb,p);
-		
-		return BT_ERR_OK;
+
+    return BT_ERR_OK;
 }
 
 err_t
@@ -445,8 +448,8 @@ avdtp_signal_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p,
 
     struct avdtp_pcb_t *avdtppcb =  avdtp_get_active_pcb(&l2cappcb->remote_bdaddr);
 
-			BT_AVDTP_TRACE_DEBUG("avdtp_signal_input len:%dtransaction_label:%d,packet_type:%d,message_type:%d\n",p->len,transaction_label,packet_type,message_type);
-					BT_AVDTP_TRACE_DEBUG("----------------------------------\n");
+    BT_AVDTP_TRACE_DEBUG("avdtp_signal_input len:%dtransaction_label:%d,packet_type:%d,message_type:%d\n",p->len,transaction_label,packet_type,message_type);
+    BT_AVDTP_TRACE_DEBUG("----------------------------------\n");
     bt_hex_dump(p->payload,p->len);
     BT_AVDTP_TRACE_DEBUG("----------------------------------\n");
 
@@ -458,7 +461,7 @@ avdtp_signal_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p,
         {
         case AVDTP_SI_DISCOVER:
         {
-				    BT_AVDTP_TRACE_DEBUG("AVDTP_SI_DISCOVER\n");
+            BT_AVDTP_TRACE_DEBUG("AVDTP_SI_DISCOVER\n");
 
             avdtp_handle_discovery(avdtppcb,transaction_label);
 
@@ -466,14 +469,14 @@ avdtp_signal_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p,
         }
         case AVDTP_SI_GET_CAPABILITIES:
         {
-			BT_AVDTP_TRACE_DEBUG("AVDTP_SI_GET_CAPABILITIES\n");
+            BT_AVDTP_TRACE_DEBUG("AVDTP_SI_GET_CAPABILITIES\n");
 
             avdtp_handle_get_capabilities(avdtppcb,transaction_label,data[2]>>2);
             break;
         }
         case AVDTP_SI_SET_CONFIGURATION:
         {
-			BT_AVDTP_TRACE_DEBUG("AVDTP_SI_SET_CONFIGURATION\n");
+            BT_AVDTP_TRACE_DEBUG("AVDTP_SI_SET_CONFIGURATION\n");
 
             avdtp_handle_set_configuration(avdtppcb,transaction_label,data[2]>>2,data[3]>>2,data+4,p->len-4);
             bt_pbuf_header(p,-4);
@@ -481,14 +484,14 @@ avdtp_signal_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p,
             break;
         }
         case AVDTP_SI_GET_CONFIGURATION:
-			BT_AVDTP_TRACE_DEBUG("AVDTP_SI_GET_CONFIGURATION\n");
+            BT_AVDTP_TRACE_DEBUG("AVDTP_SI_GET_CONFIGURATION\n");
             break;
         case AVDTP_SI_RECONFIGURE:
-			BT_AVDTP_TRACE_DEBUG("AVDTP_SI_RECONFIGURE\n");
+            BT_AVDTP_TRACE_DEBUG("AVDTP_SI_RECONFIGURE\n");
             break;
         case AVDTP_SI_OPEN:
         {
-			BT_AVDTP_TRACE_DEBUG("AVDTP_SI_OPEN\n");
+            BT_AVDTP_TRACE_DEBUG("AVDTP_SI_OPEN\n");
             avdtp_handle_open(avdtppcb,transaction_label);
             avdtp_event_handler(avdtppcb,AVDTP_SI_OPEN,NULL);
 
@@ -496,33 +499,33 @@ avdtp_signal_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p,
         break;
         case AVDTP_SI_START:
         {
-			BT_AVDTP_TRACE_DEBUG("AVDTP_SI_START\n");
+            BT_AVDTP_TRACE_DEBUG("AVDTP_SI_START\n");
             avdtp_handle_start(avdtppcb,transaction_label);
             break;
         }
         case AVDTP_SI_CLOSE:
-			BT_AVDTP_TRACE_DEBUG("AVDTP_SI_CLOSE\n");
+            BT_AVDTP_TRACE_DEBUG("AVDTP_SI_CLOSE\n");
             break;
         case AVDTP_SI_SUSPEND:
         {
-			BT_AVDTP_TRACE_DEBUG("AVDTP_SI_SUSPEND\n");
+            BT_AVDTP_TRACE_DEBUG("AVDTP_SI_SUSPEND\n");
             avdtp_handle_suspend(avdtppcb,transaction_label);
             break;
         }
         case AVDTP_SI_ABORT:
-			BT_AVDTP_TRACE_DEBUG("AVDTP_SI_ABORT\n");
+            BT_AVDTP_TRACE_DEBUG("AVDTP_SI_ABORT\n");
             break;
         case AVDTP_SI_SECURITY_CONTROL:
-			BT_AVDTP_TRACE_DEBUG("AVDTP_SI_SECURITY_CONTROL\n");
+            BT_AVDTP_TRACE_DEBUG("AVDTP_SI_SECURITY_CONTROL\n");
             break;
         case AVDTP_SI_GET_ALL_CAPABILITIES:
         {
-			BT_AVDTP_TRACE_DEBUG("AVDTP_SI_GET_ALL_CAPABILITIES\n");
+            BT_AVDTP_TRACE_DEBUG("AVDTP_SI_GET_ALL_CAPABILITIES\n");
             avdtp_handle_get_all_capabilities(avdtppcb,transaction_label);
             break;
         }
         case AVDTP_SI_DELAYREPORT:
-			BT_AVDTP_TRACE_DEBUG("AVDTP_SI_DELAYREPORT\n");
+            BT_AVDTP_TRACE_DEBUG("AVDTP_SI_DELAYREPORT\n");
             break;
         default:
             break;
@@ -552,7 +555,7 @@ avdtp_sep_new()
         memset(sep, 0, sizeof(struct avdtp_sep_t));
         return sep;
     }
-	BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_memp_malloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+    BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_memp_malloc fail\n",__FILE__,__FUNCTION__,__LINE__);
     return NULL;
 }
 
@@ -596,7 +599,7 @@ avdtp_init(avdtp_event_handle avdtp_evt_handle,avdtp_media_handle avdtp_media_ha
     avdtp_media_handler = avdtp_media_handle;
     if((l2cappcb = l2cap_new()) == NULL)
     {
-    		BT_AVDTP_TRACE_DEBUG("avdtp_init: Could not alloc L2CAP PCB for AVDTP_PSM\n");
+        BT_AVDTP_TRACE_DEBUG("avdtp_init: Could not alloc L2CAP PCB for AVDTP_PSM\n");
 
         return BT_ERR_MEM;
     }

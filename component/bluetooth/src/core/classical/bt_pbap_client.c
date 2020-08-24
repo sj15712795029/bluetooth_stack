@@ -158,7 +158,7 @@ err_t pbap_client_set_path(struct bd_addr_t *addr,uint8_t repositories,uint8_t t
 
     pbappcb->state = PBAP_OPERATE_SET_PATH;
 
-    obex_header_para_append(OBEX_HEADER_CONNECTION_ID,&(pbappcb->cid),sizeof(pbappcb->cid));
+    obex_header_para_append(OBEX_HEADER_CONNECTION_ID,(uint8_t *)&(pbappcb->cid),sizeof(pbappcb->cid));
 
     if(repositories == PB_LOCAL_REPOSITORY)
     {
@@ -230,8 +230,8 @@ err_t pbap_client_download_vcard_list(struct bd_addr_t *addr,uint8_t repositorie
 
     pbappcb->state = PBAP_OPERATE_PULL_VCARD_LIST;
 
-    obex_header_para_append(OBEX_HEADER_CONNECTION_ID,&(pbappcb->cid),sizeof(pbappcb->cid));
-    obex_header_para_append(OBEX_HEADER_TYPE,pbap_vcardlisting_type,sizeof(pbap_vcardlisting_type));
+    obex_header_para_append(OBEX_HEADER_CONNECTION_ID,(uint8_t *)&(pbappcb->cid),sizeof(pbappcb->cid));
+    obex_header_para_append(OBEX_HEADER_TYPE,(uint8_t *)pbap_vcardlisting_type,sizeof(pbap_vcardlisting_type));
 
     obex_header_para_append(OBEX_HEADER_NAME,NULL,0);
 
@@ -252,8 +252,8 @@ err_t pbap_client_download_vcard_entry(struct bd_addr_t *addr,uint8_t repositori
 
     pbappcb->state = PBAP_OPERATE_PULL_VCARD_ENTRY;
 
-    obex_header_para_append(OBEX_HEADER_CONNECTION_ID,&(pbappcb->cid),sizeof(pbappcb->cid));
-    obex_header_para_append(OBEX_HEADER_TYPE,pbap_vcardentry_type,sizeof(pbap_vcardentry_type));
+    obex_header_para_append(OBEX_HEADER_CONNECTION_ID,(uint8_t *)&(pbappcb->cid),sizeof(pbappcb->cid));
+    obex_header_para_append(OBEX_HEADER_TYPE,(uint8_t *)pbap_vcardentry_type,sizeof(pbap_vcardentry_type));
     sprintf((char *)name_string_temp, "%d%s", entry_number,pbap_vcard_suffix);
     for(index = 0; index < strlen(name_string_temp) + 1; index++)
     {
@@ -273,7 +273,7 @@ err_t pbap_client_download_abort(struct bd_addr_t *addr)
 
 err_t pbap_client_pull_next(struct pbap_pcb_t *pcb)
 {
-    obex_header_para_append(OBEX_HEADER_CONNECTION_ID,&(pcb->cid),sizeof(pcb->cid));
+    obex_header_para_append(OBEX_HEADER_CONNECTION_ID,(uint8_t *)&(pcb->cid),sizeof(pcb->cid));
     obex_client_get(pcb->rfcommpcb);
 }
 
@@ -284,8 +284,8 @@ err_t pbap_client_pull_phone_book(struct pbap_pcb_t *pcb,uint8_t repositories,ui
     uint8_t index = 0;
     uint8_t name_string_temp[20] = {0};
     uint8_t name_string[40] = {0};
-    obex_header_para_append(OBEX_HEADER_CONNECTION_ID,&(pcb->cid),sizeof(pcb->cid));
-    obex_header_para_append(OBEX_HEADER_TYPE,pbap_phonebook_type,sizeof(pbap_phonebook_type));
+    obex_header_para_append(OBEX_HEADER_CONNECTION_ID,(uint8_t *)&(pcb->cid),sizeof(pcb->cid));
+    obex_header_para_append(OBEX_HEADER_TYPE,(uint8_t *)pbap_phonebook_type,sizeof(pbap_phonebook_type));
     if(repositories == PB_LOCAL_REPOSITORY)
     {
         switch(type)
@@ -341,11 +341,11 @@ err_t pbap_client_pull_phone_book(struct pbap_pcb_t *pcb,uint8_t repositories,ui
 
     obex_header_para_append(OBEX_HEADER_NAME,name_string,(strlen(name_string_temp) + 1)*2);
     /* PBAP app para ass */
-    pbap_app_para_append(PBAP_APP_PARAM_MAX_LIST_COUNT,&count,sizeof(count));
+    pbap_app_para_append(PBAP_APP_PARAM_MAX_LIST_COUNT,(uint8_t *)&count,sizeof(count));
 
     if(count != 0)
     {
-        pbap_app_para_append(PBAP_APP_PARAM_LIST_START_OFFSET,&offset,sizeof(offset));
+        pbap_app_para_append(PBAP_APP_PARAM_LIST_START_OFFSET,(uint8_t *)&offset,sizeof(offset));
         {
             // test
             //pbap_app_para_append(PBAP_APP_PARAM_PROPERTY_SELECTOR,&property_mask,sizeof(property_mask));
@@ -733,7 +733,7 @@ static err_t pbap_client_run(struct pbap_pcb_t *pcb)
         break;
 
     case PBAP_W2_OBEX_CONNECTED:
-        obex_header_para_append(OBEX_HEADER_TARGET,pbap_target_id,sizeof(pbap_target_id));
+        obex_header_para_append(OBEX_HEADER_TARGET,(uint8_t *)pbap_target_id,sizeof(pbap_target_id));
         obex_client_connect(pcb->rfcommpcb,&pbap_obex_client_cbs,PBAP_CONNECT_MTU,pcb->remote_cn);
         break;
     case PBAP_OBEX_CONNECTED:

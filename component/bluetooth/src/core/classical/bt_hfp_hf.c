@@ -565,8 +565,8 @@ err_t hfp_hf_set_voice_recognition(struct bd_addr_t *addr,uint8_t value)
     }
     else
         return BT_ERR_CONN;
-		
-		return BT_ERR_OK;
+
+    return BT_ERR_OK;
 }
 
 err_t hfp_hf_get_phone_number_via_voice_tag(struct bd_addr_t *addr)
@@ -603,8 +603,8 @@ err_t hfp_hf_set_mic_volume(struct bd_addr_t *addr,uint8_t value)
     }
     else
         return BT_ERR_CONN;
-		
-		return BT_ERR_OK;
+
+    return BT_ERR_OK;
 }
 
 err_t hfp_hf_set_spk_volume(struct bd_addr_t *addr,uint8_t value)
@@ -623,8 +623,8 @@ err_t hfp_hf_set_spk_volume(struct bd_addr_t *addr,uint8_t value)
     }
     else
         return BT_ERR_CONN;
-		
-		return BT_ERR_OK;
+
+    return BT_ERR_OK;
 }
 
 err_t hfp_hf_query_hold_status(struct bd_addr_t *addr)
@@ -1648,13 +1648,16 @@ static err_t hfp_hf_handle_at_cme(struct hfp_pcb_t *pcb,uint8_t *data,uint16_t d
 static err_t hfp_hf_handle_at_cops(struct hfp_pcb_t *pcb,uint8_t *data,uint16_t data_len)
 {
     uint8_t *temp_data = data;
+    uint8_t format,name_len;
+    uint8_t *name_start;
+    uint8_t *name_end;
     uint8_t mode = bt_atoi_spec_size(temp_data,2);
     temp_data += 2;
-    uint8_t format = bt_atoi_spec_size(temp_data,2);
-    uint8_t *name_start = (uint8_t *)strchr((const char *)data,'"');
+    format = bt_atoi_spec_size(temp_data,2);
+    name_start = (uint8_t *)strchr((const char *)data,'"');
     name_start++;
-    uint8_t *name_end = (uint8_t *)strchr((const char *)name_start+1,'"');
-    uint8_t name_len = name_end - name_start;
+    name_end = (uint8_t *)strchr((const char *)name_start+1,'"');
+    name_len = name_end - name_start;
 
     BT_HFP_TRACE_DEBUG("hfp_hf_handle_at_cops: len %d\n", data_len);
 
@@ -1696,9 +1699,11 @@ static err_t hfp_hf_handle_at_clip(struct hfp_pcb_t *pcb,uint8_t *data,uint16_t 
     /* +CLIP: "10086",129 */
     uint8_t type;
     uint8_t *number_start = (uint8_t *)strchr((const char *)data,'"');
+    uint8_t *number_end;
+    uint8_t number_len;
     number_start++;
-    uint8_t *number_end = (uint8_t *)strchr((const char *)number_start+1,'"');
-    uint8_t number_len = number_end - number_start;
+    number_end = (uint8_t *)strchr((const char *)number_start+1,'"');
+    number_len = number_end - number_start;
     number_end += 2;
     type = bt_atoi_spec_size(number_end,3);
     BT_HFP_TRACE_DEBUG("hfp_hf_handle_at_clip: len %d,type %d\n", data_len,type);
@@ -1725,9 +1730,11 @@ static err_t hfp_hf_handle_at_ccwa(struct hfp_pcb_t *pcb,uint8_t *data,uint16_t 
 {
     uint8_t type;
     uint8_t *number_start = (uint8_t *)strchr((const char *)data,'"');
+    uint8_t *number_end;
+    uint8_t number_len;
     number_start++;
-    uint8_t *number_end = (uint8_t *)strchr((const char *)number_start+1,'"');
-    uint8_t number_len = number_end - number_start;
+    number_end = (uint8_t *)strchr((const char *)number_start+1,'"');
+    number_len = number_end - number_start;
     number_end += 2;
     type = bt_atoi_spec_size(number_end,3);
 
@@ -1799,9 +1806,11 @@ static err_t hfp_hf_handle_at_cnum(struct hfp_pcb_t *pcb,uint8_t *data,uint16_t 
     uint8_t type;
     uint8_t service;
     uint8_t *name_start = (uint8_t *)strchr((const char *)data,'"');
+    uint8_t *name_end;
+    uint8_t name_len;
     name_start++;
-    uint8_t *name_end = (uint8_t *)strchr((const char *)name_start+1,'"');
-    uint8_t name_len = name_end - name_start;
+    name_end = (uint8_t *)strchr((const char *)name_start+1,'"');
+    name_len = name_end - name_start;
     BT_HFP_TRACE_DEBUG("hfp_hf_handle_at_cnum: len %d\n", data_len);
     bt_hex_dump(data,data_len);
 
@@ -1836,9 +1845,11 @@ static err_t hfp_hf_handle_at_cgmi(struct hfp_pcb_t *pcb,uint8_t *data,uint16_t 
 {
     /* +CGMI: "Apple Inc." */
     uint8_t *mid_start = (uint8_t *)strchr((const char *)data,'"');
+    uint8_t *mid_end;
+    uint8_t mid_len;
     mid_start++;
-    uint8_t *mid_end = (uint8_t *)strchr((const char *)mid_start+1,'"');
-    uint8_t mid_len = mid_end - mid_start;
+    mid_end = (uint8_t *)strchr((const char *)mid_start+1,'"');
+    mid_len = mid_end - mid_start;
 
     BT_HFP_TRACE_DEBUG("hfp_hf_handle_at_cgmi: len %d\n", data_len);
     bt_hex_dump(data,data_len);
@@ -1853,9 +1864,11 @@ static err_t hfp_hf_handle_at_cgmm(struct hfp_pcb_t *pcb,uint8_t *data,uint16_t 
 {
     /* +CGMM: iPhone10,3 */
     uint8_t *mid_start = (uint8_t *)strchr((const char *)data,' ');
+    uint8_t *mid_end;
+    uint8_t mid_len;
     mid_start++;
-    uint8_t *mid_end = (uint8_t *)strchr((const char *)mid_start+1,0x0d);
-    uint8_t mid_len = mid_end - mid_start;
+    mid_end = (uint8_t *)strchr((const char *)mid_start+1,0x0d);
+    mid_len = mid_end - mid_start;
 
     BT_HFP_TRACE_DEBUG("hfp_hf_handle_at_cgmm: len %d\n", data_len);
     bt_hex_dump(data,data_len);
@@ -1870,9 +1883,11 @@ static err_t hfp_hf_handle_at_cgmr(struct hfp_pcb_t *pcb,uint8_t *data,uint16_t 
 {
     /* +CGMR: Version 12.1.2 (Build 16C101) */
     uint8_t *rid_start = (uint8_t *)strchr((const char *)data,' ');
+    uint8_t *rid_end;
+    uint8_t rid_len;
     rid_start++;
-    uint8_t *rid_end = (uint8_t *)strchr((const char *)rid_start+1,0x0d);
-    uint8_t rid_len = rid_end - rid_start;
+    rid_end = (uint8_t *)strchr((const char *)rid_start+1,0x0d);
+    rid_len = rid_end - rid_start;
 
     BT_HFP_TRACE_DEBUG("hfp_hf_handle_at_cgmr: len %d\n", data_len);
     bt_hex_dump(data,data_len);
@@ -2365,8 +2380,8 @@ static err_t hfp_hf_sco_conn_complete(void *arg, uint8_t status,struct bd_addr_t
         return BT_ERR_CONN;
 
     hfp_hf_run(hfppcb);
-		
-		return BT_ERR_OK;
+
+    return BT_ERR_OK;
 }
 
 static err_t  sco_hfp_disconn_complete(void *arg, uint8_t status,struct bd_addr_t *bdaddr)
@@ -2381,8 +2396,8 @@ static err_t  sco_hfp_disconn_complete(void *arg, uint8_t status,struct bd_addr_
 
     hfppcb->state = HFP_SCO_DISCONNECTED;
     hfp_hf_run(hfppcb);
-		
-		return BT_ERR_OK;
+
+    return BT_ERR_OK;
 }
 
 static err_t hfp_hf_run(struct hfp_pcb_t *pcb)
@@ -2402,16 +2417,16 @@ static err_t hfp_hf_run(struct hfp_pcb_t *pcb)
         l2cap_connect_req(pcb->l2cappcb, &(pcb->remote_addr), SDP_PSM, HCI_ALLOW_ROLE_SWITCH, l2cap_connect_cfm);
         break;
     case HFP_W2_SDP_QUERY_RFCOMM_CHANNEL:
-			{
+    {
         uint8_t hfp[] = {0x35, 0x03, 0x19, 0x11, 0x1f}; /* Service search pattern with HFP UUID is default */
 
         uint8_t attrids[] = {0x35, 0x03, 0x09, 0x00, 0x04}; /* Attribute IDs to search for in data element
-														sequence form */
+										sequence form */
 
         sdp_service_search_attrib_req(pcb->sdppcb, 0xFFFF, hfp, sizeof(hfp),
                                       attrids, sizeof(attrids), hfp_hf_sdp_attributes_recv);
         break;
-    	}
+    }
     case HFP_W2_SDP_DISCONNECTD:
         l2cap_disconnect_req(pcb->sdppcb->l2cappcb, l2cap_disconnect_cfm);
         sdp_free(pcb->sdppcb);

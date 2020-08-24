@@ -42,16 +42,16 @@ err_t obex_header_para_append(uint8_t hdr_id,uint8_t *hdr_data,uint8_t hdr_data_
         obex_header_offset += hdr_data_len;
 
     }
-		
-		return BT_ERR_OK;
+
+    return BT_ERR_OK;
 }
 
 err_t obex_reset_header_para()
 {
     memset(obex_header_para,0,OBEX_HEADER_MAX_SIZE);
     obex_header_offset = 0;
-	
-	return BT_ERR_OK;
+
+    return BT_ERR_OK;
 }
 
 static err_t obex_client_parse_connect_resp(struct obex_pcb_t *pcb, struct bt_pbuf_t *p)
@@ -73,18 +73,19 @@ static err_t obex_client_parse_connect_resp(struct obex_pcb_t *pcb, struct bt_pb
             }
         }
     }
-		
-		return BT_ERR_OK;
+
+    return BT_ERR_OK;
 }
 
 static err_t obex_client_parse_get_resp(struct obex_pcb_t *pcb, struct bt_pbuf_t *p)
 {
-    BT_OBEX_TRACE_DEBUG("obex_client_parse_get_resp:in\n");
     uint8_t status = ((uint8_t *)p->payload)[0];
+    BT_OBEX_TRACE_DEBUG("obex_client_parse_get_resp:in\n");
+
     if(pcb->obex_client_cbs && pcb->obex_client_cbs->obex_client_data_ind)
         pcb->obex_client_cbs->obex_client_data_ind(&pcb->remote_addr,((uint8_t *)p->payload) + OBEX_GET_FIELD_LEN,p->tot_len - OBEX_GET_FIELD_LEN,status);
 
-		return BT_ERR_OK;
+    return BT_ERR_OK;
 }
 
 static err_t obex_client_recv(void *arg, struct rfcomm_pcb_t *pcb, struct bt_pbuf_t *p, err_t err)
@@ -145,8 +146,8 @@ err_t obex_client_connect(struct rfcomm_pcb_t *rfcommpcb,obex_client_cbs_t *cb,u
 
     obex_reset_header_para();
     bt_pbuf_free(p);
-		
-		return BT_ERR_OK;
+
+    return BT_ERR_OK;
 }
 
 err_t obex_client_get(struct rfcomm_pcb_t *rfcommpcb)
@@ -174,8 +175,8 @@ err_t obex_client_get(struct rfcomm_pcb_t *rfcommpcb)
 
     obex_reset_header_para();
     bt_pbuf_free(p);
-		
-		return BT_ERR_OK;
+
+    return BT_ERR_OK;
 }
 
 err_t obex_client_setpath(struct rfcomm_pcb_t *rfcommpcb)
@@ -206,8 +207,8 @@ err_t obex_client_setpath(struct rfcomm_pcb_t *rfcommpcb)
 
     obex_reset_header_para();
     bt_pbuf_free(p);
-		
-		return BT_ERR_OK;
+
+    return BT_ERR_OK;
 }
 
 
