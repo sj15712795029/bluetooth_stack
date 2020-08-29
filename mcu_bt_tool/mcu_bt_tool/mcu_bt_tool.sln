@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mcu_bt_tool", "mcu_bt_tool\mcu_bt_tool.csproj", "{E1605015-8F4C-4019-935E-C493220EA162}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E1605015-8F4C-4019-935E-C493220EA162}.Debug|x86.ActiveCfg = Debug|x86
+		{E1605015-8F4C-4019-935E-C493220EA162}.Debug|x86.Build.0 = Debug|x86
+		{E1605015-8F4C-4019-935E-C493220EA162}.Release|x86.ActiveCfg = Release|x86
+		{E1605015-8F4C-4019-935E-C493220EA162}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

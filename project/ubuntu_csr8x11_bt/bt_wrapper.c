@@ -25,6 +25,15 @@ static err_t bt_ass_eir_data()
     uint8_t data_pos =0;
     uint8_t len = 0;
 
+#if 1
+    /* local name */
+    len = strlen(BT_LOCAL_NAME);
+    eir_data[data_pos++] = len + 1;
+    eir_data[data_pos++] = BT_DT_COMPLETE_LOCAL_NAME;
+    memcpy(eir_data+data_pos,BT_LOCAL_NAME,strlen(BT_LOCAL_NAME));
+    data_pos += strlen(BT_LOCAL_NAME);
+#endif
+
     /* 16 bit UUID */
     len = 1;
 #if PROFILE_DID_ENABLE

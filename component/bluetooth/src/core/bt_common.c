@@ -171,3 +171,27 @@ void bt_hex_dump(uint8_t *data,uint32_t len)
     }
 }
 
+uint8_t bt_parse_cod(uint8_t cod[3],uint16_t *device_service,uint16_t * device_major,uint16_t *device_minor)
+{
+	uint8_t device_type = BT_COD_TYPE_UNKNOW;
+	BT_COD_SERVICE_CLASS(*device_service,cod);
+	BT_COD_MAJOR_CLASS(*device_major,cod);
+	BT_COD_MINOR_CLASS(*device_minor,cod);
+
+	if(*device_major == BT_COD_MAJOR_AUDIO)
+	{
+		switch(*device_minor)
+		{
+			case BT_COD_MINOR_CONFM_HEADSET:
+				device_type = BT_COD_TYPE_HEADSET;
+				break;
+			default:
+				break;
+		}
+	}
+
+	return device_type;
+	
+}
+
+

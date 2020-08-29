@@ -613,6 +613,7 @@ void hci_event_input(struct bt_pbuf_t *p)
             BT_HCI_TRACE_DEBUG("\n");
 
             BT_HCI_TRACE_DEBUG("Page_Scan_Rep_Mode: 0x%x\n",((uint8_t *)p->payload)[7+resp_offset]);
+
             BT_HCI_TRACE_DEBUG("Class_of_Dev: 0x%x 0x%x 0x%x\n",((uint8_t *)p->payload)[10+resp_offset],
                                ((uint8_t *)p->payload)[11+resp_offset], ((uint8_t *)p->payload)[12+resp_offset]);
             BT_HCI_TRACE_DEBUG("Clock_Offset: 0x%x%x\n",((uint8_t *)p->payload)[13+resp_offset],
@@ -623,31 +624,43 @@ void hci_event_input(struct bt_pbuf_t *p)
                 bd_addr_set(&(inqres->bdaddr), bdaddr);
                 inqres->psrm = ((uint8_t *)p->payload)[7+resp_offset];
                 inqres->psm = ((uint8_t *)p->payload)[9+resp_offset];
-                memcpy(inqres->cod, ((uint8_t *)p->payload)+10+resp_offset, 3);
-                inqres->co = *((uint16_t *)(((uint8_t *)p->payload)+13+resp_offset));
 
                 if(evhdr->code == HCI_EXT_INQ_RESULT)
                 {
-                	uint8_t temp_rssi = ((uint8_t *)p->payload)[14+resp_offset];
-			uint8_t *eir_data = ((uint8_t *)p->payload) + 15;
-			uint8_t *temp_eir_data = eir_data;
-			if(temp_rssi && 0x80) /* negative rssi */
-				inqres->rssi = ((int8_t)(temp_rssi & (~0x80)) -128)&0xff;
-			else
-				inqres->rssi = temp_rssi;
+                    uint8_t temp_rssi = ((uint8_t *)p->payload)[14+resp_offset];
+                    uint8_t *eir_data = ((uint8_t *)p->payload) + 15;
+                    uint8_t *temp_eir_data = eir_data;
 
-			while(temp_eir_data[0] != 0)
-			{
-				uint8_t eir_element_len = temp_eir_data[0];
-				uint8_t eir_element_type = temp_eir_data[1];
-				if(eir_element_type == BT_DT_COMPLETE_LOCAL_NAME)
-				{
-					memset(inqres->remote_name,0,HCI_REMOTE_NAME_LEN);
-					memcpy(inqres->remote_name,temp_eir_data+2,eir_element_len-1);
-					break;
-				}
-				temp_eir_data += eir_element_len + 1;
-			}
+                    inqres->cod[2] = ((uint8_t *)p->payload)[9+resp_offset];
+                    inqres->cod[1] = ((uint8_t *)p->payload)[10+resp_offset];
+                    inqres->cod[0] = ((uint8_t *)p->payload)[11+resp_offset];
+                    //memcpy(inqres->cod, ((uint8_t *)p->payload)+9+resp_offset, 3);
+                    inqres->co = *((uint16_t *)(((uint8_t *)p->payload)+12+resp_offset));
+                    if(temp_rssi && 0x80) /* negative rssi */
+                        inqres->rssi = ((int8_t)(temp_rssi & (~0x80)) -128)&0xff;
+                    else
+                        inqres->rssi = temp_rssi;
+
+                    while(temp_eir_data[0] != 0)
+                    {
+                        uint8_t eir_element_len = temp_eir_data[0];
+                        uint8_t eir_element_type = temp_eir_data[1];
+                        if(eir_element_type == BT_DT_COMPLETE_LOCAL_NAME)
+                        {
+                            memset(inqres->remote_name,0,HCI_REMOTE_NAME_LEN);
+                            memcpy(inqres->remote_name,temp_eir_data+2,eir_element_len-1);
+                            break;
+                        }
+                        temp_eir_data += eir_element_len + 1;
+                    }
+                }
+                else
+                {
+                    inqres->cod[2] = ((uint8_t *)p->payload)[10+resp_offset];
+                    inqres->cod[1] = ((uint8_t *)p->payload)[11+resp_offset];
+                    inqres->cod[0] = ((uint8_t *)p->payload)[12+resp_offset];
+                    //memcpy(inqres->cod, ((uint8_t *)p->payload)+10+resp_offset, 3);
+                    inqres->co = *((uint16_t *)(((uint8_t *)p->payload)+13+resp_offset));
                 }
                 HCI_REG(&(pcb->ires), inqres);
 

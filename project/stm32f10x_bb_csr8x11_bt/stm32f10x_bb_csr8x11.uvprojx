@@ -696,11 +696,6 @@
               <FileType>1</FileType>
               <FilePath>.\main.c</FilePath>
             </File>
-            <File>
-              <FileName>shell_parse.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\shell_parse.c</FilePath>
-            </File>
           </Files>
         </Group>
       </Groups>

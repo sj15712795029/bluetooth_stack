@@ -19,6 +19,8 @@ extern struct phybusif_cb uart_if;
 
 struct link_key_record link_key_instance = {0};
 uint8_t eir_data[240]= {0};
+bt_cb_t *bt_cb = NULL;
+uint16_t bt_profile_mask = 0;
 
 static err_t bt_inquiry_complete(struct hci_pcb_t *pcb,uint16_t result);
 static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres);
@@ -81,7 +83,7 @@ static err_t bt_ass_eir_data()
     eir_data[data_pos++] = (DID_VERSION_ID_VALUE>>8) & 0xff;
 #endif
 
-	return 0;
+    return 0;
 }
 
 
@@ -120,8 +122,11 @@ err_t bt_stack_worked(void *arg)
     printf("bt_stack_worked\r\n");
     bt_ass_eir_data();
     hci_write_eir(eir_data);
-	
-	return 0;
+
+    if(bt_cb && bt_cb->bt_init_result)
+        bt_cb->bt_init_result(BT_INIT_SUCCESS,bt_profile_mask);
+
+    return 0;
 }
 
 #if PROFILE_SPP_ENABLE
@@ -401,16 +406,17 @@ static pbap_client_cbs_t pbap_client_wrapper_cb =
 
 #endif
 
-uint8_t bt_start(void)
+uint8_t bt_start(bt_cb_t *cb)
 {
 #if PROFILE_HFP_ENABLE
     uint16_t hf_feature = HFP_HFSF_EC_NR_FUNCTION |  HFP_HFSF_THREE_WAY_CALLING|
-                       HFP_HFSF_CLI_PRESENTATION_CAPABILITY | HFP_HFSF_VOICE_RECOGNITION_FUNCTION |
-                       HFP_HFSF_REMOTE_VOLUME_CONTROL |HFP_HFSF_ENHANCED_CALL_STATUS |
-                       HFP_HFSF_ENHANCED_CALL_CONTROL | HFP_HFSF_CODEC_NEGOTIATION|
-                       HFP_HFSF_HF_INDICATORS |HFP_HFSF_ESCO_S4;
+                          HFP_HFSF_CLI_PRESENTATION_CAPABILITY | HFP_HFSF_VOICE_RECOGNITION_FUNCTION |
+                          HFP_HFSF_REMOTE_VOLUME_CONTROL |HFP_HFSF_ENHANCED_CALL_STATUS |
+                          HFP_HFSF_ENHANCED_CALL_CONTROL | HFP_HFSF_CODEC_NEGOTIATION|
+                          HFP_HFSF_HF_INDICATORS |HFP_HFSF_ESCO_S4;
 #endif
 
+    bt_cb = cb;
     bt_mem_init();
     bt_memp_init();
     phybusif_open(115200,0);
@@ -426,22 +432,28 @@ uint8_t bt_start(void)
     /* bluetooth classical profile init */
 #if PROFILE_DID_ENABLE
     did_init();
+    bt_profile_mask |= BT_PROFILE_DID_PSE_MASK;
 #endif
 #if PROFILE_SPP_ENABLE
     spp_init(&spp_wrapper_cb);
+    bt_profile_mask |= BT_PROFILE_SPP_MASK;
 #endif
 #if PROFILE_HFP_ENABLE
     hfp_hf_init(hf_feature,HFP_HF_SDP_UNSUPPORT_WBS,&hfp_hf_wrapper_cb);
     //hfp_hf_init(hf_feature,HFP_HF_SDP_SUPPORT_WBS,&hfp_hf_wrapper_cb);
+    bt_profile_mask |= BT_PROFILE_HFP_HF_MASK;
 #endif
 #if PROFILE_PBAP_ENABLE
-	pbap_client_init(&pbap_client_wrapper_cb);
+    pbap_client_init(&pbap_client_wrapper_cb);
+    bt_profile_mask |= BT_PROFILE_PBAP_PCE_MASK;
 #endif
 #if PROFILE_A2DP_ENABLE
     a2dp_sink_init();
+    bt_profile_mask |= BT_PROFILE_A2DP_SINK_MASK;
 #endif
 #if PROFILE_AVRCP_ENABLE
     avrcp_controller_init();
+    bt_profile_mask |= BT_PROFILE_AVRCP_CONTROL_MASK;
 #endif
 
     hci_reset();
@@ -452,6 +464,8 @@ uint8_t bt_start(void)
 
 uint8_t bt_stop(void)
 {
+    bt_profile_mask = 0;
+    bt_cb = NULL;
     hci_reset_all();
     l2cap_reset_all();
     sdp_reset_all();
@@ -462,6 +476,9 @@ uint8_t bt_stop(void)
 uint8_t bt_start_inquiry(uint8_t inquiry_len,uint8_t max_dev)
 {
     uint32_t lap =  0x9E8B33;    /* GIAC */
+
+    if(bt_cb && bt_cb->bt_inquiry_status)
+        bt_cb->bt_inquiry_status(BT_INQUIRY_START);
     hci_inquiry(lap,inquiry_len,max_dev,bt_inquiry_result,bt_inquiry_complete);
     return 0;
 }
@@ -469,36 +486,40 @@ uint8_t bt_start_inquiry(uint8_t inquiry_len,uint8_t max_dev)
 
 uint8_t bt_le_inquiry(uint8_t enable)
 {
-	hci_set_le_scan_enable(enable,0);
-	return 0;
+    hci_set_le_scan_enable(enable,0);
+    return 0;
 }
 
 
 static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres)
 {
-	if(inqres != NULL)
-        {
-            printf("ires->psrm %d\nires->psm %d\nires->co %d\n", inqres->psrm, inqres->psm, inqres->co);
-            printf("ires->bdaddr %02x:%02x:%02x:%02x:%02x:%02x\n",
-                   inqres->bdaddr.addr[5], inqres->bdaddr.addr[4], inqres->bdaddr.addr[3],
-                   inqres->bdaddr.addr[2], inqres->bdaddr.addr[1], inqres->bdaddr.addr[0]);
-		printf("inqres->rssi %d\n",inqres->rssi);
-		printf("inqres->remote_name %s\n",inqres->remote_name);
-        }
+    if(inqres != NULL)
+    {
+    	uint8_t dev_type = BT_COD_TYPE_UNKNOW;
+        uint16_t cod_dev_service;
+        uint16_t cod_dev_major;
+        uint16_t cod_dev_minor;
+        printf("ires->psrm %d\nires->psm %d\nires->co %d\n", inqres->psrm, inqres->psm, inqres->co);
+        printf("ires->bdaddr %02x:%02x:%02x:%02x:%02x:%02x\n",
+               inqres->bdaddr.addr[5], inqres->bdaddr.addr[4], inqres->bdaddr.addr[3],
+               inqres->bdaddr.addr[2], inqres->bdaddr.addr[1], inqres->bdaddr.addr[0]);
+        printf("inqres->rssi %d\n",inqres->rssi);
+        printf("inqres->remote_name %s\n",inqres->remote_name);
+	printf("cod[0]=(0x%x) cod[1]=(0x%x) cod[2]=(0x%x)\n",inqres->cod[0],inqres->cod[1],inqres->cod[2]);
+	
+        dev_type = bt_parse_cod(inqres->cod,&cod_dev_service,&cod_dev_major,&cod_dev_minor);
+        printf("cod_dev_service(0x%x) cod_dev_major(0x%x) cod_dev_minor(0x%x)\n",cod_dev_service,cod_dev_major,cod_dev_minor);
+        if(bt_cb && bt_cb->bt_inquiry_result)
+            bt_cb->bt_inquiry_result(&inqres->bdaddr,dev_type,inqres->remote_name);
+    }
 
-	return BT_ERR_OK;
+    return BT_ERR_OK;
 }
 
 static err_t bt_inquiry_complete(struct hci_pcb_t *pcb,uint16_t result)
 {
-	if(result == HCI_SUCCESS)
-    {
-    	printf("Inquiry complete success\n");
-    }
-	else
-	{
-		printf("Inquiry complete fail\n");
-	}
-	return BT_ERR_OK;
+    if(bt_cb && bt_cb->bt_inquiry_status)
+        bt_cb->bt_inquiry_status(BT_INQUIRY_COMPLETE);
+    return BT_ERR_OK;
 }
 

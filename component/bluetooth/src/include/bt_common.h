@@ -177,6 +177,186 @@ struct bd_addr_t {
 #define BT_DT_MANUFACTURER_SPECIFIC_DATA                         0xFF
 
 
+/*********************************
+ *** Class of Device constants ***
+ *********************************/
+#define BT_FORMAT_TYPE_1 0x00
+
+/****************************
+ * minor device class field
+ ****************************/
+
+/* 0x00 is used as unclassified for all minor device classes */
+#define BT_COD_MINOR_UNCLASSIFIED 0x00
+
+/* minor device class field for Computer Major Class */
+/* #define BTM_COD_MINOR_UNCLASSIFIED       0x00    */
+#define BT_COD_MINOR_DESKTOP_WORKSTATION 0x04
+#define BT_COD_MINOR_SERVER_COMPUTER 0x08
+#define BT_COD_MINOR_LAPTOP 0x0C
+#define BT_COD_MINOR_HANDHELD_PC_PDA 0x10 /* clam shell */
+#define BT_COD_MINOR_PALM_SIZE_PC_PDA 0x14
+#define BT_COD_MINOR_WEARABLE_COMPUTER 0x18 /* watch sized */
+
+/* minor device class field for Phone Major Class */
+/* #define BTM_COD_MINOR_UNCLASSIFIED       0x00    */
+#define BT_COD_MINOR_CELLULAR 0x04
+#define BT_COD_MINOR_CORDLESS 0x08
+#define BT_COD_MINOR_SMART_PHONE 0x0C
+/* wired modem or voice gatway */
+#define BT_COD_MINOR_WIRED_MDM_V_GTWY 0x10
+#define BT_COD_MINOR_ISDN_ACCESS 0x14
+
+/* minor device class field for LAN Access Point Major Class */
+/* Load Factor Field bit 5-7 */
+#define BT_COD_MINOR_FULLY_AVAILABLE 0x00
+#define BT_COD_MINOR_1_17_UTILIZED 0x20
+#define BT_COD_MINOR_17_33_UTILIZED 0x40
+#define BT_COD_MINOR_33_50_UTILIZED 0x60
+#define BT_COD_MINOR_50_67_UTILIZED 0x80
+#define BT_COD_MINOR_67_83_UTILIZED 0xA0
+#define BT_COD_MINOR_83_99_UTILIZED 0xC0
+#define BT_COD_MINOR_NO_SERVICE_AVAILABLE 0xE0
+/* sub-Field bit 2-4 */
+/* #define BTM_COD_MINOR_UNCLASSIFIED       0x00    */
+
+/* minor device class field for Audio/Video Major Class */
+/* #define BTM_COD_MINOR_UNCLASSIFIED       0x00    */
+#define BT_COD_MINOR_CONFM_HEADSET 0x04
+#define BT_COD_MINOR_CONFM_HANDSFREE 0x08
+#define BT_COD_MINOR_MICROPHONE 0x10
+#define BT_COD_MINOR_LOUDSPEAKER 0x14
+#define BT_COD_MINOR_HEADPHONES 0x18
+#define BT_COD_MINOR_PORTABLE_AUDIO 0x1C
+#define BT_COD_MINOR_CAR_AUDIO 0x20
+#define BT_COD_MINOR_SET_TOP_BOX 0x24
+#define BT_COD_MINOR_HIFI_AUDIO 0x28
+#define BT_COD_MINOR_VCR 0x2C
+#define BT_COD_MINOR_VIDEO_CAMERA 0x30
+#define BT_COD_MINOR_CAMCORDER 0x34
+#define BT_COD_MINOR_VIDEO_MONITOR 0x38
+#define BT_COD_MINOR_VIDDISP_LDSPKR 0x3C
+#define BT_COD_MINOR_VIDEO_CONFERENCING 0x40
+#define BT_COD_MINOR_GAMING_TOY 0x48
+
+/* minor device class field for Peripheral Major Class */
+/* Bits 6-7 independently specify mouse, keyboard, or combo mouse/keyboard */
+#define BT_COD_MINOR_KEYBOARD 0x40
+#define BT_COD_MINOR_POINTING 0x80
+#define BT_COD_MINOR_COMBO 0xC0
+/* Bits 2-5 OR'd with selection from bits 6-7 */
+/* #define BTM_COD_MINOR_UNCLASSIFIED       0x00    */
+#define BT_COD_MINOR_JOYSTICK 0x04
+#define BT_COD_MINOR_GAMEPAD 0x08
+#define BT_COD_MINOR_REMOTE_CONTROL 0x0C
+#define BT_COD_MINOR_SENSING_DEVICE 0x10
+#define BT_COD_MINOR_DIGITIZING_TABLET 0x14
+#define BT_COD_MINOR_CARD_READER 0x18 /* e.g. SIM card reader */
+#define BT_COD_MINOR_DIGITAL_PAN 0x1C
+#define BT_COD_MINOR_HAND_SCANNER 0x20
+#define BT_COD_MINOR_HAND_GESTURAL_INPUT 0x24
+
+/* minor device class field for Imaging Major Class */
+/* Bits 5-7 independently specify display, camera, scanner, or printer */
+#define BT_COD_MINOR_DISPLAY 0x10
+#define BT_COD_MINOR_CAMERA 0x20
+#define BT_COD_MINOR_SCANNER 0x40
+#define BT_COD_MINOR_PRINTER 0x80
+/* Bits 2-3 Reserved */
+/* #define BTM_COD_MINOR_UNCLASSIFIED       0x00    */
+
+/* minor device class field for Wearable Major Class */
+/* Bits 2-7 meaningful    */
+#define BT_COD_MINOR_WRIST_WATCH 0x04
+#define BT_COD_MINOR_PAGER 0x08
+#define BT_COD_MINOR_JACKET 0x0C
+#define BT_COD_MINOR_HELMET 0x10
+#define BT_COD_MINOR_GLASSES 0x14
+
+/* minor device class field for Toy Major Class */
+/* Bits 2-7 meaningful    */
+#define BT_COD_MINOR_ROBOT 0x04
+#define BT_COD_MINOR_VEHICLE 0x08
+#define BT_COD_MINOR_DOLL_ACTION_FIGURE 0x0C
+#define BT_COD_MINOR_CONTROLLER 0x10
+#define BT_COD_MINOR_GAME 0x14
+
+/* minor device class field for Health Major Class */
+/* Bits 2-7 meaningful    */
+#define BT_COD_MINOR_BLOOD_MONITOR 0x04
+#define BT_COD_MINOR_THERMOMETER 0x08
+#define BT_COD_MINOR_WEIGHING_SCALE 0x0C
+#define BT_COD_MINOR_GLUCOSE_METER 0x10
+#define BT_COD_MINOR_PULSE_OXIMETER 0x14
+#define BT_COD_MINOR_HEART_PULSE_MONITOR 0x18
+#define BT_COD_MINOR_HEALTH_DATA_DISPLAY 0x1C
+#define BT_COD_MINOR_STEP_COUNTER 0x20
+#define BT_COD_MINOR_BODY_COM_ANALYZER 0x24
+#define BT_COD_MINOR_PEAK_FLOW_MONITOR 0x28
+#define BT_COD_MINOR_MEDICATION_MONITOR 0x2C
+#define BT_COD_MINOR_KNEE_PROSTHESIS 0x30
+#define BT_COD_MINOR_ANKLE_PROSTHESIS 0x34
+
+/***************************
+ * major device class field
+ ***************************/
+#define BT_COD_MAJOR_MISCELLANEOUS 0x00
+#define BT_COD_MAJOR_COMPUTER 0x01
+#define BT_COD_MAJOR_PHONE 0x02
+#define BT_COD_MAJOR_LAN_ACCESS_PT 0x03
+#define BT_COD_MAJOR_AUDIO 0x04
+#define BT_COD_MAJOR_PERIPHERAL 0x05
+#define BT_COD_MAJOR_IMAGING 0x06
+#define BT_COD_MAJOR_WEARABLE 0x07
+#define BT_COD_MAJOR_TOY 0x08
+#define BT_COD_MAJOR_HEALTH 0x09
+#define BT_COD_MAJOR_UNCLASSIFIED 0x1F
+
+/***************************
+ * service class fields
+ ***************************/
+#define BT_COD_SERVICE_LMTD_DISCOVER 0x0020
+#define BT_COD_SERVICE_POSITIONING 0x0100
+#define BT_COD_SERVICE_NETWORKING 0x0200
+#define BT_COD_SERVICE_RENDERING 0x0400
+#define BT_COD_SERVICE_CAPTURING 0x0800
+#define BT_COD_SERVICE_OBJ_TRANSFER 0x1000
+#define BT_COD_SERVICE_AUDIO 0x2000
+#define BT_COD_SERVICE_TELEPHONY 0x4000
+#define BT_COD_SERVICE_INFORMATION 0x8000
+
+/* class of device field macros */
+#define BT_COD_FORMAT_TYPE(u8, pd) \
+  { (u8) = (pd)[2] & 0x03; }
+#define BT_COD_MINOR_CLASS(u8, pd) \
+  { (u8) = (pd)[2] & 0xFC; }
+#define BT_COD_MAJOR_CLASS(u8, pd) \
+  { (u8) = (pd)[1] & 0x1F; }
+#define BT_COD_SERVICE_CLASS(u16, pd) \
+  {                                    \
+    (u16) = (pd)[0];                   \
+    (u16) <<= 8;                       \
+    (u16) += (pd)[1] & 0xE0;           \
+  }
+
+/* to set the fields (assumes that format type is always 0) */
+#define FIELDS_TO_COD(pd, mn, mj, sv)                   \
+  {                                                     \
+    (pd)[2] = mn;                                       \
+    (pd)[1] = (mj) + ((sv)&BTM_COD_SERVICE_CLASS_LO_B); \
+    (pd)[0] = (sv) >> 8;                                \
+  }
+
+/* the COD masks */
+#define BT_COD_FORMAT_TYPE_MASK 0x03
+#define BT_COD_MINOR_CLASS_MASK 0xFC
+#define BT_COD_MAJOR_CLASS_MASK 0x1F
+#define BT_COD_SERVICE_CLASS_LO_B 0x00E0
+#define BT_COD_SERVICE_CLASS_MASK 0xFFE0
+
+#define BT_COD_TYPE_UNKNOW 0x00
+#define BT_COD_TYPE_HEADSET 0x01
+
 uint16_t bt_le_read_16(const uint8_t * buffer, int pos);
 uint32_t bt_le_read_24(const uint8_t * buffer, int pos);
 uint32_t bt_le_read_32(const uint8_t * buffer, int pos);
@@ -193,6 +373,6 @@ void bt_be_store_64(uint8_t *buffer,uint16_t pos,uint64_t value);
 uint32_t bt_atoi_spec_size(const uint8_t *str,uint8_t size);
 uint32_t bt_atoi(const uint8_t *str);
 void bt_hex_dump(uint8_t *data,uint32_t len);
-
+uint8_t bt_parse_cod(uint8_t cod[3],uint16_t *device_service,uint16_t * device_major,uint16_t *device_minor);
 #endif
 
