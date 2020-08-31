@@ -707,6 +707,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
+		HW_DEBUG("usage:%s\n",usage);
     return HW_ERR_SHELL_NO_CMD;
 }
 

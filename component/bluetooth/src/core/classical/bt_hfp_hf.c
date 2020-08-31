@@ -103,7 +103,7 @@ WM8978 WBS³öÉùÒô
 * static const uint8_t HF_AT_CGMM_RSP[] = "+CGMM:";	-->DONE
 * static const uint8_t HF_AT_CGMR_RSP[] = "+CGMR:";	-->DONE
 * static const uint8_t HF_AT_CGSN_RSP[] = "+CGSN:";	-->DONE
-************************ 3GPP  *************************************************************
+************************ 3GPP  *************************************************************/
 
 /* ÎÄµµ */
 /* BQB + ÎÄµµ */
@@ -972,6 +972,7 @@ static err_t hfp_hf_deactivate_ind_report(struct hfp_pcb_t *pcb)
     memset(pcb->indicator_enable_map,0,pcb->number_of_indicator);
     return hfp_hf_send(pcb,buffer, strlen((const char*)buffer));
 }
+
 
 static err_t hfp_hf_retrieve_can_hold_call(struct hfp_pcb_t *pcb)
 {

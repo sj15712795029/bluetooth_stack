@@ -160,6 +160,15 @@ typedef enum {
 } avrcp_operation_id_e;
 
 err_t avrcp_controller_init(void);
+err_t avrcp_controller_forward(void);
+err_t avrcp_controller_backward(void);
+err_t avrcp_controller_play(void);
+err_t avrcp_controller_stop(void);
+err_t avrcp_controller_pause(void);
+err_t avrcp_controller_get_element_attributes(uint8_t *element_attr, uint8_t element_size);
+err_t avrcp_controller_enable_notification(avrcp_notification_event_id_e event_id);
+err_t avrcp_controller_get_supported_company_ids(void);
+err_t avrcp_controller_get_supported_events(void);
 #endif
 
 

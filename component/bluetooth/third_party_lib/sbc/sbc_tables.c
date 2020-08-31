@@ -267,7 +267,7 @@ static const int32_t _anamatrix8[8] = {
 /*
  * Calculates the CRC-8 of the first len bits in data
  */
-static const uint8_t crc_table[256] = {
+volatile static const uint8_t crc_table[256] = {
 	0x00, 0x1D, 0x3A, 0x27, 0x74, 0x69, 0x4E, 0x53,
 	0xE8, 0xF5, 0xD2, 0xCF, 0x9C, 0x81, 0xA6, 0xBB,
 	0xCD, 0xD0, 0xF7, 0xEA, 0xB9, 0xA4, 0x83, 0x9E,
@@ -303,7 +303,7 @@ static const uint8_t crc_table[256] = {
 };
 
 /* A2DP specification: Appendix B, page 69 */
-static const int sbc_offset4[4][4] = {
+volatile static const int sbc_offset4[4][4] = {
 	{ -1, 0, 0, 0 },
 	{ -2, 0, 0, 1 },
 	{ -2, 0, 0, 1 },
@@ -311,7 +311,7 @@ static const int sbc_offset4[4][4] = {
 };
 
 /* A2DP specification: Appendix B, page 69 */
-static const int sbc_offset8[4][8] = {
+volatile static const int sbc_offset8[4][8] = {
 	{ -2, 0, 0, 0, 0, 0, 0, 1 },
 	{ -3, 0, 0, 0, 0, 0, 1, 2 },
 	{ -4, 0, 0, 0, 0, 0, 1, 2 },

@@ -4,6 +4,7 @@
 #include "bt_hfp_hf.h"
 #include "bt_pbap_client.h"
 #include "bt_avrcp_controller.h"
+#include "bt_spp.h"
 #include "bt_common.h"
 
 #define LINK_KEY_MAX 10

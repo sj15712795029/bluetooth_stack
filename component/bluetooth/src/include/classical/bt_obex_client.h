@@ -99,6 +99,7 @@ struct obex_pcb_t
 err_t obex_header_para_append(uint8_t hdr_id,uint8_t *hdr_data,uint8_t hdr_data_len);
 err_t obex_client_connect(struct rfcomm_pcb_t *rfcommpcb,obex_client_cbs_t *cb,uint16_t mtu,uint8_t scn);
 err_t obex_client_get(struct rfcomm_pcb_t *rfcommpcb);
+err_t obex_client_setpath(struct rfcomm_pcb_t *rfcommpcb);
 
 extern struct obex_pcb_t *obex_active_pcbs;  /* List of all active PBAP PCBs */
 extern struct obex_pcb_t *obex_tmp_pcb;
@@ -119,7 +120,5 @@ extern struct obex_pcb_t *obex_tmp_pcb;
                             } \
                             npcb->next = NULL; \
                             } while(0)
-
-														
 #endif
-														
+
