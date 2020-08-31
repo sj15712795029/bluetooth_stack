@@ -88,7 +88,7 @@ static err_t bt_ass_eir_data()
     eir_data[data_pos++] = (DID_VERSION_ID_VALUE>>8) & 0xff;
 #endif
 
-	return 0;
+    return 0;
 }
 
 static err_t bt_inquiry_complete(struct hci_pcb_t *pcb,uint16_t result);
@@ -130,8 +130,8 @@ err_t bt_stack_worked(void *arg)
     printf("bt_stack_worked\r\n");
     bt_ass_eir_data();
     hci_write_eir(eir_data);
-	
-	return 0;
+
+    return 0;
 }
 
 #if PROFILE_SPP_ENABLE
@@ -415,17 +415,17 @@ uint8_t bt_start(void)
 {
 #if PROFILE_HFP_ENABLE
     uint16_t hf_feature = HFP_HFSF_EC_NR_FUNCTION |  HFP_HFSF_THREE_WAY_CALLING|
-                       HFP_HFSF_CLI_PRESENTATION_CAPABILITY | HFP_HFSF_VOICE_RECOGNITION_FUNCTION |
-                       HFP_HFSF_REMOTE_VOLUME_CONTROL |HFP_HFSF_ENHANCED_CALL_STATUS |
-                       HFP_HFSF_ENHANCED_CALL_CONTROL | HFP_HFSF_CODEC_NEGOTIATION|
-                       HFP_HFSF_HF_INDICATORS |HFP_HFSF_ESCO_S4;
+                          HFP_HFSF_CLI_PRESENTATION_CAPABILITY | HFP_HFSF_VOICE_RECOGNITION_FUNCTION |
+                          HFP_HFSF_REMOTE_VOLUME_CONTROL |HFP_HFSF_ENHANCED_CALL_STATUS |
+                          HFP_HFSF_ENHANCED_CALL_CONTROL | HFP_HFSF_CODEC_NEGOTIATION|
+                          HFP_HFSF_HF_INDICATORS |HFP_HFSF_ESCO_S4;
 #endif
 
     bt_mem_init();
     bt_memp_init();
     phybusif_open(115200,0);
 #if BT_ENABLE_SNOOP > 0
-	bt_snoop_init();
+    bt_snoop_init();
 #endif
     /* blueooth stack init */
     hci_init();
@@ -448,7 +448,7 @@ uint8_t bt_start(void)
     //hfp_hf_init(hf_feature,HFP_HF_SDP_SUPPORT_WBS,&hfp_hf_wrapper_cb);
 #endif
 #if PROFILE_PBAP_ENABLE
-	pbap_client_init(&pbap_client_wrapper_cb);
+    pbap_client_init(&pbap_client_wrapper_cb);
 #endif
 #if PROFILE_A2DP_ENABLE
     a2dp_sink_init();
@@ -457,10 +457,10 @@ uint8_t bt_start(void)
     avrcp_controller_init();
 #endif
 
-	phybusif_reset(&uart_if);
+    phybusif_reset(&uart_if);
     hci_reset();
 
-    
+
     return 0;
 }
 
@@ -489,72 +489,72 @@ uint8_t bt_stop_inquiry(void)
 
 uint8_t hci_start_periodic_inquiry(uint16_t min_length,uint16_t max_length,uint8_t inquiry_len,uint8_t max_dev)
 {
-	uint32_t lap =  0x9E8B33;    /* GIAC */
-	hci_periodic_inquiry(min_length,max_length,lap,inquiry_len,max_dev,bt_inquiry_result,bt_inquiry_complete);
+    uint32_t lap =  0x9E8B33;    /* GIAC */
+    hci_periodic_inquiry(min_length,max_length,lap,inquiry_len,max_dev,bt_inquiry_result,bt_inquiry_complete);
 
-	return 0;
+    return 0;
 }
 uint8_t bt_stop_periodic_inquiry(void)
 {
-	hci_cancel_periodic_inquiry();
-	return 0;
+    hci_cancel_periodic_inquiry();
+    return 0;
 }
 
 uint8_t bt_get_remote_name(struct bd_addr_t *bdaddr)
 {
-	hci_get_remote_name(bdaddr,bt_get_remote_name_complete);
-	return 0;
+    hci_get_remote_name(bdaddr,bt_get_remote_name_complete);
+    return 0;
 }
 
 
 uint8_t bt_cancel_get_remote_name(struct bd_addr_t *bdaddr)
 {
-	hci_cancel_get_remote_name(bdaddr);
-	return 0;
+    hci_cancel_get_remote_name(bdaddr);
+    return 0;
 }
 
 uint8_t bt_le_inquiry(uint8_t enable)
 {
-	hci_set_le_scan_enable(enable,0);
-	return 0;
+    hci_set_le_scan_enable(enable,0);
+    return 0;
 }
 
 
 
 static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres)
 {
-	if(inqres != NULL)
-        {
-            printf("ires->psrm %d\nires->psm %d\nires->co %d\n", inqres->psrm, inqres->psm, inqres->co);
-            printf("ires->bdaddr %02x:%02x:%02x:%02x:%02x:%02x\n",
-                   inqres->bdaddr.addr[5], inqres->bdaddr.addr[4], inqres->bdaddr.addr[3],
-                   inqres->bdaddr.addr[2], inqres->bdaddr.addr[1], inqres->bdaddr.addr[0]);
-		printf("inqres->rssi %d\n",inqres->rssi);
-		printf("inqres->remote_name %s\n",inqres->remote_name);
-        }
+    if(inqres != NULL)
+    {
+        printf("ires->psrm %d\nires->psm %d\nires->co %d\n", inqres->psrm, inqres->psm, inqres->co);
+        printf("ires->bdaddr %02x:%02x:%02x:%02x:%02x:%02x\n",
+               inqres->bdaddr.addr[5], inqres->bdaddr.addr[4], inqres->bdaddr.addr[3],
+               inqres->bdaddr.addr[2], inqres->bdaddr.addr[1], inqres->bdaddr.addr[0]);
+        printf("inqres->rssi %d\n",inqres->rssi);
+        printf("inqres->remote_name %s\n",inqres->remote_name);
+    }
 
-	return BT_ERR_OK;
+    return BT_ERR_OK;
 }
 
 static err_t bt_inquiry_complete(struct hci_pcb_t *pcb,uint16_t result)
 {
-	if(result == HCI_SUCCESS)
+    if(result == HCI_SUCCESS)
     {
-    	printf("Inquiry complete success\n");
+        printf("Inquiry complete success\n");
     }
-	else
-	{
-		printf("Inquiry complete fail\n");
-	}
-	return BT_ERR_OK;
+    else
+    {
+        printf("Inquiry complete fail\n");
+    }
+    return BT_ERR_OK;
 }
 
 static err_t bt_get_remote_name_complete(struct hci_pcb_t *pcb,struct bd_addr_t *bdaddr,uint8_t * name)
 {
-	printf("---------bt_address:\n");
-	bt_hex_dump(bdaddr,6);
-	printf("---------bt_name:\n");
-	bt_hex_dump(name,248);
-	return BT_ERR_OK;
+    printf("---------bt_address:\n");
+    bt_hex_dump(bdaddr,6);
+    printf("---------bt_name:\n");
+    bt_hex_dump(name,248);
+    return BT_ERR_OK;
 }
 

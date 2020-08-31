@@ -51,7 +51,7 @@ extern "C" {
 
 /* Error Message */
 #define EIO		5
-#define ENOMEM	12
+#define ENOMEM_SBC	12
 #define ENOSPC	28
 
 struct sbc_struct {

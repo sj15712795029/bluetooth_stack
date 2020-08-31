@@ -62,12 +62,14 @@ err_t pbap_app_para_append(uint8_t para_id,uint8_t *para_data,uint8_t para_data_
     pbap_app_para[pbap_app_para_offset++] = para_data_len;
     memcpy(pbap_app_para+pbap_app_para_offset,para_data,para_data_len);
     pbap_app_para_offset += para_data_len;
+	return BT_ERR_OK;
 }
 
 err_t pbap_app_para_reset()
 {
     memset(pbap_app_para,0,PBAP_APP_PARA_MAX_SIZE);
     pbap_app_para_offset = 0;
+	return BT_ERR_OK;
 }
 
 
@@ -134,6 +136,8 @@ err_t pbap_client_download_phonebook(struct bd_addr_t *addr,uint8_t repositories
 
     pbappcb->state = PBAP_OPERATE_PULL_PHONEBOOK;
     pbap_client_pull_phone_book(pbappcb,repositories,type,0xffff,0x0,PBAP_PROPERTY_MASK_DEFAULT,PBAP_VCARD_FORMAT3_0);
+
+	return BT_ERR_OK;
 }
 
 err_t pbap_client_query_phonebook_size(struct bd_addr_t *addr,uint8_t repositories,uint8_t type)
@@ -144,6 +148,8 @@ err_t pbap_client_query_phonebook_size(struct bd_addr_t *addr,uint8_t repositori
 
     pbappcb->state = PBAP_OPERATE_QUERY_PHONEBOOK_SIZE;
     pbap_client_pull_phone_book(pbappcb,repositories,type,0x0,0x0,PBAP_PROPERTY_MASK_DEFAULT,PBAP_VCARD_FORMAT3_0);
+		
+		return BT_ERR_OK;
 
 }
 
@@ -191,31 +197,33 @@ err_t pbap_client_set_path(struct bd_addr_t *addr,uint8_t repositories,uint8_t t
             sprintf((char *)name_string_temp, "%s/%s/%s", pbap_sim_repositories,pbap_telecom_repositories,pbap_pb_name);
             break;
         case PB_INCOMING_BOOK_TYPE:
-            sprintf((char *)name_string_temp, "%s/%s/%s", pbap_sim_repositories,pbap_telecom_repositories,pbap_ich_name,pbap_vcard_suffix);
+            sprintf((char *)name_string_temp, "%s/%s/%s/%s", pbap_sim_repositories,pbap_telecom_repositories,pbap_ich_name,pbap_vcard_suffix);
             break;
         case PB_OUTGOING_BOOK_TYPE:
-            sprintf((char *)name_string_temp, "%s/%s/%s", pbap_sim_repositories,pbap_telecom_repositories,pbap_och_name,pbap_vcard_suffix);
+            sprintf((char *)name_string_temp, "%s/%s/%s/%s", pbap_sim_repositories,pbap_telecom_repositories,pbap_och_name,pbap_vcard_suffix);
             break;
         case PB_MISSING_BOOK_TYPE:
-            sprintf((char *)name_string_temp, "%s/%s/%s", pbap_sim_repositories,pbap_telecom_repositories,pbap_mch_name,pbap_vcard_suffix);
+            sprintf((char *)name_string_temp, "%s/%s/%s/%s", pbap_sim_repositories,pbap_telecom_repositories,pbap_mch_name,pbap_vcard_suffix);
             break;
         case PB_COMBINE_BOOK_TYPE:
-            sprintf((char *)name_string_temp, "%s/%s/%s", pbap_sim_repositories,pbap_telecom_repositories,pbap_cch_name,pbap_vcard_suffix);
+            sprintf((char *)name_string_temp, "%s/%s/%s/%s", pbap_sim_repositories,pbap_telecom_repositories,pbap_cch_name,pbap_vcard_suffix);
             break;
         default:
             break;
         }
     }
-    for(index = 0; index < strlen(name_string_temp) + 1; index++)
+    for(index = 0; index < strlen((const char *)name_string_temp) + 1; index++)
     {
         name_string[index*2] = 0;
         name_string[index*2+1] = name_string_temp[index];
     }
-    obex_header_para_append(OBEX_HEADER_NAME,name_string,(strlen(name_string_temp) + 1)*2);
+    obex_header_para_append(OBEX_HEADER_NAME,name_string,(strlen((const char *)name_string_temp) + 1)*2);
 
     pbappcb->current_repositories = repositories;
     pbappcb->current_type = type;
     obex_client_setpath(pbappcb->rfcommpcb);
+
+	return BT_ERR_OK;
 
 }
 
@@ -236,6 +244,8 @@ err_t pbap_client_download_vcard_list(struct bd_addr_t *addr,uint8_t repositorie
     obex_header_para_append(OBEX_HEADER_NAME,NULL,0);
 
     obex_client_get(pbappcb->rfcommpcb);
+
+	return BT_ERR_OK;
 }
 
 err_t pbap_client_download_vcard_entry(struct bd_addr_t *addr,uint8_t repositories,uint8_t type,uint16_t entry_number)
@@ -255,26 +265,29 @@ err_t pbap_client_download_vcard_entry(struct bd_addr_t *addr,uint8_t repositori
     obex_header_para_append(OBEX_HEADER_CONNECTION_ID,(uint8_t *)&(pbappcb->cid),sizeof(pbappcb->cid));
     obex_header_para_append(OBEX_HEADER_TYPE,(uint8_t *)pbap_vcardentry_type,sizeof(pbap_vcardentry_type));
     sprintf((char *)name_string_temp, "%d%s", entry_number,pbap_vcard_suffix);
-    for(index = 0; index < strlen(name_string_temp) + 1; index++)
+    for(index = 0; index < strlen((const char *)name_string_temp) + 1; index++)
     {
         name_string[index*2] = 0;
         name_string[index*2+1] = name_string_temp[index];
     }
-    obex_header_para_append(OBEX_HEADER_NAME,name_string,(strlen(name_string_temp) + 1)*2);
+    obex_header_para_append(OBEX_HEADER_NAME,name_string,(strlen((const char *)name_string_temp) + 1)*2);
 
     obex_client_get(pbappcb->rfcommpcb);
+
+	return BT_ERR_OK;
 
 }
 
 err_t pbap_client_download_abort(struct bd_addr_t *addr)
 {
-
+	return BT_ERR_OK;
 }
 
 err_t pbap_client_pull_next(struct pbap_pcb_t *pcb)
 {
     obex_header_para_append(OBEX_HEADER_CONNECTION_ID,(uint8_t *)&(pcb->cid),sizeof(pcb->cid));
     obex_client_get(pcb->rfcommpcb);
+	return BT_ERR_OK;
 }
 
 
@@ -333,13 +346,13 @@ err_t pbap_client_pull_phone_book(struct pbap_pcb_t *pcb,uint8_t repositories,ui
         }
     }
 
-    for(index = 0; index < strlen(name_string_temp) + 1; index++)
+    for(index = 0; index < strlen((const char *)name_string_temp) + 1; index++)
     {
         name_string[index*2] = 0;
         name_string[index*2+1] = name_string_temp[index];
     }
 
-    obex_header_para_append(OBEX_HEADER_NAME,name_string,(strlen(name_string_temp) + 1)*2);
+    obex_header_para_append(OBEX_HEADER_NAME,name_string,(strlen((const char *)name_string_temp) + 1)*2);
     /* PBAP app para ass */
     pbap_app_para_append(PBAP_APP_PARAM_MAX_LIST_COUNT,(uint8_t *)&count,sizeof(count));
 
@@ -362,6 +375,8 @@ err_t pbap_client_pull_phone_book(struct pbap_pcb_t *pcb,uint8_t repositories,ui
     pbap_app_para_reset();
 
     obex_client_get(pcb->rfcommpcb);
+
+	return BT_ERR_OK;
 }
 
 void obex_client_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status,uint32_t cid)

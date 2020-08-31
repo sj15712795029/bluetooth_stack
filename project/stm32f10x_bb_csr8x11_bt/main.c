@@ -48,7 +48,7 @@ void bt_app_init_result(uint8_t status,uint16_t profile_mask)
 {
     uint8_t profile_mask_buf[8] = {0};
     printf("bt_app_init_result(%d) profile_mask(0x%x)\n",status,profile_mask);
-    sprintf(profile_mask_buf,"%x",profile_mask);
+    sprintf((char *)profile_mask_buf,"%x",profile_mask);
     uart_send_json("BT","BT_START",status==0?(uint8_t*)"SUCCESS":(uint8_t*)"FAIL",profile_mask_buf,0,0,0,0);
 }
 
@@ -62,17 +62,13 @@ void bt_app_inquiry_result(struct bd_addr_t *address,uint8_t dev_type,uint8_t *n
 {
 	uint8_t address_buf[16] = {0};
 	uint8_t device_type_buf[16] = {0};
-    printf("bt_inquiry_result address:");
-    bt_hex_dump(address,BD_ADDR_LEN);
-    printf("\n device type %d\n",dev_type);
-    printf("bt name(%s)\n",name);
 
-	sprintf(address_buf,"%02x:%02x:%02x:%02x:%02x:%02x",address->addr[0],address->addr[1],address->addr[2],\
+	sprintf((char *)address_buf,"%02x:%02x:%02x:%02x:%02x:%02x",address->addr[0],address->addr[1],address->addr[2],\
 		address->addr[3],address->addr[4],address->addr[5]);
 	if(dev_type == BT_COD_TYPE_HEADSET)
-		sprintf(device_type_buf,"%s","HEADSET");
+		sprintf((char *)device_type_buf,"%s","HEADSET");
 	else
-		sprintf(device_type_buf,"%s","UNKNOW");
+		sprintf((char *)device_type_buf,"%s","UNKNOW");
 	uart_send_json("BT","BT_INQUIRY_RESULT",(uint8_t*)"SUCCESS",address_buf,device_type_buf,name,0,0);
 }
 

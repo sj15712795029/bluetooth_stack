@@ -357,7 +357,7 @@ err_t avrcp_controller_input(struct bt_pbuf_t *p)
     }
     case AVRCP_CMD_OPCODE_PASS_THROUGH:
     {
-        avrcp_operation_id_e id = data[3];
+        avrcp_operation_id_e id = (avrcp_operation_id_e)data[3];
         if(wait_press_resp == 1)
             avrcp_controller_pass_through_realease_cmd(id);
         break;

@@ -136,7 +136,7 @@ typedef err_t (*avdtp_event_handle)(struct avdtp_pcb_t *pcb,uint32_t msg_id,stru
 typedef err_t (*avdtp_media_handle)(struct avdtp_pcb_t *pcb,struct bt_pbuf_t *p);
 err_t avdtp_init(avdtp_event_handle avdtp_evt_handle,avdtp_media_handle avdtp_media_handle);
 err_t avdtp_create_sep(uint8_t * media_codec_info, uint16_t media_codec_info_len);
-
+uint8_t *avdtp_get_spec_cap_value(uint8_t category_id,uint8_t *cap,uint16_t cap_len,uint16_t *spec_cap_len);
 
 extern struct avdtp_sep_t *avdtp_local_sep; /* List of all active avdtp seps */
 extern struct avdtp_sep_t *avdtp_tmp_sep;      /* Only used for temporary storage. */

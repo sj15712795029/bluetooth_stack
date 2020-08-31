@@ -23,5 +23,6 @@ typedef size_t mem_size_t;
 
 #endif
 
+void* bt_mem_trim(void *mem, mem_size_t size);
 
 #endif

@@ -94,7 +94,7 @@ static err_t  link_key_req(void *arg,struct bd_addr_t *bdaddr)
     bt_hex_dump(bdaddr->addr,6);
     if(bd_addr_cmp(&(link_key_instance.remote_addr),bdaddr))
     {
-        hci_link_key_request_reply(bdaddr,&(link_key_instance.link_key));
+        hci_link_key_request_reply(bdaddr,link_key_instance.link_key);
     }
     else
     {

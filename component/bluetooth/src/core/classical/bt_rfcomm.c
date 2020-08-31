@@ -102,6 +102,8 @@ void rfcomm_tmr(void)
     struct rfcomm_pcb_t *pcb, *tpcb;
     err_t ret = BT_ERR_OK;
 
+	BT_UNUSED_ARG(ret);
+
     /* Step through all of the active pcbs */
     for(pcb = rfcomm_active_pcbs; pcb != NULL; pcb = pcb->next)
     {
@@ -859,6 +861,8 @@ void rfcomm_process_msg(struct rfcomm_pcb_t *pcb, struct rfcomm_hdr_t *rfcommhdr
     struct rfcomm_pcb_listen_t *lpcb; /* Listen pcb */
     struct bt_pbuf_t *q;
     err_t ret = BT_ERR_OK;
+	
+	BT_UNUSED_ARG(ret);
     cmdhdr = p->payload;
     bt_pbuf_header(p, -RFCOMM_MSGHDR_LEN);
 
@@ -1206,6 +1210,7 @@ err_t rfcomm_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p,
     struct bt_pbuf_t *q;
       err_t ret = BT_ERR_OK;
 
+		BT_UNUSED_ARG(ret);
     rfcommhdr.addr = *((uint8_t *)p->payload);
     rfcommhdr.ctrl = ((uint8_t *)p->payload)[1];
 

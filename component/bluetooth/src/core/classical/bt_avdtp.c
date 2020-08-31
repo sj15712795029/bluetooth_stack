@@ -28,7 +28,7 @@ static err_t avdtp_connect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err);
 static err_t avdtp_disconnect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err);
 err_t avdtp_signal_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err);
 err_t avdtp_media_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err);
-uint8_t *avdtp_get_spec_cap_value(uint8_t category_id,uint8_t *cap,uint16_t cap_len,uint16_t *spec_cap_len);
+
 
 struct avdtp_pcb_t *avdtp_new()
 {

@@ -216,6 +216,11 @@ static err_t a2dp_sinks_media_handle(struct avdtp_pcb_t *pcb,struct bt_pbuf_t *p
     uint8_t last_packet = (data[0] >> 5) & 0x1;
     uint8_t num_frames = data[0] & 0xf;
 
+	BT_UNUSED_ARG(frame_index);
+	BT_UNUSED_ARG(fragmentation);
+	BT_UNUSED_ARG(starting_packet);
+	BT_UNUSED_ARG(last_packet);
+	BT_UNUSED_ARG(num_frames);
     data += 1;
     data_len -= 1;
 

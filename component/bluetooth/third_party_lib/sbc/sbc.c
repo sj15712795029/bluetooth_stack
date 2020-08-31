@@ -1278,9 +1278,9 @@ int sbc_init(sbc_t *sbc, unsigned long flags)
 	memset(sbc, 0, sizeof(sbc_t));
 
 	/* NOTED:size is big ,so need heap size > 0x1590 */
-	sbc->priv_alloc_base = malloc(sizeof(struct sbc_priv) + SBC_ALIGN_MASK);
+	sbc->priv_alloc_base = (void *)malloc(sizeof(struct sbc_priv) + SBC_ALIGN_MASK);
 	if (!sbc->priv_alloc_base)
-		return -ENOMEM;
+		return -ENOMEM_SBC;
 
 	sbc->priv = (void *) (((uintptr_t) sbc->priv_alloc_base +
 			SBC_ALIGN_MASK) & ~((uintptr_t) SBC_ALIGN_MASK));
