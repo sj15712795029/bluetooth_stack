@@ -15,6 +15,8 @@ uint32_t last_sys_time = 0;
 
 #define CONF_BSP_TICKS_PER_SEC 100
 
+struct bd_addr_t connect_addr;
+
 uint8_t uart_send_json(uint8_t *func,uint8_t *operate,uint8_t *status,uint8_t *para1,uint8_t *para2,uint8_t *para3,uint8_t *para4,uint8_t *para5)
 {
     uint8_t *bt_status_string;
@@ -55,28 +57,52 @@ void bt_app_init_result(uint8_t status,uint16_t profile_mask)
 void bt_app_inquiry_status(uint8_t status)
 {
     printf("bt_inquiry_status %d\n",status);
-	uart_send_json("BT","BT_INQUIRY_STATUS",(uint8_t*)"SUCCESS",status==0?(uint8_t*)"START":(uint8_t*)"STOP",0,0,0,0);
+    uart_send_json("BT","BT_INQUIRY_STATUS",(uint8_t*)"SUCCESS",status==0?(uint8_t*)"START":(uint8_t*)"STOP",0,0,0,0);
 }
 
 void bt_app_inquiry_result(struct bd_addr_t *address,uint8_t dev_type,uint8_t *name)
 {
-	uint8_t address_buf[16] = {0};
-	uint8_t device_type_buf[16] = {0};
+    uint8_t address_buf[16] = {0};
+    uint8_t device_type_buf[16] = {0};
 
-	sprintf((char *)address_buf,"%02x:%02x:%02x:%02x:%02x:%02x",address->addr[0],address->addr[1],address->addr[2],\
-		address->addr[3],address->addr[4],address->addr[5]);
-	if(dev_type == BT_COD_TYPE_HEADSET)
-		sprintf((char *)device_type_buf,"%s","HEADSET");
-	else
-		sprintf((char *)device_type_buf,"%s","UNKNOW");
-	uart_send_json("BT","BT_INQUIRY_RESULT",(uint8_t*)"SUCCESS",address_buf,device_type_buf,name,0,0);
+    sprintf((char *)address_buf,"%02x:%02x:%02x:%02x:%02x:%02x",address->addr[0],address->addr[1],address->addr[2],\
+            address->addr[3],address->addr[4],address->addr[5]);
+    if(dev_type == BT_COD_TYPE_HEADSET)
+        sprintf((char *)device_type_buf,"%s","HEADSET");
+    else
+        sprintf((char *)device_type_buf,"%s","UNKNOW");
+    uart_send_json("BT","BT_INQUIRY_RESULT",(uint8_t*)"SUCCESS",address_buf,device_type_buf,name,0,0);
 }
 
-static bt_cb_t bt_app_cb =
+static bt_app_common_cb_t bt_app_common_cb =
 {
     bt_app_init_result,
     bt_app_inquiry_status,
     bt_app_inquiry_result,
+};
+
+void bt_app_hfp_connect(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("bt_app_hfp_connect status %d address:\n",status);
+    bt_hex_dump(remote_addr->addr,6);
+    connect_addr.addr[5] = remote_addr->addr[5];
+    connect_addr.addr[4] = remote_addr->addr[4];
+    connect_addr.addr[3] = remote_addr->addr[3];
+    connect_addr.addr[2] = remote_addr->addr[2];
+    connect_addr.addr[1] = remote_addr->addr[1];
+    connect_addr.addr[0] = remote_addr->addr[0];
+}
+
+
+static bt_app_hfp_cb_t bt_app_hfp_cb =
+{
+    bt_app_hfp_connect,
+};
+
+static bt_app_cb_t bt_app_cb =
+{
+    &bt_app_common_cb,
+    &bt_app_hfp_cb,
 };
 
 static const uint8_t usage[]=
@@ -124,21 +150,6 @@ uint8_t shell_json_parse(uint8_t *operate_value,
 uint8_t shell_at_cmd_parse(uint8_t *shell_string)
 {
 
-    struct bd_addr_t oppo_addr;
-    oppo_addr.addr[5] = 0x9c;
-    oppo_addr.addr[4] = 0x0c;
-    oppo_addr.addr[3] = 0xdf;
-    oppo_addr.addr[2] = 0x24;
-    oppo_addr.addr[1] = 0x7f;
-    oppo_addr.addr[0] = 0x0a;
-
-    struct bd_addr_t iphone_addr;
-    iphone_addr.addr[5] = 0x94;
-    iphone_addr.addr[4] = 0xbf;
-    iphone_addr.addr[3] = 0x2d;
-    iphone_addr.addr[2] = 0x51;
-    iphone_addr.addr[1] = 0xb2;
-    iphone_addr.addr[0] = 0x0e;
 
     if(hw_strcmp("BT_START",(const char*)shell_string) == 0)
     {
@@ -175,7 +186,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     if(hw_strcmp("SPP_SEND",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate bt stop\n");
-        spp_send_data(&oppo_addr,"111111",hw_strlen("111111"));
+        spp_send_data(&connect_addr,"111111",hw_strlen("111111"));
         return HW_ERR_OK;
     }
 
@@ -183,7 +194,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate spp CON\n");
 
-        spp_connect(&oppo_addr);
+        spp_connect(&connect_addr);
         return HW_ERR_OK;
     }
 
@@ -191,7 +202,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate spp DISCON\n");
 
-        spp_disconnect(&oppo_addr);
+        spp_disconnect(&connect_addr);
         return HW_ERR_OK;
     }
 
@@ -199,7 +210,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP CON\n");
 
-        pbap_client_connect(&oppo_addr);
+        pbap_client_connect(&connect_addr);
         return HW_ERR_OK;
     }
 
@@ -207,7 +218,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP DISCON\n");
 
-        pbap_client_disconnect(&oppo_addr);
+        pbap_client_disconnect(&connect_addr);
         return HW_ERR_OK;
     }
 
@@ -215,7 +226,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_LPB\n");
 
-        pbap_client_download_phonebook(&oppo_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE);
+        pbap_client_download_phonebook(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE);
         return HW_ERR_OK;
     }
 
@@ -223,7 +234,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_LI\n");
 
-        pbap_client_download_phonebook(&oppo_addr,PB_LOCAL_REPOSITORY,PB_INCOMING_BOOK_TYPE);
+        pbap_client_download_phonebook(&connect_addr,PB_LOCAL_REPOSITORY,PB_INCOMING_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
@@ -231,7 +242,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_LI\n");
 
-        pbap_client_download_phonebook(&oppo_addr,PB_LOCAL_REPOSITORY,PB_OUTGOING_BOOK_TYPE);
+        pbap_client_download_phonebook(&connect_addr,PB_LOCAL_REPOSITORY,PB_OUTGOING_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
@@ -239,7 +250,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_LI\n");
 
-        pbap_client_download_phonebook(&oppo_addr,PB_LOCAL_REPOSITORY,PB_MISSING_BOOK_TYPE);
+        pbap_client_download_phonebook(&connect_addr,PB_LOCAL_REPOSITORY,PB_MISSING_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
@@ -247,7 +258,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_LI\n");
 
-        pbap_client_download_phonebook(&oppo_addr,PB_LOCAL_REPOSITORY,PB_COMBINE_BOOK_TYPE);
+        pbap_client_download_phonebook(&connect_addr,PB_LOCAL_REPOSITORY,PB_COMBINE_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
@@ -255,7 +266,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_LPB\n");
 
-        pbap_client_query_phonebook_size(&oppo_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE);
+        pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE);
         return HW_ERR_OK;
     }
 
@@ -263,7 +274,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_LI\n");
 
-        pbap_client_query_phonebook_size(&oppo_addr,PB_LOCAL_REPOSITORY,PB_INCOMING_BOOK_TYPE);
+        pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_INCOMING_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
@@ -271,7 +282,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_LI\n");
 
-        pbap_client_query_phonebook_size(&oppo_addr,PB_LOCAL_REPOSITORY,PB_OUTGOING_BOOK_TYPE);
+        pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_OUTGOING_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
@@ -279,7 +290,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_LI\n");
 
-        pbap_client_query_phonebook_size(&oppo_addr,PB_LOCAL_REPOSITORY,PB_MISSING_BOOK_TYPE);
+        pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_MISSING_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
@@ -287,7 +298,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_LI\n");
 
-        pbap_client_query_phonebook_size(&oppo_addr,PB_LOCAL_REPOSITORY,PB_COMBINE_BOOK_TYPE);
+        pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_COMBINE_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
@@ -295,7 +306,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_LPB\n");
 
-        pbap_client_set_path(&oppo_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE);
+        pbap_client_set_path(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE);
         return HW_ERR_OK;
     }
 
@@ -303,7 +314,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_LPB\n");
 
-        pbap_client_download_vcard_list(&oppo_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE);
+        pbap_client_download_vcard_list(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE);
         return HW_ERR_OK;
     }
 
@@ -311,7 +322,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_LPB\n");
 
-        pbap_client_download_vcard_entry(&oppo_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE,1);
+        pbap_client_download_vcard_entry(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE,1);
         return HW_ERR_OK;
     }
 
@@ -320,7 +331,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate HFP CON\n");
 
-        hfp_hf_connect(&oppo_addr);
+        hfp_hf_connect(&connect_addr);
         return HW_ERR_OK;
     }
 
@@ -328,7 +339,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate HFP DISCON\n");
 
-        hfp_hf_disconnect(&oppo_addr);
+        hfp_hf_disconnect(&connect_addr);
         return HW_ERR_OK;
     }
 
@@ -336,7 +347,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate HFP SCO CON\n");
 
-        hfp_hf_audio_connect(&oppo_addr);
+        hfp_hf_audio_connect(&connect_addr);
         return HW_ERR_OK;
     }
 
@@ -344,7 +355,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate HFP SCO DISCON\n");
 
-        hfp_hf_audio_disconnect(&oppo_addr);
+        hfp_hf_audio_disconnect(&connect_addr);
         return HW_ERR_OK;
     }
 
@@ -352,56 +363,56 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate HFP ANSWER INCOMING CALL\n");
 
-        hfp_hf_answer_incoming_call(&oppo_addr);
+        hfp_hf_answer_incoming_call(&connect_addr);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_CALLOUT_PN",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate call out number\n");
-        hfp_hf_callout_with_phone_number(&oppo_addr,"10086");
+        hfp_hf_callout_with_phone_number(&connect_addr,"10086");
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_CALLOUT_MEM",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate bt stop\n");
-        hfp_hf_callout_with_memory(&oppo_addr,1);
+        hfp_hf_callout_with_memory(&connect_addr,1);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_CALLOUT_LC",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate bt stop\n");
-        hfp_hf_callout_with_last_number(&oppo_addr);
+        hfp_hf_callout_with_last_number(&connect_addr);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_WN",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate call wait enable\n");
-        hfp_hf_set_call_waiting_notification(&oppo_addr,1);
+        hfp_hf_set_call_waiting_notification(&connect_addr,1);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_WD",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate call wait disenable\n");
-        hfp_hf_set_call_waiting_notification(&oppo_addr,0);
+        hfp_hf_set_call_waiting_notification(&connect_addr,0);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_CLIE",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate CLI enable\n");
-        hfp_hf_set_call_line_identification_notification(&oppo_addr,1);
+        hfp_hf_set_call_line_identification_notification(&connect_addr,1);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_CLID",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate CLI disable\n");
-        hfp_hf_set_call_line_identification_notification(&oppo_addr,0);
+        hfp_hf_set_call_line_identification_notification(&connect_addr,0);
         return HW_ERR_OK;
     }
 
@@ -409,56 +420,56 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     if(hw_strcmp("HFP_NRECD",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate CLI disable\n");
-        hfp_hf_disable_ag_nrec(&oppo_addr);
+        hfp_hf_disable_ag_nrec(&connect_addr);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_VGE",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate CLI enable\n");
-        hfp_hf_set_voice_recognition(&oppo_addr,1);
+        hfp_hf_set_voice_recognition(&connect_addr,1);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_VGD",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate CLI disable\n");
-        hfp_hf_set_voice_recognition(&oppo_addr,0);
+        hfp_hf_set_voice_recognition(&connect_addr,0);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_GPN",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate get phone number via voice tag\n");
-        hfp_hf_get_phone_number_via_voice_tag(&oppo_addr);
+        hfp_hf_get_phone_number_via_voice_tag(&connect_addr);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_DTMF",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate get phone number via voice tag\n");
-        hfp_hf_transmit_dtmf(&oppo_addr,1);
+        hfp_hf_transmit_dtmf(&connect_addr,1);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_VGM",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate VGM\n");
-        hfp_hf_set_mic_volume(&oppo_addr,1);
+        hfp_hf_set_mic_volume(&connect_addr,1);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_VGS",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate VGM\n");
-        hfp_hf_set_spk_volume(&oppo_addr,1);
+        hfp_hf_set_spk_volume(&connect_addr,1);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_LPN",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate local number\n");
-        hfp_hf_get_local_phone_number(&oppo_addr);
+        hfp_hf_get_local_phone_number(&connect_addr);
         return HW_ERR_OK;
     }
 
@@ -466,189 +477,66 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     if(hw_strcmp("HFP_CLCC",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate bt stop\n");
-        hfp_hf_query_call_list(&oppo_addr);
+        hfp_hf_query_call_list(&connect_addr);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_CALLEND",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate bt stop\n");
-        hfp_hf_hangup(&oppo_addr);
+        hfp_hf_hangup(&connect_addr);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_NET_F",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate bt stop\n");
-        hfp_hf_set_format_network(&oppo_addr);
+        hfp_hf_set_format_network(&connect_addr);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_NET_N",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate bt stop\n");
-        hfp_hf_get_network(&oppo_addr);
+        hfp_hf_get_network(&connect_addr);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_I",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate HFP_I\n");
-        hfp_hf_set_indicator_enable_value(&oppo_addr,"call",0);
+        hfp_hf_set_indicator_enable_value(&connect_addr,"call",0);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_CGMI",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate HFP_I\n");
-        hfp_hf_get_manufacturer_id(&oppo_addr);
+        hfp_hf_get_manufacturer_id(&connect_addr);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_CGMM",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate HFP_I\n");
-        hfp_hf_get_model_id(&oppo_addr);
+        hfp_hf_get_model_id(&connect_addr);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_CGMR",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate HFP_I\n");
-        hfp_hf_get_revision_id(&oppo_addr);
+        hfp_hf_get_revision_id(&connect_addr);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_PID",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate HFP_I\n");
-        hfp_hf_get_pid(&oppo_addr);
+        hfp_hf_get_pid(&connect_addr);
         return HW_ERR_OK;
     }
 
-
-    if(hw_strcmp("HFP_CON1",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate HFP CON\n");
-
-        hfp_hf_connect(&iphone_addr);
-        return HW_ERR_OK;
-    }
-
-    if(hw_strcmp("HFP_CGMI1",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate HFP_I\n");
-        hfp_hf_get_manufacturer_id(&iphone_addr);
-        return HW_ERR_OK;
-    }
-
-    if(hw_strcmp("HFP_GPN1",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate get phone number via voice tag\n");
-        hfp_hf_get_phone_number_via_voice_tag(&iphone_addr);
-        return HW_ERR_OK;
-    }
-
-    if(hw_strcmp("HFP_CGMM1",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate HFP_I\n");
-        hfp_hf_get_model_id(&iphone_addr);
-        return HW_ERR_OK;
-    }
-
-    if(hw_strcmp("HFP_QB1",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate HFP_I\n");
-        hfp_hf_query_hold_status(&iphone_addr);
-        return HW_ERR_OK;
-    }
-
-
-    if(hw_strcmp("HFP_CGMR1",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate HFP_I\n");
-        hfp_hf_get_revision_id(&iphone_addr);
-        return HW_ERR_OK;
-    }
-
-    if(hw_strcmp("HFP_VGE1",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate CLI enable\n");
-        hfp_hf_set_voice_recognition(&iphone_addr,1);
-        return HW_ERR_OK;
-    }
-
-    if(hw_strcmp("HFP_VGD1",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate CLI disable\n");
-        hfp_hf_set_voice_recognition(&iphone_addr,0);
-        return HW_ERR_OK;
-    }
-
-    if(hw_strcmp("HFP_CALLOUT_PN1",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate bt stop\n");
-        hfp_hf_callout_with_phone_number(&iphone_addr,"10010");
-        return HW_ERR_OK;
-    }
-
-    if(hw_strcmp("HFP_PID1",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate HFP_I\n");
-        hfp_hf_get_pid(&iphone_addr);
-        return HW_ERR_OK;
-    }
-
-    if(hw_strcmp("HFP_CLCC1",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate bt stop\n");
-        hfp_hf_query_call_list(&iphone_addr);
-        return HW_ERR_OK;
-    }
-
-    if(hw_strcmp("HFP_CALLEND1",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate bt stop\n");
-        hfp_hf_hangup(&iphone_addr);
-        return HW_ERR_OK;
-    }
-
-    if(hw_strcmp("HFP_NET_F1",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate bt stop\n");
-        hfp_hf_set_format_network(&iphone_addr);
-        return HW_ERR_OK;
-    }
-
-    if(hw_strcmp("HFP_NET_N1",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate bt stop\n");
-        hfp_hf_get_network(&iphone_addr);
-        return HW_ERR_OK;
-    }
-
-    if(hw_strcmp("HFP_TX_IND1",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate bt stop\n");
-        hfp_hf_transfer_hf_indicator_value(&iphone_addr,2,99);
-        return HW_ERR_OK;
-    }
-
-    if(hw_strncmp("HFP_TC1:",(const char*)shell_string,hw_strlen("HFP_TC1:")) == 0)
-    {
-        uint8_t cmd = *(shell_string + hw_strlen("HFP_TC1:"))-0x30;
-        uint8_t index = *(shell_string + hw_strlen("HFP_TC1:") + 1)-0x30;
-        HW_DEBUG("SHELL:operate HFP_TC1,cmd %d,index %d\n",cmd,index);
-        hfp_hf_three_call_control(&iphone_addr,cmd,index);
-        return HW_ERR_OK;
-    }
-
-    if(hw_strcmp("HFP_I1",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate HFP_I\n");
-        hfp_hf_set_indicator_enable_value(&iphone_addr,"call",0);
-        return HW_ERR_OK;
-    }
 
     if(hw_strcmp("AVRCP_GET_CAP1",(const char*)shell_string) == 0)
     {
@@ -707,7 +595,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-		HW_DEBUG("usage:%s\n",usage);
+    HW_DEBUG("usage:%s\n",usage);
     return HW_ERR_SHELL_NO_CMD;
 }
 

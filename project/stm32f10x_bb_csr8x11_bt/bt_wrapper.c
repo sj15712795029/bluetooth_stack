@@ -19,7 +19,7 @@ extern struct phybusif_cb uart_if;
 
 struct link_key_record link_key_instance = {0};
 uint8_t eir_data[240]= {0};
-bt_cb_t *bt_cb = NULL;
+bt_app_cb_t *bt_wrapper_cb = NULL;
 uint16_t bt_profile_mask = 0;
 
 static err_t bt_inquiry_complete(struct hci_pcb_t *pcb,uint16_t result);
@@ -123,8 +123,10 @@ err_t bt_stack_worked(void *arg)
     bt_ass_eir_data();
     hci_write_eir(eir_data);
 
-    if(bt_cb && bt_cb->bt_init_result)
-        bt_cb->bt_init_result(BT_INIT_SUCCESS,bt_profile_mask);
+    if(bt_wrapper_cb && bt_wrapper_cb->app_common_cb && bt_wrapper_cb->app_common_cb->bt_init_result)
+    {
+        bt_wrapper_cb->app_common_cb->bt_init_result(BT_INIT_SUCCESS,bt_profile_mask);
+    }
 
     return 0;
 }
@@ -162,6 +164,11 @@ void hfp_hf_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("WRAPPER << PROFILE:hfp_hf_connect_set_up,address is :\n");
     bt_hex_dump(remote_addr->addr,6);
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_connect)
+    {
+        bt_wrapper_cb->app_hfp_cb->bt_hfp_connect(remote_addr,status);
+    }
 }
 void hfp_hf_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
 {
@@ -406,7 +413,7 @@ static pbap_client_cbs_t pbap_client_wrapper_cb =
 
 #endif
 
-uint8_t bt_start(bt_cb_t *cb)
+uint8_t bt_start(bt_app_cb_t *app_cb)
 {
 #if PROFILE_HFP_ENABLE
     uint16_t hf_feature = HFP_HFSF_EC_NR_FUNCTION |  HFP_HFSF_THREE_WAY_CALLING|
@@ -416,7 +423,7 @@ uint8_t bt_start(bt_cb_t *cb)
                           HFP_HFSF_HF_INDICATORS |HFP_HFSF_ESCO_S4;
 #endif
 
-    bt_cb = cb;
+    bt_wrapper_cb = app_cb;
     bt_mem_init();
     bt_memp_init();
     phybusif_open(115200,0);
@@ -465,7 +472,7 @@ uint8_t bt_start(bt_cb_t *cb)
 uint8_t bt_stop(void)
 {
     bt_profile_mask = 0;
-    bt_cb = NULL;
+    bt_wrapper_cb = NULL;
     hci_reset_all();
     l2cap_reset_all();
     sdp_reset_all();
@@ -477,8 +484,11 @@ uint8_t bt_start_inquiry(uint8_t inquiry_len,uint8_t max_dev)
 {
     uint32_t lap =  0x9E8B33;    /* GIAC */
 
-    if(bt_cb && bt_cb->bt_inquiry_status)
-        bt_cb->bt_inquiry_status(BT_INQUIRY_START);
+    if(bt_wrapper_cb && bt_wrapper_cb->app_common_cb && bt_wrapper_cb->app_common_cb->bt_inquiry_status)
+    {
+        bt_wrapper_cb->app_common_cb->bt_inquiry_status(BT_INQUIRY_START);
+    }
+
     hci_inquiry(lap,inquiry_len,max_dev,bt_inquiry_result,bt_inquiry_complete);
     return 0;
 }
@@ -495,7 +505,7 @@ static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqre
 {
     if(inqres != NULL)
     {
-    	uint8_t dev_type = BT_COD_TYPE_UNKNOW;
+        uint8_t dev_type = BT_COD_TYPE_UNKNOW;
         uint16_t cod_dev_service;
         uint16_t cod_dev_major;
         uint16_t cod_dev_minor;
@@ -505,12 +515,16 @@ static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqre
                inqres->bdaddr.addr[2], inqres->bdaddr.addr[1], inqres->bdaddr.addr[0]);
         printf("inqres->rssi %d\n",inqres->rssi);
         printf("inqres->remote_name %s\n",inqres->remote_name);
-	printf("cod[0]=(0x%x) cod[1]=(0x%x) cod[2]=(0x%x)\n",inqres->cod[0],inqres->cod[1],inqres->cod[2]);
-	
+        printf("cod[0]=(0x%x) cod[1]=(0x%x) cod[2]=(0x%x)\n",inqres->cod[0],inqres->cod[1],inqres->cod[2]);
+
         dev_type = bt_parse_cod(inqres->cod,&cod_dev_service,&cod_dev_major,&cod_dev_minor);
         printf("cod_dev_service(0x%x) cod_dev_major(0x%x) cod_dev_minor(0x%x)\n",cod_dev_service,cod_dev_major,cod_dev_minor);
-        if(bt_cb && bt_cb->bt_inquiry_result)
-            bt_cb->bt_inquiry_result(&inqres->bdaddr,dev_type,inqres->remote_name);
+
+        if(bt_wrapper_cb && bt_wrapper_cb->app_common_cb && bt_wrapper_cb->app_common_cb->bt_inquiry_result)
+        {
+            bt_wrapper_cb->app_common_cb->bt_inquiry_result(&inqres->bdaddr,dev_type,inqres->remote_name);
+        }
+
     }
 
     return BT_ERR_OK;
@@ -518,8 +532,10 @@ static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqre
 
 static err_t bt_inquiry_complete(struct hci_pcb_t *pcb,uint16_t result)
 {
-    if(bt_cb && bt_cb->bt_inquiry_status)
-        bt_cb->bt_inquiry_status(BT_INQUIRY_COMPLETE);
+    if(bt_wrapper_cb && bt_wrapper_cb->app_common_cb && bt_wrapper_cb->app_common_cb->bt_inquiry_status)
+    {
+        bt_wrapper_cb->app_common_cb->bt_inquiry_status(BT_INQUIRY_COMPLETE);
+    }
     return BT_ERR_OK;
 }
 
