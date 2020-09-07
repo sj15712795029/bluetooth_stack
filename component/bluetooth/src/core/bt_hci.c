@@ -636,7 +636,7 @@ void hci_event_input(struct bt_pbuf_t *p)
                     inqres->cod[0] = ((uint8_t *)p->payload)[11+resp_offset];
                     //memcpy(inqres->cod, ((uint8_t *)p->payload)+9+resp_offset, 3);
                     inqres->co = *((uint16_t *)(((uint8_t *)p->payload)+12+resp_offset));
-                    if(temp_rssi && 0x80) /* negative rssi */
+                    if(temp_rssi & 0x80) /* negative rssi */
                         inqres->rssi = ((int8_t)(temp_rssi & (~0x80)) -128)&0xff;
                     else
                         inqres->rssi = temp_rssi;
