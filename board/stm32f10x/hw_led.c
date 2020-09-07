@@ -19,12 +19,21 @@ uint8_t hw_led_init()
 {
     GPIO_InitTypeDef  GPIO_InitStructure;
 
-    RCC_APB2PeriphClockCmd(LED_PERIPH_CLK, ENABLE);
+    RCC_APB2PeriphClockCmd(LED1_PERIPH_CLK, ENABLE);
 
-    GPIO_InitStructure.GPIO_Pin = LED_PIN;
+    GPIO_InitStructure.GPIO_Pin = LED1_PIN;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(LED_GPIO, &GPIO_InitStructure);
+    GPIO_Init(LED1_GPIO, &GPIO_InitStructure);
 
+    RCC_APB2PeriphClockCmd(LED2_PERIPH_CLK, ENABLE);
+
+    GPIO_InitStructure.GPIO_Pin = LED2_PIN;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(LED2_GPIO, &GPIO_InitStructure);
+
+    LED1_OFF;
+    LED2_OFF;
     return HW_ERR_OK;
 }

@@ -9,7 +9,7 @@
 #include "hw_button.h"
 #include "hw_misc.h"
 #include "hw_spi_flash.h"
-#include "hw_ov7670.h"
-//#include "usb_lib.h"
+#include "usb_lib.h"
+#include "fs_wrapper.h"
 
 #endif

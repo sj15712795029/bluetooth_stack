@@ -17,6 +17,53 @@ uint32_t last_sys_time = 0;
 
 struct bd_addr_t connect_addr;
 
+
+#define OLED_SHOW_SIZE 32
+uint8_t func_show[OLED_SHOW_SIZE];
+uint8_t operate_show[OLED_SHOW_SIZE];
+uint8_t status_show[OLED_SHOW_SIZE];
+uint8_t key1_show[OLED_SHOW_SIZE];
+uint8_t key2_show[OLED_SHOW_SIZE];
+uint8_t key3_show[OLED_SHOW_SIZE];
+
+void operate_stauts_oled_show(uint8_t *func,uint8_t *operate,uint8_t *status,uint8_t *key1,uint8_t *value1,uint8_t *key2,uint8_t *value2,uint8_t * key3,uint8_t *value3)
+{
+    hw_memset(func_show,0,OLED_SHOW_SIZE);
+    hw_memset(operate_show,0,OLED_SHOW_SIZE);
+    hw_memset(status_show,0,OLED_SHOW_SIZE);
+    hw_memset(key1_show,0,OLED_SHOW_SIZE);
+    hw_memset(key2_show,0,OLED_SHOW_SIZE);
+    hw_memset(key3_show,0,OLED_SHOW_SIZE);
+
+    hw_sprintf((char*)func_show,"FUC:%s",func);
+    hw_sprintf((char*)operate_show,"OPERATE:%s",operate);
+    hw_sprintf((char*)status_show,"STATUS:%s",status);
+
+    hw_oled_clear();
+    hw_oled_show_string(0,0,func_show,8);
+    hw_oled_show_string(0,1,operate_show,8);
+    hw_oled_show_string(0,2,status_show,8);
+
+    if(key1 && value1)
+    {
+        hw_sprintf((char*)key1_show,"%s:%s",key1,value1);
+        hw_oled_show_string(0,3,key1_show,8);
+    }
+
+    if(key2 && value2)
+    {
+        hw_sprintf((char*)key2_show,"%s:%s",key2,value2);
+        hw_oled_show_string(0,4,key2_show,8);
+    }
+
+    if(key3 && value3)
+    {
+        hw_sprintf((char*)key3_show,"%s:%s",key3,value3);
+        hw_oled_show_string(0,4,key3_show,8);
+    }
+}
+
+
 uint8_t uart_send_json(uint8_t *func,uint8_t *operate,uint8_t *status,uint8_t *para1,uint8_t *para2,uint8_t *para3,uint8_t *para4,uint8_t *para5)
 {
     uint8_t *bt_status_string;
@@ -52,6 +99,7 @@ void bt_app_init_result(uint8_t status,uint16_t profile_mask)
     printf("bt_app_init_result(%d) profile_mask(0x%x)\n",status,profile_mask);
     sprintf((char *)profile_mask_buf,"%x",profile_mask);
     uart_send_json("BT","BT_START",status==0?(uint8_t*)"SUCCESS":(uint8_t*)"FAIL",profile_mask_buf,0,0,0,0);
+    operate_stauts_oled_show("BT","BT_START","INIT_SUCCESS",0,0,0,0,0,0);
 }
 
 void bt_app_inquiry_status(uint8_t status)
@@ -124,6 +172,7 @@ uint8_t shell_json_parse(uint8_t *operate_value,
     {
         HW_DEBUG("UART PARSE DEBUG:operate BT_START\n");
         bt_start(&bt_app_cb);
+        operate_stauts_oled_show("BT",operate_value,"SUCCESS",0,0,0,0,0,0);
         return HW_ERR_OK;
     }
 
@@ -636,6 +685,13 @@ void board_init()
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
     hw_uart_debug_init(115200);
     hw_systick_init(SystemCoreClock/CONF_BSP_TICKS_PER_SEC);
+
+    hw_button_init();
+    hw_led_init();
+    hw_oled_init();
+    hw_spi_flash_init();
+    hw_usb_init();
+    file_system_init();
 }
 
 
@@ -650,6 +706,7 @@ void SysTick_Handler(void)
 extern struct phybusif_cb uart_if;
 int main()
 {
+    static uint8_t led_on = 0;
     board_init();
 
     while(1)
@@ -665,6 +722,19 @@ int main()
             last_sys_time = sys_time;
             l2cap_tmr();
             rfcomm_tmr();
+
+            if(!led_on)
+            {
+                LED1_ON;
+                LED2_ON;
+                led_on = 1;
+            }
+            else
+            {
+                LED1_OFF;
+                LED2_OFF;
+                led_on = 0;
+            }
         }
     }
 }
