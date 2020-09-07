@@ -726,6 +726,7 @@ void board_init()
     hw_button_init();
     hw_led_init();
     hw_oled_init();
+    hw_sht2x_init();
     hw_spi_flash_init();
     hw_usb_init();
     file_system_init();
