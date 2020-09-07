@@ -147,9 +147,46 @@ static bt_app_hfp_cb_t bt_app_hfp_cb =
     bt_app_hfp_connect,
 };
 
+
+void bt_app_spp_connect(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("bt_app_spp_connect status %d address:\n",status);
+    bt_hex_dump(remote_addr->addr,6);
+    connect_addr.addr[5] = remote_addr->addr[5];
+    connect_addr.addr[4] = remote_addr->addr[4];
+    connect_addr.addr[3] = remote_addr->addr[3];
+    connect_addr.addr[2] = remote_addr->addr[2];
+    connect_addr.addr[1] = remote_addr->addr[1];
+    connect_addr.addr[0] = remote_addr->addr[0];
+}
+
+void bt_app_spp_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("bt_app_spp_disconnect status %d address:\n",status);
+    bt_hex_dump(remote_addr->addr,6);
+    memset(&connect_addr,0,sizeof(connect_addr));
+}
+
+void bt_app_spp_recv_data(struct bd_addr_t *remote_addr,uint8_t *data,uint16_t data_len)
+{
+    printf("bt_app_spp_recv_data len %d address:\n",data_len);
+    bt_hex_dump(remote_addr->addr,6);
+    printf("data is :");
+    bt_hex_dump(data,data_len);
+}
+
+static bt_app_spp_cb_t bt_app_spp_cb =
+{
+    bt_app_spp_connect,
+    bt_app_spp_disconnect,
+    bt_app_spp_recv_data,
+};
+
+
 static bt_app_cb_t bt_app_cb =
 {
     &bt_app_common_cb,
+    &bt_app_spp_cb,
     &bt_app_hfp_cb,
 };
 

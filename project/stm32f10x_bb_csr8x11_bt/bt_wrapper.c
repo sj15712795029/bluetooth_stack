@@ -136,18 +136,33 @@ void spp_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("WRAPPER << PROFILE:spp_connect_set_up,address is :\n");
     bt_hex_dump(remote_addr->addr,6);
+
+    if(bt_wrapper_cb && bt_wrapper_cb->app_spp_cb && bt_wrapper_cb->app_spp_cb->bt_spp_connect)
+    {
+        bt_wrapper_cb->app_spp_cb->bt_spp_connect(remote_addr,status);
+    }
 }
 void spp_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("WRAPPER << PROFILE:spp_connect_realease,address is :\n");
     bt_hex_dump(remote_addr->addr,6);
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_spp_cb && bt_wrapper_cb->app_spp_cb->bt_spp_disconnect)
+    {
+        bt_wrapper_cb->app_spp_cb->bt_spp_disconnect(remote_addr,status);
+    }
 }
-void spp_data_ind(struct bd_addr_t *remote_addr,uint8_t *data,uint8_t data_len)
+void spp_data_ind(struct bd_addr_t *remote_addr,uint8_t *data,uint16_t data_len)
 {
     printf("WRAPPER << PROFILE:spp_data_ind,address is :\n");
     bt_hex_dump(remote_addr->addr,6);
     printf("data len %d,data is:\n",data_len);
     bt_hex_dump(data,data_len);
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_spp_cb && bt_wrapper_cb->app_spp_cb->bt_spp_recv_data)
+    {
+        bt_wrapper_cb->app_spp_cb->bt_spp_recv_data(remote_addr,data,data_len);
+    }
 }
 
 static spp_cbs_t spp_wrapper_cb =

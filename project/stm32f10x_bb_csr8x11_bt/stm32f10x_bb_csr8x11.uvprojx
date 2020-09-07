@@ -636,6 +636,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\board\stm32f10x\hw_spi_flash.c</FilePath>
             </File>
+            <File>
+              <FileName>hw_sht2x.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\board\stm32f10x\hw_sht2x.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

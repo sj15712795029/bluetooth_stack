@@ -19,7 +19,7 @@ typedef struct
 {
     void (*spp_connect_set_up)(struct bd_addr_t *remote_addr,uint8_t status);
     void (*spp_connect_realease)(struct bd_addr_t *remote_addr,uint8_t status);
-    void (*spp_data_ind)(struct bd_addr_t *remote_addr,uint8_t *data,uint8_t data_len);
+    void (*spp_data_ind)(struct bd_addr_t *remote_addr,uint8_t *data,uint16_t data_len);
 } spp_cbs_t;
 
 
