@@ -14,16 +14,16 @@
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
-          <Device>STM32F103RE</Device>
+          <Device>STM32F103ZE</Device>
           <Vendor>STMicroelectronics</Vendor>
           <PackID>Keil.STM32F1xx_DFP.1.0.5</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x10000) IROM(0x08000000,0x80000) CPUTYPE("Cortex-M3") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
-          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0STM32F10x_512 -FS08000000 -FL080000 -FP0($$Device:STM32F103RE$Flash\STM32F10x_512.FLM))</FlashDriverDll>
+          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0STM32F10x_512 -FS08000000 -FL080000 -FP0($$Device:STM32F103ZE$Flash\STM32F10x_512.FLM))</FlashDriverDll>
           <DeviceId>0</DeviceId>
-          <RegisterFile>$$Device:STM32F103RE$Device\Include\stm32f10x.h</RegisterFile>
+          <RegisterFile>$$Device:STM32F103ZE$Device\Include\stm32f10x.h</RegisterFile>
           <MemoryEnv></MemoryEnv>
           <Cmp></Cmp>
           <Asm></Asm>
@@ -33,7 +33,7 @@
           <SLE66CMisc></SLE66CMisc>
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
-          <SFDFile>$$Device:STM32F103RE$SVD\STM32F103xx.svd</SFDFile>
+          <SFDFile>$$Device:STM32F103ZE$SVD\STM32F103xx.svd</SFDFile>
           <bCustSvd>0</bCustSvd>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\bsp\cortex-m3\core;..\..\bsp\cortex-m3\inc;..\..\board;..\..\board\stm32f10x;..\..\component\ringbuffer;..\..\component\bluetooth\src\include;..\..\component\bluetooth\src\include\classical;..\..\component\bluetooth\vendor;..\stm32f10x_bb_csr8x11_bt;..\..\component\bluetooth\third_party_lib\sbc;..\..\component\cjson</IncludePath>
+              <IncludePath>..\..\bsp\cortex-m3\core;..\..\bsp\cortex-m3\inc;..\..\bsp\cortex-m3\STM32_USB-FS-Device_Driver\inc;..\..\board;..\..\board\stm32f10x;..\..\board\stm32f10x\usb_mass_storage;..\..\component\ringbuffer;..\..\component\bluetooth\src\include;..\..\component\bluetooth\src\include\classical;..\..\component\bluetooth\vendor;..\stm32f10x_bb_csr8x11_bt;..\..\component\bluetooth\third_party_lib\sbc;..\..\component\cjson;..\..\component\fs;..\..\component\fs\fatfs13\source</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -506,6 +506,36 @@
               <FileType>1</FileType>
               <FilePath>..\..\bsp\cortex-m3\src\stm32f10x_wwdg.c</FilePath>
             </File>
+            <File>
+              <FileName>usb_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\bsp\cortex-m3\STM32_USB-FS-Device_Driver\src\usb_core.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\bsp\cortex-m3\STM32_USB-FS-Device_Driver\src\usb_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_int.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\bsp\cortex-m3\STM32_USB-FS-Device_Driver\src\usb_int.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_mem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\bsp\cortex-m3\STM32_USB-FS-Device_Driver\src\usb_mem.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_regs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\bsp\cortex-m3\STM32_USB-FS-Device_Driver\src\usb_regs.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_sil.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\bsp\cortex-m3\STM32_USB-FS-Device_Driver\src\usb_sil.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -535,6 +565,81 @@
               <FileName>hw_uart.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\board\stm32f10x\hw_uart.c</FilePath>
+            </File>
+            <File>
+              <FileName>hw_button.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\board\stm32f10x\hw_button.c</FilePath>
+            </File>
+            <File>
+              <FileName>hw_exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\board\stm32f10x\hw_exti.c</FilePath>
+            </File>
+            <File>
+              <FileName>hw_config.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\board\stm32f10x\usb_mass_storage\hw_config.c</FilePath>
+            </File>
+            <File>
+              <FileName>mass_mal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\board\stm32f10x\usb_mass_storage\mass_mal.c</FilePath>
+            </File>
+            <File>
+              <FileName>memory.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\board\stm32f10x\usb_mass_storage\memory.c</FilePath>
+            </File>
+            <File>
+              <FileName>scsi_data.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\board\stm32f10x\usb_mass_storage\scsi_data.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_bot.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\board\stm32f10x\usb_mass_storage\usb_bot.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_desc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\board\stm32f10x\usb_mass_storage\usb_desc.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_endp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\board\stm32f10x\usb_mass_storage\usb_endp.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_istr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\board\stm32f10x\usb_mass_storage\usb_istr.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_prop.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\board\stm32f10x\usb_mass_storage\usb_prop.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_pwr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\board\stm32f10x\usb_mass_storage\usb_pwr.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_scsi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\board\stm32f10x\usb_mass_storage\usb_scsi.c</FilePath>
+            </File>
+            <File>
+              <FileName>hw_spi_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\board\stm32f10x\hw_spi_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>hw_sht2x.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\board\stm32f10x\hw_sht2x.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -695,6 +800,36 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\main.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>fs</GroupName>
+          <Files>
+            <File>
+              <FileName>diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\fs\fatfs13\source\diskio.c</FilePath>
+            </File>
+            <File>
+              <FileName>ff.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\fs\fatfs13\source\ff.c</FilePath>
+            </File>
+            <File>
+              <FileName>ffsystem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\fs\fatfs13\source\ffsystem.c</FilePath>
+            </File>
+            <File>
+              <FileName>ffunicode.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\fs\fatfs13\source\ffunicode.c</FilePath>
+            </File>
+            <File>
+              <FileName>fs_wrapper.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\fs\fs_wrapper.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -37,10 +37,33 @@ typedef struct
 	void (*bt_inquiry_status)(uint8_t status);
 	void (*bt_inquiry_result)(struct bd_addr_t *address,uint8_t dev_type,uint8_t *name);
 
-}bt_cb_t;
+}bt_app_common_cb_t;
 
-uint8_t bt_start(bt_cb_t *cb);
+typedef struct
+{
+	void (*bt_spp_connect)(struct bd_addr_t *remote_addr,uint8_t status);
+	void (*bt_spp_disconnect)(struct bd_addr_t *remote_addr,uint8_t status);
+	void (*bt_spp_recv_data)(struct bd_addr_t *remote_addr,uint8_t *data,uint16_t data_len);
+}bt_app_spp_cb_t;
+
+typedef struct
+{
+	void (*bt_hfp_connect)(struct bd_addr_t *remote_addr,uint8_t status);
+
+}bt_app_hfp_cb_t;
+
+
+typedef struct
+{
+	bt_app_common_cb_t *app_common_cb;
+	bt_app_spp_cb_t *app_spp_cb;
+	bt_app_hfp_cb_t * app_hfp_cb;
+	
+}bt_app_cb_t;
+
+uint8_t bt_start(bt_app_cb_t *app_cb);
 uint8_t bt_stop(void);
 uint8_t bt_start_inquiry(uint8_t inquiry_len,uint8_t max_dev);
 uint8_t bt_le_inquiry(uint8_t enable);
+
 #endif

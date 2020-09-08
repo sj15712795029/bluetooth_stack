@@ -128,7 +128,7 @@ static uint8_t memp_memory[(MEMP_NUM_HCI_PCB *
                          MEM_ALIGN_SIZE(sizeof(struct pbap_pcb_t) +
                                         sizeof(struct bt_memp_t)) +
                          MEMP_NUM_BT_PBUF *
-                         MEM_ALIGN_SIZE(0x1000))];
+                         MEM_ALIGN_SIZE(0x500))];
 
 /******************************************************************************
  * func name   : bt_memp_init

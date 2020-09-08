@@ -771,7 +771,9 @@ uint8_t hw_oled_draw_bmp(uint8_t col_start,uint8_t page_start,uint8_t col_end,ui
 uint8_t hw_oled_init()
 {
     GPIO_InitTypeDef  GPIO_InitStructure;
-    RCC_APB2PeriphClockCmd(SSD1306_PERIPH_CLK, ENABLE);
+
+    RCC_APB2PeriphClockCmd(SSD1306_PERIPH_CLK | RCC_APB2Periph_AFIO, ENABLE);
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_NoJTRST,ENABLE);
     GPIO_InitStructure.GPIO_Pin = SSD1306_SCL_PIN|SSD1306_SDA_PIN;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
