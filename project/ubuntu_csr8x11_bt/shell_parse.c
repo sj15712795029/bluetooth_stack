@@ -17,7 +17,7 @@ static const uint8_t usage[]=
 #define BT_START_CMD "BT_START"
 #define BT_START_DES "Start bluetooth stack"
 #define BT_STOP_CMD "BT_STOP"
-#define BT_START_DES "Stop blueooth stack"
+#define BT_STOP_DES "Stop blueooth stack"
 #define BT_INQUIRY_CMD "BT_INQUIRY"
 #define BT_INQUIRY_DES "Inquiry device"
 #define BT_CANCEL_INQUIRY_CMD "BT_CANCEL_INQUIRY"
@@ -65,7 +65,7 @@ typedef struct
 cmd_desctiption_t cmd_usage[] =
 {
     {BT_START_CMD,BT_START_DES},
-    {BT_STOP_CMD,BT_START_DES},
+    {BT_STOP_CMD,BT_STOP_DES},
     {BT_INQUIRY_CMD,BT_INQUIRY_CMD},
     	{BT_CANCEL_INQUIRY_CMD,BT_CANCEL_INQUIRY_DES},
     	{BT_PERIOID_INQUIRY_CMD,BT_PERIOID_INQUIRY_DES},
