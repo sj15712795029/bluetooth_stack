@@ -97,10 +97,16 @@ void csr8x11_vendor_init(init_done_cb cb)
     }
 }
 
+void csr8x11_vendor_deinit(void)
+{
+	prepare_pos = 0;
+}
+
 chip_mgr_t csr8x11_mgr =
 {
     /* const char * name */ "CSR8x11",
     /*void  (*vendor_init)(void);*/&csr8x11_vendor_init,
+    /* void (*vendor_deinit)(void);*/&csr8x11_vendor_deinit,
 };
 
 chip_mgr_t * csr8x11_instance()

@@ -7,6 +7,7 @@ typedef struct
 
     const char * name;
     void  (*vendor_init)(init_done_cb cb);
+    void (*vendor_deinit)(void);
 } chip_mgr_t;
 
 #endif

@@ -85,13 +85,14 @@ void hci_reset_all(void)
     struct hci_link_t *link, *tlink;
     struct hci_inq_res_t *ires, *tires;
 
+    pcb->chip_mgr->vendor_deinit();
+
     for(link = hci_active_links; link != NULL;)
     {
         tlink = link->next;
         hci_close(link);
         link = tlink;
     }
-    hci_active_links = NULL;
 
     for(ires = pcb->ires; ires != NULL;)
     {
@@ -101,7 +102,10 @@ void hci_reset_all(void)
     }
     bt_memp_free(MEMP_HCI_PCB, pcb);
 
-    hci_init();
+    hci_active_links = NULL;
+    hci_tmp_link = NULL;
+
+
 }
 
 void hci_arg(void *arg)

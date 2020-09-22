@@ -93,6 +93,7 @@ err_t rfcomm_init(void)
         return BT_ERR_MEM;
     }
     rfcomm_listen(rfcommpcb, 0, rfcomm_accept);
+
     return BT_ERR_OK;
 
 }
@@ -180,12 +181,7 @@ struct rfcomm_pcb_t *rfcomm_new(struct l2cap_pcb_t *l2cappcb)
 
 void rfcomm_close(struct rfcomm_pcb_t *pcb)
 {
-#if RFCOMM_FLOW_QUEUEING
-    if(pcb->buf != NULL)
-    {
-        bt_pbuf_free(pcb->buf);
-    }
-#endif
+
     if(pcb->state == RFCOMM_LISTEN)
     {
         RFCOMM_RMV((struct rfcomm_pcb_t **)&rfcomm_listen_pcbs, pcb);
@@ -193,6 +189,12 @@ void rfcomm_close(struct rfcomm_pcb_t *pcb)
     }
     else
     {
+#if RFCOMM_FLOW_QUEUEING
+    if(pcb->buf != NULL)
+    {
+        bt_pbuf_free(pcb->buf);
+    }
+#endif
         RFCOMM_RMV(&rfcomm_active_pcbs, pcb);
         bt_memp_free(MEMP_RFCOMM_PCB, pcb);
     }
@@ -218,7 +220,10 @@ void rfcomm_reset_all(void)
         lpcb = tlpcb;
     }
 
-    rfcomm_init();
+    /* Clear globals */
+    rfcomm_listen_pcbs = NULL;
+    rfcomm_active_pcbs = NULL;
+    rfcomm_tmp_pcb = NULL;
 }
 
 struct rfcomm_pcb_t *rfcomm_get_active_pcb(uint8_t cn, struct bd_addr_t *bdaddr)
