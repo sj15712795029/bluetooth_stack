@@ -714,7 +714,21 @@ uint8_t shell_parse(uint8_t *shell_string)
 
 }
 
+void bt_reset_chip(void)
+{
+    GPIO_InitTypeDef  GPIO_InitStructure;
 
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+    GPIO_WriteBit(GPIOA, GPIO_Pin_8, Bit_RESET);
+    hw_delay_ms(200);
+    GPIO_WriteBit(GPIOA, GPIO_Pin_8, Bit_SET);
+}
 void board_init()
 {
     last_sys_time = sys_time;
@@ -730,6 +744,7 @@ void board_init()
     hw_spi_flash_init();
     hw_usb_init();
     file_system_init();
+    bt_reset_chip();
 }
 
 
@@ -739,6 +754,7 @@ void SysTick_Handler(void)
     sys_time += 1000/CONF_BSP_TICKS_PER_SEC;
     utimer_polling();
 }
+
 
 
 extern struct phybusif_cb uart_if;
