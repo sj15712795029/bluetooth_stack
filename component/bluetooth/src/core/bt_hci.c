@@ -2277,6 +2277,7 @@ err_t hci_write_local_name(uint8_t *name, uint8_t len)
     /* Assembling command packet */
     p = hci_cmd_ass(p, HCI_WRITE_LOCAL_NAME, HCI_HOST_C_N_BB, HCI_CHANGE_LOCAL_NAME_PLEN);
     /* Assembling cmd prameters */
+    memset(((uint8_t *)p->payload) + 3,0,HCI_CHANGE_LOCAL_NAME_PLEN-3);
     memcpy(((uint8_t *)p->payload) + 3, name, len);
     phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
     bt_pbuf_free(p);
