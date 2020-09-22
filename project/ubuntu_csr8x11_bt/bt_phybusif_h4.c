@@ -53,6 +53,25 @@ uint8_t hw_uart_bt_init(uint32_t baud_rate,uint8_t reconfig)
     {
         ringbuffer_init(&bt_ring_buf,bt_rx_buf,BT_RX_BUF_SIZE);
     }
+    else
+    {
+        if (tcgetattr(uart_if.phyuart_fd, &toptions) < 0)
+        {
+            printf("ERROR:Couldn't get term attributes\n");
+            return -1;
+        }
+        cfsetospeed(&toptions, baudrate);
+        cfsetispeed(&toptions, baudrate);
+
+
+        if( tcsetattr(uart_if.phyuart_fd, TCSANOW, &toptions) < 0)
+        {
+            printf("ERROR:Couldn't set term attributes\n");
+            return -1;
+        }
+
+        return 0;
+    }
 
     printf("phybusif_open /dev/ttyUSB0\n");
 
@@ -177,10 +196,10 @@ void *uart_rx_thread(void *data)
             printf("--------2----------\n");
 #endif
 
-		if(ringbuffer_space_left(&bt_ring_buf) > read_result)
-            		ringbuffer_put(&bt_ring_buf,bt_dma_rx_buf,read_result);
-		else
-			BT_TRANSPORT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] ring buffer left %d < %d\n",__FILE__,__FUNCTION__,__LINE__,ringbuffer_space_left(&bt_ring_buf),read_result);
+            if(ringbuffer_space_left(&bt_ring_buf) > read_result)
+                ringbuffer_put(&bt_ring_buf,bt_dma_rx_buf,read_result);
+            else
+                BT_TRANSPORT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] ring buffer left %d < %d\n",__FILE__,__FUNCTION__,__LINE__,ringbuffer_space_left(&bt_ring_buf),read_result);
 
         }
     }
@@ -191,8 +210,11 @@ void phybusif_open(uint32_t baud_rate,uint8_t reconfig)
 {
     hw_uart_bt_init(baud_rate,reconfig);
 
-    pthread_t thread_rx_id;
-    pthread_create(&thread_rx_id, NULL, uart_rx_thread, NULL);
+    if(reconfig == 0)
+    {
+        pthread_t thread_rx_id;
+        pthread_create(&thread_rx_id, NULL, uart_rx_thread, NULL);
+    }
 
 }
 
