@@ -236,8 +236,12 @@ namespace mcu_bt_tool
                         }
                         else
                         {
-                            if(s != "")
+                            if (s != "")
+                            {
                                 t_data_recv.Text += (s + "\r\n");
+                                t_data_recv.SelectionStart = t_data_recv.TextLength;
+                                t_data_recv.ScrollToCaret();
+                            }
                         }
 
                     }
