@@ -17,6 +17,9 @@ namespace mcu_bt_tool
 {
     public partial class Form1 : Form
     {
+        float windows_x;  //默认窗口的宽度
+        float windows_y;  //默认窗口的高度
+
         /* 用于串口插拔检测 */
         public const int WM_DEVICE_CHANGE = 0x219;
         public const int DBT_DEVICEARRIVAL = 0x8000;
@@ -40,12 +43,60 @@ namespace mcu_bt_tool
         {
             InitializeComponent();
             System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = false;
+
+            windows_x = this.Width;   //将窗体的宽度赋值给X
+            windows_y = this.Height;   //将窗体的高度赋值给Y
+            setTag(this);   //调用setTag函数
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             search_add_serial_port();
             ui_init();
+        }
+
+        private void Form1_Resize(object sender, EventArgs e)
+        {
+            float newx = (this.Width) / windows_x;   //窗体宽度缩放比例
+
+            float newy = (this.Height) / windows_y;   //窗体高度缩放比例
+
+            setControls(newx, newy, this);   //调用setControls函数
+        }
+
+        private void setTag(Control cons)
+        {
+
+            foreach (Control con in cons.Controls)
+            {
+                con.Tag = con.Width + ":" + con.Height + ":" + con.Left + ":" + con.Top + ":" + con.Font.Size;
+                if (con.Controls.Count > 0) setTag(con);   //如果此控件存在子控件，则此控件的子控件执行此函数一次
+            }
+
+        }
+
+        private void setControls(float newx, float newy, Control cons)
+        {
+
+            foreach (Control con in cons.Controls)
+            {
+                if (con.Tag == null)
+                    continue;
+                string[] myTag = con.Tag.ToString().Split(':');     //将con的宽、高、左边距、顶边距离及字体大小通过字符“:”分割成数组
+                float a = Convert.ToSingle(myTag[0]) * newx;    //根据窗口的缩放比例确定控件相应的值，宽度
+                con.Width = (int)a;
+                a = Convert.ToSingle(myTag[1]) * newy;    //高度
+                con.Height = (int)a;
+                a = Convert.ToSingle(myTag[2]) * newx;    //左边距
+                con.Left = (int)a;
+                a = Convert.ToSingle(myTag[3]) * newy;    //顶边距离
+                con.Top = (int)a;
+                Single currentSize = Convert.ToSingle(myTag[4]) * newy;     //字体大小
+                con.Font = new Font(con.Font.Name, currentSize, con.Font.Style, con.Font.Unit);
+                if (con.Controls.Count > 0) setControls(newx, newy, con);     //如果此控件存在子控件，则将相应子控件执行一次setControls函数
+
+            }
+
         }
 
         /* 开启串口button的响应 */
@@ -351,6 +402,8 @@ namespace mcu_bt_tool
         {
             ui_bt_switch_show(false,false);
         }
+
+        
 
         
         

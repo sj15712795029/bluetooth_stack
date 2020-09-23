@@ -42,6 +42,10 @@
             this.label1 = new System.Windows.Forms.Label();
             this.tc_bt_function = new System.Windows.Forms.TabControl();
             this.tp_bt_basic_func = new System.Windows.Forms.TabPage();
+            this.dg_inquiry_result = new System.Windows.Forms.DataGridView();
+            this.cod = new System.Windows.Forms.DataGridViewImageColumn();
+            this.address = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.name = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.b_stop_inquiry = new System.Windows.Forms.Button();
             this.b_start_inquiry = new System.Windows.Forms.Button();
             this.tp_bt_hfp_hf = new System.Windows.Forms.TabPage();
@@ -52,15 +56,11 @@
             this.t_data_recv = new System.Windows.Forms.TextBox();
             this.b_log_clear = new System.Windows.Forms.Button();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
-            this.dg_inquiry_result = new System.Windows.Forms.DataGridView();
-            this.cod = new System.Windows.Forms.DataGridViewImageColumn();
-            this.address = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.name = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBox1.SuspendLayout();
             this.tc_bt_function.SuspendLayout();
             this.tp_bt_basic_func.SuspendLayout();
-            this.g_log_func.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dg_inquiry_result)).BeginInit();
+            this.g_log_func.SuspendLayout();
             this.SuspendLayout();
             // 
             // b_bt_stop
@@ -204,6 +204,37 @@
             this.tp_bt_basic_func.Text = "基本功能";
             this.tp_bt_basic_func.UseVisualStyleBackColor = true;
             // 
+            // dg_inquiry_result
+            // 
+            this.dg_inquiry_result.BackgroundColor = System.Drawing.Color.White;
+            this.dg_inquiry_result.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dg_inquiry_result.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.cod,
+            this.address,
+            this.name});
+            this.dg_inquiry_result.Location = new System.Drawing.Point(133, 26);
+            this.dg_inquiry_result.Name = "dg_inquiry_result";
+            this.dg_inquiry_result.RowTemplate.Height = 27;
+            this.dg_inquiry_result.Size = new System.Drawing.Size(706, 503);
+            this.dg_inquiry_result.TabIndex = 9;
+            // 
+            // cod
+            // 
+            this.cod.HeaderText = "设备类型";
+            this.cod.Name = "cod";
+            // 
+            // address
+            // 
+            this.address.HeaderText = "设备地址";
+            this.address.Name = "address";
+            this.address.Width = 150;
+            // 
+            // name
+            // 
+            this.name.HeaderText = "设备名称";
+            this.name.Name = "name";
+            this.name.Width = 200;
+            // 
             // b_stop_inquiry
             // 
             this.b_stop_inquiry.Enabled = false;
@@ -307,37 +338,6 @@
             // 
             this.serialPort1.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort1_DataReceived);
             // 
-            // dg_inquiry_result
-            // 
-            this.dg_inquiry_result.BackgroundColor = System.Drawing.Color.White;
-            this.dg_inquiry_result.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dg_inquiry_result.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.cod,
-            this.address,
-            this.name});
-            this.dg_inquiry_result.Location = new System.Drawing.Point(133, 26);
-            this.dg_inquiry_result.Name = "dg_inquiry_result";
-            this.dg_inquiry_result.RowTemplate.Height = 27;
-            this.dg_inquiry_result.Size = new System.Drawing.Size(706, 503);
-            this.dg_inquiry_result.TabIndex = 9;
-            // 
-            // cod
-            // 
-            this.cod.HeaderText = "设备类型";
-            this.cod.Name = "cod";
-            // 
-            // address
-            // 
-            this.address.HeaderText = "设备地址";
-            this.address.Name = "address";
-            this.address.Width = 150;
-            // 
-            // name
-            // 
-            this.name.HeaderText = "设备名称";
-            this.name.Name = "name";
-            this.name.Width = 200;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -353,13 +353,14 @@
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.Resize += new System.EventHandler(this.Form1_Resize);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.tc_bt_function.ResumeLayout(false);
             this.tp_bt_basic_func.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dg_inquiry_result)).EndInit();
             this.g_log_func.ResumeLayout(false);
             this.g_log_func.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dg_inquiry_result)).EndInit();
             this.ResumeLayout(false);
 
         }
