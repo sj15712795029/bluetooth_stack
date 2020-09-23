@@ -1,11 +1,39 @@
 #ifndef BT_WRAPPER_H_H_H
 #define BT_WRAPPER_H_H_H
 
-#include "bt_hfp_hf.h"
-#include "bt_pbap_client.h"
-#include "bt_avrcp_controller.h"
-#include "bt_spp.h"
 #include "bt_common.h"
+#include "bt_pbuf.h"
+#include "bt_memp.h"
+#include "bt_mem.h"
+#include "bt_timer.h"
+#include "bt_config.h"
+#include "bt_hci.h"
+#include "bt_l2cap.h"
+#include "bt_sdp.h"
+#include "bt_rfcomm.h"
+#include "bt_phybusif_h4.h"
+#if BT_ENABLE_SNOOP > 0
+#include "bt_snoop.h"
+#endif
+#if PROFILE_HFP_ENABLE > 0
+#include "bt_hfp_hf.h"
+#endif
+#if PROFILE_SPP_ENABLE > 0
+#include "bt_spp.h"
+#endif
+#if PROFILE_DID_ENABLE > 0
+#include "bt_did.h"
+#endif
+#if PROFILE_PBAP_ENABLE > 0
+#include "bt_pbap_client.h"
+#endif
+#if PROFILE_A2DP_ENABLE > 0
+#include "bt_a2dp_sink.h"
+#endif
+#if PROFILE_AVRCP_ENABLE > 0
+#include "bt_avrcp_controller.h"
+#endif
+
 
 #define LINK_KEY_MAX 10
 struct link_key_record
@@ -64,6 +92,10 @@ typedef struct
 uint8_t bt_start(bt_app_cb_t *app_cb);
 uint8_t bt_stop(void);
 uint8_t bt_start_inquiry(uint8_t inquiry_len,uint8_t max_dev);
+uint8_t bt_stop_inquiry(void);
+uint8_t hci_start_periodic_inquiry(uint16_t min_length,uint16_t max_length,uint8_t inquiry_len,uint8_t max_dev);
+uint8_t bt_stop_periodic_inquiry(void);
+uint8_t bt_get_remote_name(struct bd_addr_t *bdaddr);
+uint8_t bt_cancel_get_remote_name(struct bd_addr_t *bdaddr);
 uint8_t bt_le_inquiry(uint8_t enable);
-
 #endif

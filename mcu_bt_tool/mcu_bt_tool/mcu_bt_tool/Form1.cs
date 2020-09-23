@@ -33,8 +33,8 @@ namespace mcu_bt_tool
         string json_bt_cmd_func = "BT";
         string json_bt_cmd_bt_on = "BT_START";
         string json_bt_cmd_bt_off = "BT_STOP";
-        string json_bt_cmd_bt_start_inquiry = "BT_START_INQUIRY";
-        string json_bt_cmd_bt_stop_inquiry = "BT_STOP_INQUIRY";
+        string json_bt_cmd_bt_start_inquiry = "BT_INQUIRY";
+        string json_bt_cmd_bt_stop_inquiry = "BT_CANCEL_INQUIRY";
 
         public Form1()
         {

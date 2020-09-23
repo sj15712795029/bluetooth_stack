@@ -1,19 +1,5 @@
 #include "bt_wrapper.h"
-#include "board_wrapper.h"
-#include "bt_pbuf.h"
-#include "bt_memp.h"
-#include "bt_hci.h"
-#include "bt_l2cap.h"
-#include "bt_sdp.h"
-#include "bt_rfcomm.h"
-#include "bt_phybusif_h4.h"
-#include "bt_spp.h"
-#include "bt_hfp_hf.h"
-#include "bt_did.h"
-#include "bt_pbap_client.h"
-#include "bt_mem.h"
-#include "bt_common.h"
-#include "bt_config.h"
+
 
 extern struct phybusif_cb uart_if;
 
@@ -28,6 +14,15 @@ static err_t bt_ass_eir_data()
 {
     uint8_t data_pos =0;
     uint8_t len = 0;
+
+#if 1
+    /* local name */
+    len = strlen(BT_LOCAL_NAME);
+    eir_data[data_pos++] = len + 1;
+    eir_data[data_pos++] = BT_DT_COMPLETE_LOCAL_NAME;
+    memcpy(eir_data+data_pos,BT_LOCAL_NAME,strlen(BT_LOCAL_NAME));
+    data_pos += strlen(BT_LOCAL_NAME);
+#endif
 
     /* 16 bit UUID */
     len = 1;
@@ -86,6 +81,9 @@ static err_t bt_ass_eir_data()
     return 0;
 }
 
+static err_t bt_inquiry_complete(struct hci_pcb_t *pcb,uint16_t result);
+static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres);
+static err_t bt_get_remote_name_complete(struct hci_pcb_t *pcb,struct bd_addr_t *bdaddr,uint8_t * name);
 
 
 static err_t  link_key_req(void *arg,struct bd_addr_t *bdaddr)
@@ -94,7 +92,7 @@ static err_t  link_key_req(void *arg,struct bd_addr_t *bdaddr)
     bt_hex_dump(bdaddr->addr,6);
     if(bd_addr_cmp(&(link_key_instance.remote_addr),bdaddr))
     {
-        hci_link_key_request_reply(bdaddr,link_key_instance.link_key);
+        hci_link_key_request_reply(bdaddr,(uint8_t *)&(link_key_instance.link_key));
     }
     else
     {
@@ -180,7 +178,7 @@ void hfp_hf_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
     printf("WRAPPER << PROFILE:hfp_hf_connect_set_up,address is :\n");
     bt_hex_dump(remote_addr->addr,6);
 
-	if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_connect)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_connect)
     {
         bt_wrapper_cb->app_hfp_cb->bt_hfp_connect(remote_addr,status);
     }
@@ -428,6 +426,8 @@ static pbap_client_cbs_t pbap_client_wrapper_cb =
 
 #endif
 
+
+
 uint8_t bt_start(bt_app_cb_t *app_cb)
 {
 #if PROFILE_HFP_ENABLE
@@ -441,7 +441,10 @@ uint8_t bt_start(bt_app_cb_t *app_cb)
     bt_wrapper_cb = app_cb;
     bt_mem_init();
     bt_memp_init();
-    phybusif_open(115200,0);
+    phybusif_open(921600,0);
+#if BT_ENABLE_SNOOP > 0
+    bt_snoop_init();
+#endif
     /* blueooth stack init */
     hci_init();
     hci_link_key_req(link_key_req);
@@ -478,6 +481,7 @@ uint8_t bt_start(bt_app_cb_t *app_cb)
     bt_profile_mask |= BT_PROFILE_AVRCP_CONTROL_MASK;
 #endif
 
+    phybusif_reset(&uart_if);
     hci_reset();
 
     phybusif_reset(&uart_if);
@@ -498,16 +502,48 @@ uint8_t bt_stop(void)
 uint8_t bt_start_inquiry(uint8_t inquiry_len,uint8_t max_dev)
 {
     uint32_t lap =  0x9E8B33;    /* GIAC */
-
-    if(bt_wrapper_cb && bt_wrapper_cb->app_common_cb && bt_wrapper_cb->app_common_cb->bt_inquiry_status)
+	
+	if(bt_wrapper_cb && bt_wrapper_cb->app_common_cb && bt_wrapper_cb->app_common_cb->bt_inquiry_status)
     {
         bt_wrapper_cb->app_common_cb->bt_inquiry_status(BT_INQUIRY_START);
     }
-
+	
     hci_inquiry(lap,inquiry_len,max_dev,bt_inquiry_result,bt_inquiry_complete);
     return 0;
 }
 
+
+uint8_t bt_stop_inquiry(void)
+{
+    hci_cancel_inquiry();
+    return 0;
+}
+
+uint8_t hci_start_periodic_inquiry(uint16_t min_length,uint16_t max_length,uint8_t inquiry_len,uint8_t max_dev)
+{
+    uint32_t lap =  0x9E8B33;    /* GIAC */
+    hci_periodic_inquiry(min_length,max_length,lap,inquiry_len,max_dev,bt_inquiry_result,bt_inquiry_complete);
+
+    return 0;
+}
+uint8_t bt_stop_periodic_inquiry(void)
+{
+    hci_cancel_periodic_inquiry();
+    return 0;
+}
+
+uint8_t bt_get_remote_name(struct bd_addr_t *bdaddr)
+{
+    hci_get_remote_name(bdaddr,bt_get_remote_name_complete);
+    return 0;
+}
+
+
+uint8_t bt_cancel_get_remote_name(struct bd_addr_t *bdaddr)
+{
+    hci_cancel_get_remote_name(bdaddr);
+    return 0;
+}
 
 uint8_t bt_le_inquiry(uint8_t enable)
 {
@@ -551,6 +587,15 @@ static err_t bt_inquiry_complete(struct hci_pcb_t *pcb,uint16_t result)
     {
         bt_wrapper_cb->app_common_cb->bt_inquiry_status(BT_INQUIRY_COMPLETE);
     }
+    return BT_ERR_OK;
+}
+
+static err_t bt_get_remote_name_complete(struct hci_pcb_t *pcb,struct bd_addr_t *bdaddr,uint8_t * name)
+{
+    printf("---------bt_address:\n");
+    bt_hex_dump((uint8_t *)bdaddr,6);
+    printf("---------bt_name:\n");
+    bt_hex_dump(name,248);
     return BT_ERR_OK;
 }
 

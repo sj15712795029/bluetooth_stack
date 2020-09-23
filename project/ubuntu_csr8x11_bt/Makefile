@@ -12,6 +12,7 @@ INCUDIRS		:= 	./ \
 								${BTSTACK_ROOT}/component/bluetooth/src/include \
 								${BTSTACK_ROOT}/component/bluetooth/src/include/classical \
 								${BTSTACK_ROOT}/component/bluetooth/vendor \
+								${BTSTACK_ROOT}/component/bluetooth/wrapper \
 								${BTSTACK_ROOT}/component/ringbuffer \
 								${BTSTACK_ROOT}/component/bluetooth/third_party_lib/sbc \
 				 				
@@ -21,6 +22,7 @@ SRCDIRS			:= 	./ \
 								${BTSTACK_ROOT}/component/bluetooth/src/core \
 								${BTSTACK_ROOT}/component/bluetooth/src/core/classical \
 								${BTSTACK_ROOT}/component/bluetooth/vendor \
+								${BTSTACK_ROOT}/component/bluetooth/wrapper \
 								${BTSTACK_ROOT}/component/ringbuffer \
 								${BTSTACK_ROOT}/component/bluetooth/third_party_lib/sbc \
 				 				

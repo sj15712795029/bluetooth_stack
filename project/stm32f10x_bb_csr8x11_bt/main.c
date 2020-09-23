@@ -1,12 +1,6 @@
 #include <stdio.h>
 #include "stm32f10x_conf.h"
 #include "board_wrapper.h"
-#include "bt_timer.h"
-#include "bt_l2cap.h"
-#include "bt_rfcomm.h"
-#include "bt_phybusif_h4.h"
-#include "hw_misc.h"
-#include "board_wrapper.h"
 #include "bt_wrapper.h"
 #include "cJSON.h"
 
@@ -190,45 +184,123 @@ static bt_app_cb_t bt_app_cb =
     &bt_app_hfp_cb,
 };
 
-static const uint8_t usage[]=
-{
-    "usage:\n"
-    "CMD\t\t\tdescription\n"
-    "BT_START\t\tStart bluetooth stack\n"
-    "BT_STOP\t\t\tStop blueooth stack\n"
-    "BT_INQUIRY\t\tInquiry device\n"
 
+#define BT_START_CMD "BT_START"
+#define BT_START_DES "Start bluetooth stack"
+#define BT_STOP_CMD "BT_STOP"
+#define BT_STOP_DES "Stop blueooth stack"
+#define BT_INQUIRY_CMD "BT_INQUIRY"
+#define BT_INQUIRY_DES "Inquiry device"
+#define BT_CANCEL_INQUIRY_CMD "BT_CANCEL_INQUIRY"
+#define BT_CANCEL_INQUIRY_DES "Cancel inquiry device"
+#define BT_PERIOID_INQUIRY_CMD "BT_PERIOID_INQUIRY"
+#define BT_PERIOID_INQUIRY_DES "Perioid inquiry device"
+#define BT_CANCEL_PERIOID_INQUIRY_CMD "BT_CANCEL_PERIOID_INQUIRY"
+#define BT_CANCEL_PERIOID_INQUIRY_DES "Cancel perioid inquiry device"
+#define BT_LE_INQUIRY_CMD "BT_LE_INQUIRY"
+#define BT_LE_INQUIRY_DES "BLE Inquiry device"
+#define BT_LE_INQUIRY_CANCEL_CMD "BT_LE_INQUIRY_STOP"
+#define BT_LE_INQUIRY_CANCEL_DES "BLE cancel Inquiry device"
+#define BT_SPP_CON_CMD "SPP_CON"
+#define BT_SPP_CON_DES "Connect spp profile"
+#define BT_SPP_SEND_CMD "SPP_SEND"
+#define BT_SPP_SEND_DES "Spp sned data"
+#define BT_SPP_DISCON_CMD "SPP_DISCON"
+#define BT_SPP_DISCON_DES "Disconnect spp profile"
+#define BT_HFP_CON_CMD "HFP_CON"
+#define BT_HFP_CON_DES "Connect hfp profile"
+#define BT_HFP_DISCON_CMD "HFP_DISCON"
+#define BT_HFP_DISCON_DES "Disconnect hfp profile"
+#define BT_HFP_SCO_CON_CMD "HFP_SCO_CON"
+#define BT_HFP_SCO_CON_DES "Connect hfp sco"
+#define BT_HFP_SCO_DISCON_CMD "HFP_SCO_DISCON"
+#define BT_HFP_SCO_DISCON_DES "Disconnect hfp sco"
+#define BT_HFP_ANSWER_CMD "HFP_ANSWER"
+#define BT_HFP_ANSWER_DES "Answer the incoming call"
+#define BT_HFP_CALLOUT_PN_CMD "HFP_CALLOUT_PN"
+#define BT_HFP_CALLOUT_PN_DES "Call out phone number(10086)"
+#define BT_HFP_CALLOUT_MEM_CMD "HFP_CALLOUT_MEM"
+#define BT_HFP_CALLOUT_MEM_DES "Call out phone number with memory 1"
+#define BT_HFP_CALLOUT_LN_CMD "HFP_CALLOUT_LC"
+#define BT_HFP_CALLOUT_LN_DES "Call out last number"
+
+
+
+
+typedef struct
+{
+    uint8_t *cmd;
+    uint8_t *description;
+} cmd_desctiption_t;
+
+cmd_desctiption_t cmd_usage[] =
+{
+    {(uint8_t *)BT_START_CMD,(uint8_t *)BT_START_DES},
+    {(uint8_t *)BT_STOP_CMD,(uint8_t *)BT_STOP_DES},
+    {(uint8_t *)BT_INQUIRY_CMD,(uint8_t *)BT_INQUIRY_CMD},
+    {(uint8_t *)BT_CANCEL_INQUIRY_CMD,(uint8_t *)BT_CANCEL_INQUIRY_DES},
+    {(uint8_t *)BT_PERIOID_INQUIRY_CMD,(uint8_t *)BT_PERIOID_INQUIRY_DES},
+    {(uint8_t *)BT_CANCEL_PERIOID_INQUIRY_CMD,(uint8_t *)BT_CANCEL_PERIOID_INQUIRY_DES},
+    {(uint8_t *)BT_LE_INQUIRY_CMD,(uint8_t *)BT_LE_INQUIRY_DES},
+    {(uint8_t *)BT_LE_INQUIRY_CANCEL_CMD,(uint8_t *)BT_LE_INQUIRY_CANCEL_DES},
+    {(uint8_t *)BT_SPP_CON_CMD,(uint8_t *)BT_SPP_CON_DES},
+    {(uint8_t *)BT_SPP_SEND_CMD,(uint8_t *)BT_SPP_SEND_DES},
+    {(uint8_t *)BT_SPP_DISCON_CMD,(uint8_t *)BT_SPP_DISCON_DES},
+    {(uint8_t *)BT_HFP_CON_CMD,(uint8_t *)BT_HFP_CON_DES},
+    {(uint8_t *)BT_HFP_DISCON_CMD,(uint8_t *)BT_HFP_DISCON_DES},
+    {(uint8_t *)BT_HFP_SCO_CON_CMD,(uint8_t *)BT_HFP_SCO_CON_DES},
+    {(uint8_t *)BT_HFP_SCO_DISCON_CMD,(uint8_t *)BT_HFP_SCO_DISCON_DES},
+    {(uint8_t *)BT_HFP_ANSWER_CMD,(uint8_t *)BT_HFP_ANSWER_DES},
+    {(uint8_t *)BT_HFP_CALLOUT_PN_CMD,(uint8_t *)BT_HFP_CALLOUT_PN_DES},
+    {(uint8_t *)BT_HFP_CALLOUT_MEM_CMD,(uint8_t *)BT_HFP_CALLOUT_MEM_DES},
+    {(uint8_t *)BT_HFP_CALLOUT_LN_CMD,(uint8_t *)BT_HFP_CALLOUT_LN_DES},
 };
 
+void show_usage()
+{
+    uint32_t index = 0;
+    for(index = 0; index < sizeof(cmd_usage)/sizeof(cmd_desctiption_t); index++)
+    {
+        printf("CMD(%s) -> DESCRIPTION(%s)\n",cmd_usage[index].cmd,cmd_usage[index].description);
+    }
+}
 
 uint8_t shell_json_parse(uint8_t *operate_value,
                          uint8_t *para1,uint8_t *para2,uint8_t *para3,
                          uint8_t *para4,uint8_t *para5,uint8_t *para6)
 {
-    if(hw_strcmp((const char *)operate_value,"BT_START") == 0)
+
+    HW_DEBUG("OPERATE:%s\n",operate_value);
+    if(hw_strcmp(BT_START_CMD,(const char*)operate_value) == 0)
     {
-        HW_DEBUG("UART PARSE DEBUG:operate BT_START\n");
+        HW_DEBUG("SHELL:operate BT_START\n");
         bt_start(&bt_app_cb);
         operate_stauts_oled_show("BT",operate_value,"SUCCESS",0,0,0,0,0,0);
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp((const char *)operate_value,"BT_START_INQUIRY") == 0)
+    if(hw_strcmp(BT_STOP_CMD,(const char*)operate_value) == 0)
     {
-        HW_DEBUG("UART PARSE DEBUG:operate BT_INQUIRY\n");
+        HW_DEBUG("SHELL:operate bt stop\n");
+        bt_stop();
+        return 0;
+    }
+
+    if(hw_strcmp(BT_INQUIRY_CMD,(const char*)operate_value) == 0)
+    {
+        HW_DEBUG("SHELL:operate BT_INQUIRY\n");
         bt_start_inquiry(0x30,HCI_INQUIRY_MAX_DEV);
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp((const char *)operate_value,"BT_STOP_INQUIRY") == 0)
+    if(hw_strcmp(BT_CANCEL_INQUIRY_CMD,(const char*)operate_value) == 0)
     {
-        HW_DEBUG("UART PARSE DEBUG:operate BT_STOP_INQUIRY\n");
-
-        return HW_ERR_OK;
+        HW_DEBUG("SHELL:operate bt cancel inquiry\n");
+        bt_stop_inquiry();
+        return 0;
     }
 
-
-
+    HW_DEBUG("NO OPERATE:%s\n",operate_value);
     return HW_ERR_SHELL_NO_CMD;
 }
 
@@ -236,39 +308,35 @@ uint8_t shell_json_parse(uint8_t *operate_value,
 uint8_t shell_at_cmd_parse(uint8_t *shell_string)
 {
 
-
-    if(hw_strcmp("BT_START",(const char*)shell_string) == 0)
+    if(hw_strcmp(BT_START_CMD,(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate bt start\n");
         bt_start(&bt_app_cb);
         return HW_ERR_OK;
     }
-    if(hw_strcmp("BT_STOP",(const char*)shell_string) == 0)
+
+    if(hw_strcmp(BT_STOP_CMD,(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate bt stop\n");
         bt_stop();
         return HW_ERR_OK;
     }
-    if(hw_strcmp("BT_INQUIRY",(const char*)shell_string) == 0)
+
+    if(hw_strcmp(BT_INQUIRY_CMD,(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate bt inquiry\n");
         bt_start_inquiry(0x30,HCI_INQUIRY_MAX_DEV);
         return HW_ERR_OK;
     }
-    if(hw_strcmp("BT_LE_INQUIRY",(const char*)shell_string) == 0)
+
+    if(hw_strcmp(BT_CANCEL_INQUIRY_CMD,(const char*)shell_string) == 0)
     {
-        HW_DEBUG("SHELL:operate bt stop\n");
-        bt_le_inquiry(1);
-        return HW_ERR_OK;
-    }
-    if(hw_strcmp("BT_LE_INQUIRY_STOP",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate bt stop\n");
-        bt_le_inquiry(0);
-        return HW_ERR_OK;
+        HW_DEBUG("SHELL:operate bt cancel inquiry\n");
+        bt_stop_inquiry();
+        return 0;
     }
 
-
+#if PROFILE_SPP_ENABLE > 0
     if(hw_strcmp("SPP_SEND",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate bt stop\n");
@@ -291,7 +359,9 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
         spp_disconnect(&connect_addr);
         return HW_ERR_OK;
     }
+#endif
 
+#if PROFILE_PBAP_ENABLE > 0
     if(hw_strcmp("PBAP_CON",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate PBAP CON\n");
@@ -411,8 +481,10 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
         pbap_client_download_vcard_entry(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE,1);
         return HW_ERR_OK;
     }
+#endif
 
 
+#if PROFILE_HFP_ENABLE > 0
     if(hw_strcmp("HFP_CON",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate HFP CON\n");
@@ -622,8 +694,10 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
         hfp_hf_get_pid(&connect_addr);
         return HW_ERR_OK;
     }
+#endif
 
 
+#if PROFILE_AVRCP_ENABLE > 0
     if(hw_strcmp("AVRCP_GET_CAP1",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:AVRCP_GET_CAP1\n");
@@ -680,8 +754,10 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
         avrcp_controller_backward();
         return HW_ERR_OK;
     }
+#endif
 
-    HW_DEBUG("usage:%s\n",usage);
+
+    show_usage();
     return HW_ERR_SHELL_NO_CMD;
 }
 
