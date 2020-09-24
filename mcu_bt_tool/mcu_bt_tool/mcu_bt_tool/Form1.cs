@@ -38,6 +38,7 @@ namespace mcu_bt_tool
         string json_bt_cmd_bt_off = "BT_STOP";
         string json_bt_cmd_bt_start_inquiry = "BT_INQUIRY";
         string json_bt_cmd_bt_stop_inquiry = "BT_CANCEL_INQUIRY";
+        string json_bt_cmd_spp_send = "SPP_SEND";
 
         public Form1()
         {
@@ -198,6 +199,40 @@ namespace mcu_bt_tool
             json_cmd_send(json_bt_cmd_func, json_bt_cmd_bt_stop_inquiry, null, null, null, null, null, null);
         }
 
+        private void b_spp_clear_recv_data_Click(object sender, EventArgs e)
+        {
+            t_spp_recv_data.Text = "";
+        }
+
+        private void b_spp_clear_send_data_Click(object sender, EventArgs e)
+        {
+            t_spp_send_data.Text = "";
+        }
+
+        private void b_spp_clear_statistics_Click(object sender, EventArgs e)
+        {
+            l_spp_recv_count.Text = "0";
+            l_spp_send_count.Text = "0";
+        }
+
+        private void b_spp_send_Click(object sender, EventArgs e)
+        {
+            if (t_spp_send_data.Text == "")
+            {
+                MessageBox.Show("请填入要发送的内容", "错误提示");
+                return;
+            }
+
+            string strencode = "";
+            byte[] utf8 = Encoding.UTF8.GetBytes(t_spp_send_data.Text);
+            strencode = Encoding.UTF8.GetString(utf8);
+
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_spp_send, strencode, strencode.Length.ToString(), null, null, null, null);
+
+            int spp_send_count = Convert.ToInt32(l_spp_send_count.Text) + t_spp_send_data.Text.Length;
+            l_spp_send_count.Text = spp_send_count.ToString();
+
+        }
 
         /* 串口搜索 */
         private void search_add_serial_port()
@@ -300,6 +335,7 @@ namespace mcu_bt_tool
                 }
                 catch (Exception ex)
                 {
+                    recv_json_str = "";
                     return;
                 }
             }
@@ -380,6 +416,35 @@ namespace mcu_bt_tool
                         dg_inquiry_result.Rows[index].Cells[0].Value = Properties.Resources.ResourceManager.GetObject("未知");
                     }
                 }
+
+                if (status.OPERATE == "BT_CON_RESULT")
+                {
+                    if (status.PARAM1 == "SPP")
+                    {
+                        ui_bt_spp_show(true);
+                        ui_bt_spp_con_status(true);
+                        ui_bt_spp_con_status(status.PARAM2);
+                    }
+
+                }
+
+                if (status.OPERATE == "BT_DISCON_RESULT")
+                {
+                    if (status.PARAM1 == "SPP")
+                    {
+                        ui_bt_spp_show(false);
+                        ui_bt_spp_con_status(false);
+                        ui_bt_spp_con_status(null);
+                    }
+                }
+
+                if (status.OPERATE == "BT_SPP_RECV")
+                {
+                    t_spp_recv_data.Text += status.PARAM1 + "\r\n";
+                    int spp_recv_count = Convert.ToInt32(l_spp_recv_count.Text) + Convert.ToInt32(status.PARAM2);
+                    l_spp_recv_count.Text = spp_recv_count.ToString();
+                }
+                
             }
         }
 
@@ -397,11 +462,65 @@ namespace mcu_bt_tool
             b_stop_inquiry.Enabled = bt_stop_show;
         }
 
+        /* SPP tabpage的显示使能 */
+        private void ui_bt_spp_show(bool bt_spp_show)
+        {
+            if (bt_spp_show)
+            {
+                t_spp_recv_data.Enabled = true;
+                t_spp_send_data.Enabled = true;
+                b_spp_clear_recv_data.Enabled = true;
+                b_spp_clear_send_data.Enabled = true;
+                b_spp_send.Enabled = true;
+                b_spp_clear_statistics.Enabled = true;
+            }
+            else
+            {
+                t_spp_recv_data.Enabled = false;
+                t_spp_send_data.Enabled = false;
+                b_spp_clear_recv_data.Enabled = false;
+                b_spp_clear_send_data.Enabled = false;
+                b_spp_send.Enabled = false;
+                b_spp_clear_statistics.Enabled = false;
+            }
+        }
+
+        /* SPP 刷新连接状态 */
+        private void ui_bt_spp_con_status(bool bt_spp_con_status)
+        {
+            if (bt_spp_con_status)
+            {
+                l_spp_con_status.Text = "已连接";
+            }
+            else
+            {
+                l_spp_con_status.Text = "未连接";
+            }
+        }
+
+        /* SPP 刷新连接地址 */
+        private void ui_bt_spp_con_status(string bt_spp_con_addr)
+        {
+            if (bt_spp_con_addr != null)
+            {
+                l_spp_con_addr.Text = bt_spp_con_addr;
+            }
+            else
+            {
+                l_spp_con_addr.Text = "00:00:00:00:00:00";
+            }
+        }
+
         /* 整个UI的初始化 */
         private void ui_init()
         {
             ui_bt_switch_show(false,false);
+            ui_bt_spp_show(false);
         }
+
+        
+
+        
 
         
 

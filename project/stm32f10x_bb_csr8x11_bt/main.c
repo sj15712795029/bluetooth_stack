@@ -144,6 +144,7 @@ static bt_app_hfp_cb_t bt_app_hfp_cb =
 
 void bt_app_spp_connect(struct bd_addr_t *remote_addr,uint8_t status)
 {
+	uint8_t addr_buf[32] = {0};
     printf("bt_app_spp_connect status %d address:\n",status);
     bt_hex_dump(remote_addr->addr,6);
     connect_addr.addr[5] = remote_addr->addr[5];
@@ -152,6 +153,9 @@ void bt_app_spp_connect(struct bd_addr_t *remote_addr,uint8_t status)
     connect_addr.addr[2] = remote_addr->addr[2];
     connect_addr.addr[1] = remote_addr->addr[1];
     connect_addr.addr[0] = remote_addr->addr[0];
+	hw_sprintf((char*)addr_buf,"%02x:%02x:%02x:%02x:%02x:%02x",remote_addr->addr[5],remote_addr->addr[4],remote_addr->addr[3],\
+		remote_addr->addr[2],remote_addr->addr[1],remote_addr->addr[0]);
+	uart_send_json("BT","BT_CON_RESULT",(uint8_t*)"SUCCESS","SPP",addr_buf,0,0,0);
 }
 
 void bt_app_spp_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
@@ -159,14 +163,23 @@ void bt_app_spp_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
     printf("bt_app_spp_disconnect status %d address:\n",status);
     bt_hex_dump(remote_addr->addr,6);
     memset(&connect_addr,0,sizeof(connect_addr));
+
+	uart_send_json("BT","BT_DISCON_RESULT",(uint8_t*)"SUCCESS","SPP",0,0,0,0);
 }
 
+uint8_t spp_recv_data_json[1024] = {0};
 void bt_app_spp_recv_data(struct bd_addr_t *remote_addr,uint8_t *data,uint16_t data_len)
 {
+	uint8_t data_len_buf[8] = {0};
     printf("bt_app_spp_recv_data len %d address:\n",data_len);
     bt_hex_dump(remote_addr->addr,6);
     printf("data is :");
     bt_hex_dump(data,data_len);
+
+	hw_sprintf((char*)data_len_buf,"%d",data_len);
+	hw_memset(spp_recv_data_json,0,sizeof(spp_recv_data_json));
+	hw_memcpy(spp_recv_data_json,data,data_len);
+	uart_send_json("BT","BT_SPP_RECV",(uint8_t*)"SUCCESS",spp_recv_data_json,data_len_buf,0,0,0);
 }
 
 static bt_app_spp_cb_t bt_app_spp_cb =
@@ -300,6 +313,16 @@ uint8_t shell_json_parse(uint8_t *operate_value,
         return 0;
     }
 
+#if PROFILE_SPP_ENABLE > 0
+	if(hw_strcmp(BT_SPP_SEND_CMD,(const char*)operate_value) == 0)
+    {
+    	uint16_t send_len = atoi((const char*)para2);
+        HW_DEBUG("SHELL:operate bt spp send\n");
+        spp_send_data(&connect_addr,para1,send_len);
+        return 0;
+    }
+#endif
+
     HW_DEBUG("NO OPERATE:%s\n",operate_value);
     return HW_ERR_SHELL_NO_CMD;
 }
@@ -344,13 +367,6 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("SPP_CON",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate spp CON\n");
-
-        spp_connect(&connect_addr);
-        return HW_ERR_OK;
-    }
 
     if(hw_strcmp("SPP_DISCON",(const char*)shell_string) == 0)
     {

@@ -56,11 +56,30 @@
             this.t_data_recv = new System.Windows.Forms.TextBox();
             this.b_log_clear = new System.Windows.Forms.Button();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
+            this.label3 = new System.Windows.Forms.Label();
+            this.l_spp_con_status = new System.Windows.Forms.Label();
+            this.l_spp_con_addr = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.b_spp_clear_send_data = new System.Windows.Forms.Button();
+            this.b_spp_clear_recv_data = new System.Windows.Forms.Button();
+            this.b_spp_clear_statistics = new System.Windows.Forms.Button();
+            this.b_spp_send = new System.Windows.Forms.Button();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.t_spp_send_data = new System.Windows.Forms.TextBox();
+            this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.t_spp_recv_data = new System.Windows.Forms.TextBox();
+            this.l_spp_recv_count = new System.Windows.Forms.Label();
+            this.l_spp_send_count = new System.Windows.Forms.Label();
+            this.label20 = new System.Windows.Forms.Label();
+            this.label21 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.tc_bt_function.SuspendLayout();
             this.tp_bt_basic_func.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dg_inquiry_result)).BeginInit();
+            this.tp_bt_spp.SuspendLayout();
             this.g_log_func.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            this.groupBox6.SuspendLayout();
             this.SuspendLayout();
             // 
             // b_bt_stop
@@ -191,7 +210,6 @@
             // 
             // tp_bt_basic_func
             // 
-            this.tp_bt_basic_func.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("tp_bt_basic_func.BackgroundImage")));
             this.tp_bt_basic_func.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.tp_bt_basic_func.Controls.Add(this.dg_inquiry_result);
             this.tp_bt_basic_func.Controls.Add(this.b_stop_inquiry);
@@ -259,7 +277,6 @@
             // 
             // tp_bt_hfp_hf
             // 
-            this.tp_bt_hfp_hf.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("tp_bt_hfp_hf.BackgroundImage")));
             this.tp_bt_hfp_hf.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.tp_bt_hfp_hf.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.tp_bt_hfp_hf.Location = new System.Drawing.Point(4, 25);
@@ -272,6 +289,20 @@
             // 
             // tp_bt_spp
             // 
+            this.tp_bt_spp.Controls.Add(this.b_spp_clear_send_data);
+            this.tp_bt_spp.Controls.Add(this.b_spp_clear_recv_data);
+            this.tp_bt_spp.Controls.Add(this.b_spp_clear_statistics);
+            this.tp_bt_spp.Controls.Add(this.b_spp_send);
+            this.tp_bt_spp.Controls.Add(this.groupBox2);
+            this.tp_bt_spp.Controls.Add(this.groupBox6);
+            this.tp_bt_spp.Controls.Add(this.l_spp_recv_count);
+            this.tp_bt_spp.Controls.Add(this.l_spp_send_count);
+            this.tp_bt_spp.Controls.Add(this.label20);
+            this.tp_bt_spp.Controls.Add(this.label21);
+            this.tp_bt_spp.Controls.Add(this.l_spp_con_addr);
+            this.tp_bt_spp.Controls.Add(this.label6);
+            this.tp_bt_spp.Controls.Add(this.l_spp_con_status);
+            this.tp_bt_spp.Controls.Add(this.label3);
             this.tp_bt_spp.Location = new System.Drawing.Point(4, 25);
             this.tp_bt_spp.Name = "tp_bt_spp";
             this.tp_bt_spp.Size = new System.Drawing.Size(862, 554);
@@ -338,11 +369,164 @@
             // 
             this.serialPort1.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort1_DataReceived);
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label3.Location = new System.Drawing.Point(26, 55);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(163, 31);
+            this.label3.TabIndex = 0;
+            this.label3.Text = "SPP连接状态:";
+            // 
+            // l_spp_con_status
+            // 
+            this.l_spp_con_status.AutoSize = true;
+            this.l_spp_con_status.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.l_spp_con_status.Location = new System.Drawing.Point(195, 55);
+            this.l_spp_con_status.Name = "l_spp_con_status";
+            this.l_spp_con_status.Size = new System.Drawing.Size(86, 31);
+            this.l_spp_con_status.TabIndex = 1;
+            this.l_spp_con_status.Text = "未连接";
+            // 
+            // l_spp_con_addr
+            // 
+            this.l_spp_con_addr.AutoSize = true;
+            this.l_spp_con_addr.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.l_spp_con_addr.Location = new System.Drawing.Point(562, 55);
+            this.l_spp_con_addr.Name = "l_spp_con_addr";
+            this.l_spp_con_addr.Size = new System.Drawing.Size(229, 31);
+            this.l_spp_con_addr.TabIndex = 3;
+            this.l_spp_con_addr.Text = "00:00:00:00:00:00";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label6.Location = new System.Drawing.Point(389, 55);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(163, 31);
+            this.label6.TabIndex = 2;
+            this.label6.Text = "SPP连接地址:";
+            // 
+            // b_spp_clear_send_data
+            // 
+            this.b_spp_clear_send_data.Location = new System.Drawing.Point(693, 389);
+            this.b_spp_clear_send_data.Name = "b_spp_clear_send_data";
+            this.b_spp_clear_send_data.Size = new System.Drawing.Size(133, 31);
+            this.b_spp_clear_send_data.TabIndex = 37;
+            this.b_spp_clear_send_data.Text = "清除发送";
+            this.b_spp_clear_send_data.UseVisualStyleBackColor = true;
+            this.b_spp_clear_send_data.Click += new System.EventHandler(this.b_spp_clear_send_data_Click);
+            // 
+            // b_spp_clear_recv_data
+            // 
+            this.b_spp_clear_recv_data.Location = new System.Drawing.Point(560, 389);
+            this.b_spp_clear_recv_data.Name = "b_spp_clear_recv_data";
+            this.b_spp_clear_recv_data.Size = new System.Drawing.Size(123, 31);
+            this.b_spp_clear_recv_data.TabIndex = 36;
+            this.b_spp_clear_recv_data.Text = "清除接收";
+            this.b_spp_clear_recv_data.UseVisualStyleBackColor = true;
+            this.b_spp_clear_recv_data.Click += new System.EventHandler(this.b_spp_clear_recv_data_Click);
+            // 
+            // b_spp_clear_statistics
+            // 
+            this.b_spp_clear_statistics.Location = new System.Drawing.Point(560, 461);
+            this.b_spp_clear_statistics.Name = "b_spp_clear_statistics";
+            this.b_spp_clear_statistics.Size = new System.Drawing.Size(266, 30);
+            this.b_spp_clear_statistics.TabIndex = 35;
+            this.b_spp_clear_statistics.Text = "清除统计";
+            this.b_spp_clear_statistics.UseVisualStyleBackColor = true;
+            this.b_spp_clear_statistics.Click += new System.EventHandler(this.b_spp_clear_statistics_Click);
+            // 
+            // b_spp_send
+            // 
+            this.b_spp_send.Location = new System.Drawing.Point(560, 426);
+            this.b_spp_send.Name = "b_spp_send";
+            this.b_spp_send.Size = new System.Drawing.Size(266, 29);
+            this.b_spp_send.TabIndex = 34;
+            this.b_spp_send.Text = "发送";
+            this.b_spp_send.UseVisualStyleBackColor = true;
+            this.b_spp_send.Click += new System.EventHandler(this.b_spp_send_Click);
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.t_spp_send_data);
+            this.groupBox2.Location = new System.Drawing.Point(12, 368);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(530, 163);
+            this.groupBox2.TabIndex = 33;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "发送区";
+            // 
+            // t_spp_send_data
+            // 
+            this.t_spp_send_data.Location = new System.Drawing.Point(8, 23);
+            this.t_spp_send_data.Multiline = true;
+            this.t_spp_send_data.Name = "t_spp_send_data";
+            this.t_spp_send_data.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.t_spp_send_data.Size = new System.Drawing.Size(509, 134);
+            this.t_spp_send_data.TabIndex = 0;
+            // 
+            // groupBox6
+            // 
+            this.groupBox6.Controls.Add(this.t_spp_recv_data);
+            this.groupBox6.Location = new System.Drawing.Point(12, 107);
+            this.groupBox6.Name = "groupBox6";
+            this.groupBox6.Size = new System.Drawing.Size(839, 261);
+            this.groupBox6.TabIndex = 32;
+            this.groupBox6.TabStop = false;
+            this.groupBox6.Text = "接收区";
+            // 
+            // t_spp_recv_data
+            // 
+            this.t_spp_recv_data.Location = new System.Drawing.Point(6, 26);
+            this.t_spp_recv_data.Multiline = true;
+            this.t_spp_recv_data.Name = "t_spp_recv_data";
+            this.t_spp_recv_data.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.t_spp_recv_data.Size = new System.Drawing.Size(827, 229);
+            this.t_spp_recv_data.TabIndex = 0;
+            // 
+            // l_spp_recv_count
+            // 
+            this.l_spp_recv_count.AutoSize = true;
+            this.l_spp_recv_count.Location = new System.Drawing.Point(620, 503);
+            this.l_spp_recv_count.Name = "l_spp_recv_count";
+            this.l_spp_recv_count.Size = new System.Drawing.Size(15, 15);
+            this.l_spp_recv_count.TabIndex = 31;
+            this.l_spp_recv_count.Text = "0";
+            // 
+            // l_spp_send_count
+            // 
+            this.l_spp_send_count.AutoSize = true;
+            this.l_spp_send_count.Location = new System.Drawing.Point(751, 503);
+            this.l_spp_send_count.Name = "l_spp_send_count";
+            this.l_spp_send_count.Size = new System.Drawing.Size(15, 15);
+            this.l_spp_send_count.TabIndex = 30;
+            this.l_spp_send_count.Text = "0";
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(702, 503);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(45, 15);
+            this.label20.TabIndex = 29;
+            this.label20.Text = "发送:";
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.Location = new System.Drawing.Point(571, 503);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(45, 15);
+            this.label21.TabIndex = 28;
+            this.label21.Text = "接收:";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(1436, 705);
             this.Controls.Add(this.b_bt_stop);
@@ -359,8 +543,14 @@
             this.tc_bt_function.ResumeLayout(false);
             this.tp_bt_basic_func.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dg_inquiry_result)).EndInit();
+            this.tp_bt_spp.ResumeLayout(false);
+            this.tp_bt_spp.PerformLayout();
             this.g_log_func.ResumeLayout(false);
             this.g_log_func.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
+            this.groupBox6.ResumeLayout(false);
+            this.groupBox6.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -393,6 +583,22 @@
         private System.Windows.Forms.DataGridViewImageColumn cod;
         private System.Windows.Forms.DataGridViewTextBoxColumn address;
         private System.Windows.Forms.DataGridViewTextBoxColumn name;
+        private System.Windows.Forms.Button b_spp_clear_send_data;
+        private System.Windows.Forms.Button b_spp_clear_recv_data;
+        private System.Windows.Forms.Button b_spp_clear_statistics;
+        private System.Windows.Forms.Button b_spp_send;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.TextBox t_spp_send_data;
+        private System.Windows.Forms.GroupBox groupBox6;
+        private System.Windows.Forms.TextBox t_spp_recv_data;
+        private System.Windows.Forms.Label l_spp_recv_count;
+        private System.Windows.Forms.Label l_spp_send_count;
+        private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.Label label21;
+        private System.Windows.Forms.Label l_spp_con_addr;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label l_spp_con_status;
+        private System.Windows.Forms.Label label3;
     }
 }
 

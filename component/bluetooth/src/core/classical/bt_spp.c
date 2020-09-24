@@ -37,11 +37,13 @@ static const uint8_t spp_service_record[] =
 
 static const uint8_t spp_service_record[] =
 {
+	/* 1.ServiceClassIDList */
     SDP_DES_SIZE8, 0x8,
     SDP_UINT16, BT_ATTRIBUTE_SERVICE_CLASS_ID_LIST>>8&0xff, BT_ATTRIBUTE_SERVICE_CLASS_ID_LIST&0xff, /* Service class ID list attribute */
             SDP_DES_SIZE8, 3,
             SDP_UUID16, BT_SERVICE_CLASS_SERIAL_PORT>>8&0xff, BT_SERVICE_CLASS_SERIAL_PORT&0xff,
 
+	/* 2.ProtocolDescriptorList */
             SDP_DES_SIZE8, 0x11,
             SDP_UINT16, BT_ATTRIBUTE_PROTOCOL_DESCRIPTOR_LIST>>8&0xff, BT_ATTRIBUTE_PROTOCOL_DESCRIPTOR_LIST&0xff,/* Protocol descriptor list attribute */
             SDP_DES_SIZE8, 0xc,
@@ -51,6 +53,7 @@ static const uint8_t spp_service_record[] =
             SDP_UUID16, BT_PROTOCOL_RFCOMM>>8&0xff, BT_PROTOCOL_RFCOMM&0xff, /*RFCOMM*/
             SDP_UINT8, RFCOMM_SPP_SERVER_CHNL, /*RFCOMM channel*/
 
+	/* BluetoothProfileDescriptorList */
             SDP_DES_SIZE8, 0xd,
             SDP_UINT16, BT_ATTRIBUTE_BLUETOOTH_PROFILE_DESCRIPTOR_LIST>>8&0xff, BT_ATTRIBUTE_BLUETOOTH_PROFILE_DESCRIPTOR_LIST&0xff, /* profile descriptor List */
             SDP_DES_SIZE8, 0x8,
@@ -424,16 +427,16 @@ static err_t spp_run(struct spp_pcb_t *pcb)
         l2cap_connect_req(pcb->l2cappcb, &(pcb->remote_addr), SDP_PSM, HCI_ALLOW_ROLE_SWITCH, l2cap_connect_cfm);
         break;
     case SPP_W2_SDP_QUERY_RFCOMM_CHANNEL:
-			{
+    {
         uint8_t spp[] = {0x35, 0x03, 0x19, 0x11, 0x01}; /* Service search pattern with SPP UUID is default */
 
         uint8_t attrids[] = {0x35, 0x03, 0x09, 0x00, 0x04}; /* Attribute IDs to search for in data element
-														sequence form */
+										sequence form */
 
         sdp_service_search_attrib_req(pcb->sdppcb, 0xFFFF, spp, sizeof(spp),
                                       attrids, sizeof(attrids), spp_sdp_attributes_recv);
         break;
-    	}
+    }
     case SPP_W2_SDP_DISCONNECTD:
         l2cap_disconnect_req(pcb->sdppcb->l2cappcb, l2cap_disconnect_cfm);
         sdp_free(pcb->sdppcb);
