@@ -6,6 +6,7 @@
   * @brief   file system header file
 ******************************************************************************/
 #include <stdint.h>
+#include "ff.h"
 #include "hw_misc.h"
 
 uint8_t file_system_init(void);
