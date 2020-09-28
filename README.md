@@ -5,7 +5,7 @@
 |     |  CSR8311 | .... | 开发板购买链接 |
 |  ----  | ----  | ---- | ---- |
 | STM32F103  | √ | x | [**购买开发板连接（点击我）**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.18.5aeb41f9OvIVgA&id=622836061708) |
-| STM32F407  | x | x | x |
+| STM32F407  | √ | x | x |
 | STM32F412  | √ | x | x |
 ## 购买链接
 [**购买开发板连接（点击我）**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.18.5aeb41f9OvIVgA&id=622836061708)
