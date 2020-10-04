@@ -7,6 +7,7 @@
 #include "hw_led.h"
 #include "hw_button.h"
 #include "hw_oled.h"
+#include "hw_lcd.h"
 #include "hw_sht2x.h"
 #include "hw_spi_flash.h"
 #include "usb_lib.h"

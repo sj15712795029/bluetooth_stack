@@ -788,6 +788,20 @@ void board_init()
     //hw_usb_init();
     file_system_init();
     bt_reset_chip();
+	
+	
+	hw_lcd_init();
+	hw_lcd_clear(COLOR_WHITE);
+	test_dir();
+
+
+	hw_lcd_fill(0,0,20,20,COLOR_RED);
+	hw_lcd_fill(0,0,10,10,COLOR_YELLOW);
+	hw_lcd_fill(10,10,20,20,COLOR_GREEN);
+	hw_lcd_fill(0,0,100,100,COLOR_YELLOW);
+
+	hw_lcd_draw_line(0,0,239,399,COLOR_YELLOW);
+	hw_lcd_draw_line(0,50,239,399,COLOR_YELLOW);
 }
 
 

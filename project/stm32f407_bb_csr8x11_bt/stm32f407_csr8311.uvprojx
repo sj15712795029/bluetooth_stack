@@ -527,6 +527,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\board\stm32f407\hw_sht2x.c</FilePath>
             </File>
+            <File>
+              <FileName>hw_lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\board\stm32f407\hw_lcd.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
