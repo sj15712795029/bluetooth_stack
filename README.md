@@ -6,7 +6,7 @@
 |  ----  | ----  | ---- | ---- |
 | STM32F103  | √ | x | [**购买开发板连接（点击我）**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.18.5aeb41f9OvIVgA&id=622836061708) |
 | STM32F407  | √ | x | x |
-| STM32F412  | √ | x | x |
+| STM32F412  | √ | x | [**购买开发板连接（点击我）**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.30.5aeb41f9DVuET8&id=628752502770) |
 ## 购买链接
 [**购买开发板连接（点击我）**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.18.5aeb41f9OvIVgA&id=622836061708)
 <br>[**购买模组连接（点击我）**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.18.5aeb41f9OvIVgA&id=622836061708)
