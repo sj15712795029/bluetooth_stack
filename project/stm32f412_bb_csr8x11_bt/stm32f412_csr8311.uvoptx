@@ -140,7 +140,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ST-LINKIII-KEIL_SWO</Key>
-          <Name>-U303030303030303030303031 -O8398 -SF4000 -C0 -A0 -I0 -HNlocalhost -HP7184 -P2 -N00("ARM CoreSight SW-DP") -D00(2BA01477) -L00(0) -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO15 -FD20000000 -FC1000 -FN1 -FF0STM32F4xx_512.FLM -FS08000000 -FL080000 -FP0($$Device:STM32F412RETx$CMSIS\Flash\STM32F4xx_512.FLM)</Name>
+          <Name>-U9 -O8398 -SF10000 -C0 -A0 -I0 -HNlocalhost -HP7184 -P2 -N00("ARM CoreSight SW-DP (ARM Core") -D00(2BA01477) -L00(0) -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO15 -FD20000000 -FC1000 -FN1 -FF0STM32F4xx_512.FLM -FS08000000 -FL080000 -FP0($$Device:STM32F412RETx$CMSIS\Flash\STM32F4xx_512.FLM)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -152,18 +152,18 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>141</LineNumber>
+          <LineNumber>834</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134223910</Address>
+          <Address>134251264</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>D:\rtos\锛侊紒锛侊紒浜у搧鍙戝竷璧勬枡\STM32_UBUNTU_BLUETOOTH\0-绯荤粺婧愮爜\1-BLUETOOTH\board\stm32f412\hw_uart.c</Filename>
+          <Filename>D:\rtos\锛侊紒锛侊紒浜у搧鍙戝竷璧勬枡\STM32_UBUNTU_BLUETOOTH\0-绯荤粺婧愮爜\1-BLUETOOTH\project\stm32f412_bb_csr8x11_bt\main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\stm32f412_csr8311\../../board/stm32f412/hw_uart.c\141</Expression>
+          <Expression>\\stm32f412_csr8311\main.c\834</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -223,6 +223,7 @@
       </SystemViewers>
       <DebugDescription>
         <Enable>1</Enable>
+        <EnableFlashSeq>0</EnableFlashSeq>
         <EnableLog>0</EnableLog>
         <Protocol>2</Protocol>
         <DbgClock>10000000</DbgClock>
@@ -764,7 +765,7 @@
 
   <Group>
     <GroupName>bt</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1112,7 +1113,7 @@
 
   <Group>
     <GroupName>app</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
