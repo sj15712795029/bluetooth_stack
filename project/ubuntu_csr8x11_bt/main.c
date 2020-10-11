@@ -202,9 +202,10 @@ static bt_app_cb_t bt_app_cb =
     &bt_app_hfp_cb,
 };
 
+
+#define LINUX_SPP_SEND_STRING "Hello,I am SPP in Linux"
 uint8_t shell_parse(uint8_t *shell_string)
 {
-
     if(hw_strcmp(BT_START_CMD,(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate bt start\n");
@@ -234,14 +235,14 @@ uint8_t shell_parse(uint8_t *shell_string)
     }
 
 #if PROFILE_SPP_ENABLE > 0
-    if(hw_strcmp("SPP_SEND",(const char*)shell_string) == 0)
+    if(hw_strncmp(BT_SPP_SEND_CMD,(const char*)shell_string,hw_strlen(BT_SPP_SEND_CMD)) == 0)
     {
-        HW_DEBUG("SHELL:operate bt stop\n");
-        spp_send_data(&connect_addr,(uint8_t *)"111111",hw_strlen("111111"));
+        HW_DEBUG("SHELL:operate bt spp send \n");
+        spp_send_data(&connect_addr,(uint8_t *)LINUX_SPP_SEND_STRING,hw_strlen(LINUX_SPP_SEND_STRING));
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("SPP_CON",(const char*)shell_string) == 0)
+    if(hw_strncmp(BT_SPP_CON_CMD,(const char*)shell_string,hw_strlen(BT_SPP_CON_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate spp CON\n");
 
@@ -249,7 +250,7 @@ uint8_t shell_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("SPP_DISCON",(const char*)shell_string) == 0)
+    if(hw_strncmp(BT_SPP_DISCON_CMD,(const char*)shell_string,hw_strlen(BT_SPP_DISCON_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate spp DISCON\n");
 
