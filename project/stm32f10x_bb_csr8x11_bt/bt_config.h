@@ -86,6 +86,7 @@
 #define BT_LOCAL_NAME "BT_DEMO"
 #define BT_PIN_CODE "0000"
 #define BT_TIMER_COUNT 64 /* TIMER COUNT */
+#define BT_BAUDRATE_1 115200
 
 
 #define PROFILE_DID_ENABLE 0
