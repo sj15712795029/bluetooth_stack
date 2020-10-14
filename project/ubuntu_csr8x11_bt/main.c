@@ -153,10 +153,66 @@ void bt_app_hfp_connect(struct bd_addr_t *remote_addr,uint8_t status)
     connect_addr.addr[0] = remote_addr->addr[0];
 }
 
+void bt_app_hfp_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("bt_app_hfp_disconnect status %d address:\n",status);
+    bt_hex_dump(remote_addr->addr,6);
+
+}
+
+
+void bt_app_hfp_signal_strength_ind(struct bd_addr_t *remote_addr,uint8_t value)
+{
+	printf("bt_app_hfp_signal_strength_ind value %d address:\n",value);
+    bt_hex_dump(remote_addr->addr,6);
+
+}
+
+void bt_app_hfp_roam_status_ind(struct bd_addr_t *remote_addr,uint8_t value)
+{
+	printf("bt_hfp_roam_status_ind value %d address:\n",value);
+    bt_hex_dump(remote_addr->addr,6);
+
+}
+
+void bt_app_hfp_batt_level_ind(struct bd_addr_t *remote_addr,uint8_t value)
+{
+	printf("bt_hfp_batt_level_ind value %d address:\n",value);
+    bt_hex_dump(remote_addr->addr,6);
+
+}
+
+void bt_app_hfp_operator(struct bd_addr_t *remote_addr,uint8_t *operator)
+{
+	printf("bt_app_hfp_operator operator %s address:\n",operator);
+    bt_hex_dump(remote_addr->addr,6);
+
+}
+
+void bt_app_hfp_call_status(struct bd_addr_t *remote_addr,uint8_t value)
+{
+	printf("bt_app_hfp_call_status value %d address:\n",value);
+    bt_hex_dump(remote_addr->addr,6);
+}
+
+void bt_app_hfp_call_setup(struct bd_addr_t *remote_addr,uint8_t value)
+{
+	printf("bt_app_hfp_call_setup value %d address:\n",value);
+    bt_hex_dump(remote_addr->addr,6);
+
+}
+
 
 static bt_app_hfp_cb_t bt_app_hfp_cb =
 {
     bt_app_hfp_connect,
+	bt_app_hfp_disconnect,
+    bt_app_hfp_signal_strength_ind,
+    bt_app_hfp_roam_status_ind,
+    bt_app_hfp_batt_level_ind,
+    bt_app_hfp_operator,
+    bt_app_hfp_call_status,
+    bt_app_hfp_call_setup,
 };
 
 
@@ -544,17 +600,10 @@ uint8_t shell_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("HFP_NET_F",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate bt stop\n");
-        hfp_hf_set_format_network(&connect_addr);
-        return HW_ERR_OK;
-    }
-
     if(hw_strcmp("HFP_NET_N",(const char*)shell_string) == 0)
     {
-        HW_DEBUG("SHELL:operate bt stop\n");
-        hfp_hf_get_network(&connect_addr);
+        HW_DEBUG("SHELL:operate operate hfp get operate\n");
+        bt_hfp_hf_get_operator(&connect_addr);
         return HW_ERR_OK;
     }
 

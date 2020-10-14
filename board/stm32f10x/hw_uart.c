@@ -163,7 +163,7 @@ void USART1_IRQHandler(void)
         if(uart1_rev_len != 0)
         {
             /* Call the parse function */
-		shell_parse(uart1_rev_buffer);
+            shell_parse(uart1_rev_buffer);
             hw_memset(uart1_rev_buffer,0,sizeof(uart1_rev_buffer));
         }
         /* Clear the interrupt and reset DMA */

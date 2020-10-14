@@ -80,6 +80,7 @@ static bt_app_common_cb_t bt_app_common_cb =
 
 void bt_app_hfp_connect(struct bd_addr_t *remote_addr,uint8_t status)
 {
+    uint8_t addr_buf[32] = {0};
     printf("bt_app_hfp_connect status %d address:\n",status);
     bt_hex_dump(remote_addr->addr,6);
     connect_addr.addr[5] = remote_addr->addr[5];
@@ -88,12 +89,90 @@ void bt_app_hfp_connect(struct bd_addr_t *remote_addr,uint8_t status)
     connect_addr.addr[2] = remote_addr->addr[2];
     connect_addr.addr[1] = remote_addr->addr[1];
     connect_addr.addr[0] = remote_addr->addr[0];
+    hw_sprintf((char*)addr_buf,"%02x:%02x:%02x:%02x:%02x:%02x",remote_addr->addr[5],remote_addr->addr[4],remote_addr->addr[3],\
+               remote_addr->addr[2],remote_addr->addr[1],remote_addr->addr[0]);
+    uart_send_json("BT","BT_CON_RESULT",(uint8_t*)"SUCCESS","HFP",addr_buf,0,0,0);
+}
+
+void bt_app_hfp_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("bt_app_hfp_disconnect status %d address:\n",status);
+    bt_hex_dump(remote_addr->addr,6);
+
+    memset(&connect_addr,0,sizeof(connect_addr));
+    uart_send_json("BT","BT_DISCON_RESULT",(uint8_t*)"SUCCESS","HFP",0,0,0,0);
+}
+
+
+void bt_app_hfp_signal_strength_ind(struct bd_addr_t *remote_addr,uint8_t value)
+{
+	uint8_t strength_buf[8] = {0};
+	printf("bt_app_hfp_signal_strength_ind value %d address:\n",value);
+    bt_hex_dump(remote_addr->addr,6);
+
+	hw_sprintf((char *)strength_buf,"%d",value);
+	uart_send_json("BT","BT_HFP_SIGNAL_STRENGTH",(uint8_t*)"SUCCESS",strength_buf,0,0,0,0);
+}
+
+void bt_app_hfp_roam_status_ind(struct bd_addr_t *remote_addr,uint8_t value)
+{
+	uint8_t roam_buf[8] = {0};
+	printf("bt_hfp_roam_status_ind value %d address:\n",value);
+    bt_hex_dump(remote_addr->addr,6);
+
+	hw_sprintf((char *)roam_buf,"%d",value);
+	uart_send_json("BT","BT_HFP_ROAM_STATUS",(uint8_t*)"SUCCESS",roam_buf,0,0,0,0);
+}
+
+void bt_app_hfp_batt_level_ind(struct bd_addr_t *remote_addr,uint8_t value)
+{
+	uint8_t batt_buf[8] = {0};
+	printf("bt_hfp_batt_level_ind value %d address:\n",value);
+    bt_hex_dump(remote_addr->addr,6);
+
+	hw_sprintf((char *)batt_buf,"%d",value);
+	uart_send_json("BT","BT_HFP_BATT_LEVEL",(uint8_t*)"SUCCESS",batt_buf,0,0,0,0);
+}
+
+void bt_app_hfp_operator(struct bd_addr_t *remote_addr,uint8_t *operator)
+{
+	printf("bt_app_hfp_operator operator %s address:\n",operator);
+    bt_hex_dump(remote_addr->addr,6);
+
+	uart_send_json("BT","BT_HFP_OPERATOR",(uint8_t*)"SUCCESS",operator,0,0,0,0);
+}
+
+void bt_app_hfp_call_status(struct bd_addr_t *remote_addr,uint8_t value)
+{
+	uint8_t call_status_buf[8] = {0};
+	printf("bt_app_hfp_call_status value %d address:\n",value);
+    bt_hex_dump(remote_addr->addr,6);
+
+	hw_sprintf((char *)call_status_buf,"%d",value);
+	uart_send_json("BT","BT_HFP_CALL_STATUS",(uint8_t*)"SUCCESS",call_status_buf,0,0,0,0);
+}
+
+void bt_app_hfp_call_setup(struct bd_addr_t *remote_addr,uint8_t value)
+{
+	uint8_t call_setup_buf[8] = {0};
+	printf("bt_app_hfp_call_setup value %d address:\n",value);
+    bt_hex_dump(remote_addr->addr,6);
+
+	hw_sprintf((char *)call_setup_buf,"%d",value);
+	uart_send_json("BT","BT_HFP_CALL_SETUP",(uint8_t*)"SUCCESS",call_setup_buf,0,0,0,0);
 }
 
 
 static bt_app_hfp_cb_t bt_app_hfp_cb =
 {
     bt_app_hfp_connect,
+    bt_app_hfp_disconnect,
+    bt_app_hfp_signal_strength_ind,
+    bt_app_hfp_roam_status_ind,
+    bt_app_hfp_batt_level_ind,
+    bt_app_hfp_operator,
+    bt_app_hfp_call_status,
+    bt_app_hfp_call_setup,
 };
 
 
@@ -276,6 +355,16 @@ uint8_t shell_json_parse(uint8_t *operate_value,
         return 0;
     }
 #endif
+
+#if PROFILE_HFP_ENABLE > 0
+	if(hw_strcmp("HFP_NET_N",(const char*)operate_value) == 0)
+    {
+        HW_DEBUG("SHELL:operate hfp get operate\n");
+        bt_hfp_hf_get_operator(&connect_addr);
+        return HW_ERR_OK;
+    }
+#endif
+
 
     HW_DEBUG("NO OPERATE:%s\n",operate_value);
     return HW_ERR_SHELL_NO_CMD;
@@ -616,17 +705,10 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("HFP_NET_F",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate bt stop\n");
-        hfp_hf_set_format_network(&connect_addr);
-        return HW_ERR_OK;
-    }
-
     if(hw_strcmp("HFP_NET_N",(const char*)shell_string) == 0)
     {
-        HW_DEBUG("SHELL:operate bt stop\n");
-        hfp_hf_get_network(&connect_addr);
+        HW_DEBUG("SHELL:operate operate hfp get operate\n");
+        bt_hfp_hf_get_operator(&connect_addr);
         return HW_ERR_OK;
     }
 
@@ -770,6 +852,7 @@ void bt_reset_chip(void)
 }
 #endif
 
+
 void board_init()
 {
     last_sys_time = sys_time;
@@ -822,6 +905,7 @@ int main()
     static uint8_t led_on = 0;
     board_init();
 
+	
     while(1)
     {
 

@@ -30,12 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.b_bt_stop = new System.Windows.Forms.Button();
-            this.b_bt_start = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.b_board_buy = new System.Windows.Forms.Button();
-            this.b_serial_close = new System.Windows.Forms.Button();
-            this.b_serial_open = new System.Windows.Forms.Button();
             this.cb_serial_baudrate = new System.Windows.Forms.ComboBox();
             this.cb_serial_port = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -46,20 +41,29 @@
             this.cod = new System.Windows.Forms.DataGridViewImageColumn();
             this.address = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.name = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.b_stop_inquiry = new System.Windows.Forms.Button();
-            this.b_start_inquiry = new System.Windows.Forms.Button();
             this.tp_bt_hfp_hf = new System.Windows.Forms.TabPage();
+            this.gb_hfp_test_area = new System.Windows.Forms.GroupBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.gb_dial_area = new System.Windows.Forms.GroupBox();
+            this.b_hfp_num0 = new System.Windows.Forms.Button();
+            this.b_hfp_num1 = new System.Windows.Forms.Button();
+            this.l_hfp_call_num = new System.Windows.Forms.Label();
+            this.b_hfp_num6 = new System.Windows.Forms.Button();
+            this.label4 = new System.Windows.Forms.Label();
+            this.b_hfp_num5 = new System.Windows.Forms.Button();
+            this.b_hfp_call_number = new System.Windows.Forms.Button();
+            this.b_hfp_num4 = new System.Windows.Forms.Button();
+            this.b_hfp_clear_num = new System.Windows.Forms.Button();
+            this.b_hfp_num2 = new System.Windows.Forms.Button();
+            this.b_hfp_num7 = new System.Windows.Forms.Button();
+            this.b_hfp_num9 = new System.Windows.Forms.Button();
+            this.b_hfp_num3 = new System.Windows.Forms.Button();
+            this.b_hfp_num8 = new System.Windows.Forms.Button();
+            this.l_hfp_con_addr = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.l_hfp_con_status = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
             this.tp_bt_spp = new System.Windows.Forms.TabPage();
-            this.g_log_func = new System.Windows.Forms.GroupBox();
-            this.b_serial_send = new System.Windows.Forms.Button();
-            this.t_data_send = new System.Windows.Forms.TextBox();
-            this.t_data_recv = new System.Windows.Forms.TextBox();
-            this.b_log_clear = new System.Windows.Forms.Button();
-            this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
-            this.label3 = new System.Windows.Forms.Label();
-            this.l_spp_con_status = new System.Windows.Forms.Label();
-            this.l_spp_con_addr = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
             this.b_spp_clear_send_data = new System.Windows.Forms.Button();
             this.b_spp_clear_recv_data = new System.Windows.Forms.Button();
             this.b_spp_clear_statistics = new System.Windows.Forms.Button();
@@ -72,37 +76,42 @@
             this.l_spp_send_count = new System.Windows.Forms.Label();
             this.label20 = new System.Windows.Forms.Label();
             this.label21 = new System.Windows.Forms.Label();
+            this.l_spp_con_addr = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.l_spp_con_status = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.g_log_func = new System.Windows.Forms.GroupBox();
+            this.t_data_send = new System.Windows.Forms.TextBox();
+            this.t_data_recv = new System.Windows.Forms.TextBox();
+            this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
+            this.tb_hfp_operate = new System.Windows.Forms.TextBox();
+            this.b_hfp_get_operate = new System.Windows.Forms.Button();
+            this.b_bt_stop = new System.Windows.Forms.Button();
+            this.b_bt_start = new System.Windows.Forms.Button();
+            this.b_serial_send = new System.Windows.Forms.Button();
+            this.b_log_clear = new System.Windows.Forms.Button();
+            this.b_stop_inquiry = new System.Windows.Forms.Button();
+            this.b_start_inquiry = new System.Windows.Forms.Button();
+            this.pb_hfp_batt = new System.Windows.Forms.PictureBox();
+            this.pb_hfp_signal = new System.Windows.Forms.PictureBox();
+            this.b_board_buy = new System.Windows.Forms.Button();
+            this.b_serial_close = new System.Windows.Forms.Button();
+            this.b_serial_open = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.tc_bt_function.SuspendLayout();
             this.tp_bt_basic_func.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dg_inquiry_result)).BeginInit();
+            this.tp_bt_hfp_hf.SuspendLayout();
+            this.gb_hfp_test_area.SuspendLayout();
+            this.groupBox3.SuspendLayout();
+            this.gb_dial_area.SuspendLayout();
             this.tp_bt_spp.SuspendLayout();
-            this.g_log_func.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox6.SuspendLayout();
+            this.g_log_func.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pb_hfp_batt)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pb_hfp_signal)).BeginInit();
             this.SuspendLayout();
-            // 
-            // b_bt_stop
-            // 
-            this.b_bt_stop.Enabled = false;
-            this.b_bt_stop.Image = ((System.Drawing.Image)(resources.GetObject("b_bt_stop.Image")));
-            this.b_bt_stop.Location = new System.Drawing.Point(748, 20);
-            this.b_bt_stop.Name = "b_bt_stop";
-            this.b_bt_stop.Size = new System.Drawing.Size(89, 90);
-            this.b_bt_stop.TabIndex = 4;
-            this.b_bt_stop.UseVisualStyleBackColor = true;
-            this.b_bt_stop.Click += new System.EventHandler(this.b_bt_stop_Click);
-            // 
-            // b_bt_start
-            // 
-            this.b_bt_start.Enabled = false;
-            this.b_bt_start.Image = ((System.Drawing.Image)(resources.GetObject("b_bt_start.Image")));
-            this.b_bt_start.Location = new System.Drawing.Point(624, 20);
-            this.b_bt_start.Name = "b_bt_start";
-            this.b_bt_start.Size = new System.Drawing.Size(91, 90);
-            this.b_bt_start.TabIndex = 2;
-            this.b_bt_start.UseVisualStyleBackColor = true;
-            this.b_bt_start.Click += new System.EventHandler(this.b_bt_start_Click);
             // 
             // groupBox1
             // 
@@ -120,40 +129,6 @@
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "串口配置区";
-            // 
-            // b_board_buy
-            // 
-            this.b_board_buy.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("b_board_buy.BackgroundImage")));
-            this.b_board_buy.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.b_board_buy.Location = new System.Drawing.Point(450, 25);
-            this.b_board_buy.Name = "b_board_buy";
-            this.b_board_buy.Size = new System.Drawing.Size(130, 65);
-            this.b_board_buy.TabIndex = 6;
-            this.b_board_buy.UseVisualStyleBackColor = true;
-            this.b_board_buy.Click += new System.EventHandler(this.b_board_buy_Click);
-            // 
-            // b_serial_close
-            // 
-            this.b_serial_close.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.b_serial_close.Enabled = false;
-            this.b_serial_close.Image = ((System.Drawing.Image)(resources.GetObject("b_serial_close.Image")));
-            this.b_serial_close.Location = new System.Drawing.Point(333, 25);
-            this.b_serial_close.Name = "b_serial_close";
-            this.b_serial_close.Size = new System.Drawing.Size(95, 65);
-            this.b_serial_close.TabIndex = 5;
-            this.b_serial_close.UseVisualStyleBackColor = true;
-            this.b_serial_close.Click += new System.EventHandler(this.b_serial_close_Click);
-            // 
-            // b_serial_open
-            // 
-            this.b_serial_open.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.b_serial_open.Image = ((System.Drawing.Image)(resources.GetObject("b_serial_open.Image")));
-            this.b_serial_open.Location = new System.Drawing.Point(220, 25);
-            this.b_serial_open.Name = "b_serial_open";
-            this.b_serial_open.Size = new System.Drawing.Size(95, 65);
-            this.b_serial_open.TabIndex = 4;
-            this.b_serial_open.UseVisualStyleBackColor = true;
-            this.b_serial_open.Click += new System.EventHandler(this.b_serial_open_Click);
             // 
             // cb_serial_baudrate
             // 
@@ -253,31 +228,16 @@
             this.name.Name = "name";
             this.name.Width = 200;
             // 
-            // b_stop_inquiry
-            // 
-            this.b_stop_inquiry.Enabled = false;
-            this.b_stop_inquiry.Image = ((System.Drawing.Image)(resources.GetObject("b_stop_inquiry.Image")));
-            this.b_stop_inquiry.Location = new System.Drawing.Point(23, 147);
-            this.b_stop_inquiry.Name = "b_stop_inquiry";
-            this.b_stop_inquiry.Size = new System.Drawing.Size(100, 104);
-            this.b_stop_inquiry.TabIndex = 8;
-            this.b_stop_inquiry.UseVisualStyleBackColor = true;
-            this.b_stop_inquiry.Click += new System.EventHandler(this.b_stop_inquiry_Click);
-            // 
-            // b_start_inquiry
-            // 
-            this.b_start_inquiry.Enabled = false;
-            this.b_start_inquiry.Image = ((System.Drawing.Image)(resources.GetObject("b_start_inquiry.Image")));
-            this.b_start_inquiry.Location = new System.Drawing.Point(23, 26);
-            this.b_start_inquiry.Name = "b_start_inquiry";
-            this.b_start_inquiry.Size = new System.Drawing.Size(104, 104);
-            this.b_start_inquiry.TabIndex = 7;
-            this.b_start_inquiry.UseVisualStyleBackColor = true;
-            this.b_start_inquiry.Click += new System.EventHandler(this.b_start_inquiry_Click);
-            // 
             // tp_bt_hfp_hf
             // 
             this.tp_bt_hfp_hf.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.tp_bt_hfp_hf.Controls.Add(this.pb_hfp_batt);
+            this.tp_bt_hfp_hf.Controls.Add(this.pb_hfp_signal);
+            this.tp_bt_hfp_hf.Controls.Add(this.gb_hfp_test_area);
+            this.tp_bt_hfp_hf.Controls.Add(this.l_hfp_con_addr);
+            this.tp_bt_hfp_hf.Controls.Add(this.label5);
+            this.tp_bt_hfp_hf.Controls.Add(this.l_hfp_con_status);
+            this.tp_bt_hfp_hf.Controls.Add(this.label8);
             this.tp_bt_hfp_hf.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.tp_bt_hfp_hf.Location = new System.Drawing.Point(4, 25);
             this.tp_bt_hfp_hf.Name = "tp_bt_hfp_hf";
@@ -286,6 +246,217 @@
             this.tp_bt_hfp_hf.TabIndex = 1;
             this.tp_bt_hfp_hf.Text = "蓝牙电话";
             this.tp_bt_hfp_hf.UseVisualStyleBackColor = true;
+            // 
+            // gb_hfp_test_area
+            // 
+            this.gb_hfp_test_area.Controls.Add(this.groupBox3);
+            this.gb_hfp_test_area.Controls.Add(this.gb_dial_area);
+            this.gb_hfp_test_area.Location = new System.Drawing.Point(6, 62);
+            this.gb_hfp_test_area.Name = "gb_hfp_test_area";
+            this.gb_hfp_test_area.Size = new System.Drawing.Size(850, 486);
+            this.gb_hfp_test_area.TabIndex = 21;
+            this.gb_hfp_test_area.TabStop = false;
+            this.gb_hfp_test_area.Text = "蓝牙电话测试区";
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.b_hfp_get_operate);
+            this.groupBox3.Controls.Add(this.tb_hfp_operate);
+            this.groupBox3.Location = new System.Drawing.Point(7, 26);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(272, 454);
+            this.groupBox3.TabIndex = 24;
+            this.groupBox3.TabStop = false;
+            // 
+            // gb_dial_area
+            // 
+            this.gb_dial_area.Controls.Add(this.b_hfp_num0);
+            this.gb_dial_area.Controls.Add(this.b_hfp_num1);
+            this.gb_dial_area.Controls.Add(this.l_hfp_call_num);
+            this.gb_dial_area.Controls.Add(this.b_hfp_num6);
+            this.gb_dial_area.Controls.Add(this.label4);
+            this.gb_dial_area.Controls.Add(this.b_hfp_num5);
+            this.gb_dial_area.Controls.Add(this.b_hfp_call_number);
+            this.gb_dial_area.Controls.Add(this.b_hfp_num4);
+            this.gb_dial_area.Controls.Add(this.b_hfp_clear_num);
+            this.gb_dial_area.Controls.Add(this.b_hfp_num2);
+            this.gb_dial_area.Controls.Add(this.b_hfp_num7);
+            this.gb_dial_area.Controls.Add(this.b_hfp_num9);
+            this.gb_dial_area.Controls.Add(this.b_hfp_num3);
+            this.gb_dial_area.Controls.Add(this.b_hfp_num8);
+            this.gb_dial_area.Location = new System.Drawing.Point(524, 16);
+            this.gb_dial_area.Name = "gb_dial_area";
+            this.gb_dial_area.Size = new System.Drawing.Size(320, 464);
+            this.gb_dial_area.TabIndex = 23;
+            this.gb_dial_area.TabStop = false;
+            // 
+            // b_hfp_num0
+            // 
+            this.b_hfp_num0.Location = new System.Drawing.Point(115, 357);
+            this.b_hfp_num0.Name = "b_hfp_num0";
+            this.b_hfp_num0.Size = new System.Drawing.Size(90, 90);
+            this.b_hfp_num0.TabIndex = 23;
+            this.b_hfp_num0.Text = "0";
+            this.b_hfp_num0.UseVisualStyleBackColor = true;
+            // 
+            // b_hfp_num1
+            // 
+            this.b_hfp_num1.Location = new System.Drawing.Point(11, 69);
+            this.b_hfp_num1.Name = "b_hfp_num1";
+            this.b_hfp_num1.Size = new System.Drawing.Size(90, 90);
+            this.b_hfp_num1.TabIndex = 10;
+            this.b_hfp_num1.Text = "1";
+            this.b_hfp_num1.UseVisualStyleBackColor = true;
+            // 
+            // l_hfp_call_num
+            // 
+            this.l_hfp_call_num.AutoSize = true;
+            this.l_hfp_call_num.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.l_hfp_call_num.Location = new System.Drawing.Point(110, 17);
+            this.l_hfp_call_num.Name = "l_hfp_call_num";
+            this.l_hfp_call_num.Size = new System.Drawing.Size(140, 27);
+            this.l_hfp_call_num.TabIndex = 22;
+            this.l_hfp_call_num.Text = "xxx-xxxx-xxxx";
+            // 
+            // b_hfp_num6
+            // 
+            this.b_hfp_num6.Location = new System.Drawing.Point(213, 165);
+            this.b_hfp_num6.Name = "b_hfp_num6";
+            this.b_hfp_num6.Size = new System.Drawing.Size(90, 90);
+            this.b_hfp_num6.TabIndex = 14;
+            this.b_hfp_num6.Text = "6";
+            this.b_hfp_num6.UseVisualStyleBackColor = true;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label4.Location = new System.Drawing.Point(7, 17);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(97, 27);
+            this.label4.TabIndex = 21;
+            this.label4.Text = "电话号码:";
+            // 
+            // b_hfp_num5
+            // 
+            this.b_hfp_num5.Location = new System.Drawing.Point(113, 165);
+            this.b_hfp_num5.Name = "b_hfp_num5";
+            this.b_hfp_num5.Size = new System.Drawing.Size(90, 90);
+            this.b_hfp_num5.TabIndex = 15;
+            this.b_hfp_num5.Text = "5";
+            this.b_hfp_num5.UseVisualStyleBackColor = true;
+            // 
+            // b_hfp_call_number
+            // 
+            this.b_hfp_call_number.Location = new System.Drawing.Point(12, 357);
+            this.b_hfp_call_number.Name = "b_hfp_call_number";
+            this.b_hfp_call_number.Size = new System.Drawing.Size(90, 90);
+            this.b_hfp_call_number.TabIndex = 20;
+            this.b_hfp_call_number.Text = "拨打电话";
+            this.b_hfp_call_number.UseVisualStyleBackColor = true;
+            // 
+            // b_hfp_num4
+            // 
+            this.b_hfp_num4.Location = new System.Drawing.Point(11, 165);
+            this.b_hfp_num4.Name = "b_hfp_num4";
+            this.b_hfp_num4.Size = new System.Drawing.Size(90, 90);
+            this.b_hfp_num4.TabIndex = 13;
+            this.b_hfp_num4.Text = "4";
+            this.b_hfp_num4.UseVisualStyleBackColor = true;
+            // 
+            // b_hfp_clear_num
+            // 
+            this.b_hfp_clear_num.Location = new System.Drawing.Point(213, 357);
+            this.b_hfp_clear_num.Name = "b_hfp_clear_num";
+            this.b_hfp_clear_num.Size = new System.Drawing.Size(90, 90);
+            this.b_hfp_clear_num.TabIndex = 19;
+            this.b_hfp_clear_num.Text = "清除号码";
+            this.b_hfp_clear_num.UseVisualStyleBackColor = true;
+            // 
+            // b_hfp_num2
+            // 
+            this.b_hfp_num2.Location = new System.Drawing.Point(113, 69);
+            this.b_hfp_num2.Name = "b_hfp_num2";
+            this.b_hfp_num2.Size = new System.Drawing.Size(90, 90);
+            this.b_hfp_num2.TabIndex = 12;
+            this.b_hfp_num2.Text = "2";
+            this.b_hfp_num2.UseVisualStyleBackColor = true;
+            // 
+            // b_hfp_num7
+            // 
+            this.b_hfp_num7.Location = new System.Drawing.Point(11, 261);
+            this.b_hfp_num7.Name = "b_hfp_num7";
+            this.b_hfp_num7.Size = new System.Drawing.Size(90, 90);
+            this.b_hfp_num7.TabIndex = 16;
+            this.b_hfp_num7.Text = "7";
+            this.b_hfp_num7.UseVisualStyleBackColor = true;
+            // 
+            // b_hfp_num9
+            // 
+            this.b_hfp_num9.Location = new System.Drawing.Point(213, 261);
+            this.b_hfp_num9.Name = "b_hfp_num9";
+            this.b_hfp_num9.Size = new System.Drawing.Size(90, 90);
+            this.b_hfp_num9.TabIndex = 17;
+            this.b_hfp_num9.Text = "9";
+            this.b_hfp_num9.UseVisualStyleBackColor = true;
+            // 
+            // b_hfp_num3
+            // 
+            this.b_hfp_num3.Location = new System.Drawing.Point(213, 69);
+            this.b_hfp_num3.Name = "b_hfp_num3";
+            this.b_hfp_num3.Size = new System.Drawing.Size(90, 90);
+            this.b_hfp_num3.TabIndex = 11;
+            this.b_hfp_num3.Text = "3";
+            this.b_hfp_num3.UseVisualStyleBackColor = true;
+            // 
+            // b_hfp_num8
+            // 
+            this.b_hfp_num8.Location = new System.Drawing.Point(113, 261);
+            this.b_hfp_num8.Name = "b_hfp_num8";
+            this.b_hfp_num8.Size = new System.Drawing.Size(90, 90);
+            this.b_hfp_num8.TabIndex = 18;
+            this.b_hfp_num8.Text = "8";
+            this.b_hfp_num8.UseVisualStyleBackColor = true;
+            // 
+            // l_hfp_con_addr
+            // 
+            this.l_hfp_con_addr.AutoSize = true;
+            this.l_hfp_con_addr.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.l_hfp_con_addr.Location = new System.Drawing.Point(421, 21);
+            this.l_hfp_con_addr.Name = "l_hfp_con_addr";
+            this.l_hfp_con_addr.Size = new System.Drawing.Size(186, 27);
+            this.l_hfp_con_addr.TabIndex = 7;
+            this.l_hfp_con_addr.Text = "00:00:00:00:00:00";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label5.Location = new System.Drawing.Point(277, 20);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(138, 27);
+            this.label5.TabIndex = 6;
+            this.label5.Text = "HFP连接地址:";
+            // 
+            // l_hfp_con_status
+            // 
+            this.l_hfp_con_status.AutoSize = true;
+            this.l_hfp_con_status.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.l_hfp_con_status.Location = new System.Drawing.Point(151, 20);
+            this.l_hfp_con_status.Name = "l_hfp_con_status";
+            this.l_hfp_con_status.Size = new System.Drawing.Size(72, 27);
+            this.l_hfp_con_status.TabIndex = 5;
+            this.l_hfp_con_status.Text = "未连接";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label8.Location = new System.Drawing.Point(7, 20);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(138, 27);
+            this.label8.TabIndex = 4;
+            this.label8.Text = "HFP连接状态:";
             // 
             // tp_bt_spp
             // 
@@ -309,105 +480,6 @@
             this.tp_bt_spp.TabIndex = 2;
             this.tp_bt_spp.Text = "蓝牙串口";
             this.tp_bt_spp.UseVisualStyleBackColor = true;
-            // 
-            // g_log_func
-            // 
-            this.g_log_func.BackColor = System.Drawing.Color.Transparent;
-            this.g_log_func.Controls.Add(this.b_serial_send);
-            this.g_log_func.Controls.Add(this.t_data_send);
-            this.g_log_func.Controls.Add(this.t_data_recv);
-            this.g_log_func.Controls.Add(this.b_log_clear);
-            this.g_log_func.Location = new System.Drawing.Point(884, 12);
-            this.g_log_func.Name = "g_log_func";
-            this.g_log_func.Size = new System.Drawing.Size(541, 690);
-            this.g_log_func.TabIndex = 6;
-            this.g_log_func.TabStop = false;
-            this.g_log_func.Text = "串口调试区";
-            // 
-            // b_serial_send
-            // 
-            this.b_serial_send.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("b_serial_send.BackgroundImage")));
-            this.b_serial_send.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.b_serial_send.Location = new System.Drawing.Point(412, 614);
-            this.b_serial_send.Name = "b_serial_send";
-            this.b_serial_send.Size = new System.Drawing.Size(114, 67);
-            this.b_serial_send.TabIndex = 3;
-            this.b_serial_send.UseVisualStyleBackColor = true;
-            this.b_serial_send.Click += new System.EventHandler(this.b_serial_send_Click);
-            // 
-            // t_data_send
-            // 
-            this.t_data_send.Location = new System.Drawing.Point(18, 614);
-            this.t_data_send.Multiline = true;
-            this.t_data_send.Name = "t_data_send";
-            this.t_data_send.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.t_data_send.Size = new System.Drawing.Size(388, 66);
-            this.t_data_send.TabIndex = 2;
-            this.t_data_send.Text = "shop220811498.taobao.com";
-            // 
-            // t_data_recv
-            // 
-            this.t_data_recv.Location = new System.Drawing.Point(16, 23);
-            this.t_data_recv.Multiline = true;
-            this.t_data_recv.Name = "t_data_recv";
-            this.t_data_recv.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.t_data_recv.Size = new System.Drawing.Size(510, 542);
-            this.t_data_recv.TabIndex = 1;
-            // 
-            // b_log_clear
-            // 
-            this.b_log_clear.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("b_log_clear.BackgroundImage")));
-            this.b_log_clear.Location = new System.Drawing.Point(18, 571);
-            this.b_log_clear.Name = "b_log_clear";
-            this.b_log_clear.Size = new System.Drawing.Size(508, 37);
-            this.b_log_clear.TabIndex = 0;
-            this.b_log_clear.Text = "清空调试日志";
-            this.b_log_clear.UseVisualStyleBackColor = true;
-            this.b_log_clear.Click += new System.EventHandler(this.b_log_clear_Click);
-            // 
-            // serialPort1
-            // 
-            this.serialPort1.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort1_DataReceived);
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label3.Location = new System.Drawing.Point(26, 55);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(163, 31);
-            this.label3.TabIndex = 0;
-            this.label3.Text = "SPP连接状态:";
-            // 
-            // l_spp_con_status
-            // 
-            this.l_spp_con_status.AutoSize = true;
-            this.l_spp_con_status.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.l_spp_con_status.Location = new System.Drawing.Point(195, 55);
-            this.l_spp_con_status.Name = "l_spp_con_status";
-            this.l_spp_con_status.Size = new System.Drawing.Size(86, 31);
-            this.l_spp_con_status.TabIndex = 1;
-            this.l_spp_con_status.Text = "未连接";
-            // 
-            // l_spp_con_addr
-            // 
-            this.l_spp_con_addr.AutoSize = true;
-            this.l_spp_con_addr.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.l_spp_con_addr.Location = new System.Drawing.Point(562, 55);
-            this.l_spp_con_addr.Name = "l_spp_con_addr";
-            this.l_spp_con_addr.Size = new System.Drawing.Size(229, 31);
-            this.l_spp_con_addr.TabIndex = 3;
-            this.l_spp_con_addr.Text = "00:00:00:00:00:00";
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label6.Location = new System.Drawing.Point(389, 55);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(163, 31);
-            this.label6.TabIndex = 2;
-            this.label6.Text = "SPP连接地址:";
             // 
             // b_spp_clear_send_data
             // 
@@ -523,6 +595,218 @@
             this.label21.TabIndex = 28;
             this.label21.Text = "接收:";
             // 
+            // l_spp_con_addr
+            // 
+            this.l_spp_con_addr.AutoSize = true;
+            this.l_spp_con_addr.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.l_spp_con_addr.Location = new System.Drawing.Point(562, 55);
+            this.l_spp_con_addr.Name = "l_spp_con_addr";
+            this.l_spp_con_addr.Size = new System.Drawing.Size(229, 31);
+            this.l_spp_con_addr.TabIndex = 3;
+            this.l_spp_con_addr.Text = "00:00:00:00:00:00";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label6.Location = new System.Drawing.Point(389, 55);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(163, 31);
+            this.label6.TabIndex = 2;
+            this.label6.Text = "SPP连接地址:";
+            // 
+            // l_spp_con_status
+            // 
+            this.l_spp_con_status.AutoSize = true;
+            this.l_spp_con_status.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.l_spp_con_status.Location = new System.Drawing.Point(195, 55);
+            this.l_spp_con_status.Name = "l_spp_con_status";
+            this.l_spp_con_status.Size = new System.Drawing.Size(86, 31);
+            this.l_spp_con_status.TabIndex = 1;
+            this.l_spp_con_status.Text = "未连接";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label3.Location = new System.Drawing.Point(26, 55);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(163, 31);
+            this.label3.TabIndex = 0;
+            this.label3.Text = "SPP连接状态:";
+            // 
+            // g_log_func
+            // 
+            this.g_log_func.BackColor = System.Drawing.Color.Transparent;
+            this.g_log_func.Controls.Add(this.b_serial_send);
+            this.g_log_func.Controls.Add(this.t_data_send);
+            this.g_log_func.Controls.Add(this.t_data_recv);
+            this.g_log_func.Controls.Add(this.b_log_clear);
+            this.g_log_func.Location = new System.Drawing.Point(884, 12);
+            this.g_log_func.Name = "g_log_func";
+            this.g_log_func.Size = new System.Drawing.Size(541, 690);
+            this.g_log_func.TabIndex = 6;
+            this.g_log_func.TabStop = false;
+            this.g_log_func.Text = "串口调试区";
+            // 
+            // t_data_send
+            // 
+            this.t_data_send.Location = new System.Drawing.Point(18, 614);
+            this.t_data_send.Multiline = true;
+            this.t_data_send.Name = "t_data_send";
+            this.t_data_send.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.t_data_send.Size = new System.Drawing.Size(388, 66);
+            this.t_data_send.TabIndex = 2;
+            this.t_data_send.Text = "shop220811498.taobao.com";
+            // 
+            // t_data_recv
+            // 
+            this.t_data_recv.Location = new System.Drawing.Point(16, 23);
+            this.t_data_recv.Multiline = true;
+            this.t_data_recv.Name = "t_data_recv";
+            this.t_data_recv.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.t_data_recv.Size = new System.Drawing.Size(510, 542);
+            this.t_data_recv.TabIndex = 1;
+            // 
+            // serialPort1
+            // 
+            this.serialPort1.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort1_DataReceived);
+            // 
+            // tb_hfp_operate
+            // 
+            this.tb_hfp_operate.Location = new System.Drawing.Point(7, 27);
+            this.tb_hfp_operate.Multiline = true;
+            this.tb_hfp_operate.Name = "tb_hfp_operate";
+            this.tb_hfp_operate.Size = new System.Drawing.Size(128, 38);
+            this.tb_hfp_operate.TabIndex = 0;
+            // 
+            // b_hfp_get_operate
+            // 
+            this.b_hfp_get_operate.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.b_hfp_get_operate.Location = new System.Drawing.Point(156, 26);
+            this.b_hfp_get_operate.Name = "b_hfp_get_operate";
+            this.b_hfp_get_operate.Size = new System.Drawing.Size(105, 39);
+            this.b_hfp_get_operate.TabIndex = 1;
+            this.b_hfp_get_operate.Text = "获取运营商";
+            this.b_hfp_get_operate.UseVisualStyleBackColor = true;
+            this.b_hfp_get_operate.Click += new System.EventHandler(this.b_hfp_get_operate_Click);
+            // 
+            // b_bt_stop
+            // 
+            this.b_bt_stop.Enabled = false;
+            this.b_bt_stop.Image = ((System.Drawing.Image)(resources.GetObject("b_bt_stop.Image")));
+            this.b_bt_stop.Location = new System.Drawing.Point(748, 20);
+            this.b_bt_stop.Name = "b_bt_stop";
+            this.b_bt_stop.Size = new System.Drawing.Size(89, 90);
+            this.b_bt_stop.TabIndex = 4;
+            this.b_bt_stop.UseVisualStyleBackColor = true;
+            this.b_bt_stop.Click += new System.EventHandler(this.b_bt_stop_Click);
+            // 
+            // b_bt_start
+            // 
+            this.b_bt_start.Enabled = false;
+            this.b_bt_start.Image = ((System.Drawing.Image)(resources.GetObject("b_bt_start.Image")));
+            this.b_bt_start.Location = new System.Drawing.Point(624, 20);
+            this.b_bt_start.Name = "b_bt_start";
+            this.b_bt_start.Size = new System.Drawing.Size(91, 90);
+            this.b_bt_start.TabIndex = 2;
+            this.b_bt_start.UseVisualStyleBackColor = true;
+            this.b_bt_start.Click += new System.EventHandler(this.b_bt_start_Click);
+            // 
+            // b_serial_send
+            // 
+            this.b_serial_send.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("b_serial_send.BackgroundImage")));
+            this.b_serial_send.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.b_serial_send.Location = new System.Drawing.Point(412, 614);
+            this.b_serial_send.Name = "b_serial_send";
+            this.b_serial_send.Size = new System.Drawing.Size(114, 67);
+            this.b_serial_send.TabIndex = 3;
+            this.b_serial_send.UseVisualStyleBackColor = true;
+            this.b_serial_send.Click += new System.EventHandler(this.b_serial_send_Click);
+            // 
+            // b_log_clear
+            // 
+            this.b_log_clear.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("b_log_clear.BackgroundImage")));
+            this.b_log_clear.Location = new System.Drawing.Point(18, 571);
+            this.b_log_clear.Name = "b_log_clear";
+            this.b_log_clear.Size = new System.Drawing.Size(508, 37);
+            this.b_log_clear.TabIndex = 0;
+            this.b_log_clear.Text = "清空调试日志";
+            this.b_log_clear.UseVisualStyleBackColor = true;
+            this.b_log_clear.Click += new System.EventHandler(this.b_log_clear_Click);
+            // 
+            // b_stop_inquiry
+            // 
+            this.b_stop_inquiry.Enabled = false;
+            this.b_stop_inquiry.Image = ((System.Drawing.Image)(resources.GetObject("b_stop_inquiry.Image")));
+            this.b_stop_inquiry.Location = new System.Drawing.Point(23, 147);
+            this.b_stop_inquiry.Name = "b_stop_inquiry";
+            this.b_stop_inquiry.Size = new System.Drawing.Size(100, 104);
+            this.b_stop_inquiry.TabIndex = 8;
+            this.b_stop_inquiry.UseVisualStyleBackColor = true;
+            this.b_stop_inquiry.Click += new System.EventHandler(this.b_stop_inquiry_Click);
+            // 
+            // b_start_inquiry
+            // 
+            this.b_start_inquiry.Enabled = false;
+            this.b_start_inquiry.Image = ((System.Drawing.Image)(resources.GetObject("b_start_inquiry.Image")));
+            this.b_start_inquiry.Location = new System.Drawing.Point(23, 26);
+            this.b_start_inquiry.Name = "b_start_inquiry";
+            this.b_start_inquiry.Size = new System.Drawing.Size(104, 104);
+            this.b_start_inquiry.TabIndex = 7;
+            this.b_start_inquiry.UseVisualStyleBackColor = true;
+            this.b_start_inquiry.Click += new System.EventHandler(this.b_start_inquiry_Click);
+            // 
+            // pb_hfp_batt
+            // 
+            this.pb_hfp_batt.Location = new System.Drawing.Point(780, 13);
+            this.pb_hfp_batt.Name = "pb_hfp_batt";
+            this.pb_hfp_batt.Size = new System.Drawing.Size(53, 50);
+            this.pb_hfp_batt.TabIndex = 23;
+            this.pb_hfp_batt.TabStop = false;
+            // 
+            // pb_hfp_signal
+            // 
+            this.pb_hfp_signal.Location = new System.Drawing.Point(709, 13);
+            this.pb_hfp_signal.Name = "pb_hfp_signal";
+            this.pb_hfp_signal.Size = new System.Drawing.Size(53, 50);
+            this.pb_hfp_signal.TabIndex = 22;
+            this.pb_hfp_signal.TabStop = false;
+            // 
+            // b_board_buy
+            // 
+            this.b_board_buy.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("b_board_buy.BackgroundImage")));
+            this.b_board_buy.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.b_board_buy.Location = new System.Drawing.Point(450, 25);
+            this.b_board_buy.Name = "b_board_buy";
+            this.b_board_buy.Size = new System.Drawing.Size(130, 65);
+            this.b_board_buy.TabIndex = 6;
+            this.b_board_buy.UseVisualStyleBackColor = true;
+            this.b_board_buy.Click += new System.EventHandler(this.b_board_buy_Click);
+            // 
+            // b_serial_close
+            // 
+            this.b_serial_close.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.b_serial_close.Enabled = false;
+            this.b_serial_close.Image = ((System.Drawing.Image)(resources.GetObject("b_serial_close.Image")));
+            this.b_serial_close.Location = new System.Drawing.Point(333, 25);
+            this.b_serial_close.Name = "b_serial_close";
+            this.b_serial_close.Size = new System.Drawing.Size(95, 65);
+            this.b_serial_close.TabIndex = 5;
+            this.b_serial_close.UseVisualStyleBackColor = true;
+            this.b_serial_close.Click += new System.EventHandler(this.b_serial_close_Click);
+            // 
+            // b_serial_open
+            // 
+            this.b_serial_open.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.b_serial_open.Image = ((System.Drawing.Image)(resources.GetObject("b_serial_open.Image")));
+            this.b_serial_open.Location = new System.Drawing.Point(220, 25);
+            this.b_serial_open.Name = "b_serial_open";
+            this.b_serial_open.Size = new System.Drawing.Size(95, 65);
+            this.b_serial_open.TabIndex = 4;
+            this.b_serial_open.UseVisualStyleBackColor = true;
+            this.b_serial_open.Click += new System.EventHandler(this.b_serial_open_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -543,14 +827,23 @@
             this.tc_bt_function.ResumeLayout(false);
             this.tp_bt_basic_func.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dg_inquiry_result)).EndInit();
+            this.tp_bt_hfp_hf.ResumeLayout(false);
+            this.tp_bt_hfp_hf.PerformLayout();
+            this.gb_hfp_test_area.ResumeLayout(false);
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
+            this.gb_dial_area.ResumeLayout(false);
+            this.gb_dial_area.PerformLayout();
             this.tp_bt_spp.ResumeLayout(false);
             this.tp_bt_spp.PerformLayout();
-            this.g_log_func.ResumeLayout(false);
-            this.g_log_func.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
+            this.g_log_func.ResumeLayout(false);
+            this.g_log_func.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pb_hfp_batt)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pb_hfp_signal)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -599,6 +892,31 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label l_spp_con_status;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label l_hfp_con_addr;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label l_hfp_con_status;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Button b_hfp_num8;
+        private System.Windows.Forms.Button b_hfp_num9;
+        private System.Windows.Forms.Button b_hfp_num7;
+        private System.Windows.Forms.Button b_hfp_num5;
+        private System.Windows.Forms.Button b_hfp_num6;
+        private System.Windows.Forms.Button b_hfp_num4;
+        private System.Windows.Forms.Button b_hfp_num2;
+        private System.Windows.Forms.Button b_hfp_num3;
+        private System.Windows.Forms.Button b_hfp_num1;
+        private System.Windows.Forms.GroupBox gb_hfp_test_area;
+        private System.Windows.Forms.GroupBox gb_dial_area;
+        private System.Windows.Forms.Label l_hfp_call_num;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Button b_hfp_call_number;
+        private System.Windows.Forms.Button b_hfp_clear_num;
+        private System.Windows.Forms.Button b_hfp_num0;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.PictureBox pb_hfp_batt;
+        private System.Windows.Forms.PictureBox pb_hfp_signal;
+        private System.Windows.Forms.Button b_hfp_get_operate;
+        private System.Windows.Forms.TextBox tb_hfp_operate;
     }
 }
 

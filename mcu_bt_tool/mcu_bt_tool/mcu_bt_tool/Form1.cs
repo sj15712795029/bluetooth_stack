@@ -39,6 +39,7 @@ namespace mcu_bt_tool
         string json_bt_cmd_bt_start_inquiry = "BT_INQUIRY";
         string json_bt_cmd_bt_stop_inquiry = "BT_CANCEL_INQUIRY";
         string json_bt_cmd_spp_send = "SPP_SEND";
+        string json_bt_cmd_hfp_get_operate = "HFP_NET_N";
 
         public Form1()
         {
@@ -48,12 +49,13 @@ namespace mcu_bt_tool
             windows_x = this.Width;   //将窗体的宽度赋值给X
             windows_y = this.Height;   //将窗体的高度赋值给Y
             setTag(this);   //调用setTag函数
+
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             search_add_serial_port();
-            ui_init();
+            ui_init();        
         }
 
         private void Form1_Resize(object sender, EventArgs e)
@@ -426,6 +428,13 @@ namespace mcu_bt_tool
                         ui_bt_spp_con_status(status.PARAM2);
                     }
 
+                    if (status.PARAM1 == "HFP")
+                    {
+                        ui_bt_hfp_show(true);
+                        ui_bt_hfp_con_status(true);
+                        ui_bt_hfp_con_status(status.PARAM2);
+                    }
+
                 }
 
                 if (status.OPERATE == "BT_DISCON_RESULT")
@@ -436,6 +445,13 @@ namespace mcu_bt_tool
                         ui_bt_spp_con_status(false);
                         ui_bt_spp_con_status(null);
                     }
+
+                    if (status.PARAM1 == "HFP")
+                    {
+                        ui_bt_hfp_show(false);
+                        ui_bt_hfp_con_status(false);
+                        ui_bt_hfp_con_status(null);
+                    }
                 }
 
                 if (status.OPERATE == "BT_SPP_RECV")
@@ -444,6 +460,23 @@ namespace mcu_bt_tool
                     int spp_recv_count = Convert.ToInt32(l_spp_recv_count.Text) + Convert.ToInt32(status.PARAM2);
                     l_spp_recv_count.Text = spp_recv_count.ToString();
                 }
+
+                if (status.OPERATE == "BT_HFP_SIGNAL_STRENGTH")
+                {
+                    string picture_name = "signal_" + status.PARAM1;
+                    ui_bt_hfp_update_signal(picture_name);
+                }
+
+                if (status.OPERATE == "BT_HFP_BATT_LEVEL")
+                {
+                    string picture_name = "batt_" + status.PARAM1;
+                    ui_bt_hfp_update_batt(picture_name);
+                }
+
+                if (status.OPERATE == "BT_HFP_OPERATOR")
+                {
+                    tb_hfp_operate.Text = status.PARAM1;
+                } 
                 
             }
         }
@@ -511,21 +544,100 @@ namespace mcu_bt_tool
             }
         }
 
+        /* HFP tabpage的显示使能 */
+        private void ui_bt_hfp_show(bool bt_hfp_show)
+        {
+            if (bt_hfp_show)
+            {
+                /* 所有控件显示 */
+#if false
+                b_hfp_num1.Enabled = true;
+                b_hfp_num2.Enabled = true;
+                b_hfp_num3.Enabled = true;
+                b_hfp_num4.Enabled = true;
+                b_hfp_num5.Enabled = true;
+                b_hfp_num6.Enabled = true;
+                b_hfp_num7.Enabled = true;
+                b_hfp_num8.Enabled = true;
+                b_hfp_num9.Enabled = true;
+#endif
+                gb_hfp_test_area.Enabled = true;
+            }
+            else
+            {
+                /* 所有控件灰掉 */
+#if false
+                b_hfp_num1.Enabled = false;
+                b_hfp_num2.Enabled = false;
+                b_hfp_num3.Enabled = false;
+                b_hfp_num4.Enabled = false;
+                b_hfp_num5.Enabled = false;
+                b_hfp_num6.Enabled = false;
+                b_hfp_num7.Enabled = false;
+                b_hfp_num8.Enabled = false;
+                b_hfp_num9.Enabled = false;
+#endif
+                gb_hfp_test_area.Enabled = false;
+            }
+        }
+
+        /* HFP 刷新连接状态 */
+        private void ui_bt_hfp_con_status(bool bt_hfp_con_status)
+        {
+            if (bt_hfp_con_status)
+            {
+                l_hfp_con_status.Text = "已连接";
+            }
+            else
+            {
+                l_hfp_con_status.Text = "未连接";
+            }
+        }
+
+        /* HFP 刷新连接地址 */
+        private void ui_bt_hfp_con_status(string bt_hfp_con_addr)
+        {
+            if (bt_hfp_con_addr != null)
+            {
+                l_hfp_con_addr.Text = bt_hfp_con_addr;
+            }
+            else
+            {
+                l_hfp_con_addr.Text = "00:00:00:00:00:00";
+            }
+        }
+
+        /* 刷新HFP信号图标 */
+        private void ui_bt_hfp_update_signal(string picture_name)
+        {
+            pb_hfp_signal.Image = (System.Drawing.Image)Properties.Resources.ResourceManager.GetObject(picture_name);
+            pb_hfp_signal.SizeMode = PictureBoxSizeMode.Zoom;
+        }
+
+        /* 刷新HFP电量图标 */
+        private void ui_bt_hfp_update_batt(string picture_name)
+        {
+            pb_hfp_batt.Image = (System.Drawing.Image)Properties.Resources.ResourceManager.GetObject(picture_name);
+            pb_hfp_batt.SizeMode = PictureBoxSizeMode.Zoom;
+        }
+
+        /* 获取运营商名称 */
+        private void b_hfp_get_operate_Click(object sender, EventArgs e)
+        {
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_get_operate, null, null, null, null, null, null);
+        }
+
         /* 整个UI的初始化 */
         private void ui_init()
         {
             ui_bt_switch_show(false,false);
             ui_bt_spp_show(false);
+            ui_bt_hfp_show(false);
+            
         }
 
         
-
-        
-
-        
-
-        
-        
+      
     }
 
 

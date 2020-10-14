@@ -187,6 +187,11 @@ void hfp_hf_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("WRAPPER << PROFILE:hfp_hf_connect_realease,address is :\n");
     bt_hex_dump(remote_addr->addr,6);
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_disconnect)
+    {
+        bt_wrapper_cb->app_hfp_cb->bt_hfp_disconnect(remote_addr,status);
+    }
 }
 void hfp_hf_sco_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
 {
@@ -213,6 +218,11 @@ void hfp_hf_call_status(struct bd_addr_t *remote_addr,uint8_t value)
     default:
         break;
     }
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_call_status)
+    {
+        bt_wrapper_cb->app_hfp_cb->bt_hfp_call_status(remote_addr,value);
+    }
 }
 void hfp_hf_call_setup_status(struct bd_addr_t *remote_addr,uint8_t value)
 {
@@ -234,6 +244,11 @@ void hfp_hf_call_setup_status(struct bd_addr_t *remote_addr,uint8_t value)
         break;
     default:
         break;
+    }
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_call_setup)
+    {
+        bt_wrapper_cb->app_hfp_cb->bt_hfp_call_setup(remote_addr,value);
     }
 }
 void hfp_hf_call_held_status(struct bd_addr_t *remote_addr,uint8_t value)
@@ -259,11 +274,21 @@ void hfp_hf_signal_status(struct bd_addr_t *remote_addr,uint8_t value)
 {
     printf("WRAPPER << PROFILE:hfp_hf_signal_status,value %d,address is :\n",value);
     bt_hex_dump(remote_addr->addr,6);
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_signal_strength_ind)
+    {
+        bt_wrapper_cb->app_hfp_cb->bt_hfp_signal_strength_ind(remote_addr,value);
+    }
 }
 void hfp_hf_battchg_status(struct bd_addr_t *remote_addr,uint8_t value)
 {
     printf("WRAPPER << PROFILE:hfp_hf_battchg_status,value %d,address is :\n",value);
     bt_hex_dump(remote_addr->addr,6);
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_batt_level_ind)
+    {
+        bt_wrapper_cb->app_hfp_cb->bt_hfp_batt_level_ind(remote_addr,value);
+    }
 }
 void hfp_hf_server_status(struct bd_addr_t *remote_addr,uint8_t value)
 {
@@ -274,12 +299,22 @@ void hfp_hf_roam_status(struct bd_addr_t *remote_addr,uint8_t value)
 {
     printf("WRAPPER << PROFILE:hfp_hf_roam_status, value %d,address is :\n",value);
     bt_hex_dump(remote_addr->addr,6);
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_roam_status_ind)
+    {
+        bt_wrapper_cb->app_hfp_cb->bt_hfp_roam_status_ind(remote_addr,value);
+    }
 }
 void hfp_hf_network(struct bd_addr_t *remote_addr,uint8_t mode,uint8_t format,uint8_t *operator,uint8_t operator_len)
 {
     printf("WRAPPER << PROFILE:hfp_hf_network,address is :\n");
     bt_hex_dump(remote_addr->addr,6);
     printf("mode %d,format %d,operator %s,operator_len %d\n",mode,format,operator,operator_len);
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_operator)
+    {
+        bt_wrapper_cb->app_hfp_cb->bt_hfp_operator(remote_addr,operator);
+    }
 }
 void hfp_hf_ring(struct bd_addr_t *remote_addr)
 {
@@ -441,7 +476,7 @@ uint8_t bt_start(bt_app_cb_t *app_cb)
     bt_wrapper_cb = app_cb;
     bt_mem_init();
     bt_memp_init();
-    phybusif_open(921600,0);
+    phybusif_open(BT_BAUDRATE_1,0);
 #if BT_ENABLE_SNOOP > 0
     bt_snoop_init();
 #endif
@@ -550,6 +585,14 @@ uint8_t bt_le_inquiry(uint8_t enable)
     hci_set_le_scan_enable(enable,0);
     return 0;
 }
+
+/************************* HFP API ***********************/
+uint8_t bt_hfp_hf_get_operator(struct bd_addr_t *bdaddr)
+{
+	hfp_hf_get_network(bdaddr);
+	return 0;
+}
+
 
 
 static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres)

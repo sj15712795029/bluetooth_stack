@@ -77,7 +77,13 @@ typedef struct
 typedef struct
 {
 	void (*bt_hfp_connect)(struct bd_addr_t *remote_addr,uint8_t status);
-
+	void (*bt_hfp_disconnect)(struct bd_addr_t *remote_addr,uint8_t status);
+	void (*bt_hfp_signal_strength_ind)(struct bd_addr_t *remote_addr,uint8_t value);
+	void (*bt_hfp_roam_status_ind)(struct bd_addr_t *remote_addr,uint8_t value);
+	void (*bt_hfp_batt_level_ind)(struct bd_addr_t *remote_addr,uint8_t value);
+	void (*bt_hfp_operator)(struct bd_addr_t *remote_addr,uint8_t *operator);
+	void (*bt_hfp_call_status)(struct bd_addr_t *remote_addr,uint8_t value);
+	void (*bt_hfp_call_setup)(struct bd_addr_t *remote_addr,uint8_t value);
 }bt_app_hfp_cb_t;
 
 
@@ -89,6 +95,7 @@ typedef struct
 	
 }bt_app_cb_t;
 
+/*********************** COMMON API ***********************/
 uint8_t bt_start(bt_app_cb_t *app_cb);
 uint8_t bt_stop(void);
 uint8_t bt_start_inquiry(uint8_t inquiry_len,uint8_t max_dev);
@@ -98,4 +105,8 @@ uint8_t bt_stop_periodic_inquiry(void);
 uint8_t bt_get_remote_name(struct bd_addr_t *bdaddr);
 uint8_t bt_cancel_get_remote_name(struct bd_addr_t *bdaddr);
 uint8_t bt_le_inquiry(uint8_t enable);
+
+/************************* HFP API ***********************/
+uint8_t bt_hfp_hf_get_operator(struct bd_addr_t *bdaddr);
+
 #endif
