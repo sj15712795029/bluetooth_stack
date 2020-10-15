@@ -149,6 +149,26 @@ void bt_app_hfp_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
     uart_send_json("BT","BT_DISCON_RESULT",(uint8_t*)"SUCCESS","HFP",0,0,0,0);
 }
 
+void bt_app_hfp_sco_connect(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    uint8_t addr_buf[32] = {0};
+    printf("bt_app_hfp_sco_connect status %d address:\n",status);
+    bt_hex_dump(remote_addr->addr,6);
+
+    hw_sprintf((char*)addr_buf,"%02x:%02x:%02x:%02x:%02x:%02x",remote_addr->addr[5],remote_addr->addr[4],remote_addr->addr[3],\
+               remote_addr->addr[2],remote_addr->addr[1],remote_addr->addr[0]);
+    uart_send_json("BT","BT_SCO_CON_RESULT",(uint8_t*)"SUCCESS","HFP",addr_buf,0,0,0);
+}
+
+void bt_app_hfp_sco_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("bt_app_hfp_sco_disconnect status %d address:\n",status);
+    bt_hex_dump(remote_addr->addr,6);
+
+    uart_send_json("BT","BT_SCO_DISCON_RESULT",(uint8_t*)"SUCCESS","HFP",0,0,0,0);
+}
+
+
 
 void bt_app_hfp_signal_strength_ind(struct bd_addr_t *remote_addr,uint8_t value)
 {
@@ -213,6 +233,8 @@ static bt_app_hfp_cb_t bt_app_hfp_cb =
 {
     bt_app_hfp_connect,
     bt_app_hfp_disconnect,
+    bt_app_hfp_sco_connect,
+    bt_app_hfp_sco_disconnect,
     bt_app_hfp_signal_strength_ind,
     bt_app_hfp_roam_status_ind,
     bt_app_hfp_batt_level_ind,
@@ -304,10 +326,8 @@ static bt_app_cb_t bt_app_cb =
 #define BT_HFP_CON_DES "Connect hfp profile"
 #define BT_HFP_DISCON_CMD "HFP_DISCON"
 #define BT_HFP_DISCON_DES "Disconnect hfp profile"
-#define BT_HFP_SCO_CON_CMD "HFP_SCO_CON"
-#define BT_HFP_SCO_CON_DES "Connect hfp sco"
-#define BT_HFP_SCO_DISCON_CMD "HFP_SCO_DISCON"
-#define BT_HFP_SCO_DISCON_DES "Disconnect hfp sco"
+#define BT_HFP_AUDIO_TRANSFER_CMD "BT_AUDIO_TRANSFER"
+#define BT_HFP_AUDIO_TRANSFER_DES "sco audio transfer"
 #define BT_HFP_ANSWER_CMD "HFP_ANSWER"
 #define BT_HFP_ANSWER_DES "Answer the incoming call"
 #define BT_HFP_CALLOUT_PN_CMD "HFP_CALLOUT_PN"
@@ -341,8 +361,7 @@ cmd_desctiption_t cmd_usage[] =
     {(uint8_t *)BT_SPP_DISCON_CMD,(uint8_t *)BT_SPP_DISCON_DES},
     {(uint8_t *)BT_HFP_CON_CMD,(uint8_t *)BT_HFP_CON_DES},
     {(uint8_t *)BT_HFP_DISCON_CMD,(uint8_t *)BT_HFP_DISCON_DES},
-    {(uint8_t *)BT_HFP_SCO_CON_CMD,(uint8_t *)BT_HFP_SCO_CON_DES},
-    {(uint8_t *)BT_HFP_SCO_DISCON_CMD,(uint8_t *)BT_HFP_SCO_DISCON_DES},
+    {(uint8_t *)BT_HFP_AUDIO_TRANSFER_CMD,(uint8_t *)BT_HFP_AUDIO_TRANSFER_DES},
     {(uint8_t *)BT_HFP_ANSWER_CMD,(uint8_t *)BT_HFP_ANSWER_DES},
     {(uint8_t *)BT_HFP_CALLOUT_PN_CMD,(uint8_t *)BT_HFP_CALLOUT_PN_DES},
     {(uint8_t *)BT_HFP_CALLOUT_MEM_CMD,(uint8_t *)BT_HFP_CALLOUT_MEM_DES},
@@ -408,6 +427,14 @@ uint8_t shell_json_parse(uint8_t *operate_value,
     {
         HW_DEBUG("SHELL:operate hfp get operate\n");
         bt_hfp_hf_get_operator(&connect_addr);
+        return HW_ERR_OK;
+    }
+
+	if(hw_strcmp("BT_AUDIO_TRANSFER",(const char*)operate_value) == 0)
+    {
+        HW_DEBUG("SHELL:operate HFP AUDIO TRANSFER\n");
+
+        bt_hfp_hf_audio_transfer(&connect_addr);
         return HW_ERR_OK;
     }
 #endif
@@ -607,19 +634,12 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("HFP_SCO_CON",(const char*)shell_string) == 0)
+
+    if(hw_strcmp("BT_AUDIO_TRANSFER",(const char*)shell_string) == 0)
     {
-        HW_DEBUG("SHELL:operate HFP SCO CON\n");
+        HW_DEBUG("SHELL:operate HFP AUDIO TRANSFER\n");
 
-        hfp_hf_audio_connect(&connect_addr);
-        return HW_ERR_OK;
-    }
-
-    if(hw_strcmp("HFP_SCO_DISCON",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate HFP SCO DISCON\n");
-
-        hfp_hf_audio_disconnect(&connect_addr);
+        bt_hfp_hf_audio_transfer(&connect_addr);
         return HW_ERR_OK;
     }
 

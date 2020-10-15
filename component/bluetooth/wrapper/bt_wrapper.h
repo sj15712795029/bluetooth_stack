@@ -78,6 +78,8 @@ typedef struct
 {
 	void (*bt_hfp_connect)(struct bd_addr_t *remote_addr,uint8_t status);
 	void (*bt_hfp_disconnect)(struct bd_addr_t *remote_addr,uint8_t status);
+	void (*bt_hfp_sco_connect)(struct bd_addr_t *remote_addr,uint8_t status);
+	void (*bt_hfp_sco_disconnect)(struct bd_addr_t *remote_addr,uint8_t status);
 	void (*bt_hfp_signal_strength_ind)(struct bd_addr_t *remote_addr,uint8_t value);
 	void (*bt_hfp_roam_status_ind)(struct bd_addr_t *remote_addr,uint8_t value);
 	void (*bt_hfp_batt_level_ind)(struct bd_addr_t *remote_addr,uint8_t value);
@@ -108,5 +110,6 @@ uint8_t bt_le_inquiry(uint8_t enable);
 
 /************************* HFP API ***********************/
 uint8_t bt_hfp_hf_get_operator(struct bd_addr_t *bdaddr);
+uint8_t bt_hfp_hf_audio_transfer(struct bd_addr_t *bdaddr);
 
 #endif

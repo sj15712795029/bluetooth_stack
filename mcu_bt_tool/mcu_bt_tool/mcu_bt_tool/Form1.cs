@@ -40,6 +40,18 @@ namespace mcu_bt_tool
         string json_bt_cmd_bt_stop_inquiry = "BT_CANCEL_INQUIRY";
         string json_bt_cmd_spp_send = "SPP_SEND";
         string json_bt_cmd_hfp_get_operate = "HFP_NET_N";
+        string json_bt_cmd_hfp_audio_transfer = "BT_AUDIO_TRANSFER";
+
+        /* HFP的call/callsetup status */
+        bool bt_hfp_is_call_active = false;
+        int bt_hfp_call_time_count = 0;
+        public const int HFP_CALL_NO_INPORCESS = 0;
+        public const int HFP_CALL_INPORCESS = 1;
+
+        public const int HFP_CALL_NO_CALL = 0;
+        public const int HFP_CALL_INCOMING_CALL = 1;
+        public const int HFP_CALL_OUTGOING_CALL = 2;
+        public const int HFP_CALL_RALERT_OUTGOING_CALL = 3;
 
         public Form1()
         {
@@ -234,6 +246,17 @@ namespace mcu_bt_tool
             int spp_send_count = Convert.ToInt32(l_spp_send_count.Text) + t_spp_send_data.Text.Length;
             l_spp_send_count.Text = spp_send_count.ToString();
 
+        }
+
+        /* 获取运营商名称 */
+        private void b_hfp_get_operate_Click(object sender, EventArgs e)
+        {
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_get_operate, null, null, null, null, null, null);
+        }
+
+        private void b_hfp_audio_transfer_Click(object sender, EventArgs e)
+        {
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_audio_transfer, null, null, null, null, null, null);
         }
 
         /* 串口搜索 */
@@ -476,8 +499,63 @@ namespace mcu_bt_tool
                 if (status.OPERATE == "BT_HFP_OPERATOR")
                 {
                     tb_hfp_operate.Text = status.PARAM1;
-                } 
+                }
+
+                if (status.OPERATE == "BT_HFP_CALL_STATUS")
+                {
+                    int call_status = Convert.ToInt32(status.PARAM1);
+                    if (call_status == HFP_CALL_NO_INPORCESS)
+                    {
+                        l_hfp_call_status.Text = "无通话";
+                        bt_hfp_is_call_active = false;
+                        bt_hfp_call_time_count = 0;
+                        l_hfp_call_time.Text = "00:00:00";
+                        
+                    }
+                    else if (call_status == HFP_CALL_INPORCESS)
+                    {
+                        bt_hfp_is_call_active = true;
+                        l_hfp_call_status.Text = "通话中";                   
+                    }
+                }
+
+                if (status.OPERATE == "BT_HFP_CALL_SETUP")
+                {
+                    int callsetup_status = Convert.ToInt32(status.PARAM1);
+                    if (callsetup_status == HFP_CALL_INCOMING_CALL)
+                    {
+                        l_hfp_call_status.Text = "来电中";
+                    }
+                    else if (callsetup_status == HFP_CALL_OUTGOING_CALL)
+                    {
+                        l_hfp_call_status.Text = "去电中";
+                    }
+                }
+
+                if (status.OPERATE == "BT_SCO_CON_RESULT")
+                {
+                    b_hfp_audio_transfer.Text = "切换音源" + "(目前声音在HF)";
+                }
+
+                if (status.OPERATE == "BT_SCO_DISCON_RESULT")
+                {
+                    b_hfp_audio_transfer.Text = "切换音源" + "(目前声音在AG)";
+                }
                 
+            }
+        }
+
+
+        /* timer 中断 */
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if (bt_hfp_is_call_active)
+            {
+                bt_hfp_call_time_count += 1;
+                int hours = bt_hfp_call_time_count / 3600;
+                int minutes = (bt_hfp_call_time_count - hours * 3600) / 60;
+                int seconds = bt_hfp_call_time_count - hours * 3600 - minutes * 60;
+                l_hfp_call_time.Text = hours.ToString("00") + ":" + minutes.ToString("00") + ":" + seconds.ToString("00");
             }
         }
 
@@ -621,11 +699,7 @@ namespace mcu_bt_tool
             pb_hfp_batt.SizeMode = PictureBoxSizeMode.Zoom;
         }
 
-        /* 获取运营商名称 */
-        private void b_hfp_get_operate_Click(object sender, EventArgs e)
-        {
-            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_get_operate, null, null, null, null, null, null);
-        }
+        
 
         /* 整个UI的初始化 */
         private void ui_init()
@@ -635,6 +709,10 @@ namespace mcu_bt_tool
             ui_bt_hfp_show(false);
             
         }
+
+        
+
+        
 
         
       

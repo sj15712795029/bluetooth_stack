@@ -7,6 +7,7 @@ struct link_key_record link_key_instance = {0};
 uint8_t eir_data[240]= {0};
 bt_app_cb_t *bt_wrapper_cb = NULL;
 uint16_t bt_profile_mask = 0;
+uint8_t bt_sco_connected = 0;
 
 static err_t bt_inquiry_complete(struct hci_pcb_t *pcb,uint16_t result);
 static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres);
@@ -197,11 +198,23 @@ void hfp_hf_sco_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("WRAPPER << PROFILE:hfp_hf_sco_connect_set_up,address is :\n");
     bt_hex_dump(remote_addr->addr,6);
+
+	bt_sco_connected = 1;
+	if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_sco_connect)
+    {
+        bt_wrapper_cb->app_hfp_cb->bt_hfp_sco_connect(remote_addr,status);
+    }
 }
 void hfp_hf_sco_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("WRAPPER << PROFILE:hfp_hf_sco_connect_realease,address is :\n");
     bt_hex_dump(remote_addr->addr,6);
+
+	bt_sco_connected = 0;
+	if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_sco_disconnect)
+    {
+        bt_wrapper_cb->app_hfp_cb->bt_hfp_sco_disconnect(remote_addr,status);
+    }
 }
 void hfp_hf_call_status(struct bd_addr_t *remote_addr,uint8_t value)
 {
@@ -590,6 +603,21 @@ uint8_t bt_le_inquiry(uint8_t enable)
 uint8_t bt_hfp_hf_get_operator(struct bd_addr_t *bdaddr)
 {
 	hfp_hf_get_network(bdaddr);
+	return 0;
+}
+
+uint8_t bt_hfp_hf_audio_transfer(struct bd_addr_t *bdaddr)
+{
+	printf("APP >> WRAPPER: bt_hfp_hf_audio_transfer bt_sco_connected(%d)\n",bt_sco_connected);
+	if(bt_sco_connected == 0)
+	{
+		hfp_hf_audio_connect(bdaddr);
+	}
+	else
+	{
+		hfp_hf_audio_disconnect(bdaddr);
+	}
+
 	return 0;
 }
 
