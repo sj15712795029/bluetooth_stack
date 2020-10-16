@@ -111,5 +111,8 @@ uint8_t bt_le_inquiry(uint8_t enable);
 /************************* HFP API ***********************/
 uint8_t bt_hfp_hf_get_operator(struct bd_addr_t *bdaddr);
 uint8_t bt_hfp_hf_audio_transfer(struct bd_addr_t *bdaddr);
+uint8_t bt_hfp_hf_accept_incoming_call(struct bd_addr_t *bdaddr);
+uint8_t bt_hfp_hf_end_call(struct bd_addr_t *bdaddr);
+
 
 #endif

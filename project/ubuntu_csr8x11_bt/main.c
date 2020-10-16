@@ -58,6 +58,8 @@ uint32_t last_sys_time = 0;
 #define BT_HFP_AUDIO_TRANSFER_DES "sco audio transfer"
 #define BT_HFP_ANSWER_CMD "HFP_ANSWER"
 #define BT_HFP_ANSWER_DES "Answer the incoming call"
+#define BT_HFP_END_CALL_CMD "HFP_CALLEND"
+#define BT_HFP_END_CALL_DES "End call"
 #define BT_HFP_CALLOUT_PN_CMD "HFP_CALLOUT_PN"
 #define BT_HFP_CALLOUT_PN_DES "Call out phone number(10086)"
 #define BT_HFP_CALLOUT_MEM_CMD "HFP_CALLOUT_MEM"
@@ -91,6 +93,7 @@ cmd_desctiption_t cmd_usage[] =
     {(uint8_t *)BT_HFP_DISCON_CMD,(uint8_t *)BT_HFP_DISCON_DES},
     {(uint8_t *)BT_HFP_AUDIO_TRANSFER_CMD,(uint8_t *)BT_HFP_AUDIO_TRANSFER_DES},
     {(uint8_t *)BT_HFP_ANSWER_CMD,(uint8_t *)BT_HFP_ANSWER_DES},
+    {(uint8_t *)BT_HFP_END_CALL_CMD,(uint8_t *)BT_HFP_END_CALL_DES},
     {(uint8_t *)BT_HFP_CALLOUT_PN_CMD,(uint8_t *)BT_HFP_CALLOUT_PN_DES},
     {(uint8_t *)BT_HFP_CALLOUT_MEM_CMD,(uint8_t *)BT_HFP_CALLOUT_MEM_DES},
     {(uint8_t *)BT_HFP_CALLOUT_LN_CMD,(uint8_t *)BT_HFP_CALLOUT_LN_DES},
@@ -477,11 +480,18 @@ uint8_t shell_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("HFP_ANSWER",(const char*)shell_string) == 0)
+    if(hw_strncmp("HFP_ANSWER",(const char*)shell_string,hw_strlen(BT_HFP_ANSWER_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate HFP ANSWER INCOMING CALL\n");
 
-        hfp_hf_answer_incoming_call(&connect_addr);
+        bt_hfp_hf_accept_incoming_call(&connect_addr);
+        return HW_ERR_OK;
+    }
+
+	if(hw_strncmp("HFP_CALLEND",(const char*)shell_string,hw_strlen(BT_HFP_END_CALL_CMD)) == 0)
+    {
+        HW_DEBUG("SHELL:operate bt end call\n");
+        bt_hfp_hf_end_call(&connect_addr);
         return HW_ERR_OK;
     }
 
@@ -596,13 +606,6 @@ uint8_t shell_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate bt stop\n");
         hfp_hf_query_call_list(&connect_addr);
-        return HW_ERR_OK;
-    }
-
-    if(hw_strcmp("HFP_CALLEND",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate bt stop\n");
-        hfp_hf_hangup(&connect_addr);
         return HW_ERR_OK;
     }
 

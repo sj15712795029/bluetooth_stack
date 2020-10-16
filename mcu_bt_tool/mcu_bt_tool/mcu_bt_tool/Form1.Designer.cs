@@ -362,6 +362,7 @@
             this.b_end_call.TabIndex = 5;
             this.b_end_call.Text = "挂断电话";
             this.b_end_call.UseVisualStyleBackColor = true;
+            this.b_end_call.Click += new System.EventHandler(this.b_end_call_Click);
             // 
             // b_hfp_audio_transfer
             // 
@@ -381,6 +382,7 @@
             this.b_answer_call.TabIndex = 3;
             this.b_answer_call.Text = "接听电话";
             this.b_answer_call.UseVisualStyleBackColor = true;
+            this.b_answer_call.Click += new System.EventHandler(this.b_answer_call_Click);
             // 
             // label7
             // 

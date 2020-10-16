@@ -621,6 +621,19 @@ uint8_t bt_hfp_hf_audio_transfer(struct bd_addr_t *bdaddr)
 	return 0;
 }
 
+uint8_t bt_hfp_hf_accept_incoming_call(struct bd_addr_t *bdaddr)
+{
+	hfp_hf_answer_incoming_call(bdaddr);
+
+	return 0;
+}
+
+uint8_t bt_hfp_hf_end_call(struct bd_addr_t *bdaddr)
+{
+	hfp_hf_hangup(bdaddr);
+	
+	return 0;
+}
 
 
 static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres)
