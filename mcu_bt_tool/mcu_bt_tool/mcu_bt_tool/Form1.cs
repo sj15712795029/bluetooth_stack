@@ -43,6 +43,8 @@ namespace mcu_bt_tool
         string json_bt_cmd_hfp_audio_transfer = "BT_AUDIO_TRANSFER";
         string json_bt_cmd_hfp_answer_call = "HFP_ANSWER";
         string json_bt_cmd_hfp_end_call = "HFP_CALLEND";
+        string json_bt_cmd_hfp_call_pn = "HFP_CALLOUT_PN"; /* 通过手机号拨打电话 */
+        
 
         /* HFP的call/callsetup status */
         bool bt_hfp_is_call_active = false;
@@ -269,13 +271,71 @@ namespace mcu_bt_tool
         private void b_end_call_Click(object sender, EventArgs e)
         {
             json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_end_call, null, null, null, null, null, null);
-            l_hfp_call_status.Text = "无通话";
-            bt_hfp_is_call_active = false;
-            bt_hfp_call_time_count = 0;
-            l_hfp_call_time.Text = "00:00:00";
+        }
 
-            ui_bt_hfp_answer_call_enable(false);
-            ui_bt_hfp_end_call_enable(false);
+        private void b_hfp_num1_Click(object sender, EventArgs e)
+        {
+            l_hfp_call_num.Text += "1";
+        }
+
+        private void b_hfp_num2_Click(object sender, EventArgs e)
+        {
+            l_hfp_call_num.Text += "2";
+        }
+
+        private void b_hfp_num3_Click(object sender, EventArgs e)
+        {
+            l_hfp_call_num.Text += "3";
+        }
+
+        private void b_hfp_num4_Click(object sender, EventArgs e)
+        {
+            l_hfp_call_num.Text += "4";
+        }
+
+        private void b_hfp_num5_Click(object sender, EventArgs e)
+        {
+            l_hfp_call_num.Text += "5";
+        }
+
+        private void b_hfp_num6_Click(object sender, EventArgs e)
+        {
+            l_hfp_call_num.Text += "6";
+        }
+
+        private void b_hfp_num7_Click(object sender, EventArgs e)
+        {
+            l_hfp_call_num.Text += "7";
+        }
+
+        private void b_hfp_num8_Click(object sender, EventArgs e)
+        {
+            l_hfp_call_num.Text += "8";
+        }
+
+        private void b_hfp_num9_Click(object sender, EventArgs e)
+        {
+            l_hfp_call_num.Text += "9";
+        }
+
+        private void b_hfp_num0_Click(object sender, EventArgs e)
+        {
+            l_hfp_call_num.Text += "0";
+        }
+
+        private void b_hfp_clear_num_Click(object sender, EventArgs e)
+        {
+            l_hfp_call_num.Text = l_hfp_call_num.Text.Substring(0, l_hfp_call_num.Text.Length - 1);
+        }
+
+        private void b_hfp_call_number_Click(object sender, EventArgs e)
+        {
+            if (l_hfp_call_num.Text == "")
+            {
+                MessageBox.Show("请填入要拨打的手机号码", "错误提示");
+                return;
+            }
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_call_pn, l_hfp_call_num.Text, null, null, null, null, null);
         }
 
         /* 串口搜索 */
@@ -760,16 +820,24 @@ namespace mcu_bt_tool
                 b_end_call.Enabled = false;
         }
 
-
+        private void ui_bt_hfp_clear_call_num()
+        {
+            l_hfp_call_num.Text = "";
+        }
 
         /* 整个UI的初始化 */
         private void ui_init()
         {
             ui_bt_switch_show(false,false);
             ui_bt_spp_show(false);
-            ui_bt_hfp_show(false);
+            //ui_bt_hfp_show(false);
+            ui_bt_hfp_clear_call_num();
             
         }
+
+        
+
+        
 
         
 

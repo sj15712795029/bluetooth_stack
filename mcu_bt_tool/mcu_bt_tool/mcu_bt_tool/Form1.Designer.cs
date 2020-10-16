@@ -473,6 +473,7 @@
             this.b_hfp_num0.TabIndex = 23;
             this.b_hfp_num0.Text = "0";
             this.b_hfp_num0.UseVisualStyleBackColor = true;
+            this.b_hfp_num0.Click += new System.EventHandler(this.b_hfp_num0_Click);
             // 
             // b_hfp_num1
             // 
@@ -482,6 +483,7 @@
             this.b_hfp_num1.TabIndex = 10;
             this.b_hfp_num1.Text = "1";
             this.b_hfp_num1.UseVisualStyleBackColor = true;
+            this.b_hfp_num1.Click += new System.EventHandler(this.b_hfp_num1_Click);
             // 
             // l_hfp_call_num
             // 
@@ -501,6 +503,7 @@
             this.b_hfp_num6.TabIndex = 14;
             this.b_hfp_num6.Text = "6";
             this.b_hfp_num6.UseVisualStyleBackColor = true;
+            this.b_hfp_num6.Click += new System.EventHandler(this.b_hfp_num6_Click);
             // 
             // label4
             // 
@@ -520,6 +523,7 @@
             this.b_hfp_num5.TabIndex = 15;
             this.b_hfp_num5.Text = "5";
             this.b_hfp_num5.UseVisualStyleBackColor = true;
+            this.b_hfp_num5.Click += new System.EventHandler(this.b_hfp_num5_Click);
             // 
             // b_hfp_call_number
             // 
@@ -529,6 +533,7 @@
             this.b_hfp_call_number.TabIndex = 20;
             this.b_hfp_call_number.Text = "拨打电话";
             this.b_hfp_call_number.UseVisualStyleBackColor = true;
+            this.b_hfp_call_number.Click += new System.EventHandler(this.b_hfp_call_number_Click);
             // 
             // b_hfp_num4
             // 
@@ -538,6 +543,7 @@
             this.b_hfp_num4.TabIndex = 13;
             this.b_hfp_num4.Text = "4";
             this.b_hfp_num4.UseVisualStyleBackColor = true;
+            this.b_hfp_num4.Click += new System.EventHandler(this.b_hfp_num4_Click);
             // 
             // b_hfp_clear_num
             // 
@@ -547,6 +553,7 @@
             this.b_hfp_clear_num.TabIndex = 19;
             this.b_hfp_clear_num.Text = "清除号码";
             this.b_hfp_clear_num.UseVisualStyleBackColor = true;
+            this.b_hfp_clear_num.Click += new System.EventHandler(this.b_hfp_clear_num_Click);
             // 
             // b_hfp_num2
             // 
@@ -556,6 +563,7 @@
             this.b_hfp_num2.TabIndex = 12;
             this.b_hfp_num2.Text = "2";
             this.b_hfp_num2.UseVisualStyleBackColor = true;
+            this.b_hfp_num2.Click += new System.EventHandler(this.b_hfp_num2_Click);
             // 
             // b_hfp_num7
             // 
@@ -565,6 +573,7 @@
             this.b_hfp_num7.TabIndex = 16;
             this.b_hfp_num7.Text = "7";
             this.b_hfp_num7.UseVisualStyleBackColor = true;
+            this.b_hfp_num7.Click += new System.EventHandler(this.b_hfp_num7_Click);
             // 
             // b_hfp_num9
             // 
@@ -574,6 +583,7 @@
             this.b_hfp_num9.TabIndex = 17;
             this.b_hfp_num9.Text = "9";
             this.b_hfp_num9.UseVisualStyleBackColor = true;
+            this.b_hfp_num9.Click += new System.EventHandler(this.b_hfp_num9_Click);
             // 
             // b_hfp_num3
             // 
@@ -583,6 +593,7 @@
             this.b_hfp_num3.TabIndex = 11;
             this.b_hfp_num3.Text = "3";
             this.b_hfp_num3.UseVisualStyleBackColor = true;
+            this.b_hfp_num3.Click += new System.EventHandler(this.b_hfp_num3_Click);
             // 
             // b_hfp_num8
             // 
@@ -592,6 +603,7 @@
             this.b_hfp_num8.TabIndex = 18;
             this.b_hfp_num8.Text = "8";
             this.b_hfp_num8.UseVisualStyleBackColor = true;
+            this.b_hfp_num8.Click += new System.EventHandler(this.b_hfp_num8_Click);
             // 
             // l_hfp_con_addr
             // 

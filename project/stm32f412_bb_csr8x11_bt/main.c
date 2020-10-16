@@ -455,6 +455,13 @@ uint8_t shell_json_parse(uint8_t *operate_value,
         bt_hfp_hf_end_call(&connect_addr);
         return HW_ERR_OK;
     }
+
+	if(hw_strcmp("HFP_CALLOUT_PN",(const char*)operate_value) == 0)
+    {
+        HW_DEBUG("SHELL:operate call out by number\n");
+        bt_hfp_hf_callout_by_number(&connect_addr,para1);
+        return HW_ERR_OK;
+    }
 #endif
 
 
@@ -678,22 +685,22 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
 
     if(hw_strcmp("HFP_CALLOUT_PN",(const char*)shell_string) == 0)
     {
-        HW_DEBUG("SHELL:operate call out number\n");
-        hfp_hf_callout_with_phone_number(&connect_addr,"10086");
+        HW_DEBUG("SHELL:operate call out number 10086\n");
+        bt_hfp_hf_callout_by_number(&connect_addr,"10086");
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_CALLOUT_MEM",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate bt stop\n");
-        hfp_hf_callout_with_memory(&connect_addr,1);
+        bt_hfp_hf_callout_by_memory(&connect_addr,1);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_CALLOUT_LC",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate bt stop\n");
-        hfp_hf_callout_with_last_number(&connect_addr);
+        bt_hfp_hf_callout_by_last(&connect_addr);
         return HW_ERR_OK;
     }
 

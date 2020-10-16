@@ -8,6 +8,7 @@ uint8_t eir_data[240]= {0};
 bt_app_cb_t *bt_wrapper_cb = NULL;
 uint16_t bt_profile_mask = 0;
 uint8_t bt_sco_connected = 0;
+uint8_t bt_call_active = 0;
 
 static err_t bt_inquiry_complete(struct hci_pcb_t *pcb,uint16_t result);
 static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres);
@@ -224,9 +225,11 @@ void hfp_hf_call_status(struct bd_addr_t *remote_addr,uint8_t value)
     {
     case HFP_CALL_NO_INPORCESS:
         printf("NO CALL IN PROCESS\n");
+		bt_call_active = 0;
         break;
     case HFP_CALL_INPORCESS:
         printf("CALL IN PROCESS\n");
+		bt_call_active = 1;
         break;
     default:
         break;
@@ -263,6 +266,14 @@ void hfp_hf_call_setup_status(struct bd_addr_t *remote_addr,uint8_t value)
     {
         bt_wrapper_cb->app_hfp_cb->bt_hfp_call_setup(remote_addr,value);
     }
+
+	if((value == HFP_CALL_NO_CALL) && (bt_call_active == 0))
+	{
+		if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_call_status)
+	    {
+	        bt_wrapper_cb->app_hfp_cb->bt_hfp_call_status(remote_addr,HFP_CALL_NO_INPORCESS);
+	    }
+	}
 }
 void hfp_hf_call_held_status(struct bd_addr_t *remote_addr,uint8_t value)
 {
@@ -634,6 +645,28 @@ uint8_t bt_hfp_hf_end_call(struct bd_addr_t *bdaddr)
 	
 	return 0;
 }
+
+uint8_t bt_hfp_hf_callout_by_number(struct bd_addr_t *addr,uint8_t *number)
+{
+	hfp_hf_callout_with_phone_number(addr,number);
+
+	return 0;
+}
+
+uint8_t bt_hfp_hf_callout_by_memory(struct bd_addr_t *addr,uint8_t memory_id)
+{
+	hfp_hf_callout_with_memory(addr,memory_id);
+
+	return 0;
+}
+
+uint8_t bt_hfp_hf_callout_by_last(struct bd_addr_t *addr)
+{
+	hfp_hf_callout_with_last_number(addr);
+
+	return 0;
+}
+
 
 
 static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres)
