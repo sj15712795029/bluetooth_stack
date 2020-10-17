@@ -120,5 +120,6 @@ uint8_t bt_hfp_hf_callout_by_memory(struct bd_addr_t *addr,uint8_t memory_id);
 uint8_t bt_hfp_hf_callout_by_last(struct bd_addr_t *addr);
 uint8_t bt_hfp_hf_get_local_phone_number(struct bd_addr_t *addr);
 uint8_t bt_hfp_hf_get_call_list(struct bd_addr_t *addr);
+uint8_t bt_hfp_hf_disable_ecnr(struct bd_addr_t *addr);
 
 #endif

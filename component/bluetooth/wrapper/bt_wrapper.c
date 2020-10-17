@@ -696,6 +696,13 @@ uint8_t bt_hfp_hf_get_call_list(struct bd_addr_t *addr)
 	return 0;
 }
 
+uint8_t bt_hfp_hf_disable_ecnr(struct bd_addr_t *addr)
+{
+	hfp_hf_disable_ag_nrec(addr);
+
+	return 0;
+}
+
 
 static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres)
 {

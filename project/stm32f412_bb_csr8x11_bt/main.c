@@ -360,6 +360,9 @@ static bt_app_cb_t bt_app_cb =
 #define BT_HFP_LOCAL_PN_DES "Get local phone number"
 #define BT_HFP_CALL_LIST_CMD "HFP_CLCC"
 #define BT_HFP_CALL_LIST_DES "Get call list information"
+#define BT_HFP_DISABLE_ECNR_CMD "HFP_NRECD"
+#define BT_HFP_DISABLE_ECNR_DES "Disable AG ECNR"
+
 
 
 typedef struct
@@ -391,7 +394,7 @@ cmd_desctiption_t cmd_usage[] =
     {(uint8_t *)BT_HFP_CALLOUT_LN_CMD,(uint8_t *)BT_HFP_CALLOUT_LN_DES},
     {(uint8_t *)BT_HFP_LOCAL_PN_CMD,(uint8_t *)BT_HFP_LOCAL_PN_DES},
 	{(uint8_t *)BT_HFP_CALL_LIST_CMD,(uint8_t *)BT_HFP_CALL_LIST_DES},
-
+	{(uint8_t *)BT_HFP_DISABLE_ECNR_CMD,(uint8_t *)BT_HFP_DISABLE_ECNR_DES},
 };
 
 void show_usage()
@@ -764,8 +767,9 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
 
     if(hw_strcmp("HFP_NRECD",(const char*)shell_string) == 0)
     {
-        HW_DEBUG("SHELL:operate CLI disable\n");
-        hfp_hf_disable_ag_nrec(&connect_addr);
+        HW_DEBUG("SHELL:operate disable ag ecnr\n");
+		bt_hfp_hf_disable_ecnr(&connect_addr);
+        
         return HW_ERR_OK;
     }
 

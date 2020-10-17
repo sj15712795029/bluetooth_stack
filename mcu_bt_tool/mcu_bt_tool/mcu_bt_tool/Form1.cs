@@ -853,7 +853,7 @@ namespace mcu_bt_tool
         {
             ui_bt_switch_show(false,false);
             ui_bt_spp_show(false);
-            //ui_bt_hfp_show(false);
+            ui_bt_hfp_show(false);
             ui_bt_hfp_clear_call_num();
             
         }
