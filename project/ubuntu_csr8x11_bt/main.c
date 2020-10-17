@@ -66,6 +66,9 @@ uint32_t last_sys_time = 0;
 #define BT_HFP_CALLOUT_MEM_DES "Call out phone number with memory 1"
 #define BT_HFP_CALLOUT_LN_CMD "HFP_CALLOUT_LC"
 #define BT_HFP_CALLOUT_LN_DES "Call out last number"
+#define BT_HFP_LOCAL_PN_CMD "HFP_LPN"
+#define BT_HFP_LOCAL_PN_DES "Get local phone number"
+
 
 
 
@@ -97,6 +100,7 @@ cmd_desctiption_t cmd_usage[] =
     {(uint8_t *)BT_HFP_CALLOUT_PN_CMD,(uint8_t *)BT_HFP_CALLOUT_PN_DES},
     {(uint8_t *)BT_HFP_CALLOUT_MEM_CMD,(uint8_t *)BT_HFP_CALLOUT_MEM_DES},
     {(uint8_t *)BT_HFP_CALLOUT_LN_CMD,(uint8_t *)BT_HFP_CALLOUT_LN_DES},
+    {(uint8_t *)BT_HFP_LOCAL_PN_CMD,(uint8_t *)BT_HFP_LOCAL_PN_DES},
 };
 
 
@@ -217,6 +221,13 @@ void bt_app_hfp_call_setup(struct bd_addr_t *remote_addr,uint8_t value)
 
 }
 
+void bt_app_hfp_local_pn(struct bd_addr_t *remote_addr,uint8_t *local_pn)
+{
+	printf("bt_app_hfp_local_pn %s address:\n",local_pn);
+    bt_hex_dump(remote_addr->addr,6);
+
+}
+
 
 static bt_app_hfp_cb_t bt_app_hfp_cb =
 {
@@ -230,6 +241,7 @@ static bt_app_hfp_cb_t bt_app_hfp_cb =
     bt_app_hfp_operator,
     bt_app_hfp_call_status,
     bt_app_hfp_call_setup,
+    bt_app_hfp_local_pn,
 };
 
 
@@ -516,34 +528,14 @@ uint8_t shell_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("HFP_WN",(const char*)shell_string) == 0)
+	if(hw_strncmp("HFP_LPN",(const char*)shell_string,hw_strlen(BT_HFP_LOCAL_PN_CMD)) == 0)
     {
-        HW_DEBUG("SHELL:operate call wait enable\n");
-        hfp_hf_set_call_waiting_notification(&connect_addr,1);
+        HW_DEBUG("SHELL:operate local number\n");
+        bt_hfp_hf_get_local_phone_number(&connect_addr);
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("HFP_WD",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate call wait disenable\n");
-        hfp_hf_set_call_waiting_notification(&connect_addr,0);
-        return HW_ERR_OK;
-    }
-
-    if(hw_strcmp("HFP_CLIE",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate CLI enable\n");
-        hfp_hf_set_call_line_identification_notification(&connect_addr,1);
-        return HW_ERR_OK;
-    }
-
-    if(hw_strcmp("HFP_CLID",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate CLI disable\n");
-        hfp_hf_set_call_line_identification_notification(&connect_addr,0);
-        return HW_ERR_OK;
-    }
-
+    
 
     if(hw_strcmp("HFP_NRECD",(const char*)shell_string) == 0)
     {

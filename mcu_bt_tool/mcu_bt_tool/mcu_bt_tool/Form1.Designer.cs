@@ -58,6 +58,8 @@
             this.l_hfp_call_time = new System.Windows.Forms.Label();
             this.l_hfp_call_status = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.tb_hfp_lpn = new System.Windows.Forms.TextBox();
+            this.b_hfp_get_lpn = new System.Windows.Forms.Button();
             this.b_hfp_get_operate = new System.Windows.Forms.Button();
             this.tb_hfp_operate = new System.Windows.Forms.TextBox();
             this.gb_dial_area = new System.Windows.Forms.GroupBox();
@@ -416,6 +418,8 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.tb_hfp_lpn);
+            this.groupBox3.Controls.Add(this.b_hfp_get_lpn);
             this.groupBox3.Controls.Add(this.b_hfp_get_operate);
             this.groupBox3.Controls.Add(this.tb_hfp_operate);
             this.groupBox3.Location = new System.Drawing.Point(7, 26);
@@ -423,6 +427,25 @@
             this.groupBox3.Size = new System.Drawing.Size(241, 454);
             this.groupBox3.TabIndex = 24;
             this.groupBox3.TabStop = false;
+            // 
+            // tb_hfp_lpn
+            // 
+            this.tb_hfp_lpn.Location = new System.Drawing.Point(6, 85);
+            this.tb_hfp_lpn.Multiline = true;
+            this.tb_hfp_lpn.Name = "tb_hfp_lpn";
+            this.tb_hfp_lpn.Size = new System.Drawing.Size(228, 38);
+            this.tb_hfp_lpn.TabIndex = 3;
+            // 
+            // b_hfp_get_lpn
+            // 
+            this.b_hfp_get_lpn.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.b_hfp_get_lpn.Location = new System.Drawing.Point(7, 129);
+            this.b_hfp_get_lpn.Name = "b_hfp_get_lpn";
+            this.b_hfp_get_lpn.Size = new System.Drawing.Size(227, 39);
+            this.b_hfp_get_lpn.TabIndex = 2;
+            this.b_hfp_get_lpn.Text = "获取本地号码";
+            this.b_hfp_get_lpn.UseVisualStyleBackColor = true;
+            this.b_hfp_get_lpn.Click += new System.EventHandler(this.b_hfp_get_lpn_Click);
             // 
             // b_hfp_get_operate
             // 
@@ -1029,6 +1052,8 @@
         private System.Windows.Forms.Label l_hfp_call_time;
         private System.Windows.Forms.Label l_hfp_call_status;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.TextBox tb_hfp_lpn;
+        private System.Windows.Forms.Button b_hfp_get_lpn;
     }
 }
 

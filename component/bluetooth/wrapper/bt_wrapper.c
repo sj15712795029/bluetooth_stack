@@ -388,10 +388,17 @@ void hfp_hf_hold_status(struct bd_addr_t *remote_addr,uint8_t value)
 
 void hfp_hf_local_number(struct bd_addr_t *remote_addr,uint8_t *number,uint8_t number_len,uint8_t type,uint8_t service)
 {
+	uint8_t lpn_buffer[16] = {0};
     printf("WRAPPER << PROFILE:hfp_hf_local_number, type %d,service %d address is :\n",type,service);
     bt_hex_dump(remote_addr->addr,6);
     printf("number len %d,number is:\n",number_len);
     bt_hex_dump(number,number_len);
+
+	memcpy(lpn_buffer,number,number_len);
+	if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_local_pn)
+    {
+        bt_wrapper_cb->app_hfp_cb->bt_hfp_local_pn(remote_addr,lpn_buffer);
+    }
 }
 
 void hfp_hf_call_list(struct bd_addr_t *remote_addr,uint8_t *number,uint8_t number_len,uint8_t index,uint8_t dir,uint8_t status,uint8_t mode,uint8_t mpty,uint8_t type)
@@ -667,6 +674,12 @@ uint8_t bt_hfp_hf_callout_by_last(struct bd_addr_t *addr)
 	return 0;
 }
 
+uint8_t bt_hfp_hf_get_local_phone_number(struct bd_addr_t *addr)
+{
+	hfp_hf_get_local_phone_number(addr);
+	
+	return 0;
+}
 
 
 static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres)

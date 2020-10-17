@@ -44,6 +44,7 @@ namespace mcu_bt_tool
         string json_bt_cmd_hfp_answer_call = "HFP_ANSWER";
         string json_bt_cmd_hfp_end_call = "HFP_CALLEND";
         string json_bt_cmd_hfp_call_pn = "HFP_CALLOUT_PN"; /* 通过手机号拨打电话 */
+        string json_bt_cmd_hfp_get_lpn = "HFP_LPN"; /* 获取本地号码 */
         
 
         /* HFP的call/callsetup status */
@@ -336,6 +337,11 @@ namespace mcu_bt_tool
                 return;
             }
             json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_call_pn, l_hfp_call_num.Text, null, null, null, null, null);
+        }
+
+        private void b_hfp_get_lpn_Click(object sender, EventArgs e)
+        {
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_get_lpn, null, null, null, null, null, null);
         }
 
         /* 串口搜索 */
@@ -635,6 +641,11 @@ namespace mcu_bt_tool
                 {
                     b_hfp_audio_transfer.Text = "切换音源" + "(目前声音在AG)";
                 }
+
+                if (status.OPERATE == "BT_HFP_LOCAL_PN")
+                {
+                    tb_hfp_lpn.Text = status.PARAM1;
+                }
                 
             }
         }
@@ -834,6 +845,8 @@ namespace mcu_bt_tool
             ui_bt_hfp_clear_call_num();
             
         }
+
+        
 
         
 

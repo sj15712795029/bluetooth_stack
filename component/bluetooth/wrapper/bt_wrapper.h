@@ -86,6 +86,7 @@ typedef struct
 	void (*bt_hfp_operator)(struct bd_addr_t *remote_addr,uint8_t *operator);
 	void (*bt_hfp_call_status)(struct bd_addr_t *remote_addr,uint8_t value);
 	void (*bt_hfp_call_setup)(struct bd_addr_t *remote_addr,uint8_t value);
+	void (*bt_hfp_local_pn)(struct bd_addr_t *remote_addr,uint8_t *local_pn);
 }bt_app_hfp_cb_t;
 
 
@@ -113,6 +114,10 @@ uint8_t bt_hfp_hf_get_operator(struct bd_addr_t *bdaddr);
 uint8_t bt_hfp_hf_audio_transfer(struct bd_addr_t *bdaddr);
 uint8_t bt_hfp_hf_accept_incoming_call(struct bd_addr_t *bdaddr);
 uint8_t bt_hfp_hf_end_call(struct bd_addr_t *bdaddr);
+uint8_t bt_hfp_hf_callout_by_number(struct bd_addr_t *addr,uint8_t *number);
+uint8_t bt_hfp_hf_callout_by_memory(struct bd_addr_t *addr,uint8_t memory_id);
+uint8_t bt_hfp_hf_callout_by_last(struct bd_addr_t *addr);
+uint8_t bt_hfp_hf_get_local_phone_number(struct bd_addr_t *addr);
 
 
 #endif
