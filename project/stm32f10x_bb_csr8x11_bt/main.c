@@ -235,6 +235,14 @@ void bt_app_hfp_local_pn(struct bd_addr_t *remote_addr,uint8_t *local_pn)
 	uart_send_json("BT","BT_HFP_LOCAL_PN",(uint8_t*)"SUCCESS",local_pn,0,0,0,0);
 }
 
+void bt_app_hfp_call_pn(struct bd_addr_t *remote_addr,uint8_t *phone_number)
+{
+	printf("bt_app_hfp_call_pn %s address:\n",phone_number);
+    bt_hex_dump(remote_addr->addr,6);
+
+	uart_send_json("BT","BT_HFP_CALL_PN",(uint8_t*)"SUCCESS",phone_number,0,0,0,0);
+}
+
 
 static bt_app_hfp_cb_t bt_app_hfp_cb =
 {
@@ -249,6 +257,7 @@ static bt_app_hfp_cb_t bt_app_hfp_cb =
     bt_app_hfp_call_status,
     bt_app_hfp_call_setup,
     bt_app_hfp_local_pn,
+    bt_app_hfp_call_pn,
 };
 
 
@@ -348,9 +357,8 @@ static bt_app_cb_t bt_app_cb =
 #define BT_HFP_CALLOUT_LN_DES "Call out last number"
 #define BT_HFP_LOCAL_PN_CMD "HFP_LPN"
 #define BT_HFP_LOCAL_PN_DES "Get local phone number"
-
-
-
+#define BT_HFP_CALL_LIST_CMD "HFP_CLCC"
+#define BT_HFP_CALL_LIST_DES "Get call list information"
 
 
 typedef struct
@@ -381,6 +389,8 @@ cmd_desctiption_t cmd_usage[] =
     {(uint8_t *)BT_HFP_CALLOUT_MEM_CMD,(uint8_t *)BT_HFP_CALLOUT_MEM_DES},
     {(uint8_t *)BT_HFP_CALLOUT_LN_CMD,(uint8_t *)BT_HFP_CALLOUT_LN_DES},
     {(uint8_t *)BT_HFP_LOCAL_PN_CMD,(uint8_t *)BT_HFP_LOCAL_PN_DES},
+	{(uint8_t *)BT_HFP_CALL_LIST_CMD,(uint8_t *)BT_HFP_CALL_LIST_DES},
+
 };
 
 void show_usage()
@@ -479,6 +489,13 @@ uint8_t shell_json_parse(uint8_t *operate_value,
     {
         HW_DEBUG("SHELL:operate local number\n");
         bt_hfp_hf_get_local_phone_number(&connect_addr);
+        return HW_ERR_OK;
+    }
+
+	if(hw_strcmp("HFP_CLCC",(const char*)operate_value) == 0)
+    {
+        HW_DEBUG("SHELL:operate bt get call list\n");
+        bt_hfp_hf_get_call_list(&connect_addr);
         return HW_ERR_OK;
     }
 #endif
@@ -739,8 +756,8 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
 
     if(hw_strcmp("HFP_CLCC",(const char*)shell_string) == 0)
     {
-        HW_DEBUG("SHELL:operate bt stop\n");
-        hfp_hf_query_call_list(&connect_addr);
+        HW_DEBUG("SHELL:operate bt get call list\n");
+        bt_hfp_hf_get_call_list(&connect_addr);
         return HW_ERR_OK;
     }
 

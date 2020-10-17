@@ -51,10 +51,11 @@
             this.pb_hfp_signal = new System.Windows.Forms.PictureBox();
             this.gb_hfp_test_area = new System.Windows.Forms.GroupBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.b_hfp_get_call_pn = new System.Windows.Forms.Button();
             this.b_end_call = new System.Windows.Forms.Button();
             this.b_hfp_audio_transfer = new System.Windows.Forms.Button();
             this.b_answer_call = new System.Windows.Forms.Button();
-            this.label7 = new System.Windows.Forms.Label();
+            this.l_hfp_call_pn = new System.Windows.Forms.Label();
             this.l_hfp_call_time = new System.Windows.Forms.Label();
             this.l_hfp_call_status = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
@@ -344,10 +345,11 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.b_hfp_get_call_pn);
             this.groupBox4.Controls.Add(this.b_end_call);
             this.groupBox4.Controls.Add(this.b_hfp_audio_transfer);
             this.groupBox4.Controls.Add(this.b_answer_call);
-            this.groupBox4.Controls.Add(this.label7);
+            this.groupBox4.Controls.Add(this.l_hfp_call_pn);
             this.groupBox4.Controls.Add(this.l_hfp_call_time);
             this.groupBox4.Controls.Add(this.l_hfp_call_status);
             this.groupBox4.Location = new System.Drawing.Point(254, 16);
@@ -355,6 +357,16 @@
             this.groupBox4.Size = new System.Drawing.Size(264, 464);
             this.groupBox4.TabIndex = 25;
             this.groupBox4.TabStop = false;
+            // 
+            // b_hfp_get_call_pn
+            // 
+            this.b_hfp_get_call_pn.Location = new System.Drawing.Point(11, 203);
+            this.b_hfp_get_call_pn.Name = "b_hfp_get_call_pn";
+            this.b_hfp_get_call_pn.Size = new System.Drawing.Size(240, 52);
+            this.b_hfp_get_call_pn.TabIndex = 6;
+            this.b_hfp_get_call_pn.Text = "获取电话号码";
+            this.b_hfp_get_call_pn.UseVisualStyleBackColor = true;
+            this.b_hfp_get_call_pn.Click += new System.EventHandler(this.b_hfp_get_call_pn_Click);
             // 
             // b_end_call
             // 
@@ -368,7 +380,7 @@
             // 
             // b_hfp_audio_transfer
             // 
-            this.b_hfp_audio_transfer.Location = new System.Drawing.Point(11, 215);
+            this.b_hfp_audio_transfer.Location = new System.Drawing.Point(11, 261);
             this.b_hfp_audio_transfer.Name = "b_hfp_audio_transfer";
             this.b_hfp_audio_transfer.Size = new System.Drawing.Size(240, 52);
             this.b_hfp_audio_transfer.TabIndex = 4;
@@ -386,15 +398,15 @@
             this.b_answer_call.UseVisualStyleBackColor = true;
             this.b_answer_call.Click += new System.EventHandler(this.b_answer_call_Click);
             // 
-            // label7
+            // l_hfp_call_pn
             // 
-            this.label7.AutoSize = true;
-            this.label7.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label7.Location = new System.Drawing.Point(39, 110);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(188, 31);
-            this.label7.TabIndex = 2;
-            this.label7.Text = "xxx-xxxx-xxxx";
+            this.l_hfp_call_pn.AutoSize = true;
+            this.l_hfp_call_pn.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.l_hfp_call_pn.Location = new System.Drawing.Point(62, 116);
+            this.l_hfp_call_pn.Name = "l_hfp_call_pn";
+            this.l_hfp_call_pn.Size = new System.Drawing.Size(188, 31);
+            this.l_hfp_call_pn.TabIndex = 2;
+            this.l_hfp_call_pn.Text = "xxx-xxxx-xxxx";
             // 
             // l_hfp_call_time
             // 
@@ -1048,12 +1060,13 @@
         private System.Windows.Forms.Button b_end_call;
         private System.Windows.Forms.Button b_hfp_audio_transfer;
         private System.Windows.Forms.Button b_answer_call;
-        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label l_hfp_call_pn;
         private System.Windows.Forms.Label l_hfp_call_time;
         private System.Windows.Forms.Label l_hfp_call_status;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.TextBox tb_hfp_lpn;
         private System.Windows.Forms.Button b_hfp_get_lpn;
+        private System.Windows.Forms.Button b_hfp_get_call_pn;
     }
 }
 

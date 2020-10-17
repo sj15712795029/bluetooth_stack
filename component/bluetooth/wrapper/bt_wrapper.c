@@ -403,10 +403,18 @@ void hfp_hf_local_number(struct bd_addr_t *remote_addr,uint8_t *number,uint8_t n
 
 void hfp_hf_call_list(struct bd_addr_t *remote_addr,uint8_t *number,uint8_t number_len,uint8_t index,uint8_t dir,uint8_t status,uint8_t mode,uint8_t mpty,uint8_t type)
 {
+	uint8_t pn_buffer[16] = {0};
     printf("WRAPPER << PROFILE:hfp_hf_call_list, index %d,dir %d status %d mode %d mpty %d type %d address is :\n",index,dir,status,mode,mpty,type);
     bt_hex_dump(remote_addr->addr,6);
     printf("number len %d,number is:\n",number_len);
     bt_hex_dump(number,number_len);
+
+	memcpy(pn_buffer,number,number_len);
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_call_pn)
+    {
+        bt_wrapper_cb->app_hfp_cb->bt_hfp_call_pn(remote_addr,pn_buffer);
+    }
 }
 
 void hfp_hf_manufacturer_id(struct bd_addr_t *remote_addr,uint8_t *mid,uint8_t mid_len)
@@ -678,6 +686,13 @@ uint8_t bt_hfp_hf_get_local_phone_number(struct bd_addr_t *addr)
 {
 	hfp_hf_get_local_phone_number(addr);
 	
+	return 0;
+}
+
+uint8_t bt_hfp_hf_get_call_list(struct bd_addr_t *addr)
+{
+	hfp_hf_query_call_list(addr);
+
 	return 0;
 }
 

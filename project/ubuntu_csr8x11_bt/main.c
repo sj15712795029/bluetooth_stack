@@ -68,8 +68,8 @@ uint32_t last_sys_time = 0;
 #define BT_HFP_CALLOUT_LN_DES "Call out last number"
 #define BT_HFP_LOCAL_PN_CMD "HFP_LPN"
 #define BT_HFP_LOCAL_PN_DES "Get local phone number"
-
-
+#define BT_HFP_CALL_LIST_CMD "HFP_CLCC"
+#define BT_HFP_CALL_LIST_DES "Get call list information"
 
 
 
@@ -101,6 +101,7 @@ cmd_desctiption_t cmd_usage[] =
     {(uint8_t *)BT_HFP_CALLOUT_MEM_CMD,(uint8_t *)BT_HFP_CALLOUT_MEM_DES},
     {(uint8_t *)BT_HFP_CALLOUT_LN_CMD,(uint8_t *)BT_HFP_CALLOUT_LN_DES},
     {(uint8_t *)BT_HFP_LOCAL_PN_CMD,(uint8_t *)BT_HFP_LOCAL_PN_DES},
+    {(uint8_t *)BT_HFP_CALL_LIST_CMD,(uint8_t *)BT_HFP_CALL_LIST_DES},
 };
 
 
@@ -228,6 +229,13 @@ void bt_app_hfp_local_pn(struct bd_addr_t *remote_addr,uint8_t *local_pn)
 
 }
 
+void bt_app_hfp_call_pn(struct bd_addr_t *remote_addr,uint8_t *phone_number)
+{
+	printf("bt_app_hfp_call_pn %s address:\n",phone_number);
+    bt_hex_dump(remote_addr->addr,6);
+}
+
+
 
 static bt_app_hfp_cb_t bt_app_hfp_cb =
 {
@@ -242,6 +250,7 @@ static bt_app_hfp_cb_t bt_app_hfp_cb =
     bt_app_hfp_call_status,
     bt_app_hfp_call_setup,
     bt_app_hfp_local_pn,
+    bt_app_hfp_call_pn,
 };
 
 
@@ -535,7 +544,12 @@ uint8_t shell_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-    
+    if(hw_strncmp("HFP_CLCC",(const char*)shell_string,hw_strlen(BT_HFP_CALL_LIST_CMD)) == 0)
+    {
+        HW_DEBUG("SHELL:operate bt get call list\n");
+        bt_hfp_hf_get_call_list(&connect_addr);
+        return HW_ERR_OK;
+    }
 
     if(hw_strcmp("HFP_NRECD",(const char*)shell_string) == 0)
     {
@@ -593,13 +607,6 @@ uint8_t shell_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-
-    if(hw_strcmp("HFP_CLCC",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate bt stop\n");
-        hfp_hf_query_call_list(&connect_addr);
-        return HW_ERR_OK;
-    }
 
     if(hw_strcmp("HFP_NET_N",(const char*)shell_string) == 0)
     {

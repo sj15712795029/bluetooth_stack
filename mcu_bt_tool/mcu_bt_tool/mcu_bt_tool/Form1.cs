@@ -45,7 +45,7 @@ namespace mcu_bt_tool
         string json_bt_cmd_hfp_end_call = "HFP_CALLEND";
         string json_bt_cmd_hfp_call_pn = "HFP_CALLOUT_PN"; /* 通过手机号拨打电话 */
         string json_bt_cmd_hfp_get_lpn = "HFP_LPN"; /* 获取本地号码 */
-        
+        string json_bt_cmd_hfp_get_call_pn = "HFP_CLCC"; /* 获取通话号码 */
 
         /* HFP的call/callsetup status */
         bool bt_hfp_is_call_active = false;
@@ -344,6 +344,11 @@ namespace mcu_bt_tool
             json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_get_lpn, null, null, null, null, null, null);
         }
 
+        private void b_hfp_get_call_pn_Click(object sender, EventArgs e)
+        {
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_get_call_pn, null, null, null, null, null, null);
+        }
+
         /* 串口搜索 */
         private void search_add_serial_port()
         {
@@ -601,6 +606,7 @@ namespace mcu_bt_tool
                         bt_hfp_is_call_active = false;
                         bt_hfp_call_time_count = 0;
                         l_hfp_call_time.Text = "00:00:00";
+                        l_hfp_call_pn.Text = "xxx-xxxx-xxxx";
 
                         ui_bt_hfp_answer_call_enable(false);
                         ui_bt_hfp_end_call_enable(false);
@@ -646,6 +652,12 @@ namespace mcu_bt_tool
                 {
                     tb_hfp_lpn.Text = status.PARAM1;
                 }
+
+                if (status.OPERATE == "BT_HFP_CALL_PN")
+                {
+                    l_hfp_call_pn.Text = status.PARAM1;
+                }
+                
                 
             }
         }
@@ -845,6 +857,8 @@ namespace mcu_bt_tool
             ui_bt_hfp_clear_call_num();
             
         }
+
+        
 
         
 
