@@ -594,14 +594,14 @@ uint8_t shell_parse(uint8_t *shell_string)
     if(hw_strcmp("HFP_VGM",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate VGM\n");
-        hfp_hf_set_mic_volume(&connect_addr,1);
+        bt_hfp_hf_set_mic_volume(&connect_addr,1);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_VGS",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate VGM\n");
-        hfp_hf_set_spk_volume(&connect_addr,1);
+        bt_hfp_hf_set_spk_volume(&connect_addr,1);
         return HW_ERR_OK;
     }
 

@@ -501,6 +501,21 @@ uint8_t shell_json_parse(uint8_t *operate_value,
         bt_hfp_hf_get_call_list(&connect_addr);
         return HW_ERR_OK;
     }
+
+	if(hw_strcmp("HFP_VGM",(const char*)operate_value) == 0)
+    {
+        HW_DEBUG("SHELL:operate VGM\n");
+        bt_hfp_hf_set_mic_volume(&connect_addr,atoi((const char*)para1));
+        return HW_ERR_OK;
+    }
+
+    if(hw_strcmp("HFP_VGS",(const char*)operate_value) == 0)
+    {
+        HW_DEBUG("SHELL:operate VGM\n");
+        bt_hfp_hf_set_spk_volume(&connect_addr,atoi((const char*)para1));
+        return HW_ERR_OK;
+    }
+	
 #endif
 
 
@@ -803,14 +818,14 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     if(hw_strcmp("HFP_VGM",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate VGM\n");
-        hfp_hf_set_mic_volume(&connect_addr,1);
+        bt_hfp_hf_set_mic_volume(&connect_addr,1);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_VGS",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate VGM\n");
-        hfp_hf_set_spk_volume(&connect_addr,1);
+        bt_hfp_hf_set_spk_volume(&connect_addr,1);
         return HW_ERR_OK;
     }
 

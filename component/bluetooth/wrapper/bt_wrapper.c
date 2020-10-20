@@ -704,6 +704,23 @@ uint8_t bt_hfp_hf_disable_ecnr(struct bd_addr_t *addr)
 }
 
 
+uint8_t bt_hfp_hf_set_mic_volume(struct bd_addr_t *addr,uint8_t value)
+{
+	uint8_t mic_volume = value>=HFP_VOLUME_MAX?HFP_VOLUME_MAX:value;
+	hfp_hf_set_mic_volume(addr,mic_volume);
+
+	return 0;
+}
+
+uint8_t bt_hfp_hf_set_spk_volume(struct bd_addr_t *addr,uint8_t value)
+{
+	uint8_t spk_volume = (value>=HFP_VOLUME_MAX)?HFP_VOLUME_MAX:value;
+	hfp_hf_set_spk_volume(addr,spk_volume);
+
+	return 0;
+}
+
+
 static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres)
 {
     if(inqres != NULL)

@@ -46,8 +46,12 @@ namespace mcu_bt_tool
         string json_bt_cmd_hfp_call_pn = "HFP_CALLOUT_PN"; /* 通过手机号拨打电话 */
         string json_bt_cmd_hfp_get_lpn = "HFP_LPN"; /* 获取本地号码 */
         string json_bt_cmd_hfp_get_call_pn = "HFP_CLCC"; /* 获取通话号码 */
+        string json_bt_cmd_hfp_set_mic_volume = "HFP_VGM"; /* 设置HFP mic音量 */
+        string json_bt_cmd_hfp_set_spk_volume = "HFP_VGS"; /* 设置HFP spk音量 */
 
         /* HFP的call/callsetup status */
+        int bt_hfp_default_mic_volume = 9;
+        int bt_hfp_default_spk_volume = 9;
         bool bt_hfp_is_call_active = false;
         int bt_hfp_call_time_count = 0;
         public const int HFP_CALL_NO_INPORCESS = 0;
@@ -349,6 +353,44 @@ namespace mcu_bt_tool
             json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_get_call_pn, null, null, null, null, null, null);
         }
 
+        private void b_hfp_set_mic_vinc_Click(object sender, EventArgs e)
+        {
+            bt_hfp_default_mic_volume += 1;
+
+            if (bt_hfp_default_mic_volume >= 15)
+                bt_hfp_default_mic_volume = 15;
+            l_hfp_current_mic_v.Text = bt_hfp_default_mic_volume.ToString();
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_set_mic_volume, bt_hfp_default_mic_volume.ToString(), null, null, null, null, null);
+        }
+
+        private void b_hfp_set_mic_vdec_Click(object sender, EventArgs e)
+        {
+            bt_hfp_default_mic_volume -= 1;
+
+            if (bt_hfp_default_mic_volume <= 0)
+                bt_hfp_default_mic_volume = 0;
+            l_hfp_current_mic_v.Text = bt_hfp_default_mic_volume.ToString();
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_set_mic_volume, bt_hfp_default_mic_volume.ToString(), null, null, null, null, null);
+        }
+
+        private void b_hfp_set_spk_vinc_Click(object sender, EventArgs e)
+        {
+            bt_hfp_default_spk_volume += 1;
+            if (bt_hfp_default_spk_volume >= 15)
+                bt_hfp_default_spk_volume = 15;
+            l_hfp_current_spk_v.Text = bt_hfp_default_spk_volume.ToString();
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_set_spk_volume, bt_hfp_default_spk_volume.ToString(), null, null, null, null, null);
+        }
+
+        private void b_hfp_set_spk_vdec_Click(object sender, EventArgs e)
+        {
+            bt_hfp_default_spk_volume -= 1;
+            if (bt_hfp_default_spk_volume <= 0)
+                bt_hfp_default_spk_volume = 0;
+            l_hfp_current_spk_v.Text = bt_hfp_default_spk_volume.ToString();
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_set_spk_volume, bt_hfp_default_spk_volume.ToString(), null, null, null, null, null);
+        }
+
         /* 串口搜索 */
         private void search_add_serial_port()
         {
@@ -546,6 +588,9 @@ namespace mcu_bt_tool
                         ui_bt_hfp_show(true);
                         ui_bt_hfp_con_status(true);
                         ui_bt_hfp_con_status(status.PARAM2);
+
+                        json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_set_mic_volume, bt_hfp_default_mic_volume.ToString(), null, null, null, null, null);
+                        json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_set_spk_volume, bt_hfp_default_spk_volume.ToString(), null, null, null, null, null);
                     }
 
                 }
@@ -859,20 +904,7 @@ namespace mcu_bt_tool
         }
 
         
-
-        
-
-        
-
-        
-
-        
-
-        
-
-        
-
-        
+    
       
     }
 

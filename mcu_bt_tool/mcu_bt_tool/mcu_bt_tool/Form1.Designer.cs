@@ -108,6 +108,14 @@
             this.b_bt_stop = new System.Windows.Forms.Button();
             this.b_bt_start = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.label7 = new System.Windows.Forms.Label();
+            this.b_hfp_set_mic_vinc = new System.Windows.Forms.Button();
+            this.b_hfp_set_mic_vdec = new System.Windows.Forms.Button();
+            this.l_hfp_current_mic_v = new System.Windows.Forms.Label();
+            this.l_hfp_current_spk_v = new System.Windows.Forms.Label();
+            this.b_hfp_set_spk_vdec = new System.Windows.Forms.Button();
+            this.b_hfp_set_spk_vinc = new System.Windows.Forms.Button();
+            this.label10 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.tc_bt_function.SuspendLayout();
             this.tp_bt_basic_func.SuspendLayout();
@@ -345,6 +353,14 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.l_hfp_current_spk_v);
+            this.groupBox4.Controls.Add(this.b_hfp_set_spk_vdec);
+            this.groupBox4.Controls.Add(this.b_hfp_set_spk_vinc);
+            this.groupBox4.Controls.Add(this.label10);
+            this.groupBox4.Controls.Add(this.l_hfp_current_mic_v);
+            this.groupBox4.Controls.Add(this.b_hfp_set_mic_vdec);
+            this.groupBox4.Controls.Add(this.b_hfp_set_mic_vinc);
+            this.groupBox4.Controls.Add(this.label7);
             this.groupBox4.Controls.Add(this.b_hfp_get_call_pn);
             this.groupBox4.Controls.Add(this.b_end_call);
             this.groupBox4.Controls.Add(this.b_hfp_audio_transfer);
@@ -944,6 +960,82 @@
             this.timer1.Interval = 1000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(7, 331);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(99, 20);
+            this.label7.TabIndex = 7;
+            this.label7.Text = "当前mic音量:";
+            // 
+            // b_hfp_set_mic_vinc
+            // 
+            this.b_hfp_set_mic_vinc.Location = new System.Drawing.Point(152, 323);
+            this.b_hfp_set_mic_vinc.Name = "b_hfp_set_mic_vinc";
+            this.b_hfp_set_mic_vinc.Size = new System.Drawing.Size(46, 35);
+            this.b_hfp_set_mic_vinc.TabIndex = 8;
+            this.b_hfp_set_mic_vinc.Text = "V+";
+            this.b_hfp_set_mic_vinc.UseVisualStyleBackColor = true;
+            this.b_hfp_set_mic_vinc.Click += new System.EventHandler(this.b_hfp_set_mic_vinc_Click);
+            // 
+            // b_hfp_set_mic_vdec
+            // 
+            this.b_hfp_set_mic_vdec.Location = new System.Drawing.Point(204, 323);
+            this.b_hfp_set_mic_vdec.Name = "b_hfp_set_mic_vdec";
+            this.b_hfp_set_mic_vdec.Size = new System.Drawing.Size(46, 35);
+            this.b_hfp_set_mic_vdec.TabIndex = 9;
+            this.b_hfp_set_mic_vdec.Text = "V-";
+            this.b_hfp_set_mic_vdec.UseVisualStyleBackColor = true;
+            this.b_hfp_set_mic_vdec.Click += new System.EventHandler(this.b_hfp_set_mic_vdec_Click);
+            // 
+            // l_hfp_current_mic_v
+            // 
+            this.l_hfp_current_mic_v.AutoSize = true;
+            this.l_hfp_current_mic_v.Location = new System.Drawing.Point(118, 331);
+            this.l_hfp_current_mic_v.Name = "l_hfp_current_mic_v";
+            this.l_hfp_current_mic_v.Size = new System.Drawing.Size(18, 20);
+            this.l_hfp_current_mic_v.TabIndex = 10;
+            this.l_hfp_current_mic_v.Text = "9";
+            // 
+            // l_hfp_current_spk_v
+            // 
+            this.l_hfp_current_spk_v.AutoSize = true;
+            this.l_hfp_current_spk_v.Location = new System.Drawing.Point(118, 374);
+            this.l_hfp_current_spk_v.Name = "l_hfp_current_spk_v";
+            this.l_hfp_current_spk_v.Size = new System.Drawing.Size(18, 20);
+            this.l_hfp_current_spk_v.TabIndex = 14;
+            this.l_hfp_current_spk_v.Text = "9";
+            // 
+            // b_hfp_set_spk_vdec
+            // 
+            this.b_hfp_set_spk_vdec.Location = new System.Drawing.Point(204, 366);
+            this.b_hfp_set_spk_vdec.Name = "b_hfp_set_spk_vdec";
+            this.b_hfp_set_spk_vdec.Size = new System.Drawing.Size(46, 35);
+            this.b_hfp_set_spk_vdec.TabIndex = 13;
+            this.b_hfp_set_spk_vdec.Text = "V-";
+            this.b_hfp_set_spk_vdec.UseVisualStyleBackColor = true;
+            this.b_hfp_set_spk_vdec.Click += new System.EventHandler(this.b_hfp_set_spk_vdec_Click);
+            // 
+            // b_hfp_set_spk_vinc
+            // 
+            this.b_hfp_set_spk_vinc.Location = new System.Drawing.Point(152, 366);
+            this.b_hfp_set_spk_vinc.Name = "b_hfp_set_spk_vinc";
+            this.b_hfp_set_spk_vinc.Size = new System.Drawing.Size(46, 35);
+            this.b_hfp_set_spk_vinc.TabIndex = 12;
+            this.b_hfp_set_spk_vinc.Text = "V+";
+            this.b_hfp_set_spk_vinc.UseVisualStyleBackColor = true;
+            this.b_hfp_set_spk_vinc.Click += new System.EventHandler(this.b_hfp_set_spk_vinc_Click);
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(7, 374);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(98, 20);
+            this.label10.TabIndex = 11;
+            this.label10.Text = "当前spk音量:";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -1067,6 +1159,14 @@
         private System.Windows.Forms.TextBox tb_hfp_lpn;
         private System.Windows.Forms.Button b_hfp_get_lpn;
         private System.Windows.Forms.Button b_hfp_get_call_pn;
+        private System.Windows.Forms.Label l_hfp_current_spk_v;
+        private System.Windows.Forms.Button b_hfp_set_spk_vdec;
+        private System.Windows.Forms.Button b_hfp_set_spk_vinc;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label l_hfp_current_mic_v;
+        private System.Windows.Forms.Button b_hfp_set_mic_vdec;
+        private System.Windows.Forms.Button b_hfp_set_mic_vinc;
+        private System.Windows.Forms.Label label7;
     }
 }
 

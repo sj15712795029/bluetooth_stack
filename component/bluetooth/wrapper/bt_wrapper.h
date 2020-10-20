@@ -59,6 +59,9 @@ struct link_key_record
 #define BT_PROFILE_DID_PSE_MASK (1<<8)
 #define BT_PROFILE_SPP_MASK (1<<9)
 
+#define HFP_VOLUME_MIN 0
+#define HFP_VOLUME_MAX 15
+
 typedef struct
 {
 	void (*bt_init_result)(uint8_t status,uint16_t profile_mask);
@@ -121,5 +124,8 @@ uint8_t bt_hfp_hf_callout_by_last(struct bd_addr_t *addr);
 uint8_t bt_hfp_hf_get_local_phone_number(struct bd_addr_t *addr);
 uint8_t bt_hfp_hf_get_call_list(struct bd_addr_t *addr);
 uint8_t bt_hfp_hf_disable_ecnr(struct bd_addr_t *addr);
+uint8_t bt_hfp_hf_set_mic_volume(struct bd_addr_t *addr,uint8_t value);
+uint8_t bt_hfp_hf_set_spk_volume(struct bd_addr_t *addr,uint8_t value);
+
 
 #endif
