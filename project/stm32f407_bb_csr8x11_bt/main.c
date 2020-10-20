@@ -316,6 +316,11 @@ static bt_app_cb_t bt_app_cb =
 #define BT_HFP_CALL_LIST_DES "Get call list information"
 #define BT_HFP_DISABLE_ECNR_CMD "HFP_NRECD"
 #define BT_HFP_DISABLE_ECNR_DES "Disable AG ECNR"
+#define BT_HFP_VGS_CMD "HFP_VGS"
+#define BT_HFP_VGS_DES "Set HFP speaker volume"
+#define BT_HFP_VGM_CMD "HFP_VGM"
+#define BT_HFP_VGM_DES "Set HFP mic volume"
+
 
 
 
@@ -349,6 +354,8 @@ cmd_desctiption_t cmd_usage[] =
     {(uint8_t *)BT_HFP_LOCAL_PN_CMD,(uint8_t *)BT_HFP_LOCAL_PN_DES},
 	{(uint8_t *)BT_HFP_CALL_LIST_CMD,(uint8_t *)BT_HFP_CALL_LIST_DES},
 	{(uint8_t *)BT_HFP_DISABLE_ECNR_CMD,(uint8_t *)BT_HFP_DISABLE_ECNR_DES},
+	{(uint8_t *)BT_HFP_VGS_CMD,(uint8_t *)BT_HFP_VGS_DES},
+    {(uint8_t *)BT_HFP_VGM_CMD,(uint8_t *)BT_HFP_VGM_DES},
 };
 
 void show_usage()
