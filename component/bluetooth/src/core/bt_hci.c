@@ -284,8 +284,8 @@ void hci_acl_input(struct bt_pbuf_t *p)
     //bt_pbuf_header(p, HCI_ACL_HDR_LEN);
     aclhdr = p->payload;
 
-    BT_HCI_TRACE_DEBUG("DEBUG:BT RX ACL LEN:%d\n",aclhdr->len);
-    bt_hex_dump(p->payload,aclhdr->len + HCI_ACL_HDR_LEN);
+    //BT_HCI_TRACE_DEBUG("DEBUG:BT RX ACL LEN:%d\n",aclhdr->len);
+    //bt_hex_dump(p->payload,aclhdr->len + HCI_ACL_HDR_LEN);
 
     //bt_pbuf_header(p, -HCI_ACL_HDR_LEN);
 
@@ -474,6 +474,11 @@ err_t read_bdaddr_complete(void *arg, struct bd_addr_t *bdaddr)
 
 static void hci_init_cmd_complete_handle(uint8_t ocf, uint8_t ogf,uint8_t * payload)
 {
+    if(ogf == HCI_VENDOR_OGF && ocf == 0)
+    {
+        vendor_init();
+    }
+
     if(ogf == HCI_HOST_C_N_BB && ocf == HCI_RESET)
     {
         utimer_cancel(pcb->timer);
@@ -531,7 +536,11 @@ static void hci_init_cmd_complete_handle(uint8_t ocf, uint8_t ogf,uint8_t * payl
 
     if(ogf == HCI_HOST_C_N_BB && ocf == HCI_WRITE_PAGE_TIMEOUT)
     {
-        hci_set_event_mask(0xffffffff,0x1FFFFFFF);
+#if BT_BLE_ENABLE > 0
+        hci_set_event_mask(0xffffffff,0x3FFFFFFF);
+#else
+        hci_set_event_mask(0xffffffff,0x1FFFFFFF); /* base 0x1FFFFFFF:Add LE Meta event(bit 61) */
+#endif
     }
 
     if(ogf == HCI_HOST_C_N_BB && ocf == HCI_SET_EVENT_MASK)
@@ -549,27 +558,30 @@ static void hci_init_cmd_complete_handle(uint8_t ocf, uint8_t ogf,uint8_t * payl
         hci_write_scan_enable(HCI_SCAN_EN_INQUIRY | HCI_SCAN_EN_PAGE);
     }
 
+#if BT_BLE_ENABLE > 0
     if(ogf == HCI_HOST_C_N_BB && ocf == HCI_WRITE_SCAN_ENABLE)
     {
-        hci_write_le_enable(1,1);
+        hci_write_le_enable(1,0);
     }
 
     if(ogf == HCI_HOST_C_N_BB && ocf == HCI_WRITE_LE_SUPPORT)
     {
-        hci_set_le_scan_param(1, 0x10, 0x10,0, 0);
-    }
+        if(pcb->init_status == BLUETOOTH_INITING)
+            HCI_BT_WORKING(pcb);
+        pcb->init_status = BLUETOOTH_WORKING;
 
-    if(ogf == HCI_LE && ocf == HCI_SET_SCAN_PARAM)
+    }
+#else
+    if(ogf == HCI_HOST_C_N_BB && ocf == HCI_WRITE_SCAN_ENABLE)
     {
         if(pcb->init_status == BLUETOOTH_INITING)
             HCI_BT_WORKING(pcb);
         pcb->init_status = BLUETOOTH_WORKING;
-    }
 
-    if(ogf == HCI_VENDOR_OGF && ocf == 0)
-    {
-        vendor_init();
     }
+#endif
+
+
 }
 
 
@@ -592,8 +604,8 @@ void hci_event_input(struct bt_pbuf_t *p)
 
     evhdr = p->payload;
 
-    BT_HCI_TRACE_DEBUG("DEBUG:BT RX event (0x%x) LEN:%d\n",evhdr->code,p->tot_len);
-    bt_hex_dump(p->payload,evhdr->len + HCI_EVENT_HDR_LEN);
+    //BT_HCI_TRACE_DEBUG("DEBUG:BT RX event (0x%x) LEN:%d\n",evhdr->code,p->tot_len);
+    //bt_hex_dump(p->payload,evhdr->len + HCI_EVENT_HDR_LEN);
 
 
     bt_pbuf_header(p, -HCI_EVENT_HDR_LEN);
@@ -986,6 +998,16 @@ void hci_event_input(struct bt_pbuf_t *p)
         }
         else if(ogf == HCI_LE)
         {
+            if(ocf == HCI_SET_SCAN)
+            {
+                BT_HCI_TRACE_DEBUG("HCI_SET_SCAN le_inq_w2_stop(%d)\n",pcb->le_inq_w2_stop);
+                if(pcb->le_inq_w2_stop == 1)
+                {
+                    BT_HCI_TRACE_DEBUG("DEBUG:hci_event_input:le inquiry complete, 0x%x %s\n",((uint8_t *)p->payload)[0], hci_get_error_code(((uint8_t *)p->payload)[0]));
+                    HCI_EVENT_LE_INQ_COMPLETE(pcb,((uint8_t *)p->payload)[0],ret);
+                    pcb->le_inq_w2_stop = 0;
+                }
+            }
         }
         else if(ogf == HCI_VENDOR_OGF)
         {
@@ -1116,12 +1138,38 @@ void hci_event_input(struct bt_pbuf_t *p)
         bdaddr = (void *)((uint8_t *)p->payload);
         hci_user_confirm_req_reply(bdaddr);
         break;
+
+#if BT_BLE_ENABLE > 0
     case HCI_LE_META:
     {
-        BT_HCI_TRACE_DEBUG("hci_event_input: le meta event sub event 0x%x\n",((uint8_t *)p->payload)[0]);
+        uint8_t sub_event = ((uint8_t *)p->payload)[0];
+        BT_HCI_TRACE_DEBUG("hci_event_input: le meta event sub event 0x%x\n",sub_event);
+
+        switch(sub_event)
+        {
+        case HCI_SUBEVENT_LE_ADV_REPORT:
+        {
+            struct hci_le_inq_res_t hci_le_inq_res = {0};
+
+            hci_le_inq_res.addr_type = ((uint8_t *)p->payload)[3];
+            memcpy(hci_le_inq_res.bdaddr.addr,((uint8_t *)p->payload)+4,BD_ADDR_LEN);
+            hci_le_inq_res.adv_size = ((uint8_t *)p->payload)[10];
+            hci_le_inq_res.adv_type = ((uint8_t *)p->payload)[2];
+            memcpy(hci_le_inq_res.adv_data,((uint8_t *)p->payload)+11,hci_le_inq_res.adv_size);
+            hci_le_inq_res.rssi = ((uint8_t *)p->payload)[11+hci_le_inq_res.adv_size];
+
+			HCI_EVENT_LE_INQ_RESULT(pcb,&hci_le_inq_res,ret);
+
+            break;
+        }
+
+        default:
+            break;
+        }
 
         break;
     }
+#endif
     case HCI_VENDOR_SPEC:
         vendor_init();
         break;
@@ -2682,6 +2730,7 @@ err_t hci_enable_dut_mode(void)
     return BT_ERR_OK;
 }
 
+#if BT_BLE_ENABLE > 0
 err_t hci_set_le_scan_param(uint8_t scan_type,uint16_t scan_interval,uint16_t scan_window,uint8_t own_type,uint8_t scan_filter)
 {
     struct bt_pbuf_t *p;
@@ -2709,7 +2758,10 @@ err_t hci_set_le_scan_param(uint8_t scan_type,uint16_t scan_interval,uint16_t sc
     return BT_ERR_OK;
 }
 
-err_t hci_set_le_scan_enable(uint8_t scan_enable,uint8_t filter_duplicates)
+err_t hci_le_inquiry(uint8_t filter_duplicates,
+					err_t (*le_inq_result)(struct hci_pcb_t *pcb,struct hci_le_inq_res_t *le_inqres),
+                     err_t (* le_inq_complete)(struct hci_pcb_t *pcb,uint16_t result))
+
 {
     struct bt_pbuf_t *p;
     if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_SET_LE_SCAN_PLEN, BT_PBUF_RAM)) == NULL)
@@ -2718,10 +2770,14 @@ err_t hci_set_le_scan_enable(uint8_t scan_enable,uint8_t filter_duplicates)
 
         return BT_ERR_MEM;
     }
+
+    pcb->le_inq_result = le_inq_result;
+	pcb->le_inq_complete = le_inq_complete;
+
     /* Assembling command packet */
     p = hci_cmd_ass(p, HCI_SET_SCAN, HCI_LE, HCI_SET_LE_SCAN_PLEN);
     /* Assembling cmd prameters */
-    ((uint8_t *)p->payload)[3] = scan_enable;
+    ((uint8_t *)p->payload)[3] = 1;
     ((uint8_t *)p->payload)[4] = filter_duplicates;
 
     phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
@@ -2731,5 +2787,28 @@ err_t hci_set_le_scan_enable(uint8_t scan_enable,uint8_t filter_duplicates)
 }
 
 
+err_t hci_le_cancel_inquiry(void)
+{
+    struct bt_pbuf_t *p;
+    if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_SET_LE_SCAN_PLEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+
+        return BT_ERR_MEM;
+    }
+
+    pcb->le_inq_w2_stop  = 1;
+    /* Assembling command packet */
+    p = hci_cmd_ass(p, HCI_SET_SCAN, HCI_LE, HCI_SET_LE_SCAN_PLEN);
+    /* Assembling cmd prameters */
+    ((uint8_t *)p->payload)[3] = 0;
+    ((uint8_t *)p->payload)[4] = 0;
+
+    phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
+    bt_pbuf_free(p);
+
+    return BT_ERR_OK;
+}
+#endif
 
 

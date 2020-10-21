@@ -12,6 +12,15 @@ uint8_t bt_call_active = 0;
 
 static err_t bt_inquiry_complete(struct hci_pcb_t *pcb,uint16_t result);
 static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres);
+#if BT_BLE_ENABLE > 0
+static err_t bt_le_inquiry_complete(struct hci_pcb_t *pcb,uint16_t result);
+static err_t bt_le_inquiry_result(struct hci_pcb_t *pcb,struct hci_le_inq_res_t *le_inqres);
+static uint8_t bt_le_adv_get_type(bt_le_adv_parse_t *bt_adv_le_parse);
+static uint8_t bt_le_adv_get_size(bt_le_adv_parse_t *bt_adv_le_parse);
+static uint8_t *bt_le_adv_get_data(bt_le_adv_parse_t *bt_adv_le_parse);
+#endif
+
+
 static err_t bt_ass_eir_data()
 {
     uint8_t data_pos =0;
@@ -619,11 +628,54 @@ uint8_t bt_cancel_get_remote_name(struct bd_addr_t *bdaddr)
     return 0;
 }
 
-uint8_t bt_le_inquiry(uint8_t enable)
+#if BT_BLE_ENABLE > 0
+uint8_t bt_le_start_inquiry(void)
 {
-    hci_set_le_scan_enable(enable,0);
+	hci_set_le_scan_param(1,0x30,0x30,0,0);
+    hci_le_inquiry(0,bt_le_inquiry_result,bt_le_inquiry_complete);
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_common_cb && bt_wrapper_cb->app_common_cb->bt_le_inquiry_status)
+    {
+        bt_wrapper_cb->app_common_cb->bt_le_inquiry_status(BT_LE_INQUIRY_START);
+    }
     return 0;
 }
+
+uint8_t bt_le_stop_inquiry(void)
+{
+    hci_le_cancel_inquiry();
+
+    return 0;
+}
+
+uint8_t bt_le_adv_parse_init(bt_le_adv_parse_t *bt_adv_le_parse,uint8_t adv_size,uint8_t *adv_data)
+{
+	bt_adv_le_parse->adv_data = adv_data;
+	bt_adv_le_parse->adv_len = adv_size;
+	bt_adv_le_parse->adv_offset = 0;
+	bt_adv_le_parse->adv_item_len = 0;
+	
+	return 0;
+}
+uint8_t bt_le_adv_has_more(bt_le_adv_parse_t *bt_adv_le_parse)
+{
+	if(bt_adv_le_parse->adv_offset >= bt_adv_le_parse->adv_len)
+		return 0;
+	else 
+		return 1;
+}
+
+
+uint8_t ble_le_adv_data_parse(bt_le_adv_parse_t *bt_adv_le_parse,uint8_t *adv_item_type,uint8_t *adv_item_data_len,uint8_t **adv_item_data)
+{
+	*adv_item_data_len = bt_le_adv_get_size(bt_adv_le_parse);
+	*adv_item_type = bt_le_adv_get_type(bt_adv_le_parse);
+	*adv_item_data = bt_le_adv_get_data(bt_adv_le_parse);
+
+	return 0;
+	
+}
+#endif
 
 /************************* HFP API ***********************/
 uint8_t bt_hfp_hf_get_operator(struct bd_addr_t *bdaddr)
@@ -759,6 +811,53 @@ static err_t bt_inquiry_complete(struct hci_pcb_t *pcb,uint16_t result)
     return BT_ERR_OK;
 }
 
+#if BT_BLE_ENABLE > 0
+static err_t bt_le_inquiry_result(struct hci_pcb_t *pcb,struct hci_le_inq_res_t *le_inqres)
+{
+    if(le_inqres != NULL)
+    {
+        
+        if(bt_wrapper_cb && bt_wrapper_cb->app_common_cb && bt_wrapper_cb->app_common_cb->bt_le_inquiry_result)
+        {
+            bt_wrapper_cb->app_common_cb->bt_le_inquiry_result(&le_inqres->bdaddr,le_inqres->rssi,
+				le_inqres->adv_type,le_inqres->adv_size,le_inqres->adv_data);
+        }
+
+    }
+
+    return BT_ERR_OK;
+}
+
+
+static err_t bt_le_inquiry_complete(struct hci_pcb_t *pcb,uint16_t result)
+{
+    if(bt_wrapper_cb && bt_wrapper_cb->app_common_cb && bt_wrapper_cb->app_common_cb->bt_le_inquiry_status)
+    {
+        bt_wrapper_cb->app_common_cb->bt_le_inquiry_status(BT_LE_INQUIRY_COMPLETE);
+    }
+    return BT_ERR_OK;
+}
+
+static uint8_t bt_le_adv_get_type(bt_le_adv_parse_t *bt_adv_le_parse)
+{
+	return bt_adv_le_parse->adv_data[bt_adv_le_parse->adv_offset++];
+}
+static uint8_t bt_le_adv_get_size(bt_le_adv_parse_t *bt_adv_le_parse)
+{
+	uint8_t adv_item_size = bt_adv_le_parse->adv_data[bt_adv_le_parse->adv_offset++] - 1;
+	bt_adv_le_parse->adv_item_len = adv_item_size;
+	return adv_item_size;
+}
+static uint8_t *bt_le_adv_get_data(bt_le_adv_parse_t *bt_adv_le_parse)
+{
+	uint8_t *adv_data = bt_adv_le_parse->adv_data + bt_adv_le_parse->adv_offset;
+	bt_adv_le_parse->adv_offset += bt_adv_le_parse->adv_item_len;
+	return adv_data;
+}
+
+
+#endif
+
 static err_t bt_get_remote_name_complete(struct hci_pcb_t *pcb,struct bd_addr_t *bdaddr,uint8_t * name)
 {
     printf("---------bt_address:\n");
@@ -767,4 +866,8 @@ static err_t bt_get_remote_name_complete(struct hci_pcb_t *pcb,struct bd_addr_t 
     bt_hex_dump(name,248);
     return BT_ERR_OK;
 }
+
+
+
+
 

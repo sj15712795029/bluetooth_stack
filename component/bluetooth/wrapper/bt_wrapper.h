@@ -47,6 +47,9 @@ struct link_key_record
 #define BT_INIT_FAIL 1
 #define BT_INQUIRY_START 0
 #define BT_INQUIRY_COMPLETE 1
+#define BT_LE_INQUIRY_START 0
+#define BT_LE_INQUIRY_COMPLETE 1
+
 
 #define BT_PROFILE_HFP_HF_MASK (1<<0)
 #define BT_PROFILE_HFP_AG_MASK (1<<1)
@@ -67,7 +70,10 @@ typedef struct
 	void (*bt_init_result)(uint8_t status,uint16_t profile_mask);
 	void (*bt_inquiry_status)(uint8_t status);
 	void (*bt_inquiry_result)(struct bd_addr_t *address,uint8_t dev_type,uint8_t *name);
-
+#if BT_BLE_ENABLE > 0
+	void (*bt_le_inquiry_status)(uint8_t status);
+	void (*bt_le_inquiry_result)(struct bd_addr_t *address,int8_t rssi,uint8_t adv_type,uint8_t adv_size,uint8_t *adv_data);
+#endif
 }bt_app_common_cb_t;
 
 typedef struct
@@ -102,6 +108,15 @@ typedef struct
 	
 }bt_app_cb_t;
 
+
+typedef struct
+{
+	uint8_t *adv_data;
+	uint8_t adv_len;
+	uint8_t adv_item_len;
+	uint8_t adv_offset;
+}bt_le_adv_parse_t;
+
 /*********************** COMMON API ***********************/
 uint8_t bt_start(bt_app_cb_t *app_cb);
 uint8_t bt_stop(void);
@@ -111,7 +126,15 @@ uint8_t hci_start_periodic_inquiry(uint16_t min_length,uint16_t max_length,uint8
 uint8_t bt_stop_periodic_inquiry(void);
 uint8_t bt_get_remote_name(struct bd_addr_t *bdaddr);
 uint8_t bt_cancel_get_remote_name(struct bd_addr_t *bdaddr);
-uint8_t bt_le_inquiry(uint8_t enable);
+#if BT_BLE_ENABLE > 0
+uint8_t bt_le_start_inquiry(void);
+uint8_t bt_le_stop_inquiry(void);
+uint8_t bt_le_adv_parse_init(bt_le_adv_parse_t *bt_adv_le_parse,uint8_t adv_size,uint8_t *adv_data);
+uint8_t bt_le_adv_has_more(bt_le_adv_parse_t *bt_adv_le_parse);
+uint8_t ble_le_adv_data_parse(bt_le_adv_parse_t *bt_adv_le_parse,uint8_t *adv_item_type,uint8_t *adv_item_data_len,uint8_t **adv_item_data);
+#endif
+
+
 
 /************************* HFP API ***********************/
 uint8_t bt_hfp_hf_get_operator(struct bd_addr_t *bdaddr);

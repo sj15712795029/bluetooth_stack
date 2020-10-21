@@ -76,6 +76,8 @@
 
 
 /***********   bluetooth function option **************************************/
+#define BT_CLASSICAL_ENABLE 1
+#define BT_BLE_ENABLE 1
 /** BT_PBUF_TRANSPORT_H2 = 0x01,BT_PBUF_TRANSPORT_H4 = 0x02,BT_PBUF_TRANSPORT_H5 = 0x03,BT_PBUF_TRANSPORT_BCSP = 0x04,*/
 #define BT_ENABLE_SNOOP 1
 #define BT_TRANSPORT_TYPE 0x02

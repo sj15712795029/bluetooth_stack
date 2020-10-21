@@ -21,6 +21,7 @@ struct hci_inq_res_t;
 
 #define HCI_RESET_TIMEOUT	10
 #define HCI_REMOTE_NAME_LEN 32
+#define HCI_LE_ADV_MAX_SIZE 32
 #define HCI_INQUIRY_MAX_DEV MEMP_NUM_HCI_INQ
 
 #define HCI_EVENT_HDR_LEN 2
@@ -239,7 +240,7 @@ struct hci_inq_res_t;
 #define HCI_USER_PASSKEY_NOTIFICATION 0x3B
 #define HCI_KEYPRESS_NOTIFICATION 0x3C
 #define HCI_REMOTE_HOST_SUPPORT_FEATURE_NOTIFICATION 0x3D
-#define HCI_LE_META 0x3e
+#define HCI_LE_META 0x3E
 #define HCI_VENDOR_SPEC 0xFF
 
 /* Success code */
@@ -391,7 +392,7 @@ struct hci_inq_res_t;
 #define INQUIRY_MODE_EIR 2
 
 /**
- * SSP Authentication Requirements, see IO Capability Request Reply Commmand 
+ * SSP Authentication Requirements, see IO Capability Request Reply Commmand
  */
 
 // Numeric comparison with automatic accept allowed.
@@ -411,6 +412,21 @@ struct hci_inq_res_t;
 
 // Use IO capabilities to determine authentication procedure.
 #define SSP_IO_AUTHREQ_MITM_PROTECTION_REQUIRED_GENERAL_BONDING 0x05
+
+
+
+/* LE META SUBEVENT */
+#define HCI_SUBEVENT_LE_CONN_COMPLETE                0x01
+#define HCI_SUBEVENT_LE_ADV_REPORT                 0x02
+#define HCI_SUBEVENT_LE_CONNE_UPDATE_COMPLETE         0x03
+#define HCI_SUBEVENT_LE_READ_REMOTE_USED_FEATURES_COMPLETE 0x04
+#define HCI_SUBEVENT_LE_LONG_TERM_KEY_REQUEST              0x05
+#define HCI_SUBEVENT_LE_REMOTE_CONN_PARAM_REQUEST 0x06
+#define HCI_SUBEVENT_LE_DATA_LENGTH_CHANGE 0x07
+#define HCI_SUBEVENT_LE_READ_LOCAL_P256_PUBLIC_KEY_COMPLETE 0x08
+#define HCI_SUBEVENT_LE_GENERATE_DHKEY_COMPLETE            0x09
+#define HCI_SUBEVENT_LE_ENHANCED_CONN_COMPLETE       0x0A
+#define HCI_SUBEVENT_LE_DIRECT_AD_REPORT          0x0B
 
 
 
@@ -436,11 +452,21 @@ struct hci_inq_res_t
     uint8_t psrm; /* Page scan repetition mode */
     uint8_t psm; /* Page scan mode */
     uint16_t co; /* Clock offset */
-	int8_t rssi;
-	uint8_t support_carplay;
-	uint8_t remote_name[HCI_REMOTE_NAME_LEN];
+    int8_t rssi;
+    uint8_t support_carplay;
+    uint8_t remote_name[HCI_REMOTE_NAME_LEN];
 };
 
+
+struct hci_le_inq_res_t
+{
+    uint8_t addr_type;
+    struct bd_addr_t bdaddr; /* Bluetooth address of a device found in an inquiry */
+    int8_t rssi;
+    uint8_t adv_type;
+    uint8_t adv_size;
+    uint8_t adv_data[HCI_LE_ADV_MAX_SIZE];
+};
 /**
  * Connection State
  */
@@ -507,7 +533,7 @@ struct hci_pcb_t
     chip_mgr_t *chip_mgr;
     struct bd_addr_t local_bd_addr;
     uint8_t ssp_enable;
-	uint8_t ssp_io_cap;
+    uint8_t ssp_io_cap;
     uint32_t class_of_device;
     const uint8_t *local_name;
     uint8_t *pincode;
@@ -524,6 +550,7 @@ struct hci_pcb_t
 
     struct hci_inq_res_t *ires; /* Results of an inquiry */
 
+    uint8_t le_inq_w2_stop;
     err_t (* pin_req)(void *arg, struct bd_addr_t *bdaddr);
     err_t (* bt_working)(void *arg);
     err_t (* sco_req)(void *arg, struct bd_addr_t *bdaddr);
@@ -531,6 +558,8 @@ struct hci_pcb_t
     err_t (*sco_disconn_complete)(void *arg, uint8_t status,struct bd_addr_t *bdaddr);
     err_t (*inq_result)(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres);
     err_t (* inq_complete)(struct hci_pcb_t *pcb,uint16_t result);
+    err_t (*le_inq_result)(struct hci_pcb_t *pcb,struct hci_le_inq_res_t *le_inqres);
+    err_t (*le_inq_complete)(struct hci_pcb_t *pcb,uint16_t result);
     err_t (*name_req_complete)(struct hci_pcb_t *pcb,struct bd_addr_t *bdaddr,uint8_t * name);
     err_t (* rbd_complete)(void *arg, struct bd_addr_t *bdaddr);
     err_t (* link_key_not)(void *arg, struct bd_addr_t *bdaddr, uint8_t *key,uint8_t key_type);
@@ -572,6 +601,12 @@ struct hci_pcb_t
 #define HCI_EVENT_INQ_COMPLETE(pcb,result,ret) \
                               if((pcb)->inq_complete != NULL) \
                               (ret = (pcb)->inq_complete((pcb),(result)))
+#define HCI_EVENT_LE_INQ_RESULT(pcb,result,ret)\
+							  if((pcb)->le_inq_result != NULL) \
+							 (ret = (pcb)->le_inq_result((pcb),(result)))
+#define HCI_EVENT_LE_INQ_COMPLETE(pcb,result,ret) \
+                              if((pcb)->le_inq_complete != NULL) \
+                              (ret = (pcb)->le_inq_complete((pcb),(result)))
 #define HCI_EVENT_REMOTE_NAME_REQ_COMPLETE(pcb,bdaddr,name,ret) \
                               if((pcb)->name_req_complete != NULL) \
                               (ret = (pcb)->name_req_complete((pcb),(bdaddr),(name)))
@@ -703,8 +738,15 @@ err_t hci_read_rssi(struct bd_addr_t *bdaddr);
 /* OGF = 0x06 TESTING COMMANDS */
 err_t hci_enable_dut_mode(void);
 /* OGF = 0x08 LE CONTROLLER COMMANDS */
+#if BT_BLE_ENABLE > 0
 err_t hci_set_le_scan_param(uint8_t scan_type,uint16_t scan_interval,uint16_t scan_window,uint8_t own_type,uint8_t scan_filter);
-err_t hci_set_le_scan_enable(uint8_t scan_enable,uint8_t filter_duplicates);
+err_t hci_le_inquiry(uint8_t filter_duplicates,
+					err_t (*le_inq_result)(struct hci_pcb_t *pcb,struct hci_le_inq_res_t *le_inqres),
+                     err_t (* le_inq_complete)(struct hci_pcb_t *pcb,uint16_t result));
+err_t hci_le_cancel_inquiry(void);
+#endif
+
+
 
 #endif
 

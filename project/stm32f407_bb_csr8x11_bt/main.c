@@ -71,11 +71,68 @@ void bt_app_inquiry_result(struct bd_addr_t *address,uint8_t dev_type,uint8_t *n
     uart_send_json("BT","BT_INQUIRY_RESULT",(uint8_t*)"SUCCESS",address_buf,device_type_buf,name,0,0);
 }
 
+#if BT_BLE_ENABLE > 0
+void bt_app_le_inquiry_result(struct bd_addr_t *address,int8_t rssi,uint8_t adv_type,uint8_t adv_size,uint8_t *adv_data)
+{
+    bt_le_adv_parse_t bt_le_adv_parse = {0};
+    printf("-----------le inquiry result ----------\n");
+    printf("address:0x%x:0x%x:0x%x:0x%x:0x%x:0x%x\n",address->addr[0],address->addr[1],address->addr[2],\
+           address->addr[3],address->addr[4],address->addr[5]);
+    printf("adv type %d\n",adv_type);
+    printf("adv size %d\n",adv_size);
+    printf("adv rssi %d\n",rssi);
+    printf("adv data:");
+    bt_hex_dump(adv_data,adv_size);
+    for(bt_le_adv_parse_init(&bt_le_adv_parse,adv_size,adv_data); bt_le_adv_has_more(&bt_le_adv_parse);)
+    {
+        uint8_t adv_item_size;
+        uint8_t adv_item_type;
+        uint8_t *adv_item_data;
+        ble_le_adv_data_parse(&bt_le_adv_parse,&adv_item_type,&adv_item_size,&adv_item_data);
+        printf("adv_item_size(%d)\n",adv_item_size);
+        printf("adv_item_type(%d)\n",adv_item_type);
+        printf("adv_item_data:\n");
+        bt_hex_dump(adv_item_data,adv_item_size);
+        switch(adv_item_type)
+        {
+        case BT_DT_FLAGS:
+            break;
+        case BT_DT_COMPLETE_LOCAL_NAME:
+        {
+            uint8_t index = 0;
+            printf("LE ADV NAME:");
+            for(index = 0; index < adv_item_size; index++)
+                printf("%c",adv_item_data[index]);
+			printf("\n");
+            break;
+        }
+        case BT_DT_TX_POWER_LEVEL:
+            printf("%d dBm\n", *(int8_t*)adv_item_data);
+            break;
+        default:
+            break;
+        }
+    }
+    printf("----------------------- ----------\n");
+}
+
+
+void bt_app_le_inquiry_status(uint8_t status)
+{
+    printf("bt_app_le_inquiry_status %d\n",status);
+}
+#endif
+
+
 static bt_app_common_cb_t bt_app_common_cb =
 {
     bt_app_init_result,
     bt_app_inquiry_status,
     bt_app_inquiry_result,
+#if BT_BLE_ENABLE > 0
+    bt_app_le_inquiry_status,
+    bt_app_le_inquiry_result,
+#endif
 };
 
 void bt_app_hfp_connect(struct bd_addr_t *remote_addr,uint8_t status)
@@ -286,7 +343,7 @@ static bt_app_cb_t bt_app_cb =
 #define BT_CANCEL_PERIOID_INQUIRY_DES "Cancel perioid inquiry device"
 #define BT_LE_INQUIRY_CMD "BT_LE_INQUIRY"
 #define BT_LE_INQUIRY_DES "BLE Inquiry device"
-#define BT_LE_INQUIRY_CANCEL_CMD "BT_LE_INQUIRY_STOP"
+#define BT_LE_INQUIRY_CANCEL_CMD "BT_LE_STOP_INQUIRY"
 #define BT_LE_INQUIRY_CANCEL_DES "BLE cancel Inquiry device"
 #define BT_SPP_CON_CMD "SPP_CON"
 #define BT_SPP_CON_DES "Connect spp profile"
@@ -515,6 +572,23 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
         bt_stop_inquiry();
         return 0;
     }
+
+#if BT_BLE_ENABLE > 0
+    if(hw_strcmp(BT_LE_INQUIRY_CMD,(const char*)shell_string) == 0)
+    {
+        HW_DEBUG("SHELL:operate ble inquiry\n");
+        bt_le_start_inquiry();
+        return HW_ERR_OK;
+    }
+
+    if(hw_strcmp(BT_LE_INQUIRY_CANCEL_CMD,(const char*)shell_string) == 0)
+    {
+        HW_DEBUG("SHELL:operate ble cancel inquiry\n");
+        bt_le_stop_inquiry();
+        return 0;
+    }
+#endif
+
 
 #if PROFILE_SPP_ENABLE > 0
     if(hw_strcmp("SPP_SEND",(const char*)shell_string) == 0)
