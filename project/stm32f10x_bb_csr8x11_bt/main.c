@@ -148,7 +148,7 @@ void bt_app_le_inquiry_result(struct bd_addr_t *address,int8_t rssi,uint8_t adv_
             printf("LE ADV NAME:");
             for(index = 0; index < adv_item_size; index++)
                 printf("%c",adv_item_data[index]);
-			printf("\n");
+            printf("\n");
             break;
         }
         case BT_DT_TX_POWER_LEVEL:
@@ -166,6 +166,13 @@ void bt_app_le_inquiry_status(uint8_t status)
 {
     printf("bt_app_le_inquiry_status %d\n",status);
 }
+
+const uint8_t adv_data[] =
+{
+    0x08, BT_DT_COMPLETE_LOCAL_NAME, 'B', 'T', '_', 'D', 'E', 'M', 'O',
+};
+uint8_t adv_data_len = sizeof(adv_data);
+
 #endif
 
 
@@ -228,76 +235,76 @@ void bt_app_hfp_sco_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
 
 void bt_app_hfp_signal_strength_ind(struct bd_addr_t *remote_addr,uint8_t value)
 {
-	uint8_t strength_buf[8] = {0};
-	printf("bt_app_hfp_signal_strength_ind value %d address:\n",value);
+    uint8_t strength_buf[8] = {0};
+    printf("bt_app_hfp_signal_strength_ind value %d address:\n",value);
     bt_hex_dump(remote_addr->addr,6);
 
-	hw_sprintf((char *)strength_buf,"%d",value);
-	uart_send_json("BT","BT_HFP_SIGNAL_STRENGTH",(uint8_t*)"SUCCESS",strength_buf,0,0,0,0);
+    hw_sprintf((char *)strength_buf,"%d",value);
+    uart_send_json("BT","BT_HFP_SIGNAL_STRENGTH",(uint8_t*)"SUCCESS",strength_buf,0,0,0,0);
 }
 
 void bt_app_hfp_roam_status_ind(struct bd_addr_t *remote_addr,uint8_t value)
 {
-	uint8_t roam_buf[8] = {0};
-	printf("bt_hfp_roam_status_ind value %d address:\n",value);
+    uint8_t roam_buf[8] = {0};
+    printf("bt_hfp_roam_status_ind value %d address:\n",value);
     bt_hex_dump(remote_addr->addr,6);
 
-	hw_sprintf((char *)roam_buf,"%d",value);
-	uart_send_json("BT","BT_HFP_ROAM_STATUS",(uint8_t*)"SUCCESS",roam_buf,0,0,0,0);
+    hw_sprintf((char *)roam_buf,"%d",value);
+    uart_send_json("BT","BT_HFP_ROAM_STATUS",(uint8_t*)"SUCCESS",roam_buf,0,0,0,0);
 }
 
 void bt_app_hfp_batt_level_ind(struct bd_addr_t *remote_addr,uint8_t value)
 {
-	uint8_t batt_buf[8] = {0};
-	printf("bt_hfp_batt_level_ind value %d address:\n",value);
+    uint8_t batt_buf[8] = {0};
+    printf("bt_hfp_batt_level_ind value %d address:\n",value);
     bt_hex_dump(remote_addr->addr,6);
 
-	hw_sprintf((char *)batt_buf,"%d",value);
-	uart_send_json("BT","BT_HFP_BATT_LEVEL",(uint8_t*)"SUCCESS",batt_buf,0,0,0,0);
+    hw_sprintf((char *)batt_buf,"%d",value);
+    uart_send_json("BT","BT_HFP_BATT_LEVEL",(uint8_t*)"SUCCESS",batt_buf,0,0,0,0);
 }
 
 void bt_app_hfp_operator(struct bd_addr_t *remote_addr,uint8_t *operator)
 {
-	printf("bt_app_hfp_operator operator %s address:\n",operator);
+    printf("bt_app_hfp_operator operator %s address:\n",operator);
     bt_hex_dump(remote_addr->addr,6);
 
-	uart_send_json("BT","BT_HFP_OPERATOR",(uint8_t*)"SUCCESS",operator,0,0,0,0);
+    uart_send_json("BT","BT_HFP_OPERATOR",(uint8_t*)"SUCCESS",operator,0,0,0,0);
 }
 
 void bt_app_hfp_call_status(struct bd_addr_t *remote_addr,uint8_t value)
 {
-	uint8_t call_status_buf[8] = {0};
-	printf("bt_app_hfp_call_status value %d address:\n",value);
+    uint8_t call_status_buf[8] = {0};
+    printf("bt_app_hfp_call_status value %d address:\n",value);
     bt_hex_dump(remote_addr->addr,6);
 
-	hw_sprintf((char *)call_status_buf,"%d",value);
-	uart_send_json("BT","BT_HFP_CALL_STATUS",(uint8_t*)"SUCCESS",call_status_buf,0,0,0,0);
+    hw_sprintf((char *)call_status_buf,"%d",value);
+    uart_send_json("BT","BT_HFP_CALL_STATUS",(uint8_t*)"SUCCESS",call_status_buf,0,0,0,0);
 }
 
 void bt_app_hfp_call_setup(struct bd_addr_t *remote_addr,uint8_t value)
 {
-	uint8_t call_setup_buf[8] = {0};
-	printf("bt_app_hfp_call_setup value %d address:\n",value);
+    uint8_t call_setup_buf[8] = {0};
+    printf("bt_app_hfp_call_setup value %d address:\n",value);
     bt_hex_dump(remote_addr->addr,6);
 
-	hw_sprintf((char *)call_setup_buf,"%d",value);
-	uart_send_json("BT","BT_HFP_CALL_SETUP",(uint8_t*)"SUCCESS",call_setup_buf,0,0,0,0);
+    hw_sprintf((char *)call_setup_buf,"%d",value);
+    uart_send_json("BT","BT_HFP_CALL_SETUP",(uint8_t*)"SUCCESS",call_setup_buf,0,0,0,0);
 }
 
 void bt_app_hfp_local_pn(struct bd_addr_t *remote_addr,uint8_t *local_pn)
 {
-	printf("bt_app_hfp_local_pn %s address:\n",local_pn);
+    printf("bt_app_hfp_local_pn %s address:\n",local_pn);
     bt_hex_dump(remote_addr->addr,6);
 
-	uart_send_json("BT","BT_HFP_LOCAL_PN",(uint8_t*)"SUCCESS",local_pn,0,0,0,0);
+    uart_send_json("BT","BT_HFP_LOCAL_PN",(uint8_t*)"SUCCESS",local_pn,0,0,0,0);
 }
 
 void bt_app_hfp_call_pn(struct bd_addr_t *remote_addr,uint8_t *phone_number)
 {
-	printf("bt_app_hfp_call_pn %s address:\n",phone_number);
+    printf("bt_app_hfp_call_pn %s address:\n",phone_number);
     bt_hex_dump(remote_addr->addr,6);
 
-	uart_send_json("BT","BT_HFP_CALL_PN",(uint8_t*)"SUCCESS",phone_number,0,0,0,0);
+    uart_send_json("BT","BT_HFP_CALL_PN",(uint8_t*)"SUCCESS",phone_number,0,0,0,0);
 }
 
 
@@ -390,6 +397,10 @@ static bt_app_cb_t bt_app_cb =
 #define BT_LE_INQUIRY_DES "BLE Inquiry device"
 #define BT_LE_INQUIRY_CANCEL_CMD "BT_LE_STOP_INQUIRY"
 #define BT_LE_INQUIRY_CANCEL_DES "BLE cancel Inquiry device"
+#define BT_LE_ADV_ENABLE_CMD "BT_LE_ADV_ENABLE"
+#define BT_LE_ADV_ENABLE_DES "Ble start advertising"
+#define BT_LE_ADV_DISABLE_CMD "BT_LE_ADV_DISABLE"
+#define BT_LE_ADV_DISABLE_DES "Ble stop advertising"
 #define BT_SPP_CON_CMD "SPP_CON"
 #define BT_SPP_CON_DES "Connect spp profile"
 #define BT_SPP_SEND_CMD "SPP_SEND"
@@ -440,11 +451,18 @@ cmd_desctiption_t cmd_usage[] =
     {(uint8_t *)BT_CANCEL_INQUIRY_CMD,(uint8_t *)BT_CANCEL_INQUIRY_DES},
     {(uint8_t *)BT_PERIOID_INQUIRY_CMD,(uint8_t *)BT_PERIOID_INQUIRY_DES},
     {(uint8_t *)BT_CANCEL_PERIOID_INQUIRY_CMD,(uint8_t *)BT_CANCEL_PERIOID_INQUIRY_DES},
+#if BT_BLE_ENABLE > 0
     {(uint8_t *)BT_LE_INQUIRY_CMD,(uint8_t *)BT_LE_INQUIRY_DES},
     {(uint8_t *)BT_LE_INQUIRY_CANCEL_CMD,(uint8_t *)BT_LE_INQUIRY_CANCEL_DES},
+    {(uint8_t *)BT_LE_ADV_ENABLE_CMD,(uint8_t *)BT_LE_ADV_ENABLE_DES},
+    {(uint8_t *)BT_LE_ADV_DISABLE_CMD,(uint8_t *)BT_LE_ADV_DISABLE_CMD},
+#endif
+#if PROFILE_SPP_ENABLE > 0
     {(uint8_t *)BT_SPP_CON_CMD,(uint8_t *)BT_SPP_CON_DES},
     {(uint8_t *)BT_SPP_SEND_CMD,(uint8_t *)BT_SPP_SEND_DES},
     {(uint8_t *)BT_SPP_DISCON_CMD,(uint8_t *)BT_SPP_DISCON_DES},
+#endif
+#if PROFILE_HFP_ENABLE > 0
     {(uint8_t *)BT_HFP_CON_CMD,(uint8_t *)BT_HFP_CON_DES},
     {(uint8_t *)BT_HFP_DISCON_CMD,(uint8_t *)BT_HFP_DISCON_DES},
     {(uint8_t *)BT_HFP_AUDIO_TRANSFER_CMD,(uint8_t *)BT_HFP_AUDIO_TRANSFER_DES},
@@ -454,10 +472,11 @@ cmd_desctiption_t cmd_usage[] =
     {(uint8_t *)BT_HFP_CALLOUT_MEM_CMD,(uint8_t *)BT_HFP_CALLOUT_MEM_DES},
     {(uint8_t *)BT_HFP_CALLOUT_LN_CMD,(uint8_t *)BT_HFP_CALLOUT_LN_DES},
     {(uint8_t *)BT_HFP_LOCAL_PN_CMD,(uint8_t *)BT_HFP_LOCAL_PN_DES},
-	{(uint8_t *)BT_HFP_CALL_LIST_CMD,(uint8_t *)BT_HFP_CALL_LIST_DES},
-	{(uint8_t *)BT_HFP_DISABLE_ECNR_CMD,(uint8_t *)BT_HFP_DISABLE_ECNR_DES},
-	{(uint8_t *)BT_HFP_VGS_CMD,(uint8_t *)BT_HFP_VGS_DES},
+    {(uint8_t *)BT_HFP_CALL_LIST_CMD,(uint8_t *)BT_HFP_CALL_LIST_DES},
+    {(uint8_t *)BT_HFP_DISABLE_ECNR_CMD,(uint8_t *)BT_HFP_DISABLE_ECNR_DES},
+    {(uint8_t *)BT_HFP_VGS_CMD,(uint8_t *)BT_HFP_VGS_DES},
     {(uint8_t *)BT_HFP_VGM_CMD,(uint8_t *)BT_HFP_VGM_DES},
+#endif
 };
 
 void show_usage()
@@ -515,14 +534,14 @@ uint8_t shell_json_parse(uint8_t *operate_value,
 #endif
 
 #if PROFILE_HFP_ENABLE > 0
-	if(hw_strcmp("HFP_NET_N",(const char*)operate_value) == 0)
+    if(hw_strcmp("HFP_NET_N",(const char*)operate_value) == 0)
     {
         HW_DEBUG("SHELL:operate hfp get operate\n");
         bt_hfp_hf_get_operator(&connect_addr);
         return HW_ERR_OK;
     }
 
-	if(hw_strcmp("BT_AUDIO_TRANSFER",(const char*)operate_value) == 0)
+    if(hw_strcmp("BT_AUDIO_TRANSFER",(const char*)operate_value) == 0)
     {
         HW_DEBUG("SHELL:operate HFP AUDIO TRANSFER\n");
 
@@ -530,7 +549,7 @@ uint8_t shell_json_parse(uint8_t *operate_value,
         return HW_ERR_OK;
     }
 
-	if(hw_strcmp("HFP_ANSWER",(const char*)operate_value) == 0)
+    if(hw_strcmp("HFP_ANSWER",(const char*)operate_value) == 0)
     {
         HW_DEBUG("SHELL:operate HFP ANSWER INCOMING CALL\n");
 
@@ -538,35 +557,35 @@ uint8_t shell_json_parse(uint8_t *operate_value,
         return HW_ERR_OK;
     }
 
-	if(hw_strcmp("HFP_CALLEND",(const char*)operate_value) == 0)
+    if(hw_strcmp("HFP_CALLEND",(const char*)operate_value) == 0)
     {
         HW_DEBUG("SHELL:operate bt end call\n");
         bt_hfp_hf_end_call(&connect_addr);
         return HW_ERR_OK;
     }
 
-	if(hw_strcmp("HFP_CALLOUT_PN",(const char*)operate_value) == 0)
+    if(hw_strcmp("HFP_CALLOUT_PN",(const char*)operate_value) == 0)
     {
         HW_DEBUG("SHELL:operate call out by number\n");
         bt_hfp_hf_callout_by_number(&connect_addr,para1);
         return HW_ERR_OK;
     }
 
-	if(hw_strcmp("HFP_LPN",(const char*)operate_value) == 0)
+    if(hw_strcmp("HFP_LPN",(const char*)operate_value) == 0)
     {
         HW_DEBUG("SHELL:operate local number\n");
         bt_hfp_hf_get_local_phone_number(&connect_addr);
         return HW_ERR_OK;
     }
 
-	if(hw_strcmp("HFP_CLCC",(const char*)operate_value) == 0)
+    if(hw_strcmp("HFP_CLCC",(const char*)operate_value) == 0)
     {
         HW_DEBUG("SHELL:operate bt get call list\n");
         bt_hfp_hf_get_call_list(&connect_addr);
         return HW_ERR_OK;
     }
 
-	if(hw_strcmp("HFP_VGM",(const char*)operate_value) == 0)
+    if(hw_strcmp("HFP_VGM",(const char*)operate_value) == 0)
     {
         HW_DEBUG("SHELL:operate VGM\n");
         bt_hfp_hf_set_mic_volume(&connect_addr,atoi((const char*)para1));
@@ -579,7 +598,7 @@ uint8_t shell_json_parse(uint8_t *operate_value,
         bt_hfp_hf_set_spk_volume(&connect_addr,atoi((const char*)para1));
         return HW_ERR_OK;
     }
-	
+
 #endif
 
 
@@ -633,6 +652,21 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
         bt_le_stop_inquiry();
         return 0;
     }
+
+    if(hw_strcmp(BT_LE_ADV_ENABLE_CMD,(const char*)shell_string) == 0)
+    {
+        HW_DEBUG("SHELL:operate ble start advertising\n");
+        bt_le_set_adv_enable(adv_data_len,adv_data);
+        return HW_ERR_OK;
+    }
+
+    if(hw_strcmp(BT_LE_ADV_DISABLE_CMD,(const char*)shell_string) == 0)
+    {
+        HW_DEBUG("SHELL:operate ble stop advertising\n");
+        bt_le_set_adv_disable();
+        return 0;
+    }
+
 #endif
 
 
@@ -794,7 +828,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-	if(hw_strcmp("HFP_NET_N",(const char*)shell_string) == 0)
+    if(hw_strcmp("HFP_NET_N",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate operate hfp get operate\n");
         bt_hfp_hf_get_operator(&connect_addr);
@@ -817,7 +851,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-	if(hw_strcmp("HFP_CALLEND",(const char*)shell_string) == 0)
+    if(hw_strcmp("HFP_CALLEND",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate bt end call\n");
         bt_hfp_hf_end_call(&connect_addr);
@@ -845,7 +879,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-	if(hw_strcmp("HFP_LPN",(const char*)shell_string) == 0)
+    if(hw_strcmp("HFP_LPN",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate local number\n");
         bt_hfp_hf_get_local_phone_number(&connect_addr);
@@ -863,8 +897,8 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     if(hw_strcmp("HFP_NRECD",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate disable ag ecnr\n");
-		bt_hfp_hf_disable_ecnr(&connect_addr);
-        
+        bt_hfp_hf_disable_ecnr(&connect_addr);
+
         return HW_ERR_OK;
     }
 

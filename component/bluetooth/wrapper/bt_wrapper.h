@@ -132,6 +132,9 @@ uint8_t bt_le_stop_inquiry(void);
 uint8_t bt_le_adv_parse_init(bt_le_adv_parse_t *bt_adv_le_parse,uint8_t adv_size,uint8_t *adv_data);
 uint8_t bt_le_adv_has_more(bt_le_adv_parse_t *bt_adv_le_parse);
 uint8_t ble_le_adv_data_parse(bt_le_adv_parse_t *bt_adv_le_parse,uint8_t *adv_item_type,uint8_t *adv_item_data_len,uint8_t **adv_item_data);
+uint8_t bt_le_set_adv_enable(uint8_t adv_data_len,uint8_t *adv_data);
+uint8_t bt_le_set_adv_disable(void);
+
 #endif
 
 

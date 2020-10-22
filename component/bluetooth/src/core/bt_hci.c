@@ -998,9 +998,9 @@ void hci_event_input(struct bt_pbuf_t *p)
         }
         else if(ogf == HCI_LE)
         {
-            if(ocf == HCI_SET_SCAN)
+            if(ocf == HCI_LE_SET_SCAN)
             {
-                BT_HCI_TRACE_DEBUG("HCI_SET_SCAN le_inq_w2_stop(%d)\n",pcb->le_inq_w2_stop);
+                BT_HCI_TRACE_DEBUG("HCI_LE_SET_SCAN le_inq_w2_stop(%d)\n",pcb->le_inq_w2_stop);
                 if(pcb->le_inq_w2_stop == 1)
                 {
                     BT_HCI_TRACE_DEBUG("DEBUG:hci_event_input:le inquiry complete, 0x%x %s\n",((uint8_t *)p->payload)[0], hci_get_error_code(((uint8_t *)p->payload)[0]));
@@ -2741,7 +2741,7 @@ err_t hci_set_le_scan_param(uint8_t scan_type,uint16_t scan_interval,uint16_t sc
         return BT_ERR_MEM;
     }
     /* Assembling command packet */
-    p = hci_cmd_ass(p, HCI_SET_SCAN_PARAM, HCI_LE, HCI_SET_LE_SCAN_PARAM_PLEN);
+    p = hci_cmd_ass(p, HCI_LE_SET_SCAN_PARAM, HCI_LE, HCI_SET_LE_SCAN_PARAM_PLEN);
     offset += 3;
     ((uint8_t *)p->payload)[offset] = scan_type;
     offset += 1;
@@ -2775,7 +2775,7 @@ err_t hci_le_inquiry(uint8_t filter_duplicates,
 	pcb->le_inq_complete = le_inq_complete;
 
     /* Assembling command packet */
-    p = hci_cmd_ass(p, HCI_SET_SCAN, HCI_LE, HCI_SET_LE_SCAN_PLEN);
+    p = hci_cmd_ass(p, HCI_LE_SET_SCAN, HCI_LE, HCI_SET_LE_SCAN_PLEN);
     /* Assembling cmd prameters */
     ((uint8_t *)p->payload)[3] = 1;
     ((uint8_t *)p->payload)[4] = filter_duplicates;
@@ -2799,7 +2799,7 @@ err_t hci_le_cancel_inquiry(void)
 
     pcb->le_inq_w2_stop  = 1;
     /* Assembling command packet */
-    p = hci_cmd_ass(p, HCI_SET_SCAN, HCI_LE, HCI_SET_LE_SCAN_PLEN);
+    p = hci_cmd_ass(p, HCI_LE_SET_SCAN, HCI_LE, HCI_SET_LE_SCAN_PLEN);
     /* Assembling cmd prameters */
     ((uint8_t *)p->payload)[3] = 0;
     ((uint8_t *)p->payload)[4] = 0;
@@ -2809,6 +2809,86 @@ err_t hci_le_cancel_inquiry(void)
 
     return BT_ERR_OK;
 }
+
+err_t hci_le_set_adv_param(uint16_t adv_int_min, uint16_t adv_int_max, uint8_t adv_type,
+    uint8_t own_address_typ, uint8_t peer_address_type,struct bd_addr_t *peer_address, uint8_t channel_map, uint8_t filter_policy)
+{
+	struct bt_pbuf_t *p;
+    uint8_t offset = 0;
+    if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_SET_LE_ADV_PARAM_PLEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_MEM;
+    }
+    /* Assembling command packet */
+    p = hci_cmd_ass(p, HCI_LE_SET_ADV_PARAM, HCI_LE, HCI_SET_LE_ADV_PARAM_PLEN);
+    offset += 3;
+    bt_le_store_16((uint8_t *)p->payload,offset,adv_int_min);
+    offset += 2;
+    bt_le_store_16((uint8_t *)p->payload,offset,adv_int_max);
+    offset += 2;
+    ((uint8_t *)p->payload)[offset] = adv_type;
+    offset += 1;
+	((uint8_t *)p->payload)[offset] = own_address_typ;
+    offset += 1;
+	((uint8_t *)p->payload)[offset] = peer_address_type;
+    offset += 1;
+	memcpy(((uint8_t *)p->payload)+offset, peer_address->addr, BD_ADDR_LEN);
+	offset += BD_ADDR_LEN;
+	((uint8_t *)p->payload)[offset] = channel_map;
+    offset += 1;
+    ((uint8_t *)p->payload)[offset] = filter_policy;
+    phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
+    bt_pbuf_free(p);
+
+    return BT_ERR_OK;
+}
+
+err_t hci_le_set_adv_data(uint8_t adv_len,uint8_t *adv_data)
+{
+	struct bt_pbuf_t *p;
+    uint8_t offset = 0;
+    if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_SET_LE_ADV_DATA_PLEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_MEM;
+    }
+    /* Assembling command packet */
+    p = hci_cmd_ass(p, HCI_LE_SET_ADV_DATA, HCI_LE, HCI_SET_LE_ADV_DATA_PLEN);
+    offset += 3;
+	((uint8_t *)p->payload)[offset] = adv_len;
+    offset += 1;
+
+	memset(((uint8_t *)p->payload) + offset,0,HCI_SET_LE_ADV_DATA_PLEN-offset);
+	memcpy(((uint8_t *)p->payload)+offset, adv_data, adv_len);
+
+    phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
+    bt_pbuf_free(p);
+
+    return BT_ERR_OK;
+}
+
+err_t hci_le_set_adv_enable(uint8_t enable)
+{
+	struct bt_pbuf_t *p;
+    uint8_t offset = 0;
+    if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_SET_LE_ADV_ENABLE_PLEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_MEM;
+    }
+    /* Assembling command packet */
+    p = hci_cmd_ass(p, HCI_LE_SET_ADV_ENABLE, HCI_LE, HCI_SET_LE_ADV_ENABLE_PLEN);
+    offset += 3;
+	((uint8_t *)p->payload)[offset] = enable;
+
+    phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
+    bt_pbuf_free(p);
+
+    return BT_ERR_OK;
+}
+
+
 #endif
 
 

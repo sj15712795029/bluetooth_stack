@@ -675,6 +675,25 @@ uint8_t ble_le_adv_data_parse(bt_le_adv_parse_t *bt_adv_le_parse,uint8_t *adv_it
 	return 0;
 	
 }
+
+uint8_t bt_le_set_adv_enable(uint8_t adv_data_len,uint8_t *adv_data)
+
+{
+	struct bd_addr_t addr = {0};
+	hci_le_set_adv_param(0x30,0x30,0,0,0,&addr,0x07,0);
+	hci_le_set_adv_data(adv_data_len,adv_data);
+	hci_le_set_adv_enable(1);
+
+	return 0;
+}
+uint8_t bt_le_set_adv_disable(void)
+{
+	hci_le_set_adv_enable(0);
+
+	return 0;
+}
+
+
 #endif
 
 /************************* HFP API ***********************/

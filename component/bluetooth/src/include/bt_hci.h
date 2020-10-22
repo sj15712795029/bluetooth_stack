@@ -185,8 +185,11 @@ struct hci_inq_res_t;
 
 
 /* LE commands */
-#define HCI_SET_SCAN_PARAM 0x0b
-#define HCI_SET_SCAN 0x0c
+#define HCI_LE_SET_ADV_PARAM 0x06
+#define HCI_LE_SET_ADV_DATA 0x08
+#define HCI_LE_SET_ADV_ENABLE 0x0a
+#define HCI_LE_SET_SCAN_PARAM 0x0b
+#define HCI_LE_SET_SCAN 0x0c
 
 
 /* Possible event codes */
@@ -348,8 +351,6 @@ struct hci_inq_res_t;
 #define HCI_WRITE_EIR_PLEN 244
 #define HCI_WRITE_SSP_MODE_PLEN 4
 #define HCI_WRITE_LE_SUPPORT_PLEN 5
-#define HCI_SET_LE_SCAN_PLEN 5
-#define HCI_SET_LE_SCAN_PARAM_PLEN 10
 #define HCI_H_BUF_SIZE_PLEN 6
 #define HCI_H_NUM_COMPL_PLEN 6
 #define HCI_R_LOCOL_VER_INFO_PLEN 3
@@ -357,6 +358,12 @@ struct hci_inq_res_t;
 #define HCI_R_BD_ADDR_PLEN 3
 #define HCI_READ_RSSI_PLEN 5
 #define HCI_ENABLE_DUT_PLEN 3
+#define HCI_SET_LE_SCAN_PLEN 5
+#define HCI_SET_LE_SCAN_PARAM_PLEN 10
+#define HCI_SET_LE_ADV_PARAM_PLEN 18
+#define HCI_SET_LE_ADV_DATA_PLEN 35
+#define HCI_SET_LE_ADV_ENABLE_PLEN 4
+
 
 
 /* Set Event Filter params */
@@ -744,6 +751,10 @@ err_t hci_le_inquiry(uint8_t filter_duplicates,
 					err_t (*le_inq_result)(struct hci_pcb_t *pcb,struct hci_le_inq_res_t *le_inqres),
                      err_t (* le_inq_complete)(struct hci_pcb_t *pcb,uint16_t result));
 err_t hci_le_cancel_inquiry(void);
+err_t hci_le_set_adv_param(uint16_t adv_int_min, uint16_t adv_int_max, uint8_t adv_type,
+    uint8_t own_address_typ, uint8_t peer_address_type,struct bd_addr_t *peer_address, uint8_t channel_map, uint8_t filter_policy);
+err_t hci_le_set_adv_data(uint8_t adv_len,uint8_t *adv_data);
+err_t hci_le_set_adv_enable(uint8_t enable);
 #endif
 
 

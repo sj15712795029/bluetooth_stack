@@ -167,6 +167,13 @@ void bt_app_le_inquiry_status(uint8_t status)
 {
     printf("bt_app_le_inquiry_status %d\n",status);
 }
+
+const uint8_t adv_data[] =
+{
+    0x08, BT_DT_COMPLETE_LOCAL_NAME, 'B', 'T', '_', 'D', 'E', 'M', 'O',
+};
+uint8_t adv_data_len = sizeof(adv_data);
+
 #endif
 
 
@@ -391,6 +398,10 @@ static bt_app_cb_t bt_app_cb =
 #define BT_LE_INQUIRY_DES "BLE Inquiry device"
 #define BT_LE_INQUIRY_CANCEL_CMD "BT_LE_STOP_INQUIRY"
 #define BT_LE_INQUIRY_CANCEL_DES "BLE cancel Inquiry device"
+#define BT_LE_ADV_ENABLE_CMD "BT_LE_ADV_ENABLE"
+#define BT_LE_ADV_ENABLE_DES "Ble start advertising"
+#define BT_LE_ADV_DISABLE_CMD "BT_LE_ADV_DISABLE"
+#define BT_LE_ADV_DISABLE_DES "Ble stop advertising"
 #define BT_SPP_CON_CMD "SPP_CON"
 #define BT_SPP_CON_DES "Connect spp profile"
 #define BT_SPP_SEND_CMD "SPP_SEND"
@@ -441,11 +452,18 @@ cmd_desctiption_t cmd_usage[] =
     {(uint8_t *)BT_CANCEL_INQUIRY_CMD,(uint8_t *)BT_CANCEL_INQUIRY_DES},
     {(uint8_t *)BT_PERIOID_INQUIRY_CMD,(uint8_t *)BT_PERIOID_INQUIRY_DES},
     {(uint8_t *)BT_CANCEL_PERIOID_INQUIRY_CMD,(uint8_t *)BT_CANCEL_PERIOID_INQUIRY_DES},
+#if BT_BLE_ENABLE > 0
     {(uint8_t *)BT_LE_INQUIRY_CMD,(uint8_t *)BT_LE_INQUIRY_DES},
     {(uint8_t *)BT_LE_INQUIRY_CANCEL_CMD,(uint8_t *)BT_LE_INQUIRY_CANCEL_DES},
+    {(uint8_t *)BT_LE_ADV_ENABLE_CMD,(uint8_t *)BT_LE_ADV_ENABLE_DES},
+    {(uint8_t *)BT_LE_ADV_DISABLE_CMD,(uint8_t *)BT_LE_ADV_DISABLE_CMD},
+#endif
+#if PROFILE_SPP_ENABLE > 0
     {(uint8_t *)BT_SPP_CON_CMD,(uint8_t *)BT_SPP_CON_DES},
     {(uint8_t *)BT_SPP_SEND_CMD,(uint8_t *)BT_SPP_SEND_DES},
     {(uint8_t *)BT_SPP_DISCON_CMD,(uint8_t *)BT_SPP_DISCON_DES},
+#endif
+#if PROFILE_HFP_ENABLE > 0
     {(uint8_t *)BT_HFP_CON_CMD,(uint8_t *)BT_HFP_CON_DES},
     {(uint8_t *)BT_HFP_DISCON_CMD,(uint8_t *)BT_HFP_DISCON_DES},
     {(uint8_t *)BT_HFP_AUDIO_TRANSFER_CMD,(uint8_t *)BT_HFP_AUDIO_TRANSFER_DES},
@@ -459,6 +477,7 @@ cmd_desctiption_t cmd_usage[] =
 	{(uint8_t *)BT_HFP_DISABLE_ECNR_CMD,(uint8_t *)BT_HFP_DISABLE_ECNR_DES},
 	{(uint8_t *)BT_HFP_VGS_CMD,(uint8_t *)BT_HFP_VGS_DES},
     {(uint8_t *)BT_HFP_VGM_CMD,(uint8_t *)BT_HFP_VGM_DES},
+#endif
 };
 
 void show_usage()
@@ -634,6 +653,21 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
         bt_le_stop_inquiry();
         return 0;
     }
+
+    if(hw_strcmp(BT_LE_ADV_ENABLE_CMD,(const char*)shell_string) == 0)
+    {
+        HW_DEBUG("SHELL:operate ble start advertising\n");
+        bt_le_set_adv_enable(adv_data_len,adv_data);
+        return HW_ERR_OK;
+    }
+
+    if(hw_strcmp(BT_LE_ADV_DISABLE_CMD,(const char*)shell_string) == 0)
+    {
+        HW_DEBUG("SHELL:operate ble stop advertising\n");
+        bt_le_set_adv_disable();
+        return 0;
+    }
+
 #endif
 
 
