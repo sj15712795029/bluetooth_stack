@@ -602,7 +602,7 @@ uint8_t bt_stop_inquiry(void)
     return 0;
 }
 
-uint8_t hci_start_periodic_inquiry(uint16_t min_length,uint16_t max_length,uint8_t inquiry_len,uint8_t max_dev)
+uint8_t bt_start_periodic_inquiry(uint16_t min_length,uint16_t max_length,uint8_t inquiry_len,uint8_t max_dev)
 {
     uint32_t lap =  0x9E8B33;    /* GIAC */
     hci_periodic_inquiry(min_length,max_length,lap,inquiry_len,max_dev,bt_inquiry_result,bt_inquiry_complete);
@@ -666,7 +666,7 @@ uint8_t bt_le_adv_has_more(bt_le_adv_parse_t *bt_adv_le_parse)
 }
 
 
-uint8_t ble_le_adv_data_parse(bt_le_adv_parse_t *bt_adv_le_parse,uint8_t *adv_item_type,uint8_t *adv_item_data_len,uint8_t **adv_item_data)
+uint8_t bt_le_adv_data_parse(bt_le_adv_parse_t *bt_adv_le_parse,uint8_t *adv_item_type,uint8_t *adv_item_data_len,uint8_t **adv_item_data)
 {
 	*adv_item_data_len = bt_le_adv_get_size(bt_adv_le_parse);
 	*adv_item_type = bt_le_adv_get_type(bt_adv_le_parse);

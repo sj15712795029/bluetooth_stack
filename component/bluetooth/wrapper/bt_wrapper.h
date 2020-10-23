@@ -122,7 +122,7 @@ uint8_t bt_start(bt_app_cb_t *app_cb);
 uint8_t bt_stop(void);
 uint8_t bt_start_inquiry(uint8_t inquiry_len,uint8_t max_dev);
 uint8_t bt_stop_inquiry(void);
-uint8_t hci_start_periodic_inquiry(uint16_t min_length,uint16_t max_length,uint8_t inquiry_len,uint8_t max_dev);
+uint8_t bt_start_periodic_inquiry(uint16_t min_length,uint16_t max_length,uint8_t inquiry_len,uint8_t max_dev);
 uint8_t bt_stop_periodic_inquiry(void);
 uint8_t bt_get_remote_name(struct bd_addr_t *bdaddr);
 uint8_t bt_cancel_get_remote_name(struct bd_addr_t *bdaddr);
@@ -131,7 +131,7 @@ uint8_t bt_le_start_inquiry(void);
 uint8_t bt_le_stop_inquiry(void);
 uint8_t bt_le_adv_parse_init(bt_le_adv_parse_t *bt_adv_le_parse,uint8_t adv_size,uint8_t *adv_data);
 uint8_t bt_le_adv_has_more(bt_le_adv_parse_t *bt_adv_le_parse);
-uint8_t ble_le_adv_data_parse(bt_le_adv_parse_t *bt_adv_le_parse,uint8_t *adv_item_type,uint8_t *adv_item_data_len,uint8_t **adv_item_data);
+uint8_t bt_le_adv_data_parse(bt_le_adv_parse_t *bt_adv_le_parse,uint8_t *adv_item_type,uint8_t *adv_item_data_len,uint8_t **adv_item_data);
 uint8_t bt_le_set_adv_enable(uint8_t adv_data_len,uint8_t *adv_data);
 uint8_t bt_le_set_adv_disable(void);
 

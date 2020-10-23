@@ -134,7 +134,7 @@ void bt_app_le_inquiry_result(struct bd_addr_t *address,int8_t rssi,uint8_t adv_
         uint8_t adv_item_size;
         uint8_t adv_item_type;
         uint8_t *adv_item_data;
-        ble_le_adv_data_parse(&bt_le_adv_parse,&adv_item_type,&adv_item_size,&adv_item_data);
+        bt_le_adv_data_parse(&bt_le_adv_parse,&adv_item_type,&adv_item_size,&adv_item_data);
         printf("adv_item_size(%d)\n",adv_item_size);
         printf("adv_item_type(%d)\n",adv_item_type);
         printf("adv_item_data:\n");
