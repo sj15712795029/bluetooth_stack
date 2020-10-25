@@ -51,6 +51,25 @@
             this.pb_hfp_signal = new System.Windows.Forms.PictureBox();
             this.gb_hfp_test_area = new System.Windows.Forms.GroupBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.gb_hfp_dtmf = new System.Windows.Forms.GroupBox();
+            this.b_hfp_dtmf_0 = new System.Windows.Forms.Button();
+            this.b_hfp_dtmf_7 = new System.Windows.Forms.Button();
+            this.b_hfp_dtmf_9 = new System.Windows.Forms.Button();
+            this.b_hfp_dtmf_1 = new System.Windows.Forms.Button();
+            this.b_hfp_dtmf_8 = new System.Windows.Forms.Button();
+            this.b_hfp_dtmf_2 = new System.Windows.Forms.Button();
+            this.b_hfp_dtmf_3 = new System.Windows.Forms.Button();
+            this.b_hfp_dtmf_6 = new System.Windows.Forms.Button();
+            this.b_hfp_dtmf_4 = new System.Windows.Forms.Button();
+            this.b_hfp_dtmf_5 = new System.Windows.Forms.Button();
+            this.l_hfp_current_spk_v = new System.Windows.Forms.Label();
+            this.b_hfp_set_spk_vdec = new System.Windows.Forms.Button();
+            this.b_hfp_set_spk_vinc = new System.Windows.Forms.Button();
+            this.label10 = new System.Windows.Forms.Label();
+            this.l_hfp_current_mic_v = new System.Windows.Forms.Label();
+            this.b_hfp_set_mic_vdec = new System.Windows.Forms.Button();
+            this.b_hfp_set_mic_vinc = new System.Windows.Forms.Button();
+            this.label7 = new System.Windows.Forms.Label();
             this.b_hfp_get_call_pn = new System.Windows.Forms.Button();
             this.b_end_call = new System.Windows.Forms.Button();
             this.b_hfp_audio_transfer = new System.Windows.Forms.Button();
@@ -108,14 +127,8 @@
             this.b_bt_stop = new System.Windows.Forms.Button();
             this.b_bt_start = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.label7 = new System.Windows.Forms.Label();
-            this.b_hfp_set_mic_vinc = new System.Windows.Forms.Button();
-            this.b_hfp_set_mic_vdec = new System.Windows.Forms.Button();
-            this.l_hfp_current_mic_v = new System.Windows.Forms.Label();
-            this.l_hfp_current_spk_v = new System.Windows.Forms.Label();
-            this.b_hfp_set_spk_vdec = new System.Windows.Forms.Button();
-            this.b_hfp_set_spk_vinc = new System.Windows.Forms.Button();
-            this.label10 = new System.Windows.Forms.Label();
+            this.b_hfp_enable_vg = new System.Windows.Forms.Button();
+            this.b_hfp_disable_rg = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.tc_bt_function.SuspendLayout();
             this.tp_bt_basic_func.SuspendLayout();
@@ -125,6 +138,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pb_hfp_signal)).BeginInit();
             this.gb_hfp_test_area.SuspendLayout();
             this.groupBox4.SuspendLayout();
+            this.gb_hfp_dtmf.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.gb_dial_area.SuspendLayout();
             this.tp_bt_spp.SuspendLayout();
@@ -353,6 +367,7 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.gb_hfp_dtmf);
             this.groupBox4.Controls.Add(this.l_hfp_current_spk_v);
             this.groupBox4.Controls.Add(this.b_hfp_set_spk_vdec);
             this.groupBox4.Controls.Add(this.b_hfp_set_spk_vinc);
@@ -374,11 +389,206 @@
             this.groupBox4.TabIndex = 25;
             this.groupBox4.TabStop = false;
             // 
+            // gb_hfp_dtmf
+            // 
+            this.gb_hfp_dtmf.Controls.Add(this.b_hfp_dtmf_0);
+            this.gb_hfp_dtmf.Controls.Add(this.b_hfp_dtmf_7);
+            this.gb_hfp_dtmf.Controls.Add(this.b_hfp_dtmf_9);
+            this.gb_hfp_dtmf.Controls.Add(this.b_hfp_dtmf_1);
+            this.gb_hfp_dtmf.Controls.Add(this.b_hfp_dtmf_8);
+            this.gb_hfp_dtmf.Controls.Add(this.b_hfp_dtmf_2);
+            this.gb_hfp_dtmf.Controls.Add(this.b_hfp_dtmf_3);
+            this.gb_hfp_dtmf.Controls.Add(this.b_hfp_dtmf_6);
+            this.gb_hfp_dtmf.Controls.Add(this.b_hfp_dtmf_4);
+            this.gb_hfp_dtmf.Controls.Add(this.b_hfp_dtmf_5);
+            this.gb_hfp_dtmf.Location = new System.Drawing.Point(11, 364);
+            this.gb_hfp_dtmf.Name = "gb_hfp_dtmf";
+            this.gb_hfp_dtmf.Size = new System.Drawing.Size(253, 94);
+            this.gb_hfp_dtmf.TabIndex = 4;
+            this.gb_hfp_dtmf.TabStop = false;
+            this.gb_hfp_dtmf.Text = "通话中键盘";
+            // 
+            // b_hfp_dtmf_0
+            // 
+            this.b_hfp_dtmf_0.Location = new System.Drawing.Point(206, 62);
+            this.b_hfp_dtmf_0.Name = "b_hfp_dtmf_0";
+            this.b_hfp_dtmf_0.Size = new System.Drawing.Size(38, 28);
+            this.b_hfp_dtmf_0.TabIndex = 24;
+            this.b_hfp_dtmf_0.Text = "0";
+            this.b_hfp_dtmf_0.UseVisualStyleBackColor = true;
+            this.b_hfp_dtmf_0.Click += new System.EventHandler(this.b_hfp_dtmf_0_Click);
+            // 
+            // b_hfp_dtmf_7
+            // 
+            this.b_hfp_dtmf_7.Location = new System.Drawing.Point(60, 62);
+            this.b_hfp_dtmf_7.Name = "b_hfp_dtmf_7";
+            this.b_hfp_dtmf_7.Size = new System.Drawing.Size(38, 28);
+            this.b_hfp_dtmf_7.TabIndex = 21;
+            this.b_hfp_dtmf_7.Text = "7";
+            this.b_hfp_dtmf_7.UseVisualStyleBackColor = true;
+            this.b_hfp_dtmf_7.Click += new System.EventHandler(this.b_hfp_dtmf_7_Click);
+            // 
+            // b_hfp_dtmf_9
+            // 
+            this.b_hfp_dtmf_9.Location = new System.Drawing.Point(159, 62);
+            this.b_hfp_dtmf_9.Name = "b_hfp_dtmf_9";
+            this.b_hfp_dtmf_9.Size = new System.Drawing.Size(38, 28);
+            this.b_hfp_dtmf_9.TabIndex = 23;
+            this.b_hfp_dtmf_9.Text = "9";
+            this.b_hfp_dtmf_9.UseVisualStyleBackColor = true;
+            this.b_hfp_dtmf_9.Click += new System.EventHandler(this.b_hfp_dtmf_9_Click);
+            // 
+            // b_hfp_dtmf_1
+            // 
+            this.b_hfp_dtmf_1.Location = new System.Drawing.Point(5, 28);
+            this.b_hfp_dtmf_1.Name = "b_hfp_dtmf_1";
+            this.b_hfp_dtmf_1.Size = new System.Drawing.Size(38, 28);
+            this.b_hfp_dtmf_1.TabIndex = 15;
+            this.b_hfp_dtmf_1.Text = "1";
+            this.b_hfp_dtmf_1.UseVisualStyleBackColor = true;
+            this.b_hfp_dtmf_1.Click += new System.EventHandler(this.b_hfp_dtmf_1_Click);
+            // 
+            // b_hfp_dtmf_8
+            // 
+            this.b_hfp_dtmf_8.Location = new System.Drawing.Point(110, 62);
+            this.b_hfp_dtmf_8.Name = "b_hfp_dtmf_8";
+            this.b_hfp_dtmf_8.Size = new System.Drawing.Size(38, 28);
+            this.b_hfp_dtmf_8.TabIndex = 22;
+            this.b_hfp_dtmf_8.Text = "8";
+            this.b_hfp_dtmf_8.UseVisualStyleBackColor = true;
+            this.b_hfp_dtmf_8.Click += new System.EventHandler(this.b_hfp_dtmf_8_Click);
+            // 
+            // b_hfp_dtmf_2
+            // 
+            this.b_hfp_dtmf_2.Location = new System.Drawing.Point(60, 28);
+            this.b_hfp_dtmf_2.Name = "b_hfp_dtmf_2";
+            this.b_hfp_dtmf_2.Size = new System.Drawing.Size(38, 28);
+            this.b_hfp_dtmf_2.TabIndex = 16;
+            this.b_hfp_dtmf_2.Text = "2";
+            this.b_hfp_dtmf_2.UseVisualStyleBackColor = true;
+            this.b_hfp_dtmf_2.Click += new System.EventHandler(this.b_hfp_dtmf_2_Click);
+            // 
+            // b_hfp_dtmf_3
+            // 
+            this.b_hfp_dtmf_3.Location = new System.Drawing.Point(110, 28);
+            this.b_hfp_dtmf_3.Name = "b_hfp_dtmf_3";
+            this.b_hfp_dtmf_3.Size = new System.Drawing.Size(38, 28);
+            this.b_hfp_dtmf_3.TabIndex = 17;
+            this.b_hfp_dtmf_3.Text = "3";
+            this.b_hfp_dtmf_3.UseVisualStyleBackColor = true;
+            this.b_hfp_dtmf_3.Click += new System.EventHandler(this.b_hfp_dtmf_3_Click);
+            // 
+            // b_hfp_dtmf_6
+            // 
+            this.b_hfp_dtmf_6.Location = new System.Drawing.Point(5, 62);
+            this.b_hfp_dtmf_6.Name = "b_hfp_dtmf_6";
+            this.b_hfp_dtmf_6.Size = new System.Drawing.Size(38, 28);
+            this.b_hfp_dtmf_6.TabIndex = 20;
+            this.b_hfp_dtmf_6.Text = "6";
+            this.b_hfp_dtmf_6.UseVisualStyleBackColor = true;
+            this.b_hfp_dtmf_6.Click += new System.EventHandler(this.b_hfp_dtmf_6_Click);
+            // 
+            // b_hfp_dtmf_4
+            // 
+            this.b_hfp_dtmf_4.Location = new System.Drawing.Point(159, 28);
+            this.b_hfp_dtmf_4.Name = "b_hfp_dtmf_4";
+            this.b_hfp_dtmf_4.Size = new System.Drawing.Size(38, 28);
+            this.b_hfp_dtmf_4.TabIndex = 18;
+            this.b_hfp_dtmf_4.Text = "4";
+            this.b_hfp_dtmf_4.UseVisualStyleBackColor = true;
+            this.b_hfp_dtmf_4.Click += new System.EventHandler(this.b_hfp_dtmf_4_Click);
+            // 
+            // b_hfp_dtmf_5
+            // 
+            this.b_hfp_dtmf_5.Location = new System.Drawing.Point(206, 28);
+            this.b_hfp_dtmf_5.Name = "b_hfp_dtmf_5";
+            this.b_hfp_dtmf_5.Size = new System.Drawing.Size(38, 28);
+            this.b_hfp_dtmf_5.TabIndex = 19;
+            this.b_hfp_dtmf_5.Text = "5";
+            this.b_hfp_dtmf_5.UseVisualStyleBackColor = true;
+            this.b_hfp_dtmf_5.Click += new System.EventHandler(this.b_hfp_dtmf_5_Click);
+            // 
+            // l_hfp_current_spk_v
+            // 
+            this.l_hfp_current_spk_v.AutoSize = true;
+            this.l_hfp_current_spk_v.Location = new System.Drawing.Point(118, 331);
+            this.l_hfp_current_spk_v.Name = "l_hfp_current_spk_v";
+            this.l_hfp_current_spk_v.Size = new System.Drawing.Size(18, 20);
+            this.l_hfp_current_spk_v.TabIndex = 14;
+            this.l_hfp_current_spk_v.Text = "9";
+            // 
+            // b_hfp_set_spk_vdec
+            // 
+            this.b_hfp_set_spk_vdec.Location = new System.Drawing.Point(204, 323);
+            this.b_hfp_set_spk_vdec.Name = "b_hfp_set_spk_vdec";
+            this.b_hfp_set_spk_vdec.Size = new System.Drawing.Size(46, 35);
+            this.b_hfp_set_spk_vdec.TabIndex = 13;
+            this.b_hfp_set_spk_vdec.Text = "V-";
+            this.b_hfp_set_spk_vdec.UseVisualStyleBackColor = true;
+            this.b_hfp_set_spk_vdec.Click += new System.EventHandler(this.b_hfp_set_spk_vdec_Click);
+            // 
+            // b_hfp_set_spk_vinc
+            // 
+            this.b_hfp_set_spk_vinc.Location = new System.Drawing.Point(152, 323);
+            this.b_hfp_set_spk_vinc.Name = "b_hfp_set_spk_vinc";
+            this.b_hfp_set_spk_vinc.Size = new System.Drawing.Size(46, 35);
+            this.b_hfp_set_spk_vinc.TabIndex = 12;
+            this.b_hfp_set_spk_vinc.Text = "V+";
+            this.b_hfp_set_spk_vinc.UseVisualStyleBackColor = true;
+            this.b_hfp_set_spk_vinc.Click += new System.EventHandler(this.b_hfp_set_spk_vinc_Click);
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(7, 331);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(98, 20);
+            this.label10.TabIndex = 11;
+            this.label10.Text = "当前spk音量:";
+            // 
+            // l_hfp_current_mic_v
+            // 
+            this.l_hfp_current_mic_v.AutoSize = true;
+            this.l_hfp_current_mic_v.Location = new System.Drawing.Point(118, 288);
+            this.l_hfp_current_mic_v.Name = "l_hfp_current_mic_v";
+            this.l_hfp_current_mic_v.Size = new System.Drawing.Size(18, 20);
+            this.l_hfp_current_mic_v.TabIndex = 10;
+            this.l_hfp_current_mic_v.Text = "9";
+            // 
+            // b_hfp_set_mic_vdec
+            // 
+            this.b_hfp_set_mic_vdec.Location = new System.Drawing.Point(204, 280);
+            this.b_hfp_set_mic_vdec.Name = "b_hfp_set_mic_vdec";
+            this.b_hfp_set_mic_vdec.Size = new System.Drawing.Size(46, 35);
+            this.b_hfp_set_mic_vdec.TabIndex = 9;
+            this.b_hfp_set_mic_vdec.Text = "V-";
+            this.b_hfp_set_mic_vdec.UseVisualStyleBackColor = true;
+            this.b_hfp_set_mic_vdec.Click += new System.EventHandler(this.b_hfp_set_mic_vdec_Click);
+            // 
+            // b_hfp_set_mic_vinc
+            // 
+            this.b_hfp_set_mic_vinc.Location = new System.Drawing.Point(152, 280);
+            this.b_hfp_set_mic_vinc.Name = "b_hfp_set_mic_vinc";
+            this.b_hfp_set_mic_vinc.Size = new System.Drawing.Size(46, 35);
+            this.b_hfp_set_mic_vinc.TabIndex = 8;
+            this.b_hfp_set_mic_vinc.Text = "V+";
+            this.b_hfp_set_mic_vinc.UseVisualStyleBackColor = true;
+            this.b_hfp_set_mic_vinc.Click += new System.EventHandler(this.b_hfp_set_mic_vinc_Click);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(7, 288);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(99, 20);
+            this.label7.TabIndex = 7;
+            this.label7.Text = "当前mic音量:";
+            // 
             // b_hfp_get_call_pn
             // 
-            this.b_hfp_get_call_pn.Location = new System.Drawing.Point(11, 203);
+            this.b_hfp_get_call_pn.Location = new System.Drawing.Point(11, 196);
             this.b_hfp_get_call_pn.Name = "b_hfp_get_call_pn";
-            this.b_hfp_get_call_pn.Size = new System.Drawing.Size(240, 52);
+            this.b_hfp_get_call_pn.Size = new System.Drawing.Size(240, 38);
             this.b_hfp_get_call_pn.TabIndex = 6;
             this.b_hfp_get_call_pn.Text = "获取电话号码";
             this.b_hfp_get_call_pn.UseVisualStyleBackColor = true;
@@ -386,7 +596,7 @@
             // 
             // b_end_call
             // 
-            this.b_end_call.Location = new System.Drawing.Point(142, 159);
+            this.b_end_call.Location = new System.Drawing.Point(142, 152);
             this.b_end_call.Name = "b_end_call";
             this.b_end_call.Size = new System.Drawing.Size(109, 38);
             this.b_end_call.TabIndex = 5;
@@ -396,9 +606,9 @@
             // 
             // b_hfp_audio_transfer
             // 
-            this.b_hfp_audio_transfer.Location = new System.Drawing.Point(11, 261);
+            this.b_hfp_audio_transfer.Location = new System.Drawing.Point(11, 238);
             this.b_hfp_audio_transfer.Name = "b_hfp_audio_transfer";
-            this.b_hfp_audio_transfer.Size = new System.Drawing.Size(240, 52);
+            this.b_hfp_audio_transfer.Size = new System.Drawing.Size(240, 31);
             this.b_hfp_audio_transfer.TabIndex = 4;
             this.b_hfp_audio_transfer.Text = "切换音源";
             this.b_hfp_audio_transfer.UseVisualStyleBackColor = true;
@@ -406,7 +616,7 @@
             // 
             // b_answer_call
             // 
-            this.b_answer_call.Location = new System.Drawing.Point(11, 159);
+            this.b_answer_call.Location = new System.Drawing.Point(11, 152);
             this.b_answer_call.Name = "b_answer_call";
             this.b_answer_call.Size = new System.Drawing.Size(115, 38);
             this.b_answer_call.TabIndex = 3;
@@ -418,7 +628,7 @@
             // 
             this.l_hfp_call_pn.AutoSize = true;
             this.l_hfp_call_pn.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.l_hfp_call_pn.Location = new System.Drawing.Point(62, 116);
+            this.l_hfp_call_pn.Location = new System.Drawing.Point(62, 109);
             this.l_hfp_call_pn.Name = "l_hfp_call_pn";
             this.l_hfp_call_pn.Size = new System.Drawing.Size(188, 31);
             this.l_hfp_call_pn.TabIndex = 2;
@@ -428,7 +638,7 @@
             // 
             this.l_hfp_call_time.AutoSize = true;
             this.l_hfp_call_time.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.l_hfp_call_time.Location = new System.Drawing.Point(62, 75);
+            this.l_hfp_call_time.Location = new System.Drawing.Point(62, 68);
             this.l_hfp_call_time.Name = "l_hfp_call_time";
             this.l_hfp_call_time.Size = new System.Drawing.Size(118, 31);
             this.l_hfp_call_time.TabIndex = 1;
@@ -438,7 +648,7 @@
             // 
             this.l_hfp_call_status.AutoSize = true;
             this.l_hfp_call_status.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.l_hfp_call_status.Location = new System.Drawing.Point(77, 31);
+            this.l_hfp_call_status.Location = new System.Drawing.Point(77, 24);
             this.l_hfp_call_status.Name = "l_hfp_call_status";
             this.l_hfp_call_status.Size = new System.Drawing.Size(86, 31);
             this.l_hfp_call_status.TabIndex = 0;
@@ -446,6 +656,8 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.b_hfp_disable_rg);
+            this.groupBox3.Controls.Add(this.b_hfp_enable_vg);
             this.groupBox3.Controls.Add(this.tb_hfp_lpn);
             this.groupBox3.Controls.Add(this.b_hfp_get_lpn);
             this.groupBox3.Controls.Add(this.b_hfp_get_operate);
@@ -960,81 +1172,25 @@
             this.timer1.Interval = 1000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // label7
+            // b_hfp_enable_vg
             // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(7, 331);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(99, 20);
-            this.label7.TabIndex = 7;
-            this.label7.Text = "当前mic音量:";
+            this.b_hfp_enable_vg.Location = new System.Drawing.Point(7, 181);
+            this.b_hfp_enable_vg.Name = "b_hfp_enable_vg";
+            this.b_hfp_enable_vg.Size = new System.Drawing.Size(228, 38);
+            this.b_hfp_enable_vg.TabIndex = 4;
+            this.b_hfp_enable_vg.Text = "开启语音识别";
+            this.b_hfp_enable_vg.UseVisualStyleBackColor = true;
+            this.b_hfp_enable_vg.Click += new System.EventHandler(this.b_hfp_enable_vg_Click);
             // 
-            // b_hfp_set_mic_vinc
+            // b_hfp_disable_rg
             // 
-            this.b_hfp_set_mic_vinc.Location = new System.Drawing.Point(152, 323);
-            this.b_hfp_set_mic_vinc.Name = "b_hfp_set_mic_vinc";
-            this.b_hfp_set_mic_vinc.Size = new System.Drawing.Size(46, 35);
-            this.b_hfp_set_mic_vinc.TabIndex = 8;
-            this.b_hfp_set_mic_vinc.Text = "V+";
-            this.b_hfp_set_mic_vinc.UseVisualStyleBackColor = true;
-            this.b_hfp_set_mic_vinc.Click += new System.EventHandler(this.b_hfp_set_mic_vinc_Click);
-            // 
-            // b_hfp_set_mic_vdec
-            // 
-            this.b_hfp_set_mic_vdec.Location = new System.Drawing.Point(204, 323);
-            this.b_hfp_set_mic_vdec.Name = "b_hfp_set_mic_vdec";
-            this.b_hfp_set_mic_vdec.Size = new System.Drawing.Size(46, 35);
-            this.b_hfp_set_mic_vdec.TabIndex = 9;
-            this.b_hfp_set_mic_vdec.Text = "V-";
-            this.b_hfp_set_mic_vdec.UseVisualStyleBackColor = true;
-            this.b_hfp_set_mic_vdec.Click += new System.EventHandler(this.b_hfp_set_mic_vdec_Click);
-            // 
-            // l_hfp_current_mic_v
-            // 
-            this.l_hfp_current_mic_v.AutoSize = true;
-            this.l_hfp_current_mic_v.Location = new System.Drawing.Point(118, 331);
-            this.l_hfp_current_mic_v.Name = "l_hfp_current_mic_v";
-            this.l_hfp_current_mic_v.Size = new System.Drawing.Size(18, 20);
-            this.l_hfp_current_mic_v.TabIndex = 10;
-            this.l_hfp_current_mic_v.Text = "9";
-            // 
-            // l_hfp_current_spk_v
-            // 
-            this.l_hfp_current_spk_v.AutoSize = true;
-            this.l_hfp_current_spk_v.Location = new System.Drawing.Point(118, 374);
-            this.l_hfp_current_spk_v.Name = "l_hfp_current_spk_v";
-            this.l_hfp_current_spk_v.Size = new System.Drawing.Size(18, 20);
-            this.l_hfp_current_spk_v.TabIndex = 14;
-            this.l_hfp_current_spk_v.Text = "9";
-            // 
-            // b_hfp_set_spk_vdec
-            // 
-            this.b_hfp_set_spk_vdec.Location = new System.Drawing.Point(204, 366);
-            this.b_hfp_set_spk_vdec.Name = "b_hfp_set_spk_vdec";
-            this.b_hfp_set_spk_vdec.Size = new System.Drawing.Size(46, 35);
-            this.b_hfp_set_spk_vdec.TabIndex = 13;
-            this.b_hfp_set_spk_vdec.Text = "V-";
-            this.b_hfp_set_spk_vdec.UseVisualStyleBackColor = true;
-            this.b_hfp_set_spk_vdec.Click += new System.EventHandler(this.b_hfp_set_spk_vdec_Click);
-            // 
-            // b_hfp_set_spk_vinc
-            // 
-            this.b_hfp_set_spk_vinc.Location = new System.Drawing.Point(152, 366);
-            this.b_hfp_set_spk_vinc.Name = "b_hfp_set_spk_vinc";
-            this.b_hfp_set_spk_vinc.Size = new System.Drawing.Size(46, 35);
-            this.b_hfp_set_spk_vinc.TabIndex = 12;
-            this.b_hfp_set_spk_vinc.Text = "V+";
-            this.b_hfp_set_spk_vinc.UseVisualStyleBackColor = true;
-            this.b_hfp_set_spk_vinc.Click += new System.EventHandler(this.b_hfp_set_spk_vinc_Click);
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(7, 374);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(98, 20);
-            this.label10.TabIndex = 11;
-            this.label10.Text = "当前spk音量:";
+            this.b_hfp_disable_rg.Location = new System.Drawing.Point(6, 228);
+            this.b_hfp_disable_rg.Name = "b_hfp_disable_rg";
+            this.b_hfp_disable_rg.Size = new System.Drawing.Size(228, 37);
+            this.b_hfp_disable_rg.TabIndex = 5;
+            this.b_hfp_disable_rg.Text = "开启语音识别";
+            this.b_hfp_disable_rg.UseVisualStyleBackColor = true;
+            this.b_hfp_disable_rg.Click += new System.EventHandler(this.b_hfp_disable_rg_Click);
             // 
             // Form1
             // 
@@ -1063,6 +1219,7 @@
             this.gb_hfp_test_area.ResumeLayout(false);
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
+            this.gb_hfp_dtmf.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.gb_dial_area.ResumeLayout(false);
@@ -1167,6 +1324,19 @@
         private System.Windows.Forms.Button b_hfp_set_mic_vdec;
         private System.Windows.Forms.Button b_hfp_set_mic_vinc;
         private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Button b_hfp_dtmf_1;
+        private System.Windows.Forms.Button b_hfp_dtmf_6;
+        private System.Windows.Forms.Button b_hfp_dtmf_5;
+        private System.Windows.Forms.Button b_hfp_dtmf_4;
+        private System.Windows.Forms.Button b_hfp_dtmf_3;
+        private System.Windows.Forms.Button b_hfp_dtmf_2;
+        private System.Windows.Forms.GroupBox gb_hfp_dtmf;
+        private System.Windows.Forms.Button b_hfp_dtmf_0;
+        private System.Windows.Forms.Button b_hfp_dtmf_7;
+        private System.Windows.Forms.Button b_hfp_dtmf_9;
+        private System.Windows.Forms.Button b_hfp_dtmf_8;
+        private System.Windows.Forms.Button b_hfp_disable_rg;
+        private System.Windows.Forms.Button b_hfp_enable_vg;
     }
 }
 

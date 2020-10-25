@@ -48,6 +48,9 @@ namespace mcu_bt_tool
         string json_bt_cmd_hfp_get_call_pn = "HFP_CLCC"; /* 获取通话号码 */
         string json_bt_cmd_hfp_set_mic_volume = "HFP_VGM"; /* 设置HFP mic音量 */
         string json_bt_cmd_hfp_set_spk_volume = "HFP_VGS"; /* 设置HFP spk音量 */
+        string json_bt_cmd_hfp_dtmf = "HFP_DTMF"; /* 通话时发送键盘 */
+        string json_bt_cmd_hfp_enable_vg = "HFP_VGE";/* 开启语音识别 */
+        string json_bt_cmd_hfp_disable_vg = "HFP_VGD";/* 关闭语音识别 */
 
         /* HFP的call/callsetup status */
         int bt_hfp_default_mic_volume = 9;
@@ -391,6 +394,66 @@ namespace mcu_bt_tool
             json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_set_spk_volume, bt_hfp_default_spk_volume.ToString(), null, null, null, null, null);
         }
 
+        private void b_hfp_dtmf_1_Click(object sender, EventArgs e)
+        {
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_dtmf, "1", null, null, null, null, null);
+        }
+
+        private void b_hfp_dtmf_2_Click(object sender, EventArgs e)
+        {
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_dtmf, "2", null, null, null, null, null);
+        }
+
+        private void b_hfp_dtmf_3_Click(object sender, EventArgs e)
+        {
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_dtmf, "3", null, null, null, null, null);
+        }
+
+        private void b_hfp_dtmf_4_Click(object sender, EventArgs e)
+        {
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_dtmf, "4", null, null, null, null, null);
+        }
+
+        private void b_hfp_dtmf_5_Click(object sender, EventArgs e)
+        {
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_dtmf, "5", null, null, null, null, null);
+        }
+
+        private void b_hfp_dtmf_6_Click(object sender, EventArgs e)
+        {
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_dtmf, "6", null, null, null, null, null);
+        }
+
+        private void b_hfp_dtmf_7_Click(object sender, EventArgs e)
+        {
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_dtmf, "7", null, null, null, null, null);
+        }
+
+        private void b_hfp_dtmf_8_Click(object sender, EventArgs e)
+        {
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_dtmf, "8", null, null, null, null, null);
+        }
+
+        private void b_hfp_dtmf_9_Click(object sender, EventArgs e)
+        {
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_dtmf, "9", null, null, null, null, null);
+        }
+
+        private void b_hfp_dtmf_0_Click(object sender, EventArgs e)
+        {
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_dtmf, "0", null, null, null, null, null);
+        }
+
+        private void b_hfp_enable_vg_Click(object sender, EventArgs e)
+        {
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_enable_vg, null, null, null, null, null, null);
+        }
+
+        private void b_hfp_disable_rg_Click(object sender, EventArgs e)
+        {
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_disable_vg, null, null, null, null, null, null);
+        }
+
         /* 串口搜索 */
         private void search_add_serial_port()
         {
@@ -655,6 +718,7 @@ namespace mcu_bt_tool
 
                         ui_bt_hfp_answer_call_enable(false);
                         ui_bt_hfp_end_call_enable(false);
+                        ui_bt_hfp_dtmf_show(false);
                         
                     }
                     else if (call_status == HFP_CALL_INPORCESS)
@@ -663,6 +727,7 @@ namespace mcu_bt_tool
                         l_hfp_call_status.Text = "通话中";
                         ui_bt_hfp_answer_call_enable(false);
                         ui_bt_hfp_end_call_enable(true);
+                        ui_bt_hfp_dtmf_show(true);
                     }
                 }
 
@@ -893,6 +958,14 @@ namespace mcu_bt_tool
             l_hfp_call_num.Text = "";
         }
 
+        private void ui_bt_hfp_dtmf_show(bool enable)
+        {
+            if (enable)
+                gb_hfp_dtmf.Enabled = true;
+            else
+                gb_hfp_dtmf.Enabled = false;
+        }
+
         /* 整个UI的初始化 */
         private void ui_init()
         {
@@ -900,8 +973,13 @@ namespace mcu_bt_tool
             ui_bt_spp_show(false);
             ui_bt_hfp_show(false);
             ui_bt_hfp_clear_call_num();
+            ui_bt_hfp_dtmf_show(false);
             
         }
+
+        
+
+        
 
         
     

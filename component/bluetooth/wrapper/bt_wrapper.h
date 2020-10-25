@@ -152,6 +152,10 @@ uint8_t bt_hfp_hf_get_call_list(struct bd_addr_t *addr);
 uint8_t bt_hfp_hf_disable_ecnr(struct bd_addr_t *addr);
 uint8_t bt_hfp_hf_set_mic_volume(struct bd_addr_t *addr,uint8_t value);
 uint8_t bt_hfp_hf_set_spk_volume(struct bd_addr_t *addr,uint8_t value);
+uint8_t bt_hfp_hf_transmit_dtmf(struct bd_addr_t *addr,uint8_t value);
+uint8_t bt_hfp_hf_set_voice_recognition(struct bd_addr_t *addr,uint8_t enable);
+
+
 
 
 #endif

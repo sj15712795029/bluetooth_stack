@@ -80,6 +80,14 @@ uint32_t last_sys_time = 0;
 #define BT_HFP_VGS_DES "Set HFP speaker volume"
 #define BT_HFP_VGM_CMD "HFP_VGM"
 #define BT_HFP_VGM_DES "Set HFP mic volume"
+#define BT_HFP_DTMF_CMD "HFP_DTMF"
+#define BT_HFP_DTMF_DES "Transport hfp dtmf"
+#define BT_HFP_VOICE_RECOG_ENABLE_CMD "HFP_VGE"
+#define BT_HFP_VOICE_RECOG_ENABLE_DES "HFP voice recogntion enable"
+#define BT_HFP_VOICE_RECOG_DISABLE_CMD "HFP_VGD"
+#define BT_HFP_VOICE_RECOG_DISABLE_DES "HFP voice recogntion disable"
+
+
 
 
 
@@ -122,6 +130,9 @@ cmd_desctiption_t cmd_usage[] =
     {(uint8_t *)BT_HFP_DISABLE_ECNR_CMD,(uint8_t *)BT_HFP_DISABLE_ECNR_DES},
     {(uint8_t *)BT_HFP_VGS_CMD,(uint8_t *)BT_HFP_VGS_DES},
     {(uint8_t *)BT_HFP_VGM_CMD,(uint8_t *)BT_HFP_VGM_DES},
+    {(uint8_t *)BT_HFP_DTMF_CMD,(uint8_t *)BT_HFP_DTMF_DES},
+    {(uint8_t *)BT_HFP_VOICE_RECOG_ENABLE_CMD,(uint8_t *)BT_HFP_VOICE_RECOG_ENABLE_DES},
+    {(uint8_t *)BT_HFP_VOICE_RECOG_DISABLE_CMD,(uint8_t *)BT_HFP_VOICE_RECOG_DISABLE_DES},
 #endif
 };
 
@@ -676,17 +687,17 @@ uint8_t shell_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("HFP_VGE",(const char*)shell_string) == 0)
+    if(hw_strncmp("HFP_VGE",(const char*)shell_string,hw_strlen(BT_HFP_VOICE_RECOG_ENABLE_CMD) == 0)
     {
-        HW_DEBUG("SHELL:operate CLI enable\n");
-        hfp_hf_set_voice_recognition(&connect_addr,1);
+        HW_DEBUG("SHELL:operate voice_recognition enable\n");
+        bt_hfp_hf_set_voice_recognition(&connect_addr,1);
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("HFP_VGD",(const char*)shell_string) == 0)
+    if(hw_strncmp("HFP_VGD",(const char*)shell_string,hw_strlen(BT_HFP_VOICE_RECOG_DISABLE_CMD) == 0)
     {
-        HW_DEBUG("SHELL:operate CLI disable\n");
-        hfp_hf_set_voice_recognition(&connect_addr,0);
+        HW_DEBUG("SHELL:operate voice_recognition disable\n");
+        bt_hfp_hf_set_voice_recognition(&connect_addr,0);
         return HW_ERR_OK;
     }
 
@@ -697,10 +708,10 @@ uint8_t shell_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("HFP_DTMF",(const char*)shell_string) == 0)
+    if(hw_strncmp("HFP_DTMF",(const char*)shell_string,hw_strlen(BT_HFP_DTMF_CMD)) == 0)
     {
-        HW_DEBUG("SHELL:operate get phone number via voice tag\n");
-        hfp_hf_transmit_dtmf(&connect_addr,1);
+        HW_DEBUG("SHELL:operate hfp active call dtmf\n");
+        bt_hfp_hf_transmit_dtmf(&connect_addr,1);
         return HW_ERR_OK;
     }
 

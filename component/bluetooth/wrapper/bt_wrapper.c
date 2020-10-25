@@ -791,6 +791,21 @@ uint8_t bt_hfp_hf_set_spk_volume(struct bd_addr_t *addr,uint8_t value)
 	return 0;
 }
 
+uint8_t bt_hfp_hf_transmit_dtmf(struct bd_addr_t *addr,uint8_t value)
+{
+	hfp_hf_transmit_dtmf(addr,value);
+
+	return 0;
+}
+
+uint8_t bt_hfp_hf_set_voice_recognition(struct bd_addr_t *addr,uint8_t enable)
+{
+	hfp_hf_set_voice_recognition(addr,enable);
+
+	return 0;
+}
+
+
 
 static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres)
 {
