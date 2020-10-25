@@ -78,6 +78,12 @@
             this.l_hfp_call_time = new System.Windows.Forms.Label();
             this.l_hfp_call_status = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.tb_hfp_module_name = new System.Windows.Forms.TextBox();
+            this.b_hfp_get_module_name = new System.Windows.Forms.Button();
+            this.tb_hfp_manu_id = new System.Windows.Forms.TextBox();
+            this.b_hfp_get_manu_id = new System.Windows.Forms.Button();
+            this.b_hfp_disable_rg = new System.Windows.Forms.Button();
+            this.b_hfp_enable_vg = new System.Windows.Forms.Button();
             this.tb_hfp_lpn = new System.Windows.Forms.TextBox();
             this.b_hfp_get_lpn = new System.Windows.Forms.Button();
             this.b_hfp_get_operate = new System.Windows.Forms.Button();
@@ -127,8 +133,6 @@
             this.b_bt_stop = new System.Windows.Forms.Button();
             this.b_bt_start = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.b_hfp_enable_vg = new System.Windows.Forms.Button();
-            this.b_hfp_disable_rg = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.tc_bt_function.SuspendLayout();
             this.tp_bt_basic_func.SuspendLayout();
@@ -656,6 +660,10 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.tb_hfp_module_name);
+            this.groupBox3.Controls.Add(this.b_hfp_get_module_name);
+            this.groupBox3.Controls.Add(this.tb_hfp_manu_id);
+            this.groupBox3.Controls.Add(this.b_hfp_get_manu_id);
             this.groupBox3.Controls.Add(this.b_hfp_disable_rg);
             this.groupBox3.Controls.Add(this.b_hfp_enable_vg);
             this.groupBox3.Controls.Add(this.tb_hfp_lpn);
@@ -668,9 +676,67 @@
             this.groupBox3.TabIndex = 24;
             this.groupBox3.TabStop = false;
             // 
+            // tb_hfp_module_name
+            // 
+            this.tb_hfp_module_name.Location = new System.Drawing.Point(6, 344);
+            this.tb_hfp_module_name.Multiline = true;
+            this.tb_hfp_module_name.Name = "tb_hfp_module_name";
+            this.tb_hfp_module_name.Size = new System.Drawing.Size(228, 38);
+            this.tb_hfp_module_name.TabIndex = 9;
+            // 
+            // b_hfp_get_module_name
+            // 
+            this.b_hfp_get_module_name.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.b_hfp_get_module_name.Location = new System.Drawing.Point(7, 387);
+            this.b_hfp_get_module_name.Name = "b_hfp_get_module_name";
+            this.b_hfp_get_module_name.Size = new System.Drawing.Size(227, 39);
+            this.b_hfp_get_module_name.TabIndex = 8;
+            this.b_hfp_get_module_name.Text = "获取AG组件名字(3GPP)";
+            this.b_hfp_get_module_name.UseVisualStyleBackColor = true;
+            this.b_hfp_get_module_name.Click += new System.EventHandler(this.b_hfp_get_module_name_Click);
+            // 
+            // tb_hfp_manu_id
+            // 
+            this.tb_hfp_manu_id.Location = new System.Drawing.Point(6, 256);
+            this.tb_hfp_manu_id.Multiline = true;
+            this.tb_hfp_manu_id.Name = "tb_hfp_manu_id";
+            this.tb_hfp_manu_id.Size = new System.Drawing.Size(228, 38);
+            this.tb_hfp_manu_id.TabIndex = 7;
+            // 
+            // b_hfp_get_manu_id
+            // 
+            this.b_hfp_get_manu_id.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.b_hfp_get_manu_id.Location = new System.Drawing.Point(7, 299);
+            this.b_hfp_get_manu_id.Name = "b_hfp_get_manu_id";
+            this.b_hfp_get_manu_id.Size = new System.Drawing.Size(227, 39);
+            this.b_hfp_get_manu_id.TabIndex = 6;
+            this.b_hfp_get_manu_id.Text = "获取AG制造商名字(3GPP)";
+            this.b_hfp_get_manu_id.UseVisualStyleBackColor = true;
+            this.b_hfp_get_manu_id.Click += new System.EventHandler(this.b_hfp_get_manu_id_Click);
+            // 
+            // b_hfp_disable_rg
+            // 
+            this.b_hfp_disable_rg.Location = new System.Drawing.Point(6, 202);
+            this.b_hfp_disable_rg.Name = "b_hfp_disable_rg";
+            this.b_hfp_disable_rg.Size = new System.Drawing.Size(228, 37);
+            this.b_hfp_disable_rg.TabIndex = 5;
+            this.b_hfp_disable_rg.Text = "开启语音识别(功能鸡肋)";
+            this.b_hfp_disable_rg.UseVisualStyleBackColor = true;
+            this.b_hfp_disable_rg.Click += new System.EventHandler(this.b_hfp_disable_rg_Click);
+            // 
+            // b_hfp_enable_vg
+            // 
+            this.b_hfp_enable_vg.Location = new System.Drawing.Point(7, 159);
+            this.b_hfp_enable_vg.Name = "b_hfp_enable_vg";
+            this.b_hfp_enable_vg.Size = new System.Drawing.Size(228, 38);
+            this.b_hfp_enable_vg.TabIndex = 4;
+            this.b_hfp_enable_vg.Text = "开启语音识别(功能鸡肋)";
+            this.b_hfp_enable_vg.UseVisualStyleBackColor = true;
+            this.b_hfp_enable_vg.Click += new System.EventHandler(this.b_hfp_enable_vg_Click);
+            // 
             // tb_hfp_lpn
             // 
-            this.tb_hfp_lpn.Location = new System.Drawing.Point(6, 85);
+            this.tb_hfp_lpn.Location = new System.Drawing.Point(6, 71);
             this.tb_hfp_lpn.Multiline = true;
             this.tb_hfp_lpn.Name = "tb_hfp_lpn";
             this.tb_hfp_lpn.Size = new System.Drawing.Size(228, 38);
@@ -679,7 +745,7 @@
             // b_hfp_get_lpn
             // 
             this.b_hfp_get_lpn.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.b_hfp_get_lpn.Location = new System.Drawing.Point(7, 129);
+            this.b_hfp_get_lpn.Location = new System.Drawing.Point(7, 114);
             this.b_hfp_get_lpn.Name = "b_hfp_get_lpn";
             this.b_hfp_get_lpn.Size = new System.Drawing.Size(227, 39);
             this.b_hfp_get_lpn.TabIndex = 2;
@@ -1172,26 +1238,6 @@
             this.timer1.Interval = 1000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // b_hfp_enable_vg
-            // 
-            this.b_hfp_enable_vg.Location = new System.Drawing.Point(7, 181);
-            this.b_hfp_enable_vg.Name = "b_hfp_enable_vg";
-            this.b_hfp_enable_vg.Size = new System.Drawing.Size(228, 38);
-            this.b_hfp_enable_vg.TabIndex = 4;
-            this.b_hfp_enable_vg.Text = "开启语音识别";
-            this.b_hfp_enable_vg.UseVisualStyleBackColor = true;
-            this.b_hfp_enable_vg.Click += new System.EventHandler(this.b_hfp_enable_vg_Click);
-            // 
-            // b_hfp_disable_rg
-            // 
-            this.b_hfp_disable_rg.Location = new System.Drawing.Point(6, 228);
-            this.b_hfp_disable_rg.Name = "b_hfp_disable_rg";
-            this.b_hfp_disable_rg.Size = new System.Drawing.Size(228, 37);
-            this.b_hfp_disable_rg.TabIndex = 5;
-            this.b_hfp_disable_rg.Text = "开启语音识别";
-            this.b_hfp_disable_rg.UseVisualStyleBackColor = true;
-            this.b_hfp_disable_rg.Click += new System.EventHandler(this.b_hfp_disable_rg_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -1337,6 +1383,10 @@
         private System.Windows.Forms.Button b_hfp_dtmf_8;
         private System.Windows.Forms.Button b_hfp_disable_rg;
         private System.Windows.Forms.Button b_hfp_enable_vg;
+        private System.Windows.Forms.TextBox tb_hfp_module_name;
+        private System.Windows.Forms.Button b_hfp_get_module_name;
+        private System.Windows.Forms.TextBox tb_hfp_manu_id;
+        private System.Windows.Forms.Button b_hfp_get_manu_id;
     }
 }
 

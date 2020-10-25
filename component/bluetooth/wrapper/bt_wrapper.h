@@ -97,6 +97,8 @@ typedef struct
 	void (*bt_hfp_call_setup)(struct bd_addr_t *remote_addr,uint8_t value);
 	void (*bt_hfp_local_pn)(struct bd_addr_t *remote_addr,uint8_t *local_pn);
 	void (*bt_hfp_call_pn)(struct bd_addr_t *remote_addr,uint8_t *phone_number);
+	void (*bt_hfp_manu_id)(struct bd_addr_t *remote_addr,uint8_t *manu_id);
+	void (*bt_hfp_module_id)(struct bd_addr_t *remote_addr,uint8_t *module_id);
 }bt_app_hfp_cb_t;
 
 
@@ -154,6 +156,10 @@ uint8_t bt_hfp_hf_set_mic_volume(struct bd_addr_t *addr,uint8_t value);
 uint8_t bt_hfp_hf_set_spk_volume(struct bd_addr_t *addr,uint8_t value);
 uint8_t bt_hfp_hf_transmit_dtmf(struct bd_addr_t *addr,uint8_t value);
 uint8_t bt_hfp_hf_set_voice_recognition(struct bd_addr_t *addr,uint8_t enable);
+uint8_t bt_hfp_hf_get_manufacturer_id(struct bd_addr_t *addr);
+uint8_t bt_hfp_hf_get_model_id(struct bd_addr_t *addr);
+uint8_t bt_hfp_hf_get_revision_id(struct bd_addr_t *addr);
+uint8_t bt_hfp_hf_get_pid(struct bd_addr_t *addr);
 
 
 

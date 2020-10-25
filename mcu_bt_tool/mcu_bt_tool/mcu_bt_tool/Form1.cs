@@ -51,6 +51,8 @@ namespace mcu_bt_tool
         string json_bt_cmd_hfp_dtmf = "HFP_DTMF"; /* 通话时发送键盘 */
         string json_bt_cmd_hfp_enable_vg = "HFP_VGE";/* 开启语音识别 */
         string json_bt_cmd_hfp_disable_vg = "HFP_VGD";/* 关闭语音识别 */
+        string json_bt_cmd_hfp_get_manu_id = "HFP_CGMI";/* 获取制造商名字 */
+        string json_bt_cmd_hfp_get_module_id = "HFP_CGMM";/* 获取组件名字 */
 
         /* HFP的call/callsetup status */
         int bt_hfp_default_mic_volume = 9;
@@ -263,6 +265,7 @@ namespace mcu_bt_tool
         /* 获取运营商名称 */
         private void b_hfp_get_operate_Click(object sender, EventArgs e)
         {
+            tb_hfp_operate.Text = "";
             json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_get_operate, null, null, null, null, null, null);
         }
 
@@ -348,6 +351,7 @@ namespace mcu_bt_tool
 
         private void b_hfp_get_lpn_Click(object sender, EventArgs e)
         {
+            tb_hfp_lpn.Text = "";
             json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_get_lpn, null, null, null, null, null, null);
         }
 
@@ -452,6 +456,18 @@ namespace mcu_bt_tool
         private void b_hfp_disable_rg_Click(object sender, EventArgs e)
         {
             json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_disable_vg, null, null, null, null, null, null);
+        }
+
+        private void b_hfp_get_manu_id_Click(object sender, EventArgs e)
+        {
+            tb_hfp_manu_id.Text = "";
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_get_manu_id, null, null, null, null, null, null);        
+        }
+
+        private void b_hfp_get_module_name_Click(object sender, EventArgs e)
+        {
+            tb_hfp_module_name.Text = "";
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_get_module_id, null, null, null, null, null, null);        
         }
 
         /* 串口搜索 */
@@ -767,8 +783,16 @@ namespace mcu_bt_tool
                 {
                     l_hfp_call_pn.Text = status.PARAM1;
                 }
-                
-                
+
+                if (status.OPERATE == "BT_HFP_MANU_ID")
+                {
+                    tb_hfp_manu_id.Text = status.PARAM1;
+                }
+
+                if (status.OPERATE == "BT_HFP_MODULE_ID")
+                {
+                    tb_hfp_module_name.Text = status.PARAM1;
+                }
             }
         }
 
@@ -976,6 +1000,8 @@ namespace mcu_bt_tool
             ui_bt_hfp_dtmf_show(false);
             
         }
+
+        
 
         
 

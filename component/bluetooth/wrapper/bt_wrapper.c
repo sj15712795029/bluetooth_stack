@@ -428,18 +428,32 @@ void hfp_hf_call_list(struct bd_addr_t *remote_addr,uint8_t *number,uint8_t numb
 
 void hfp_hf_manufacturer_id(struct bd_addr_t *remote_addr,uint8_t *mid,uint8_t mid_len)
 {
+	uint8_t mid_buffer[32] = {0};
     printf("WRAPPER << PROFILE:hfp_hf_manufacturer_id, address is :\n");
     bt_hex_dump(remote_addr->addr,6);
     printf("mid len %d,mid is:\n",mid_len);
     bt_hex_dump(mid,mid_len);
+
+	memcpy(mid_buffer,mid,mid_len);
+	if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_manu_id)
+    {
+        bt_wrapper_cb->app_hfp_cb->bt_hfp_manu_id(remote_addr,mid_buffer);
+    }
 }
 
 void hfp_hf_model_id(struct bd_addr_t *remote_addr,uint8_t *mid,uint8_t mid_len)
 {
+	uint8_t mid_buffer[32] = {0};
     printf("WRAPPER << PROFILE:hfp_hf_model_id, address is :\n");
     bt_hex_dump(remote_addr->addr,6);
     printf("mid len %d,mid is:\n",mid_len);
     bt_hex_dump(mid,mid_len);
+
+	memcpy(mid_buffer,mid,mid_len);
+	if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_module_id)
+    {
+        bt_wrapper_cb->app_hfp_cb->bt_hfp_module_id(remote_addr,mid_buffer);
+    }
 }
 
 void hfp_hf_revision_id(struct bd_addr_t *remote_addr,uint8_t *rid,uint8_t rid_len)
@@ -805,6 +819,30 @@ uint8_t bt_hfp_hf_set_voice_recognition(struct bd_addr_t *addr,uint8_t enable)
 	return 0;
 }
 
+uint8_t bt_hfp_hf_get_manufacturer_id(struct bd_addr_t *addr)
+{
+	hfp_hf_get_manufacturer_id(addr);
+	return 0;
+}
+
+uint8_t bt_hfp_hf_get_model_id(struct bd_addr_t *addr)
+{
+	hfp_hf_get_model_id(addr);
+	
+	return 0;
+}
+
+uint8_t bt_hfp_hf_get_revision_id(struct bd_addr_t *addr)
+{
+	hfp_hf_get_revision_id(addr);
+	return 0;
+}
+
+uint8_t bt_hfp_hf_get_pid(struct bd_addr_t *addr)
+{
+	hfp_hf_get_pid(addr);
+	return 0;
+}
 
 
 static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres)

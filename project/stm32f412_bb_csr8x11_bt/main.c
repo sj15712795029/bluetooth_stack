@@ -308,6 +308,21 @@ void bt_app_hfp_call_pn(struct bd_addr_t *remote_addr,uint8_t *phone_number)
 	uart_send_json("BT","BT_HFP_CALL_PN",(uint8_t*)"SUCCESS",phone_number,0,0,0,0);
 }
 
+void bt_app_hfp_manu_id(struct bd_addr_t *remote_addr,uint8_t *mid)
+{
+    printf("bt_app_hfp_manu_id %s address:\n",mid);
+    bt_hex_dump(remote_addr->addr,6);
+
+    uart_send_json("BT","BT_HFP_MANU_ID",(uint8_t*)"SUCCESS",mid,0,0,0,0);
+}
+
+void bt_app_hfp_module_id(struct bd_addr_t *remote_addr,uint8_t *mid)
+{
+    printf("bt_app_hfp_module_id %s address:\n",mid);
+    bt_hex_dump(remote_addr->addr,6);
+
+    uart_send_json("BT","BT_HFP_MODULE_ID",(uint8_t*)"SUCCESS",mid,0,0,0,0);
+}
 
 static bt_app_hfp_cb_t bt_app_hfp_cb =
 {
@@ -323,6 +338,8 @@ static bt_app_hfp_cb_t bt_app_hfp_cb =
     bt_app_hfp_call_setup,
     bt_app_hfp_local_pn,
     bt_app_hfp_call_pn,
+    bt_app_hfp_manu_id,
+    bt_app_hfp_module_id,
 };
 
 
@@ -440,6 +457,12 @@ static bt_app_cb_t bt_app_cb =
 #define BT_HFP_VOICE_RECOG_ENABLE_DES "HFP voice recogntion enable"
 #define BT_HFP_VOICE_RECOG_DISABLE_CMD "HFP_VGD"
 #define BT_HFP_VOICE_RECOG_DISABLE_DES "HFP voice recogntion disable"
+#define BT_HFP_GET_MANU_ID_CMD "HFP_CGMI"
+#define BT_HFP_GET_MANU_ID_DES "HFP get manu name"
+#define BT_HFP_GET_MODULE_ID_CMD "HFP_CGMM"
+#define BT_HFP_GET_MODULE_ID_DES "HFP get module name"
+
+
 
 
 
@@ -490,6 +513,8 @@ cmd_desctiption_t cmd_usage[] =
     {(uint8_t *)BT_HFP_DTMF_CMD,(uint8_t *)BT_HFP_DTMF_DES},
     {(uint8_t *)BT_HFP_VOICE_RECOG_ENABLE_CMD,(uint8_t *)BT_HFP_VOICE_RECOG_ENABLE_DES},
     {(uint8_t *)BT_HFP_VOICE_RECOG_DISABLE_CMD,(uint8_t *)BT_HFP_VOICE_RECOG_DISABLE_DES},
+    {(uint8_t *)BT_HFP_GET_MANU_ID_CMD,(uint8_t *)BT_HFP_GET_MANU_ID_DES},
+    {(uint8_t *)BT_HFP_GET_MODULE_ID_CMD,(uint8_t *)BT_HFP_GET_MODULE_ID_DES},
 #endif
 };
 
@@ -634,6 +659,19 @@ uint8_t shell_json_parse(uint8_t *operate_value,
         return HW_ERR_OK;
     }
 
+	if(hw_strcmp("HFP_CGMI",(const char*)operate_value) == 0)
+    {
+        HW_DEBUG("SHELL:operate get manufacturer name\n");
+        bt_hfp_hf_get_manufacturer_id(&connect_addr);
+        return HW_ERR_OK;
+    }
+
+	if(hw_strcmp("HFP_CGMM",(const char*)operate_value) == 0)
+    {
+        HW_DEBUG("SHELL:operate get module id\n");
+        bt_hfp_hf_get_model_id(&connect_addr);
+        return HW_ERR_OK;
+    }
 #endif
 
 
@@ -951,12 +989,6 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("HFP_GPN",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate get phone number via voice tag\n");
-        hfp_hf_get_phone_number_via_voice_tag(&connect_addr);
-        return HW_ERR_OK;
-    }
 
     if(hw_strcmp("HFP_DTMF",(const char*)shell_string) == 0)
     {
@@ -979,38 +1011,32 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("HFP_I",(const char*)shell_string) == 0)
-    {
-        HW_DEBUG("SHELL:operate HFP_I\n");
-        hfp_hf_set_indicator_enable_value(&connect_addr,"call",0);
-        return HW_ERR_OK;
-    }
 
     if(hw_strcmp("HFP_CGMI",(const char*)shell_string) == 0)
     {
-        HW_DEBUG("SHELL:operate HFP_I\n");
-        hfp_hf_get_manufacturer_id(&connect_addr);
+        HW_DEBUG("SHELL:operate get manufacturer name\n");
+        bt_hfp_hf_get_manufacturer_id(&connect_addr);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_CGMM",(const char*)shell_string) == 0)
     {
-        HW_DEBUG("SHELL:operate HFP_I\n");
-        hfp_hf_get_model_id(&connect_addr);
+        HW_DEBUG("SHELL:operate get module id\n");
+        bt_hfp_hf_get_model_id(&connect_addr);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_CGMR",(const char*)shell_string) == 0)
     {
-        HW_DEBUG("SHELL:operate HFP_I\n");
-        hfp_hf_get_revision_id(&connect_addr);
+        HW_DEBUG("SHELL:operate HFP get revision id\n");
+        bt_hfp_hf_get_revision_id(&connect_addr);
         return HW_ERR_OK;
     }
 
     if(hw_strcmp("HFP_PID",(const char*)shell_string) == 0)
     {
-        HW_DEBUG("SHELL:operate HFP_I\n");
-        hfp_hf_get_pid(&connect_addr);
+        HW_DEBUG("SHELL:operate hfp get pid\n");
+        bt_hfp_hf_get_pid(&connect_addr);
         return HW_ERR_OK;
     }
 #endif
