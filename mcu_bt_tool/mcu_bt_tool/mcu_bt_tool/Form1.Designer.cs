@@ -1249,8 +1249,9 @@
             this.Controls.Add(this.g_log_func);
             this.Controls.Add(this.tc_bt_function);
             this.Controls.Add(this.groupBox1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "Wireless Link蓝牙协议栈测试上位机 | https://shop220811498.taobao.com/";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.Resize += new System.EventHandler(this.Form1_Resize);
             this.groupBox1.ResumeLayout(false);
