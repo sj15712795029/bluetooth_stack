@@ -466,7 +466,7 @@ static void bluetooth_chip_handle(uint8_t hci_version,uint16_t hci_reversion,uin
 err_t read_bdaddr_complete(void *arg, struct bd_addr_t *bdaddr)
 {
 
-    BT_HCI_TRACE_DEBUG("Read_bdaddr_complete: %02x:%02x:%02x:%02x:%02x:%02x\n",
+    BT_HCI_TRACE_DEBUG("DEBUG:read_bdaddr_complete: %02x:%02x:%02x:%02x:%02x:%02x\n",
                        bdaddr->addr[5], bdaddr->addr[4], bdaddr->addr[3],
                        bdaddr->addr[2], bdaddr->addr[1], bdaddr->addr[0]);
     return BT_ERR_OK;

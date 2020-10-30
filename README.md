@@ -9,23 +9,26 @@
 | STM32F412  | √ | x | [**购买开发板连接（点击我）**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.30.5aeb41f9DVuET8&id=628752502770) |
 |  | [**购买模组连接（点击我）**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.18.5aeb41f9OvIVgA&id=622836061708) |  |  |
 ## 源码目录结构
-| 目录文件夹  | 子目录文件夹            | 说明                                                   |
-| ----------- | ----------------------- | ------------------------------------------------------ |
-| board       | stm32f10x               | STM32F103板载外设驱动                                  |
-|             | stm32f407               | STM32F407板载外设驱动                                  |
-|             | stm32f412               | STM32F412板载外设驱动                                  |
-| bsp         | cortex-m3               | Cortex M3 Driver库（M3默认用标准库）                   |
-|             | cortex-m4               | Cortex M4 Driver库（M3默认用HAL库）                    |
-| component   | bluetooth               | 蓝牙协议栈源码                                         |
-|             | cjson                   | json源码（目前用于跟上位机交互）                       |
-|             | fs                      | file system文件系统，目前用于管理spi flash             |
-|             | memory_manager          | 内存管理，目前用于管理STM32F407的SRAM                  |
-|             | ringbuffer              | 环形数组，用于蓝牙接收串口数据                         |
-| mcu_bt_tool |                         | PC上位机，用于控制STM32开发板，以及接受STM32的状态回传 |
-| project     | stm32f10x_bb_csr8x11_bt | STM32F103裸机蓝牙工程                                  |
-|             | stm32f407_bb_csr8x11_bt | STM32F407裸机蓝牙工程                                  |
-|             | stm32f412_bb_csr8x11_bt | STM32F412裸机蓝牙工程                                  |
-|             | ubuntu_csr8x11_bt       | Linux ubuntu蓝牙工程                                   |
+| 目录文件夹  | 子目录文件夹                    | 说明                                                   |
+| ----------- | ------------------------------- | ------------------------------------------------------ |
+| board       | stm32f10x                       | STM32F103板载外设驱动                                  |
+|             | stm32f407                       | STM32F407板载外设驱动                                  |
+|             | stm32f412                       | STM32F412板载外设驱动                                  |
+| bsp         | cortex-m3                       | Cortex M3 Driver库（M3默认用标准库）                   |
+|             | cortex-m4                       | Cortex M4 Driver库（M3默认用HAL库）                    |
+| component   | bluetooth                       | 蓝牙协议栈源码                                         |
+|             | cjson                           | json源码（目前用于跟上位机交互）                       |
+|             | fs                              | file system文件系统，目前用于管理spi flash             |
+|             | memory_manager                  | 内存管理，目前用于管理STM32F407的SRAM                  |
+|             | ringbuffer                      | 环形数组，用于蓝牙接收串口数据                         |
+| mcu_bt_tool |                                 | PC上位机，用于控制STM32开发板，以及接受STM32的状态回传 |
+| project     | stm32f10x_bb_csr8x11_bt         | STM32F103裸机蓝牙工程                                  |
+|             | stm32f407_bb_csr8x11_bt         | STM32F407裸机蓝牙工程                                  |
+|             | stm32f412_bb_csr8x11_bt         | STM32F412裸机蓝牙工程                                  |
+|             | ubuntu_csr8x11_bt               | Linux ubuntu蓝牙工程                                   |
+| python_tool | convert_binayr_file_to_array.py | 把二进制文档转换为数据的python工具                     |
+
+
 
 ## 技术文章专栏：
 [**CSDN技术文章专栏（点击我）**](https://blog.csdn.net/xiaoxiaopengbo/category_10215137.html)

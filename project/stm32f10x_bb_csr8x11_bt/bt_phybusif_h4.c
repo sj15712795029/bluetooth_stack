@@ -127,7 +127,7 @@ void uart2_dma_enable(DMA_Channel_TypeDef*DMA_CHx)
  * return      : NULL
  * description : The send function of USART2
 ******************************************************************************/
-void uart_bt_send(uint8_t *buf,uint8_t len)
+void uart_bt_send(uint8_t *buf,uint16_t len)
 {
     uint8_t index;
     for(index = 0; index < len ; index++)
