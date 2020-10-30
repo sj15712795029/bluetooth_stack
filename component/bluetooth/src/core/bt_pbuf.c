@@ -303,7 +303,7 @@ static uint8_t pbuf_header_impl(struct bt_pbuf_t *p, int16_t header_size_increme
  * para        : p(IN)	--> 传入的pbuf
                  header_size_increment(IN)	--> payload偏移大小
                  buffer[4]={1,2,3,4}，架设payload位置在2,那么便宜-1，那么偏移
-                 位置的数据变为3，如果在此基础便宜2,那么payload变为1
+                 位置的数据变为3，如果在此基础偏移2,那么payload变为1
  * return      : 0成功，非0失败
  * description : 调整payload指针以隐藏或显示有效负载中的标头。
 ******************************************************************************/

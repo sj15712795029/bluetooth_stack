@@ -216,6 +216,9 @@ struct bt_pbuf_t *sdp_attribute_search(uint16_t max_attribl_bc, struct bt_pbuf_t
     uint16_t attribl_bc = 0; /* Byte count of the sevice attributes */
     uint32_t hdl = bt_htonl(record->hdl);
 
+    uint8_t attr_len = 0;
+    uint16_t attr = 0;
+
     if(SDP_DE_TYPE(payload[0]) == SDP_DE_TYPE_DES  &&
             SDP_DE_SIZE(payload[0]) == SDP_DE_SIZE_N1)
     {
@@ -227,14 +230,15 @@ struct bt_pbuf_t *sdp_attribute_search(uint16_t max_attribl_bc, struct bt_pbuf_t
             /* Check if this is an attribute ID or a range of attribute IDs */
             if(payload[2+i] == (SDP_DE_TYPE_UINT  | SDP_DE_SIZE_16))
             {
-                attr_id = *((uint16_t *)(payload+3+i));
+            	attr_id = *(payload + 3 + i) << 8 | *(payload + 4 + i);
                 attr_id2 = attr_id; /* For the range to cover this attribute ID only */
                 i += 3;
             }
             else if(payload[2+i] == (SDP_DE_TYPE_UINT | SDP_DE_SIZE_32))
             {
-                attr_id = *((uint16_t *)(payload+3+i));
-                attr_id2 = *((uint16_t *)(payload+5+i));
+            	/* attr range is big-endian */
+				attr_id = *(payload + 3 + i) << 8 | *(payload + 4 + i);
+                attr_id2 = *(payload + 5 + i) << 8 | *(payload + 6 + i);
                 i += 5;
             }
             else
@@ -245,27 +249,30 @@ struct bt_pbuf_t *sdp_attribute_search(uint16_t max_attribl_bc, struct bt_pbuf_t
 
             for(j = 0; j < record->len; ++j)
             {
-                if(SDP_DE_TYPE(record->record_de_list[j]) == SDP_DE_TYPE_DES && SDP_DE_SIZE(record->record_de_list[j]) == SDP_DE_SIZE_N1)
+                if(record->record_de_list[j] == SDP_DES_SIZE8)
                 {
-                    if(record->record_de_list[j + 2] == (SDP_DE_TYPE_UINT | SDP_DE_SIZE_16))
+                    if(record->record_de_list[j + 2] == SDP_UINT16)
                     {
-                        if(*((uint16_t *)(record->record_de_list + j + 3)) >= attr_id &&
-                                *((uint16_t *)(record->record_de_list + j + 3)) <= attr_id2)
+                    	attr_len = record->record_de_list[j + 1]; /* attr len  */
+                    	/* attr is big-endian */
+                    	attr = *(record->record_de_list + j + 3) << 8 | *(record->record_de_list + j + 4);
+
+                        if(attr >= attr_id && attr <= attr_id2)
                         {
-                            if(attribl_bc +  record->record_de_list[j + 1] + 2 > max_attribl_bc)
+                            if(attribl_bc +  attr_len + 2 > max_attribl_bc)
                             {
                                 /* Abort attribute search since attribute list byte count must not
                                    exceed max attribute byte count in req */
                                 break;
                             }
                             /* Allocate a bt_pbuf_t for the service attribute */
-                            r = bt_pbuf_alloc(BT_PBUF_RAW, record->record_de_list[j + 1], BT_PBUF_RAM);
+                            r = bt_pbuf_alloc(BT_PBUF_RAW, attr_len, BT_PBUF_RAM);
                             memcpy((uint8_t *)r->payload, record->record_de_list + j + 2, r->len);
                             attribl_bc += r->len;
 
                             /* If request included a service record handle attribute id, add the correct id to the
                             response */
-                            if(*((uint16_t *)(record->record_de_list + j + 3)) == 0)
+                            if(attr == 0)
                             {
                                 memcpy(((uint8_t *)r->payload) + 4, &hdl, 4);
                             }
@@ -281,6 +288,8 @@ struct bt_pbuf_t *sdp_attribute_search(uint16_t max_attribl_bc, struct bt_pbuf_t
                                 bt_pbuf_free(r);
                             }
                         }
+
+                        j += attr_len + 1; /*  offset to next attribute block */
                     }
                 }
             } /* for */

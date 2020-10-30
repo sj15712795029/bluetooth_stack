@@ -854,6 +854,12 @@ void l2cap_process_sig(struct bt_pbuf_t *q, struct l2cap_hdr_t *l2caphdr, struct
 					   now close the connection */
             break;
         case L2CAP_ECHO_REQ:
+
+        	 if(pcb == NULL)
+			{
+				/* A response without a matching request is silently discarded */
+				break;
+			}
             pcb->ursp_id = sighdr->id;
             ret = l2cap_signal(pcb, L2CAP_ECHO_RSP, sighdr->id, &(pcb->remote_bdaddr), NULL);
             break;

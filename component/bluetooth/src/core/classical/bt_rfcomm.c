@@ -1071,7 +1071,7 @@ void rfcomm_process_msg(struct rfcomm_pcb_t *pcb, struct rfcomm_hdr_t *rfcommhdr
 
             tpcb->rfcommcfg |= RFCOMM_CFG_MSC_OUT;
 
-            if(tpcb->rfcommcfg & RFCOMM_CFG_MSC_IN && tpcb->state != RFCOMM_OPEN)
+            if((tpcb->rfcommcfg & RFCOMM_CFG_MSC_IN) && tpcb->state != RFCOMM_OPEN)
             {
                 tpcb->state = RFCOMM_OPEN;
                 if(tpcb->rfcommcfg & RFCOMM_CFG_IR)

@@ -89,7 +89,7 @@ err_t spp_init(spp_cbs_t *cb)
     uint16_t spp_de_size = 0;
     uint32_t spp_record_hdl = sdp_next_rhdl();
 
-    BT_SPP_TRACE_DEBUG("spp_init: Allocate RFCOMM PCB for CN RFCOMM_SPP_SERVER_CHNL\n");
+    BT_SPP_TRACE_DEBUG("spp_init: Allocate RFCOMM PCB for CN %d\n", RFCOMM_SPP_SERVER_CHNL);
     if((rfcommpcb = rfcomm_new(NULL)) == NULL)
     {
         BT_SPP_TRACE_DEBUG("spp_init: Could not alloc RFCOMM PCB for channel RFCOMM_SPP_SERVER_CHNL\n");
