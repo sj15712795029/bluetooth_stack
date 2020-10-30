@@ -128,7 +128,7 @@ uint8_t hw_uart_bt_init(uint32_t baud_rate,uint8_t reconfig)
 }
 
 
-void uart_bt_send(uint8_t *buf,uint8_t len)
+void uart_bt_send(uint8_t *buf,uint16_t len)
 {
     write(uart_if.phyuart_fd,buf,len);
 }

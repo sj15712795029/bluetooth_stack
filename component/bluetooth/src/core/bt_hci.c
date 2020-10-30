@@ -466,7 +466,7 @@ static void bluetooth_chip_handle(uint8_t hci_version,uint16_t hci_reversion,uin
 err_t read_bdaddr_complete(void *arg, struct bd_addr_t *bdaddr)
 {
 
-    BT_HCI_TRACE_DEBUG("DEBUG:ead_bdaddr_complete: %02x:%02x:%02x:%02x:%02x:%02x\n",
+    BT_HCI_TRACE_DEBUG("Read_bdaddr_complete: %02x:%02x:%02x:%02x:%02x:%02x\n",
                        bdaddr->addr[5], bdaddr->addr[4], bdaddr->addr[3],
                        bdaddr->addr[2], bdaddr->addr[1], bdaddr->addr[0]);
     return BT_ERR_OK;
@@ -474,112 +474,118 @@ err_t read_bdaddr_complete(void *arg, struct bd_addr_t *bdaddr)
 
 static void hci_init_cmd_complete_handle(uint8_t ocf, uint8_t ogf,uint8_t * payload)
 {
-    if(ogf == HCI_VENDOR_OGF && ocf == 0)
-    {
-        vendor_init();
-    }
+    	switch(ogf) {
+		case HCI_VENDOR_OGF: {
+			if (ocf == 0) {
+				vendor_init();
+			}
+		} break;
+		case HCI_HOST_C_N_BB: {
 
-    if(ogf == HCI_HOST_C_N_BB && ocf == HCI_RESET)
-    {
-        utimer_cancel(pcb->timer);
-        if(payload[0] == HCI_SUCCESS)
-        {
-            if(pcb->vendor_init_status == VENDOR_NOT_INIT)
-            {
-                hci_read_local_version_info();
-            }
-            else
-            {
-                hci_read_buffer_size();
-            }
-        }
-    }
-    if(ogf == HCI_INFO_PARAM && ocf == HCI_READ_LOCAL_VER_INFO)
-    {
-        if(((uint8_t *)payload)[0]  == HCI_SUCCESS)
-        {
-            uint8_t hci_version = payload[1];
-            uint16_t hci_reversion = bt_le_read_16(payload,2);
-            uint8_t lmp_version = payload[4];
-            uint16_t manufacturer_name = bt_le_read_16(payload,5);
-            uint16_t lmp_subversion = bt_le_read_16(payload,7);
+			switch (ocf) {
+				case HCI_RESET: {
+			        utimer_cancel(pcb->timer);
+					if (payload[0] == HCI_SUCCESS) {
+						if (pcb->vendor_init_status == VENDOR_NOT_INIT) {
+							hci_read_local_version_info();
+						}
+						else {
+							hci_read_buffer_size();
+						}
+					}
+				} break;
+				case HCI_WRITE_COD: {
+					hci_write_local_name((uint8_t *)pcb->local_name, strlen((const char*)pcb->local_name));
 
-            BT_HCI_TRACE_DEBUG("DEBUG:HCI version:0x%x\n",hci_version);
-            BT_HCI_TRACE_DEBUG("DEBUG:HCI reversion:0x%x\n",hci_reversion);
-            BT_HCI_TRACE_DEBUG("DEBUG:LMP version:0x%x\n",lmp_version);
-            BT_HCI_TRACE_DEBUG("DEBUG:LMP reversion:0x%x\n",lmp_subversion);
-            BT_HCI_TRACE_DEBUG("DEBUG:manufacturer_name:0x%x\n",manufacturer_name);
-            bluetooth_chip_handle(hci_version,hci_reversion,lmp_version,lmp_subversion,manufacturer_name);
-            vendor_init();
-        }
-    }
-    if(ogf == HCI_INFO_PARAM && ocf == HCI_READ_BUFFER_SIZE)
-    {
-        hci_read_bd_addr(read_bdaddr_complete);
-    }
+				} break;
+				case  HCI_WRITE_LOCAL_NAME: {
+        	        hci_write_page_timeout(0x4000); /* 10.24s */
+        	    } break;
 
-    if(ogf == HCI_INFO_PARAM && ocf == HCI_READ_BD_ADDR)
-    {
-        /*TODO 2:此部分要注意是否需要反转 */
-        memcpy(pcb->local_bd_addr.addr,&payload[1],6);
-        hci_write_cod((uint8_t *)&pcb->class_of_device);
-    }
-    if(ogf == HCI_HOST_C_N_BB && ocf == HCI_WRITE_COD)
-    {
-        hci_write_local_name((uint8_t *)pcb->local_name, strlen((const char*)pcb->local_name));
-    }
-
-    if(ogf == HCI_HOST_C_N_BB && ocf == HCI_WRITE_LOCAL_NAME)
-    {
-        hci_write_page_timeout(0x4000); /* 10.24s */
-    }
-
-    if(ogf == HCI_HOST_C_N_BB && ocf == HCI_WRITE_PAGE_TIMEOUT)
-    {
+				case HCI_WRITE_PAGE_TIMEOUT: {
 #if BT_BLE_ENABLE > 0
-        hci_set_event_mask(0xffffffff,0x3FFFFFFF);
+    	        hci_set_event_mask(0xffffffff,0x3FFFFFFF);
 #else
-        hci_set_event_mask(0xffffffff,0x1FFFFFFF); /* base 0x1FFFFFFF:Add LE Meta event(bit 61) */
+					hci_set_event_mask(0xffffffff, 0x1FFFFFFF); /* base 0x1FFFFFFF:Add LE Meta event(bit 61) */
 #endif
-    }
+				} break;
 
-    if(ogf == HCI_HOST_C_N_BB && ocf == HCI_SET_EVENT_MASK)
-    {
-        hci_write_ssp_mode(pcb->ssp_enable);
-    }
+				case HCI_SET_EVENT_MASK: {
+			        hci_write_ssp_mode(pcb->ssp_enable);
+			    } break;
 
-    if(ogf == HCI_HOST_C_N_BB && ocf == HCI_WRITE_SSP_MODE)
-    {
-        hci_write_inquiry_mode(INQUIRY_MODE_EIR);
-    }
+				case HCI_WRITE_SSP_MODE: {
+			        hci_write_inquiry_mode(INQUIRY_MODE_EIR);
+			    } break;
 
-    if(ogf == HCI_HOST_C_N_BB && ocf == HCI_WRITE_INQUIRY_MODE)
-    {
-        hci_write_scan_enable(HCI_SCAN_EN_INQUIRY | HCI_SCAN_EN_PAGE);
-    }
+				case HCI_WRITE_INQUIRY_MODE: {
+			        hci_write_scan_enable(HCI_SCAN_EN_INQUIRY | HCI_SCAN_EN_PAGE);
+			    } break;
 
 #if BT_BLE_ENABLE > 0
-    if(ogf == HCI_HOST_C_N_BB && ocf == HCI_WRITE_SCAN_ENABLE)
-    {
-        hci_write_le_enable(1,0);
-    }
+				case HCI_WRITE_SCAN_ENABLE:  {
+					hci_write_le_enable(1,0);
+				} break;
 
-    if(ogf == HCI_HOST_C_N_BB && ocf == HCI_WRITE_LE_SUPPORT)
-    {
-        if(pcb->init_status == BLUETOOTH_INITING)
-            HCI_BT_WORKING(pcb);
-        pcb->init_status = BLUETOOTH_WORKING;
+				case HCI_WRITE_LE_SUPPORT: {
+					if(pcb->init_status == BLUETOOTH_INITING)
+						HCI_BT_WORKING(pcb);
+					pcb->init_status = BLUETOOTH_WORKING;
 
-    }
+				} break;
 #else
-    if(ogf == HCI_HOST_C_N_BB && ocf == HCI_WRITE_SCAN_ENABLE)
-    {
-        if(pcb->init_status == BLUETOOTH_INITING)
-            HCI_BT_WORKING(pcb);
-        pcb->init_status = BLUETOOTH_WORKING;
+				case  HCI_WRITE_SCAN_ENABLE: {
+					if(pcb->init_status == BLUETOOTH_INITING)
+						HCI_BT_WORKING(pcb);
+					pcb->init_status = BLUETOOTH_WORKING;
 
-    }
+				} break;
 #endif
+
+				default: {
+
+				} break;
+			}
+		} break;
+		case HCI_INFO_PARAM: {
+			switch (ocf) {
+				case HCI_READ_LOCAL_VER_INFO: {
+			        if(((uint8_t *)payload)[0]  == HCI_SUCCESS) {
+			            uint8_t hci_version = payload[1];
+			            uint16_t hci_reversion = bt_le_read_16(payload,2);
+			            uint8_t lmp_version = payload[4];
+			            uint16_t manufacturer_name = bt_le_read_16(payload,5);
+			            uint16_t lmp_subversion = bt_le_read_16(payload,7);
+
+			            BT_HCI_TRACE_DEBUG("DEBUG:HCI version:0x%x\n",hci_version);
+			            BT_HCI_TRACE_DEBUG("DEBUG:HCI reversion:0x%x\n",hci_reversion);
+			            BT_HCI_TRACE_DEBUG("DEBUG:LMP version:0x%x\n",lmp_version);
+			            BT_HCI_TRACE_DEBUG("DEBUG:LMP reversion:0x%x\n",lmp_subversion);
+			            BT_HCI_TRACE_DEBUG("DEBUG:manufacturer_name:0x%x\n",manufacturer_name);
+			            bluetooth_chip_handle(hci_version,hci_reversion,lmp_version,lmp_subversion,manufacturer_name);
+			            vendor_init();
+			        }
+				} break;
+
+				case HCI_READ_BUFFER_SIZE: {
+			        hci_read_bd_addr(read_bdaddr_complete);
+				} break;
+				case HCI_READ_BD_ADDR: {
+			        /*TODO 2:此部分要注意是否需要反转 */
+			        memcpy(pcb->local_bd_addr.addr,&payload[1],6);
+			        hci_write_cod((uint8_t *)&pcb->class_of_device);
+				} break;
+				default: {
+
+				} break;
+			}
+
+		} break;
+
+		default: {
+
+		} break;
+	}
 
 
 }
