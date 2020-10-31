@@ -27,6 +27,7 @@
 |             | stm32f412_bb_csr8x11_bt         | STM32F412裸机蓝牙工程                                  |
 |             | ubuntu_csr8x11_bt               | Linux ubuntu蓝牙工程                                   |
 | python_tool | convert_binayr_file_to_array.py | 把二进制文档转换为数据的python工具                     |
+|             | corvert_opcode_to_ogf_ocf.py    | 把HCI opcode转换为OGF,OCF                              |
 
 
 

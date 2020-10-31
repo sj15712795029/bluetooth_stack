@@ -1,8 +1,6 @@
 #!/bin/python
-
-# author:zhongjun_yu
-# 作用：把各个厂家的二进制fw文档转换为数组
-# 日期：2020/10/30
+# Author:Zhongjun_Yu
+# Copyright: Wireless Link(https://shop220811498.taobao.com)
 
 import os
 import sys
