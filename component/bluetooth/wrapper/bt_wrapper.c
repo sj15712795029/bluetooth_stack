@@ -538,7 +538,7 @@ uint8_t bt_start(bt_app_cb_t *app_cb)
     bt_wrapper_cb = app_cb;
     bt_mem_init();
     bt_memp_init();
-    phybusif_open(BT_BAUDRATE_1,0);
+    phybusif_open(BT_BAUDRATE_1);
 #if BT_ENABLE_SNOOP > 0
     bt_snoop_init();
 #endif

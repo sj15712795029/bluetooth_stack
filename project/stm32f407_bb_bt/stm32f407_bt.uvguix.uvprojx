@@ -7,23 +7,23 @@
 
   <Targets>
     <Target>
-      <TargetName>stm32f412_csr8311</TargetName>
+      <TargetName>stm32f407_csr8311</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060750::V5.06 update 6 (build 750)::ARMCC</pCCUsed>
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
-          <Device>STM32F412RETx</Device>
+          <Device>STM32F407ZGTx</Device>
           <Vendor>STMicroelectronics</Vendor>
           <PackID>Keil.STM32F4xx_DFP.2.15.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
-          <Cpu>IRAM(0x20000000,0x00040000) IROM(0x08000000,0x00080000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
+          <Cpu>IRAM(0x20000000,0x00020000) IRAM2(0x10000000,0x00010000) IROM(0x08000000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
-          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0STM32F4xx_512 -FS08000000 -FL080000 -FP0($$Device:STM32F412RETx$CMSIS\Flash\STM32F4xx_512.FLM))</FlashDriverDll>
+          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0STM32F4xx_1024 -FS08000000 -FL0100000 -FP0($$Device:STM32F407ZGTx$CMSIS\Flash\STM32F4xx_1024.FLM))</FlashDriverDll>
           <DeviceId>0</DeviceId>
-          <RegisterFile>$$Device:STM32F412RETx$Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h</RegisterFile>
+          <RegisterFile>$$Device:STM32F407ZGTx$Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h</RegisterFile>
           <MemoryEnv></MemoryEnv>
           <Cmp></Cmp>
           <Asm></Asm>
@@ -33,7 +33,7 @@
           <SLE66CMisc></SLE66CMisc>
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
-          <SFDFile>$$Device:STM32F412RETx$CMSIS\SVD\STM32F412xG.svd</SFDFile>
+          <SFDFile>$$Device:STM32F407ZGTx$CMSIS\SVD\STM32F40x.svd</SFDFile>
           <bCustSvd>0</bCustSvd>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
@@ -49,10 +49,10 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Objects\</OutputDirectory>
-          <OutputName>stm32f412_csr8311</OutputName>
+          <OutputName>stm32f407_bt</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
-          <CreateHexFile>0</CreateHexFile>
+          <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>0</BrowseInformation>
           <ListingPath>.\Listings\</ListingPath>
@@ -185,7 +185,7 @@
             <uocXRam>0</uocXRam>
             <RvdsVP>2</RvdsVP>
             <RvdsMve>0</RvdsMve>
-            <hadIRAM2>0</hadIRAM2>
+            <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
             <useUlib>1</useUlib>
@@ -193,7 +193,7 @@
             <uLtcg>0</uLtcg>
             <nSecure>0</nSecure>
             <RoSelD>3</RoSelD>
-            <RwSelD>3</RwSelD>
+            <RwSelD>4</RwSelD>
             <CodeSel>0</CodeSel>
             <OptFeed>0</OptFeed>
             <NoZi1>0</NoZi1>
@@ -245,12 +245,12 @@
               <IRAM>
                 <Type>0</Type>
                 <StartAddress>0x20000000</StartAddress>
-                <Size>0x40000</Size>
+                <Size>0x20000</Size>
               </IRAM>
               <IROM>
                 <Type>1</Type>
                 <StartAddress>0x8000000</StartAddress>
-                <Size>0x80000</Size>
+                <Size>0x100000</Size>
               </IROM>
               <XRAM>
                 <Type>0</Type>
@@ -275,7 +275,7 @@
               <OCR_RVCT4>
                 <Type>1</Type>
                 <StartAddress>0x8000000</StartAddress>
-                <Size>0x80000</Size>
+                <Size>0x100000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
@@ -300,12 +300,12 @@
               <OCR_RVCT9>
                 <Type>0</Type>
                 <StartAddress>0x20000000</StartAddress>
-                <Size>0x40000</Size>
+                <Size>0x20000</Size>
               </OCR_RVCT9>
               <OCR_RVCT10>
                 <Type>0</Type>
-                <StartAddress>0x0</StartAddress>
-                <Size>0x0</Size>
+                <StartAddress>0x10000000</StartAddress>
+                <Size>0x10000</Size>
               </OCR_RVCT10>
             </OnChipMemories>
             <RvctStartVector></RvctStartVector>
@@ -336,9 +336,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>USE_HAL_DRIVER,STM32F412Rx</Define>
+              <Define>USE_HAL_DRIVER,STM32F407xx</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\bsp\cortex-m4\core;..\..\bsp\cortex-m4\inc;..\..\board\stm32f412;..\..\board;..\..\component\fs;..\..\component\bluetooth\src\include;..\..\component\bluetooth\src\include\classical;..\..\component\bluetooth\vendor;..\..\component\bluetooth\wrapper;..\..\component\bluetooth\third_party_lib\sbc;..\..\component\ringbuffer;..\..\component\fs;..\..\component\fs\fatfs13\source;..\..\component\cjson;..\stm32f412_bb_csr8x11_bt;..\..\bsp\cortex-m4\STM32_USB_Device_Library\Core\Inc;..\..\bsp\cortex-m4\STM32_USB_Device_Library\Class\MSC\Inc;..\..\board\stm32f412\usb_mass_storage</IncludePath>
+              <IncludePath>..\..\bsp\cortex-m4\core;..\..\bsp\cortex-m4\inc;..\..\bsp\cortex-m4\inc\Legacy;..\..\board;..\..\board\stm32f407;..\..\component\fs;..\..\component\fs\fatfs13\source;..\..\component\bluetooth\src\include;..\..\component\bluetooth\src\include\classical;..\..\component\bluetooth\third_party_lib\sbc;..\..\component\bluetooth\vendor;..\..\component\bluetooth\wrapper;..\..\component\ringbuffer;..\..\component\cjson;..\stm32f407_bb_bt;..\..\component\memory_manager</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -388,9 +388,9 @@
               <FilePath>..\..\bsp\cortex-m4\core\system_stm32f4xx.c</FilePath>
             </File>
             <File>
-              <FileName>startup_stm32f412rx.s</FileName>
+              <FileName>startup_stm32f407xx.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\bsp\cortex-m4\core\startup_stm32f412rx.s</FilePath>
+              <FilePath>..\..\bsp\cortex-m4\core\startup_stm32f407xx.s</FilePath>
             </File>
             <File>
               <FileName>stm32f4xx_hal.c</FileName>
@@ -483,54 +483,14 @@
               <FilePath>..\..\bsp\cortex-m4\src\stm32f4xx_hal_spi.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_hal_pcd.c</FileName>
+              <FileName>stm32f4xx_ll_fsmc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\bsp\cortex-m4\src\stm32f4xx_hal_pcd.c</FilePath>
+              <FilePath>..\..\bsp\cortex-m4\src\stm32f4xx_ll_fsmc.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_hal_pcd_ex.c</FileName>
+              <FileName>stm32f4xx_hal_sram.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\bsp\cortex-m4\src\stm32f4xx_hal_pcd_ex.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_ll_usb.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\bsp\cortex-m4\src\stm32f4xx_ll_usb.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_core.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\bsp\cortex-m4\STM32_USB_Device_Library\Core\Src\usbd_core.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_ctlreq.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\bsp\cortex-m4\STM32_USB_Device_Library\Core\Src\usbd_ctlreq.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_ioreq.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\bsp\cortex-m4\STM32_USB_Device_Library\Core\Src\usbd_ioreq.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_msc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\bsp\cortex-m4\STM32_USB_Device_Library\Class\MSC\Src\usbd_msc.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_msc_bot.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\bsp\cortex-m4\STM32_USB_Device_Library\Class\MSC\Src\usbd_msc_bot.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_msc_data.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\bsp\cortex-m4\STM32_USB_Device_Library\Class\MSC\Src\usbd_msc_data.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_msc_scsi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\bsp\cortex-m4\STM32_USB_Device_Library\Class\MSC\Src\usbd_msc_scsi.c</FilePath>
+              <FilePath>..\..\bsp\cortex-m4\src\stm32f4xx_hal_sram.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -538,69 +498,39 @@
           <GroupName>board</GroupName>
           <Files>
             <File>
-              <FileName>hw_led.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\board\stm32f412\hw_led.c</FilePath>
-            </File>
-            <File>
               <FileName>hw_misc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\board\stm32f412\hw_misc.c</FilePath>
+              <FilePath>..\..\board\stm32f407\hw_misc.c</FilePath>
+            </File>
+            <File>
+              <FileName>hw_led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\board\stm32f407\hw_led.c</FilePath>
             </File>
             <File>
               <FileName>hw_uart.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\board\stm32f412\hw_uart.c</FilePath>
+              <FilePath>..\..\board\stm32f407\hw_uart.c</FilePath>
             </File>
             <File>
               <FileName>hw_systick.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\board\stm32f412\hw_systick.c</FilePath>
-            </File>
-            <File>
-              <FileName>hw_button.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\board\stm32f412\hw_button.c</FilePath>
-            </File>
-            <File>
-              <FileName>hw_exti.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\board\stm32f412\hw_exti.c</FilePath>
-            </File>
-            <File>
-              <FileName>hw_oled.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\board\stm32f412\hw_oled.c</FilePath>
+              <FilePath>..\..\board\stm32f407\hw_systick.c</FilePath>
             </File>
             <File>
               <FileName>hw_spi_flash.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\board\stm32f412\hw_spi_flash.c</FilePath>
+              <FilePath>..\..\board\stm32f407\hw_spi_flash.c</FilePath>
             </File>
             <File>
               <FileName>hw_sht2x.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\board\stm32f412\hw_sht2x.c</FilePath>
+              <FilePath>..\..\board\stm32f407\hw_sht2x.c</FilePath>
             </File>
             <File>
-              <FileName>usb_device.c</FileName>
+              <FileName>hw_lcd.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\board\stm32f412\usb_mass_storage\usb_device.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_conf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\board\stm32f412\usb_mass_storage\usbd_conf.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_desc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\board\stm32f412\usb_mass_storage\usbd_desc.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_storage_if.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\board\stm32f412\usb_mass_storage\usbd_storage_if.c</FilePath>
+              <FilePath>..\..\board\stm32f407\hw_lcd.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -732,6 +662,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\component\bluetooth\wrapper\bt_wrapper.c</FilePath>
             </File>
+            <File>
+              <FileName>bt_vendor_manager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\vendor\bt_vendor_manager.c</FilePath>
+            </File>
+            <File>
+              <FileName>bt_vendor_bcm43430a1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\vendor\bt_vendor_bcm43430a1.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -741,6 +681,11 @@
               <FileName>ringbuffer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\component\ringbuffer\ringbuffer.c</FilePath>
+            </File>
+            <File>
+              <FileName>memory_manager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\memory_manager\memory_manager.c</FilePath>
             </File>
           </Files>
         </Group>

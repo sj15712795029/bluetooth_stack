@@ -16,7 +16,7 @@
 /* The HCI LINK lists. */
 struct hci_link_t *hci_active_links;  /* List of all active HCI LINKs */
 struct hci_link_t *hci_tmp_link;
-struct hci_pcb_t *pcb;
+struct hci_pcb_t *pcb = NULL;
 
 void hci_reset_timeout(void *para)
 {
@@ -48,8 +48,32 @@ err_t hci_init(void)
     /* Clear globals */
     hci_active_links = NULL;
     hci_tmp_link = NULL;
+
+#if BT_VENDOR_CSR8X11_SUPPORT > 0
+	hci_set_chip_name(VENDOR_CSR8X11_NAME);
+#endif
+
+#if BT_VENDOR_BCM43430A1_SUPPORT > 0
+		hci_set_chip_name(VENDOR_BCM43430A1_NAME);
+#endif
+
+	
     return BT_ERR_OK;
 }
+
+err_t hci_set_chip_name(uint8_t *name)
+{
+	if(pcb != NULL)
+	{
+		pcb->chip_mgr = bt_vendor_get_chip_mrg(name);
+
+		if(pcb->chip_mgr != NULL)
+			return BT_ERR_ARG;
+	}
+
+		return BT_ERR_MEM;
+}
+
 
 struct hci_link_t *hci_new(void)
 {
@@ -425,43 +449,25 @@ uint8_t *hci_get_error_code(uint8_t code)
 }
 
 
-static void vendor_init_done()
+static void vendor_init_done(uint8_t vendor_status)
 {
-    pcb->vendor_init_status = VENDOR_INITED;
-    phybusif_open(921600,1);
-    hci_reset();
+	BT_HCI_TRACE_DEBUG("vendor_init_done %d\n",vendor_status);
+
+	if(vendor_status == VENDOR_STATUS_INITED)
+	{
+    	pcb->vendor_init_status = VENDOR_INITED;
+
+		
+		hci_reset();
+	}
+ 
 }
 
-static void vendor_init()
+static void vendor_init(uint8_t ogf,uint8_t ocf)
 {
-    pcb->chip_mgr->vendor_init(vendor_init_done);
+    pcb->chip_mgr->vendor_init(vendor_init_done,ogf,ocf);
 }
 
-static void bluetooth_chip_handle(uint8_t hci_version,uint16_t hci_reversion,uint8_t lmp_version,uint16_t lmp_subversion,uint16_t manufacturer_name)
-{
-    BT_HCI_TRACE_DEBUG("manufacturer_name 0x%x\n",manufacturer_name);
-
-    switch(manufacturer_name)
-    {
-    /* CSRоƬ */
-    case CSR_MANUFACTURER_NAME:
-    {
-        if(hci_version == CSR8x11_HCI_VERSION || \
-                hci_reversion == CSR8x11_HCI_REVERSION || \
-                lmp_version == CSR8x11_LMP_VERSION || \
-                lmp_subversion == CSR8x11_LMP_SUBVERSION)
-        {
-            BT_HCI_TRACE_DEBUG("CHIP:CSR8X11\n");
-
-            pcb->chip_mgr = csr8x11_instance();
-        }
-
-        break;
-    }
-    default:
-        break;
-    }
-}
 
 err_t read_bdaddr_complete(void *arg, struct bd_addr_t *bdaddr)
 {
@@ -475,22 +481,29 @@ err_t read_bdaddr_complete(void *arg, struct bd_addr_t *bdaddr)
 static void hci_init_cmd_complete_handle(uint8_t ocf, uint8_t ogf,uint8_t * payload)
 {
     	switch(ogf) {
-		case HCI_VENDOR_OGF: {
-			if (ocf == 0) {
-				vendor_init();
-			}
-		} break;
+		case HCI_VENDOR_OGF:
+		{
+			if(pcb->vendor_init_status == VENDOR_NOT_INIT)
+				vendor_init(ogf,ocf);
+			break;
+		} 
+		
 		case HCI_HOST_C_N_BB: {
 
 			switch (ocf) {
 				case HCI_RESET: {
 			        utimer_cancel(pcb->timer);
 					if (payload[0] == HCI_SUCCESS) {
-						if (pcb->vendor_init_status == VENDOR_NOT_INIT) {
-							hci_read_local_version_info();
+						if (pcb->vendor_init_status == VENDOR_NOT_INIT) 
+						{
+							if(pcb->chip_mgr != NULL)
+							{
+								vendor_init(ogf,ocf);								
+							}
 						}
-						else {
-							hci_read_buffer_size();
+						else 
+						{
+							hci_read_local_version_info();
 						}
 					}
 				} break;
@@ -562,8 +575,8 @@ static void hci_init_cmd_complete_handle(uint8_t ocf, uint8_t ogf,uint8_t * payl
 			            BT_HCI_TRACE_DEBUG("DEBUG:LMP version:0x%x\n",lmp_version);
 			            BT_HCI_TRACE_DEBUG("DEBUG:LMP reversion:0x%x\n",lmp_subversion);
 			            BT_HCI_TRACE_DEBUG("DEBUG:manufacturer_name:0x%x\n",manufacturer_name);
-			            bluetooth_chip_handle(hci_version,hci_reversion,lmp_version,lmp_subversion,manufacturer_name);
-			            vendor_init();
+
+						hci_read_buffer_size();
 			        }
 				} break;
 
@@ -1177,7 +1190,7 @@ void hci_event_input(struct bt_pbuf_t *p)
     }
 #endif
     case HCI_VENDOR_SPEC:
-        vendor_init();
+        vendor_init(ogf,ocf);
         break;
     default:
         BT_HCI_TRACE_DEBUG("hci_event_input: Undefined event code 0x%x\n", evhdr->code);

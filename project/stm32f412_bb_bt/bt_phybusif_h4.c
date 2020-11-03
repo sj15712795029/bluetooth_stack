@@ -14,10 +14,12 @@
 #include "board_wrapper.h"
 #include "ringbuffer.h"
 struct phybusif_cb uart_if;
+UART_HandleTypeDef huart2;
 
 
-#define BT_DMA_BUF_SIZE	(4*1024)
-#define BT_RX_BUF_SIZE (8*1024)
+
+#define BT_DMA_BUF_SIZE	(2*1024)
+#define BT_RX_BUF_SIZE (4*1024)
 struct ringbuffer bt_ring_buf;
 uint8_t bt_rx_buf[BT_RX_BUF_SIZE];
 uint8_t bt_dma_rx_buf[BT_DMA_BUF_SIZE];
@@ -37,88 +39,30 @@ DMA_InitTypeDef DMA_UART2;
  * return      : hw_uart_bt_init result
  * description : Initialization of USART2.PA0->CTS PA1->RTS PA2->TX PA3->RX
 ******************************************************************************/
-uint8_t hw_uart_bt_init(uint32_t baud_rate,uint8_t reconfig)
+uint8_t hw_uart_bt_init(uint32_t baud_rate)
 {
-    GPIO_InitTypeDef GPIO_InitStructure;
-    USART_InitTypeDef USART_InitStructure;
-    NVIC_InitTypeDef NVIC_InitStructure;
+	__HAL_RCC_DMA1_CLK_ENABLE();
 
-    if(reconfig == 0)
-        ringbuffer_init(&bt_ring_buf,bt_rx_buf,BT_RX_BUF_SIZE);
-    /* Enable USART2,GPIOA,DMA1 RCC clock */
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
-    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
+	huart2.Instance = USART2;
+  huart2.Init.BaudRate = baud_rate;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_RTS_CTS;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
+  {
+    return HW_HAL_EXCU_ERR;
+  }
 
-    USART_DeInit(USART2);
-    USART_Cmd(USART2, DISABLE);
-    /* Initialize the GPIOA0,GPIOA1,GPIOA2,GPIOA3 */
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1 | GPIO_Pin_2;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-    GPIO_Init(GPIOA, &GPIO_InitStructure);
+	HAL_UART_Receive_DMA(&huart2, bt_dma_rx_buf, BT_DMA_BUF_SIZE);
+    __HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE);
 
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_3;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-    GPIO_Init(GPIOA, &GPIO_InitStructure);
-
-    /* Data format :1:8:1, no parity check, hardware flow control */
-    USART_InitStructure.USART_BaudRate = baud_rate;
-    USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-    USART_InitStructure.USART_StopBits = USART_StopBits_1;
-    USART_InitStructure.USART_Parity = USART_Parity_No;
-    USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_RTS_CTS;
-    USART_InitStructure.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
-
-    /* Enable USART interrupts, mainly for idle interrupts */
-    NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=BT_PREE_PRIO;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = BT_SUB_PRIO;
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStructure);
-
-    /* Initializes USART2 to enable USART,USART idle interrupts, and USART RX DMA */
-    USART_Init(USART2, &USART_InitStructure);
-    USART_ITConfig(USART2, USART_IT_IDLE, ENABLE);
-    USART_DMACmd(USART2,USART_DMAReq_Rx,ENABLE);
-    USART_Cmd(USART2, ENABLE);
-
-    /* Initializes DMA and enables it */
-    hw_memset(&DMA_UART2,0,sizeof(DMA_InitTypeDef));
-    DMA_DeInit(DMA1_Channel6);
-    DMA_UART2.DMA_PeripheralBaseAddr = (uint32_t)&USART2->DR;
-    DMA_UART2.DMA_MemoryBaseAddr = (uint32_t)bt_dma_rx_buf;
-    DMA_UART2.DMA_DIR = DMA_DIR_PeripheralSRC;
-    DMA_UART2.DMA_BufferSize = BT_DMA_BUF_SIZE;
-    DMA_UART2.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-    DMA_UART2.DMA_MemoryInc = DMA_MemoryInc_Enable;
-    DMA_UART2.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
-    DMA_UART2.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
-    DMA_UART2.DMA_Mode = DMA_Mode_Normal;
-    DMA_UART2.DMA_Priority = DMA_Priority_Medium;
-    DMA_UART2.DMA_M2M = DMA_M2M_Disable;
-    DMA_Init(DMA1_Channel6, &DMA_UART2);
-
-    DMA_Cmd(DMA1_Channel6, ENABLE);
-
-    return BT_ERR_OK;
+    return HW_ERR_OK;
 
 }
 
-/******************************************************************************
- * func name   : uart2_dma_enable
- * para        : DMA_CHx(IN)  --> DMA channel
- * return      : NULL
- * description : reset DMA
-******************************************************************************/
-void uart2_dma_enable(DMA_Channel_TypeDef*DMA_CHx)
-{
-    DMA_Cmd(DMA_CHx, DISABLE );
-    DMA_UART2.DMA_MemoryBaseAddr = (uint32_t)bt_dma_rx_buf;
-    DMA_UART2.DMA_BufferSize = BT_DMA_BUF_SIZE;
-    DMA_Init(DMA1_Channel6, &DMA_UART2);
-    DMA_Cmd(DMA_CHx, ENABLE);
-}
 
 /******************************************************************************
  * func name   : uart_bt_send
@@ -133,10 +77,9 @@ void uart_bt_send(uint8_t *buf,uint16_t len)
     for(index = 0; index < len ; index++)
     {
         /* Wait until the last send is complete, then send the data */
-        while(USART_GetFlagStatus(USART2, USART_FLAG_TC) == RESET);
-        USART_SendData(USART2,buf[index]);
+		while ((USART2->SR & USART_SR_TXE) == 0);
+        USART2->DR = buf[index];
     }
-    while(USART_GetFlagStatus(USART2, USART_FLAG_TC) == RESET);
 }
 
 /******************************************************************************
@@ -147,15 +90,16 @@ void uart_bt_send(uint8_t *buf,uint16_t len)
 ******************************************************************************/
 void USART2_IRQHandler(void)
 {
+
     uint32_t recv_len;
-    if(USART_GetITStatus(USART2, USART_IT_IDLE) != RESET)
+    if((__HAL_UART_GET_FLAG(&huart2,UART_FLAG_IDLE) != RESET))
     {
-        /* Without this, the interrupt cannot be cleared and continues into the interrupt */
-        USART_ReceiveData(USART2);
 
         /* Clear the interrupt and reset DMA */
-        USART_ClearITPendingBit(USART2,USART_IT_IDLE);
-        recv_len = BT_DMA_BUF_SIZE - DMA_GetCurrDataCounter(DMA1_Channel6);
+        __HAL_UART_CLEAR_IDLEFLAG(&huart2);
+        HAL_UART_DMAStop(&huart2);
+		
+        recv_len = BT_DMA_BUF_SIZE - huart2.hdmarx->Instance->NDTR;
 
         if(recv_len > 500)
         {
@@ -172,9 +116,11 @@ void USART2_IRQHandler(void)
             {
                 ringbuffer_put(&bt_ring_buf,bt_dma_rx_buf,recv_len);
             }
-            uart2_dma_enable(DMA1_Channel6);
+            HAL_UART_Receive_DMA(&huart2,bt_dma_rx_buf,BT_DMA_BUF_SIZE);
         }
     }
+
+	HAL_UART_IRQHandler(&huart2);
 }
 
 /******************************************************************************
@@ -206,10 +152,26 @@ err_t phybusif_reset(struct phybusif_cb *cb)
     return BT_ERR_OK;
 }
 
-void phybusif_open(uint32_t baud_rate,uint8_t reconfig)
+void phybusif_open(uint32_t baud_rate)
 {
-    hw_uart_bt_init(baud_rate,reconfig);
+    ringbuffer_init(&bt_ring_buf,bt_rx_buf,BT_RX_BUF_SIZE);
+    hw_uart_bt_init(baud_rate);
 }
+
+void phybusif_reopen(uint32_t baud_rate)
+{
+
+	ringbuffer_reset(&bt_ring_buf);
+
+	phybusif_open(baud_rate);
+	
+}
+
+void phybusif_close()
+{
+	ringbuffer_reset(&bt_ring_buf);
+}
+
 
 void phybusif_output(struct bt_pbuf_t *p, uint16_t len,uint8_t packet_type)
 {

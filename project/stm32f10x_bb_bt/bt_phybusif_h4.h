@@ -18,12 +18,13 @@
 #define PHYBUSIF_PACKET_TYPE_ACL_DATA  0x02
 #define PHYBUSIF_PACKET_TYPE_SCO_DATA  0x03
 #define PHYBUSIF_PACKET_TYPE_EVT  0x04
-#define PHYBUSIF_PACKET_TYPE_ISO  0x05
 
 struct phybusif_cb;
 
 /* Application program's interface: */
-void phybusif_open(uint32_t baud_rate,uint8_t reconfig); /* Must be called first to initialize the physical bus interface */
+void phybusif_open(uint32_t baud_rate); /* Must be called first to initialize the physical bus interface */
+void phybusif_reopen(uint32_t baud_rate);
+void phybusif_close(void);
 err_t phybusif_reset(struct phybusif_cb *cb);
 err_t phybusif_input(struct phybusif_cb *cb);
 
@@ -44,7 +45,6 @@ enum phybusif_state
 /* The physical bus interface control block */
 struct phybusif_cb
 {
-	int phyuart_fd;
     enum phybusif_state state;
 
     uint32_t offset;

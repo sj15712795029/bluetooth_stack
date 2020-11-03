@@ -33,13 +33,14 @@ uint8_t bt_dma_rx_buf[BT_DMA_BUF_SIZE];
 #define BT_TX_BUF_SIZE	1024
 uint8_t bt_tx_buff[BT_TX_BUF_SIZE];
 
+uint8_t uart_thread_process = 1;
 uint8_t* bt_get_tx_buffer()
 {
     return bt_tx_buff;
 }
 
 
-uint8_t hw_uart_bt_init(uint32_t baud_rate,uint8_t reconfig)
+uint8_t hw_uart_bt_init(uint32_t baud_rate)
 {
     speed_t baudrate;
     int flags = O_RDWR | O_NOCTTY;
@@ -49,11 +50,8 @@ uint8_t hw_uart_bt_init(uint32_t baud_rate,uint8_t reconfig)
         baudrate =  B115200;
     else
         baudrate =  B921600;
-    if(reconfig == 0)
-    {
-        ringbuffer_init(&bt_ring_buf,bt_rx_buf,BT_RX_BUF_SIZE);
-    }
-    else
+
+#if 0
     {
         if (tcgetattr(uart_if.phyuart_fd, &toptions) < 0)
         {
@@ -72,6 +70,7 @@ uint8_t hw_uart_bt_init(uint32_t baud_rate,uint8_t reconfig)
 
         return 0;
     }
+#endif
 
     printf("phybusif_open /dev/ttyUSB0\n");
 
@@ -167,10 +166,8 @@ err_t phybusif_reset(struct phybusif_cb *cb)
 
 void *uart_rx_thread(void *data)
 {
-
-    while(1)
+    while(uart_thread_process)
     {
-
         fd_set read_fd;
         int result = 0;
         struct timeval tv;
@@ -203,19 +200,41 @@ void *uart_rx_thread(void *data)
 
         }
     }
+
+	pthread_exit((void *)0);
 }
 
+pthread_t thread_rx_id;
 
-void phybusif_open(uint32_t baud_rate,uint8_t reconfig)
+void phybusif_open(uint32_t baud_rate)
 {
-    hw_uart_bt_init(baud_rate,reconfig);
+	uart_thread_process = 1;
+	ringbuffer_init(&bt_ring_buf,bt_rx_buf,BT_RX_BUF_SIZE);
+    hw_uart_bt_init(baud_rate);
+  
+    pthread_create(&thread_rx_id, NULL, uart_rx_thread, NULL);
 
-    if(reconfig == 0)
-    {
-        pthread_t thread_rx_id;
-        pthread_create(&thread_rx_id, NULL, uart_rx_thread, NULL);
-    }
+}
 
+void phybusif_reopen(uint32_t baud_rate)
+{
+	uart_thread_process = 0;
+	pthread_join(thread_rx_id, NULL);
+	close(uart_if.phyuart_fd);
+
+	ringbuffer_reset(&bt_ring_buf);
+
+	phybusif_open(baud_rate);
+	
+}
+
+void phybusif_close(void)
+{
+	uart_thread_process = 0;
+	pthread_join(thread_rx_id, NULL);
+	close(uart_if.phyuart_fd);
+
+	ringbuffer_reset(&bt_ring_buf);
 }
 
 void phybusif_output(struct bt_pbuf_t *p, uint16_t len,uint8_t packet_type)

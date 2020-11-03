@@ -4,6 +4,7 @@
 #include "bt_hci.h"
 #include "bt_phybusif_h4.h"
 
+#if BT_VENDOR_CSR8X11_SUPPORT > 0
 /*************************************************************************************************
 HCI command  PACKETS Format:
 	opcode 16 bit
@@ -68,7 +69,7 @@ int prepare_pos = 0;
 unsigned char *pcsr8x11_initscript;
 
 extern struct bt_pbuf_t *hci_cmd_ass(struct bt_pbuf_t *p, uint8_t ocf, uint8_t ogf, uint8_t len);
-void csr8x11_vendor_init(init_done_cb cb)
+void csr8x11_vendor_init(init_done_cb cb,uint8_t ogf,uint8_t ocf)
 {
     struct bt_pbuf_t *p;
     uint16_t size = 0;
@@ -78,7 +79,7 @@ void csr8x11_vendor_init(init_done_cb cb)
     prepare_pos += (size+1);
 
     varid = bt_le_read_16(pcsr8x11_initscript,8);
-    if((p = bt_pbuf_alloc(BT_PBUF_TRANSPORT_H4, size+3, BT_PBUF_RAM)) == NULL)
+    if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, size+3, BT_PBUF_RAM)) == NULL)
     {
     BT_VENDOR_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
         return;
@@ -91,9 +92,11 @@ void csr8x11_vendor_init(init_done_cb cb)
     phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
     bt_pbuf_free(p);
 
+
     if(varid == WARM_RESET)
     {
-        cb();
+    	phybusif_reopen(BT_BAUDRATE_2);
+        cb(VENDOR_STATUS_INITED);
     }
 }
 
@@ -102,14 +105,26 @@ void csr8x11_vendor_deinit(void)
 	prepare_pos = 0;
 }
 
+void csr8x11_vendor_set_baud_rate(uint32_t baud_rate)
+{
+	
+}
+
+
 chip_mgr_t csr8x11_mgr =
 {
     /* const char * name */ "CSR8x11",
-    /*void  (*vendor_init)(void);*/&csr8x11_vendor_init,
+    /* void  (*vendor_init)(init_done_cb cb,uint8_t ogf,uint8_t ocf);*/&csr8x11_vendor_init,
     /* void (*vendor_deinit)(void);*/&csr8x11_vendor_deinit,
+    /* void (*vendor_set_baud_rate)(uint32_t baud_rate);*/&csr8x11_vendor_set_baud_rate,
 };
+#endif
 
-chip_mgr_t * csr8x11_instance()
+chip_mgr_t * csr8x11_instance(void)
 {
+#if BT_VENDOR_CSR8X11_SUPPORT > 0
     return &csr8x11_mgr;
+#else
+	return NULL;
+#endif
 }

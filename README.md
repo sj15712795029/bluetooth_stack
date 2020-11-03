@@ -2,12 +2,13 @@
 这是一个包含传统蓝牙跟低功耗蓝牙的协议栈，属于超轻量级蓝牙协议栈，用作学习蓝牙协议栈的人使用
 <br>我根据此部分也搭建了一个开发环境，来作为额外收入，希望大家多多支持。有不足支持也希望大家指正。
 
-|     |  CSR8311 | .... | 开发板购买链接 |
+|     |  CSR8311 | BCM43430A(AP6212A) | 开发板购买链接 |
 |  ----  | ----  | ---- | ---- |
-| STM32F103  | √ | x | [**购买开发板连接（点击我）**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.18.5aeb41f9OvIVgA&id=622836061708) |
-| STM32F407  | √ | x | x |
-| STM32F412  | √ | x | [**购买开发板连接（点击我）**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.30.5aeb41f9DVuET8&id=628752502770) |
-|  | [**购买模组连接（点击我）**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.18.5aeb41f9OvIVgA&id=622836061708) |  |  |
+| STM32F103  | √ | √ | [**购买开发板连接（点击我）**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.18.5aeb41f9OvIVgA&id=622836061708) |
+| STM32F407  | √ | √ | 暂未上线 |
+| STM32F412  | √ | √ | [**购买开发板连接（点击我）**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.30.5aeb41f9DVuET8&id=628752502770) |
+| Linux | √ | √ | [**购买模组连接（点击我）**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.18.5aeb41f9OvIVgA&id=622836061708) |
+|  | [**购买模组连接（点击我）**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.18.5aeb41f9OvIVgA&id=622836061708) | 暂未上线 |  |
 ## 源码目录结构
 | 目录文件夹  | 子目录文件夹                    | 说明                                                   |
 | ----------- | ------------------------------- | ------------------------------------------------------ |
@@ -22,10 +23,10 @@
 |             | memory_manager                  | 内存管理，目前用于管理STM32F407的SRAM                  |
 |             | ringbuffer                      | 环形数组，用于蓝牙接收串口数据                         |
 | mcu_bt_tool |                                 | PC上位机，用于控制STM32开发板，以及接受STM32的状态回传 |
-| project     | stm32f10x_bb_csr8x11_bt         | STM32F103裸机蓝牙工程                                  |
-|             | stm32f407_bb_csr8x11_bt         | STM32F407裸机蓝牙工程                                  |
-|             | stm32f412_bb_csr8x11_bt         | STM32F412裸机蓝牙工程                                  |
-|             | ubuntu_csr8x11_bt               | Linux ubuntu蓝牙工程                                   |
+| project     | stm32f10x_bb_bt                 | STM32F103裸机(BB:bare board)蓝牙工程                   |
+|             | stm32f407_bb_bt                 | STM32F407裸机(BB:bare board)蓝牙工程                   |
+|             | stm32f412_bb_bt                 | STM32F412裸机(BB:bare board)蓝牙工程                   |
+|             | linux_bt                        | Linux 蓝牙工程                                         |
 | python_tool | convert_binayr_file_to_array.py | 把二进制文档转换为数据的python工具                     |
 |             | corvert_opcode_to_ogf_ocf.py    | 把HCI opcode转换为OGF,OCF                              |
 

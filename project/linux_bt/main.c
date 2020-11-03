@@ -431,7 +431,7 @@ uint8_t shell_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp(BT_INQUIRY_CMD,(const char*)shell_string) == 0)
+    if(hw_strncmp(BT_INQUIRY_CMD,(const char*)shell_string,hw_strlen(BT_INQUIRY_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate bt inquiry\n");
         bt_start_inquiry(0x30,HCI_INQUIRY_MAX_DEV);

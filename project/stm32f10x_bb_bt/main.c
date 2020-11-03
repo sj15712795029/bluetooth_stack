@@ -731,7 +731,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     if(hw_strcmp(BT_LE_ADV_ENABLE_CMD,(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate ble start advertising\n");
-        bt_le_set_adv_enable(adv_data_len,adv_data);
+        bt_le_set_adv_enable(adv_data_len,(uint8_t *)adv_data);
         return HW_ERR_OK;
     }
 

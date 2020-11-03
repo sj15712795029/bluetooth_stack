@@ -136,6 +136,7 @@ struct bt_pbuf_t *bt_pbuf_alloc(uint8_t layer, uint16_t length, bt_pbuf_type_e t
 
     if (p == NULL)
     {
+    	BT_PBUF_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] alloc_len < MEM_ALIGN_SIZE(length)\n",__FILE__,__FUNCTION__,__LINE__);
         return NULL;
     }
         /* Set up internal structure of the bt_pbuf_t. */

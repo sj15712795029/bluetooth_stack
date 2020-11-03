@@ -22,7 +22,9 @@
 struct phybusif_cb;
 
 /* Application program's interface: */
-void phybusif_open(uint32_t baud_rate,uint8_t reconfig); /* Must be called first to initialize the physical bus interface */
+void phybusif_open(uint32_t baud_rate); /* Must be called first to initialize the physical bus interface */
+void phybusif_reopen(uint32_t baud_rate);
+void phybusif_close(void);
 err_t phybusif_reset(struct phybusif_cb *cb);
 err_t phybusif_input(struct phybusif_cb *cb);
 

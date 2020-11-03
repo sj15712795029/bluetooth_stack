@@ -32,6 +32,7 @@ uint8_t* bt_get_tx_buffer()
     return bt_tx_buff;
 }
 
+
 DMA_InitTypeDef DMA_UART2;
 /******************************************************************************
  * func name   : hw_uart_bt_init
@@ -39,28 +40,25 @@ DMA_InitTypeDef DMA_UART2;
  * return      : hw_uart_bt_init result
  * description : Initialization of USART2.PA0->CTS PA1->RTS PA2->TX PA3->RX
 ******************************************************************************/
-uint8_t hw_uart_bt_init(uint32_t baud_rate,uint8_t reconfig)
-{
-	__HAL_RCC_DMA1_CLK_ENABLE();
+uint8_t hw_uart_bt_init(uint32_t baud_rate)
+{	
+    __HAL_RCC_DMA1_CLK_ENABLE();
 
-    if(reconfig == 0)
-        ringbuffer_init(&bt_ring_buf,bt_rx_buf,BT_RX_BUF_SIZE);
+    huart2.Instance = USART2;
+    huart2.Init.BaudRate = baud_rate;
+    huart2.Init.WordLength = UART_WORDLENGTH_8B;
+    huart2.Init.StopBits = UART_STOPBITS_1;
+    huart2.Init.Parity = UART_PARITY_NONE;
+    huart2.Init.Mode = UART_MODE_TX_RX;
+    huart2.Init.HwFlowCtl = UART_HWCONTROL_RTS_CTS;
+    huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+    if (HAL_UART_Init(&huart2) != HAL_OK)
+    {
+        return HW_HAL_EXCU_ERR;
+    }
 
-	huart2.Instance = USART2;
-  huart2.Init.BaudRate = baud_rate;
-  huart2.Init.WordLength = UART_WORDLENGTH_8B;
-  huart2.Init.StopBits = UART_STOPBITS_1;
-  huart2.Init.Parity = UART_PARITY_NONE;
-  huart2.Init.Mode = UART_MODE_TX_RX;
-  huart2.Init.HwFlowCtl = UART_HWCONTROL_RTS_CTS;
-  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart2) != HAL_OK)
-  {
-    return HW_HAL_EXCU_ERR;
-  }
-
-	HAL_UART_Receive_DMA(&huart2, bt_dma_rx_buf, BT_DMA_BUF_SIZE);
-    __HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE);
+        HAL_UART_Receive_DMA(&huart2, bt_dma_rx_buf, BT_DMA_BUF_SIZE);
+        __HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE);
 
     return HW_ERR_OK;
 
@@ -80,7 +78,7 @@ void uart_bt_send(uint8_t *buf,uint16_t len)
     for(index = 0; index < len ; index++)
     {
         /* Wait until the last send is complete, then send the data */
-		while ((USART2->SR & USART_SR_TXE) == 0);
+        while ((USART2->SR & USART_SR_TXE) == 0);
         USART2->DR = buf[index];
     }
 }
@@ -101,7 +99,7 @@ void USART2_IRQHandler(void)
         /* Clear the interrupt and reset DMA */
         __HAL_UART_CLEAR_IDLEFLAG(&huart2);
         HAL_UART_DMAStop(&huart2);
-		
+
         recv_len = BT_DMA_BUF_SIZE - huart2.hdmarx->Instance->NDTR;
 
         if(recv_len > 500)
@@ -123,7 +121,7 @@ void USART2_IRQHandler(void)
         }
     }
 
-	HAL_UART_IRQHandler(&huart2);
+    HAL_UART_IRQHandler(&huart2);
 }
 
 /******************************************************************************
@@ -155,41 +153,58 @@ err_t phybusif_reset(struct phybusif_cb *cb)
     return BT_ERR_OK;
 }
 
-void phybusif_open(uint32_t baud_rate,uint8_t reconfig)
+void phybusif_open(uint32_t baud_rate)
 {
-    hw_uart_bt_init(baud_rate,reconfig);
+	ringbuffer_init(&bt_ring_buf,bt_rx_buf,BT_RX_BUF_SIZE);
+    hw_uart_bt_init(baud_rate);
 }
+
+void phybusif_reopen(uint32_t baud_rate)
+{
+
+	ringbuffer_reset(&bt_ring_buf);
+
+	phybusif_open(baud_rate);
+	
+}
+
+void phybusif_close()
+{
+	ringbuffer_reset(&bt_ring_buf);
+}
+
+
 
 void phybusif_output(struct bt_pbuf_t *p, uint16_t len,uint8_t packet_type)
 {
-	bt_pbuf_header(p, 1);
-	((uint8_t *)p->payload)[0] = packet_type;
+    bt_pbuf_header(p, 1);
+    ((uint8_t *)p->payload)[0] = packet_type;
 
 #if 0
     switch(packet_type)
     {
-	    case PHYBUSIF_PACKET_TYPE_CMD
-	    {
-	    	((uint8_t *)p->payload)[3] = ;
-	        break;
-	    }
-	    case PHYBUSIF_PACKET_TYPE_ACL_DATA
-	    {
-	        break;
-	    }
-	    case PHYBUSIF_PACKET_TYPE_SCO_DATA
-	    {
-	        break;
-	    }
-	    case PHYBUSIF_PACKET_TYPE_EVT
-	    {
-	        break;
-	    }
-	    default:
-	    {
-	        BT_TRANSPORT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] packet_type is unvalid\n",__FILE__,__FUNCTION__,__LINE__);
-	        break;
-	    }
+    case PHYBUSIF_PACKET_TYPE_CMD
+    {
+        ((uint8_t *)p->payload)[3] = ;
+        break;
+    }
+    case PHYBUSIF_PACKET_TYPE_ACL_DATA
+    {
+        break;
+    }
+    case PHYBUSIF_PACKET_TYPE_SCO_DATA
+    {
+        break;
+    }
+    case PHYBUSIF_PACKET_TYPE_EVT
+    {
+        break;
+    }
+    default:
+    {
+        BT_TRANSPORT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] packet_type is unvalid\n",__FILE__,__FUNCTION__,__LINE__);
+        break;
+    }
     }
 #endif
 

@@ -30,6 +30,7 @@ struct hci_inq_res_t;
 #define HCI_CMD_HDR_LEN 3
 
 /* Opcode Group Field (OGF) values */
+#define HCI_NOP_OGF 0x00
 #define HCI_LINK_CONTROL 0x01   /* Link Control Commands */
 #define HCI_LINK_POLICY 0x02    /* Link Policy Commands */
 #define HCI_HOST_C_N_BB 0x03    /* Host Controller & Baseband Commands */
@@ -40,6 +41,7 @@ struct hci_inq_res_t;
 #define HCI_VENDOR_OGF 0x3F /* vendor Commands */
 
 /* Opcode Command Field (OCF) values */
+#define HCI_NOP_OCF 0x00
 /* Link control commands */
 #define HCI_INQUIRY 0x01
 #define HCI_INQUIRY_CANCEL 0x02
@@ -654,6 +656,7 @@ extern struct hci_link_t *hci_tmp_link; /* Only used for temporary storage. */
 /*-------------------- common api ----------------------------------------*/
 /*  Functions for interfacing with HCI */
 err_t hci_init(void);
+err_t hci_set_chip_name(uint8_t *name);
 err_t hci_close(struct hci_link_t *link);
 void hci_reset_all(void);
 void hci_arg(void *arg);

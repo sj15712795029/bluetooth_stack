@@ -49,7 +49,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Objects\</OutputDirectory>
-          <OutputName>stm32f10x_bb_csr8x11</OutputName>
+          <OutputName>stm32f10x_bb_bt</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>0</CreateHexFile>
@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\bsp\cortex-m3\core;..\..\bsp\cortex-m3\inc;..\..\bsp\cortex-m3\STM32_USB-FS-Device_Driver\inc;..\..\board;..\..\board\stm32f10x;..\..\board\stm32f10x\usb_mass_storage;..\..\component\ringbuffer;..\..\component\bluetooth\src\include;..\..\component\bluetooth\src\include\classical;..\..\component\bluetooth\vendor;..\stm32f10x_bb_csr8x11_bt;..\..\component\bluetooth\third_party_lib\sbc;..\..\component\bluetooth\wrapper;..\..\component\cjson;..\..\component\fs;..\..\component\fs\fatfs13\source</IncludePath>
+              <IncludePath>..\..\bsp\cortex-m3\core;..\..\bsp\cortex-m3\inc;..\..\bsp\cortex-m3\STM32_USB-FS-Device_Driver\inc;..\..\board;..\..\board\stm32f10x;..\..\board\stm32f10x\usb_mass_storage;..\..\component\ringbuffer;..\..\component\bluetooth\src\include;..\..\component\bluetooth\src\include\classical;..\..\component\bluetooth\vendor;..\stm32f10x_bb_bt;..\..\component\bluetooth\third_party_lib\sbc;..\..\component\bluetooth\wrapper;..\..\component\cjson;..\..\component\fs;..\..\component\fs\fatfs13\source</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -766,6 +766,16 @@
               <FileName>bt_wrapper.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\component\bluetooth\wrapper\bt_wrapper.c</FilePath>
+            </File>
+            <File>
+              <FileName>bt_vendor_manager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\vendor\bt_vendor_manager.c</FilePath>
+            </File>
+            <File>
+              <FileName>bt_vendor_bcm43430a1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\vendor\bt_vendor_bcm43430a1.c</FilePath>
             </File>
           </Files>
         </Group>
