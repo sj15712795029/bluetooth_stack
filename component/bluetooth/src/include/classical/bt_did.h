@@ -29,19 +29,7 @@
 
 /* DID Attribute value */
 #define DID_SPEC_ID_VALUE 0x0103 /* DID SPEC V1.3 */
-/*
-	vendor ID value 0xffff :This value has special meaning depending on the context in which it used.
-	Link Manager Protocol (LMP): This value may be used in the internal and
-	interoperability tests before a Company ID has been assigned.
-	This value shall not be used in shipping end products.
-	Device ID Profile: This value is reserved as the default vendor ID
-	when no Device ID service record is present in a remote device. 
-*/
-#define DID_VENDOR_ID_VALUE 0xffff
-#define DID_PRODUCT_ID_VALUE 0xffff
-#define DID_VERSION_ID_VALUE 0x0100
-#define DID_PRIMARY_RECORD_VALUE 0x01
-#define DID_VENDOR_ID_SOURCE_VALUE DID_VENDOR_ID_SOURCE_BLUETOOTH
+
 
 err_t did_init(void);
 

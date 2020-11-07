@@ -101,13 +101,25 @@ typedef struct
 	void (*bt_hfp_module_id)(struct bd_addr_t *remote_addr,uint8_t *module_id);
 }bt_app_hfp_cb_t;
 
+typedef struct
+{
+	void (*bt_a2dp_signal_connect)(struct bd_addr_t *remote_addr,uint8_t status);
+	void (*bt_a2dp_signal_disconnect)(struct bd_addr_t *remote_addr,uint8_t status);
+	void (*bt_a2dp_stream_connect)(struct bd_addr_t *remote_addr,uint8_t status);
+	void (*bt_a2dp_stream_disconnect)(struct bd_addr_t *remote_addr,uint8_t status);
+	void (*bt_a2dp_start)(struct bd_addr_t *remote_addr,uint8_t value);
+	void (*bt_a2dp_relase)(struct bd_addr_t *remote_addr,uint8_t value);
+	void (*bt_a2dp_suspend)(struct bd_addr_t *remote_addr,uint8_t value);
+	void (*bt_a2dp_abort)(struct bd_addr_t *remote_addr,uint8_t value);
+}bt_app_a2dp_cb_t;
+
 
 typedef struct
 {
 	bt_app_common_cb_t *app_common_cb;
 	bt_app_spp_cb_t *app_spp_cb;
 	bt_app_hfp_cb_t * app_hfp_cb;
-	
+	bt_app_a2dp_cb_t *app_a2dp_cb;
 }bt_app_cb_t;
 
 
@@ -140,7 +152,7 @@ uint8_t bt_le_set_adv_disable(void);
 #endif
 
 
-
+#if PROFILE_HFP_ENABLE
 /************************* HFP API ***********************/
 uint8_t bt_hfp_hf_get_operator(struct bd_addr_t *bdaddr);
 uint8_t bt_hfp_hf_audio_transfer(struct bd_addr_t *bdaddr);
@@ -160,6 +172,7 @@ uint8_t bt_hfp_hf_get_manufacturer_id(struct bd_addr_t *addr);
 uint8_t bt_hfp_hf_get_model_id(struct bd_addr_t *addr);
 uint8_t bt_hfp_hf_get_revision_id(struct bd_addr_t *addr);
 uint8_t bt_hfp_hf_get_pid(struct bd_addr_t *addr);
+#endif
 
 
 

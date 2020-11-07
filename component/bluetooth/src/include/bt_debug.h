@@ -14,7 +14,13 @@
 #define BT_TRACE_LEVEL_ERROR 1   /* Error condition trace messages       */
 #define BT_TRACE_LEVEL_WARNING 2 /* Warning condition trace messages     */
 #define BT_TRACE_LEVEL_DEBUG 3   /* Full debug messages                  */
+#define BT_TRACE_LEVEL_INFO 4 /* info messages                  */
 
+#define BT_HEX_TRACE_DEBUG(fmt,...)                                      \
+  {                                                                \
+    if (BT_HEX_TRACE_LEVEL > BT_TRACE_LEVEL_NONE)               \
+      BT_DEBUG(fmt,##__VA_ARGS__); \
+  }
 
 #define BT_PBUF_TRACE_ERROR(fmt,...)                                      \
   {                                                                \
@@ -328,6 +334,13 @@
       BT_DEBUG(fmt,##__VA_ARGS__); \
   }
 
+#define BT_AVDTP_INFO_DEBUG(fmt,...)                                      \
+  {                                                                \
+    if (BT_AVDTP_TRACE_LEVEL >= BT_TRACE_LEVEL_INFO)               \
+      BT_DEBUG(fmt,##__VA_ARGS__); \
+  }
+
+
 #define BT_AVCTP_TRACE_ERROR(fmt,...)                                      \
   {                                                                \
     if (BT_AVCTP_TRACE_LEVEL >= BT_TRACE_LEVEL_ERROR)               \
@@ -364,6 +377,13 @@
     if (BT_A2DP_TRACE_LEVEL >= BT_TRACE_LEVEL_DEBUG)               \
       BT_DEBUG(fmt,##__VA_ARGS__); \
   }
+
+#define BT_A2DP_INFO_TRACE_DEBUG(fmt,...)                                      \
+  {                                                                \
+    if (BT_A2DP_TRACE_LEVEL >= BT_TRACE_LEVEL_INFO)               \
+      BT_DEBUG(fmt,##__VA_ARGS__); \
+  }
+
 
 #define BT_AVRCP_TRACE_ERROR(fmt,...)                                      \
   {                                                                \

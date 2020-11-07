@@ -1679,7 +1679,6 @@ err_t hci_get_remote_feature(struct bd_addr_t *bdaddr)
 
     link = hci_get_link(bdaddr);
 
-    printf("hci_get_remote_feature 1\n");
     if(link == NULL)
     {
         BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] Connection does not existl\n",__FILE__,__FUNCTION__,__LINE__);
@@ -1694,7 +1693,6 @@ err_t hci_get_remote_feature(struct bd_addr_t *bdaddr)
         return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
     }
 
-    printf("hci_get_remote_feature 2\n");
     /* Assembling command packet */
     p = hci_cmd_ass(p, HCI_READ_REMOTE_SUPPORT_FEATURE, HCI_LINK_CONTROL, HCI_GET_REMOTE_FEATURE_PLEN);
 
@@ -1703,7 +1701,6 @@ err_t hci_get_remote_feature(struct bd_addr_t *bdaddr)
     phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
     bt_pbuf_free(p);
 
-    printf("hci_get_remote_feature 3\n");
 
     return BT_ERR_OK;
 }

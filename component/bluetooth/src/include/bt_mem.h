@@ -14,7 +14,6 @@
 
 
 #if MEM_LIBC_MALLOC
-
 typedef size_t mem_size_t;
 #define bt_mem_init()
 #define bt_mem_free free

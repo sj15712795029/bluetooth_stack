@@ -12,6 +12,7 @@
 
 #include "bt_common.h"
 #include "bt_l2cap.h"
+#include "bt_avdtp.h"
 
 typedef enum
 {
@@ -58,11 +59,24 @@ typedef enum
     AVDTP_REPORTING = 0x02,
     AVDTP_RECOVERY = 0x03,
     AVDTP_CONTENT_PROTECTION = 0x04, //4
-    AVDTP_HEADER_COMPRESSION = 0x05, //5
-    AVDTP_MULTIPLEXING = 0x06,       //6
-    AVDTP_MEDIA_CODEC = 0x07,        //7
-    AVDTP_DELAY_REPORTING = 0x08,    //8
+    AVDTP_HEADER_COMPRESSION = 0x05,
+    AVDTP_MULTIPLEXING = 0x06,
+    AVDTP_MEDIA_CODEC = 0x07,
+    AVDTP_DELAY_REPORTING = 0x08,
 } avdtp_service_category_e;
+
+typedef enum
+{
+    AVDTP_MEDIA_TRANSPORT_MASK = 0x01,
+    AVDTP_REPORTING_MASK = 0x02,
+    AVDTP_RECOVERY_MASK = 0x04,
+    AVDTP_CONTENT_PROTECTION_MASK = 0x08, //4
+    AVDTP_HEADER_COMPRESSION_MASK = 0x10,
+    AVDTP_MULTIPLEXING_MASK = 0x20,
+    AVDTP_MEDIA_CODEC_MASK = 0x40,
+    AVDTP_DELAY_REPORTING_MASK = 0x80,
+} avdtp_service_category_mask_e;
+
 
 
 // Signal Identifier fields
@@ -95,6 +109,13 @@ typedef enum
 } avdtp_signal_identifier_e;
 
 
+typedef enum
+{
+	AVDTP_CONN_STATUS_NONE,
+	AVDTP_CONN_STATUS_SIGNAL,
+	AVDTP_CONN_STATUS_STREAM,
+}avdtp_connect_status_e;
+
 #define AVDTP_SIG_HDR_SIZE 2
 #define AVDTP_DIS_PER_EP_SIZE 2
 #define AVDTP_CAP_HDR_SIZE 2
@@ -102,9 +123,12 @@ typedef enum
 struct avdtp_pcb_t
 {
     struct avdtp_pcb_t *next; /* For the linked list */
-    uint8_t stream_open;
+    uint8_t avdtp_conn_status;
     struct l2cap_pcb_t *avdtp_signal_l2cappcb; /* The L2CAP connection */
     struct l2cap_pcb_t *avdtp_media_l2cappcb;
+	struct bd_addr_t remote_bdaddr;
+	uint8_t codec_type;
+	uint8_t content_protection;
     void *callback_arg;
     /* Callback */
 };
@@ -125,6 +149,8 @@ typedef struct
 struct avdtp_sep_t
 {
     struct avdtp_sep_t *next; /* For the linked list */
+	uint8_t codec_type;
+	uint8_t content_protection;
     uint8_t seid;
     uint8_t in_use;
     uint8_t service_categories_bitmap;
@@ -132,10 +158,19 @@ struct avdtp_sep_t
     avdtp_capabilities_t cap;
 };
 
+struct service_category_hdr
+{
+    uint8_t service_category;
+	uint8_t losc;
+}BT_PACK_END;
+
+ 
+
+
 typedef err_t (*avdtp_event_handle)(struct avdtp_pcb_t *pcb,uint32_t msg_id,struct bt_pbuf_t *p);
 typedef err_t (*avdtp_media_handle)(struct avdtp_pcb_t *pcb,struct bt_pbuf_t *p);
 err_t avdtp_init(avdtp_event_handle avdtp_evt_handle,avdtp_media_handle avdtp_media_handle);
-err_t avdtp_create_sep(uint8_t * media_codec_info, uint16_t media_codec_info_len);
+err_t avdtp_create_sep(uint8_t codec_type,uint8_t * media_codec_info, uint16_t media_codec_info_len);
 uint8_t *avdtp_get_spec_cap_value(uint8_t category_id,uint8_t *cap,uint16_t cap_len,uint16_t *spec_cap_len);
 
 extern struct avdtp_sep_t *avdtp_local_sep; /* List of all active avdtp seps */

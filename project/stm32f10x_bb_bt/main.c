@@ -191,7 +191,7 @@ void bt_app_hfp_connect(struct bd_addr_t *remote_addr,uint8_t status)
 {
     uint8_t addr_buf[32] = {0};
     printf("bt_app_hfp_connect status %d address:\n",status);
-    bt_hex_dump(remote_addr->addr,6);
+    bt_addr_dump(remote_addr->addr);
     connect_addr.addr[5] = remote_addr->addr[5];
     connect_addr.addr[4] = remote_addr->addr[4];
     connect_addr.addr[3] = remote_addr->addr[3];
@@ -206,7 +206,7 @@ void bt_app_hfp_connect(struct bd_addr_t *remote_addr,uint8_t status)
 void bt_app_hfp_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("bt_app_hfp_disconnect status %d address:\n",status);
-    bt_hex_dump(remote_addr->addr,6);
+    bt_addr_dump(remote_addr->addr);
 
     memset(&connect_addr,0,sizeof(connect_addr));
     uart_send_json("BT","BT_DISCON_RESULT",(uint8_t*)"SUCCESS","HFP",0,0,0,0);
@@ -216,7 +216,7 @@ void bt_app_hfp_sco_connect(struct bd_addr_t *remote_addr,uint8_t status)
 {
     uint8_t addr_buf[32] = {0};
     printf("bt_app_hfp_sco_connect status %d address:\n",status);
-    bt_hex_dump(remote_addr->addr,6);
+    bt_addr_dump(remote_addr->addr);
 
     hw_sprintf((char*)addr_buf,"%02x:%02x:%02x:%02x:%02x:%02x",remote_addr->addr[5],remote_addr->addr[4],remote_addr->addr[3],\
                remote_addr->addr[2],remote_addr->addr[1],remote_addr->addr[0]);
@@ -226,7 +226,7 @@ void bt_app_hfp_sco_connect(struct bd_addr_t *remote_addr,uint8_t status)
 void bt_app_hfp_sco_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("bt_app_hfp_sco_disconnect status %d address:\n",status);
-    bt_hex_dump(remote_addr->addr,6);
+    bt_addr_dump(remote_addr->addr);
 
     uart_send_json("BT","BT_SCO_DISCON_RESULT",(uint8_t*)"SUCCESS","HFP",0,0,0,0);
 }
@@ -237,7 +237,7 @@ void bt_app_hfp_signal_strength_ind(struct bd_addr_t *remote_addr,uint8_t value)
 {
     uint8_t strength_buf[8] = {0};
     printf("bt_app_hfp_signal_strength_ind value %d address:\n",value);
-    bt_hex_dump(remote_addr->addr,6);
+    bt_addr_dump(remote_addr->addr);
 
     hw_sprintf((char *)strength_buf,"%d",value);
     uart_send_json("BT","BT_HFP_SIGNAL_STRENGTH",(uint8_t*)"SUCCESS",strength_buf,0,0,0,0);
@@ -247,7 +247,7 @@ void bt_app_hfp_roam_status_ind(struct bd_addr_t *remote_addr,uint8_t value)
 {
     uint8_t roam_buf[8] = {0};
     printf("bt_hfp_roam_status_ind value %d address:\n",value);
-    bt_hex_dump(remote_addr->addr,6);
+    bt_addr_dump(remote_addr->addr);
 
     hw_sprintf((char *)roam_buf,"%d",value);
     uart_send_json("BT","BT_HFP_ROAM_STATUS",(uint8_t*)"SUCCESS",roam_buf,0,0,0,0);
@@ -257,7 +257,7 @@ void bt_app_hfp_batt_level_ind(struct bd_addr_t *remote_addr,uint8_t value)
 {
     uint8_t batt_buf[8] = {0};
     printf("bt_hfp_batt_level_ind value %d address:\n",value);
-    bt_hex_dump(remote_addr->addr,6);
+    bt_addr_dump(remote_addr->addr);
 
     hw_sprintf((char *)batt_buf,"%d",value);
     uart_send_json("BT","BT_HFP_BATT_LEVEL",(uint8_t*)"SUCCESS",batt_buf,0,0,0,0);
@@ -266,7 +266,7 @@ void bt_app_hfp_batt_level_ind(struct bd_addr_t *remote_addr,uint8_t value)
 void bt_app_hfp_operator(struct bd_addr_t *remote_addr,uint8_t *operator)
 {
     printf("bt_app_hfp_operator operator %s address:\n",operator);
-    bt_hex_dump(remote_addr->addr,6);
+    bt_addr_dump(remote_addr->addr);
 
     uart_send_json("BT","BT_HFP_OPERATOR",(uint8_t*)"SUCCESS",operator,0,0,0,0);
 }
@@ -275,7 +275,7 @@ void bt_app_hfp_call_status(struct bd_addr_t *remote_addr,uint8_t value)
 {
     uint8_t call_status_buf[8] = {0};
     printf("bt_app_hfp_call_status value %d address:\n",value);
-    bt_hex_dump(remote_addr->addr,6);
+    bt_addr_dump(remote_addr->addr);
 
     hw_sprintf((char *)call_status_buf,"%d",value);
     uart_send_json("BT","BT_HFP_CALL_STATUS",(uint8_t*)"SUCCESS",call_status_buf,0,0,0,0);
@@ -285,7 +285,7 @@ void bt_app_hfp_call_setup(struct bd_addr_t *remote_addr,uint8_t value)
 {
     uint8_t call_setup_buf[8] = {0};
     printf("bt_app_hfp_call_setup value %d address:\n",value);
-    bt_hex_dump(remote_addr->addr,6);
+    bt_addr_dump(remote_addr->addr);
 
     hw_sprintf((char *)call_setup_buf,"%d",value);
     uart_send_json("BT","BT_HFP_CALL_SETUP",(uint8_t*)"SUCCESS",call_setup_buf,0,0,0,0);
@@ -294,7 +294,7 @@ void bt_app_hfp_call_setup(struct bd_addr_t *remote_addr,uint8_t value)
 void bt_app_hfp_local_pn(struct bd_addr_t *remote_addr,uint8_t *local_pn)
 {
     printf("bt_app_hfp_local_pn %s address:\n",local_pn);
-    bt_hex_dump(remote_addr->addr,6);
+    bt_addr_dump(remote_addr->addr);
 
     uart_send_json("BT","BT_HFP_LOCAL_PN",(uint8_t*)"SUCCESS",local_pn,0,0,0,0);
 }
@@ -302,7 +302,7 @@ void bt_app_hfp_local_pn(struct bd_addr_t *remote_addr,uint8_t *local_pn)
 void bt_app_hfp_call_pn(struct bd_addr_t *remote_addr,uint8_t *phone_number)
 {
     printf("bt_app_hfp_call_pn %s address:\n",phone_number);
-    bt_hex_dump(remote_addr->addr,6);
+    bt_addr_dump(remote_addr->addr);
 
     uart_send_json("BT","BT_HFP_CALL_PN",(uint8_t*)"SUCCESS",phone_number,0,0,0,0);
 }
@@ -310,7 +310,7 @@ void bt_app_hfp_call_pn(struct bd_addr_t *remote_addr,uint8_t *phone_number)
 void bt_app_hfp_manu_id(struct bd_addr_t *remote_addr,uint8_t *mid)
 {
     printf("bt_app_hfp_manu_id %s address:\n",mid);
-    bt_hex_dump(remote_addr->addr,6);
+    bt_addr_dump(remote_addr->addr);
 
     uart_send_json("BT","BT_HFP_MANU_ID",(uint8_t*)"SUCCESS",mid,0,0,0,0);
 }
@@ -318,7 +318,7 @@ void bt_app_hfp_manu_id(struct bd_addr_t *remote_addr,uint8_t *mid)
 void bt_app_hfp_module_id(struct bd_addr_t *remote_addr,uint8_t *mid)
 {
     printf("bt_app_hfp_module_id %s address:\n",mid);
-    bt_hex_dump(remote_addr->addr,6);
+    bt_addr_dump(remote_addr->addr);
 
     uart_send_json("BT","BT_HFP_MODULE_ID",(uint8_t*)"SUCCESS",mid,0,0,0,0);
 }
@@ -343,12 +343,72 @@ static bt_app_hfp_cb_t bt_app_hfp_cb =
     bt_app_hfp_module_id,
 };
 
+void bt_app_a2dp_signal_connect(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("bt_app_a2dp_signal_connect:\n");
+    bt_addr_dump(remote_addr->addr);
+}
+void bt_app_a2dp_signal_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("bt_app_a2dp_signal_disconnect:\n");
+    bt_addr_dump(remote_addr->addr);
+
+}
+void bt_app_a2dp_stream_connect(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("bt_app_a2dp_stream_connect:\n");
+    bt_addr_dump(remote_addr->addr);
+
+}
+void bt_app_a2dp_stream_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("bt_app_a2dp_stream_disconnect:\n");
+    bt_addr_dump(remote_addr->addr);
+
+}
+void bt_app_a2dp_start(struct bd_addr_t *remote_addr,uint8_t value)
+{
+    printf("bt_app_a2dp_start address:\n");
+    bt_addr_dump(remote_addr->addr);
+
+}
+void bt_app_a2dp_relase(struct bd_addr_t *remote_addr,uint8_t value)
+{
+    printf("bt_app_a2dp_relase:\n");
+    bt_addr_dump(remote_addr->addr);
+
+}
+void bt_app_a2dp_suspend(struct bd_addr_t *remote_addr,uint8_t value)
+{
+    printf("bt_app_a2dp_suspend:\n");
+    bt_addr_dump(remote_addr->addr);
+
+}
+void bt_app_a2dp_abort(struct bd_addr_t *remote_addr,uint8_t value)
+{
+    printf("bt_app_a2dp_abort:\n");
+    bt_addr_dump(remote_addr->addr);
+
+}
+
+static bt_app_a2dp_cb_t bt_app_a2dp_cb =
+{
+    bt_app_a2dp_signal_connect,
+    bt_app_a2dp_signal_disconnect,
+    bt_app_a2dp_stream_connect,
+    bt_app_a2dp_stream_disconnect,
+    bt_app_a2dp_start,
+    bt_app_a2dp_relase,
+    bt_app_a2dp_suspend,
+    bt_app_a2dp_abort,
+};
+
 
 void bt_app_spp_connect(struct bd_addr_t *remote_addr,uint8_t status)
 {
     uint8_t addr_buf[32] = {0};
     printf("bt_app_spp_connect status %d address:\n",status);
-    bt_hex_dump(remote_addr->addr,6);
+    bt_addr_dump(remote_addr->addr);
     connect_addr.addr[5] = remote_addr->addr[5];
     connect_addr.addr[4] = remote_addr->addr[4];
     connect_addr.addr[3] = remote_addr->addr[3];
@@ -363,7 +423,7 @@ void bt_app_spp_connect(struct bd_addr_t *remote_addr,uint8_t status)
 void bt_app_spp_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("bt_app_spp_disconnect status %d address:\n",status);
-    bt_hex_dump(remote_addr->addr,6);
+    bt_addr_dump(remote_addr->addr);
     memset(&connect_addr,0,sizeof(connect_addr));
 
     uart_send_json("BT","BT_DISCON_RESULT",(uint8_t*)"SUCCESS","SPP",0,0,0,0);
@@ -374,7 +434,7 @@ void bt_app_spp_recv_data(struct bd_addr_t *remote_addr,uint8_t *data,uint16_t d
 {
     uint8_t data_len_buf[8] = {0};
     printf("bt_app_spp_recv_data len %d address:\n",data_len);
-    bt_hex_dump(remote_addr->addr,6);
+    bt_addr_dump(remote_addr->addr);
     printf("data is :");
     bt_hex_dump(data,data_len);
 
@@ -397,6 +457,7 @@ static bt_app_cb_t bt_app_cb =
     &bt_app_common_cb,
     &bt_app_spp_cb,
     &bt_app_hfp_cb,
+    &bt_app_a2dp_cb,
 };
 
 

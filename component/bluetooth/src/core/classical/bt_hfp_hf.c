@@ -800,13 +800,6 @@ static struct hfp_pcb_t *hfp_get_active_pcb(struct bd_addr_t *bdaddr)
     return pcb;
 }
 
-/*-----------------------------------------------------------------------------------*/
-/*
- * hfp_close():
- *
- * Closes the hfp protocol control block.
- */
-/*-----------------------------------------------------------------------------------*/
 static void hfp_close(struct hfp_pcb_t *pcb)
 {
     if(pcb != NULL)
@@ -2357,7 +2350,7 @@ static err_t hfp_hf_sco_connect_ind(void *arg, struct bd_addr_t *bdaddr)
 
     BT_HFP_TRACE_DEBUG("hfp_hf_sco_connect_ind: hfp sco req handle\n");
 
-    bt_hex_dump((bdaddr->addr),6);
+	bt_addr_dump(bdaddr->addr);
 
     hfppcb = hfp_get_active_pcb(bdaddr);
     if(!hfppcb)
@@ -2375,7 +2368,7 @@ static err_t hfp_hf_sco_conn_complete(void *arg, uint8_t status,struct bd_addr_t
 
     BT_HFP_TRACE_DEBUG("hfp_hf_sco_conn_complete: hfp sco conn complete status %d\n",status);
 
-    bt_hex_dump((bdaddr->addr),6);
+	bt_addr_dump(bdaddr->addr);
     hfppcb = hfp_get_active_pcb(bdaddr);
     if(!hfppcb)
         return BT_ERR_CONN;
@@ -2390,7 +2383,8 @@ static err_t  sco_hfp_disconn_complete(void *arg, uint8_t status,struct bd_addr_
     struct hfp_pcb_t *hfppcb;
 
     BT_HFP_TRACE_DEBUG("sco_hfp_disconn_complete: hfp sco disconn complete status %d\n",status);
-    bt_hex_dump((bdaddr->addr),6);
+
+	bt_addr_dump(bdaddr->addr);
     hfppcb = hfp_get_active_pcb(bdaddr);
     if(!hfppcb)
         return BT_ERR_CONN;

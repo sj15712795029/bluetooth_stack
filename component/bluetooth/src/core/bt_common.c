@@ -153,12 +153,12 @@ void bt_hex_dump(uint8_t *data,uint32_t len)
     for(curline = 0; curline < line; curline++)
     {
         sprintf(showline,"%08xh:",curline*MAX_COL);
-        BT_DEBUG("%s",showline);
+        BT_HEX_TRACE_DEBUG("%s",showline);
         for(curcol = 0; curcol < MAX_COL; curcol++)
         {
             if(data_pos < len)
             {
-                BT_DEBUG("%02x ",data[data_pos]);
+                BT_HEX_TRACE_DEBUG("%02x ",data[data_pos]);
                 data_pos++;
                 continue;
             }
@@ -167,9 +167,17 @@ void bt_hex_dump(uint8_t *data,uint32_t len)
                 break;
             }
         }
-        BT_DEBUG("\n");
+        BT_HEX_TRACE_DEBUG("\n");
     }
 }
+
+void bt_addr_dump(uint8_t *addr)
+{
+	uint8_t addr_buff[32];
+	sprintf((char*)addr_buff,"BT ADDR:%02x:%02x:%02x:%02x:%02x:%02x\n",addr[0],addr[1],addr[2],addr[3],addr[5],addr[5]);
+	BT_HEX_TRACE_DEBUG((char*)addr_buff);
+}
+
 
 uint8_t bt_parse_cod(uint8_t cod[3],uint16_t *device_service,uint16_t * device_major,uint16_t *device_minor)
 {

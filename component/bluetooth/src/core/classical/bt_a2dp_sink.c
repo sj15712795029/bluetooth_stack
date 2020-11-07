@@ -5,7 +5,11 @@
 #include "bt_pbuf.h"
 #include "bt_config.h"
 
+a2dp_sink_cbs_t *a2dp_sink_cbs;
 sbc_t sbc_context;
+uint32_t pcm_data_len;
+uint8_t pcm_data[1024];
+
 
 struct avdtp_pcb_t *temp_a2dp_sink;
 
@@ -43,10 +47,11 @@ static  uint8_t a2dp_sink_service_record[] =
 
 };
 
-struct a2dp_pcb *a2dp_sink_active_pcbs;  /* List of all active A2DP PCBs */
-struct a2dp_pcb *a2dp_sink_tmp_pcb;
+struct a2dp_pcb_t *a2dp_sink_active_pcbs;  /* List of all active A2DP PCBs */
+struct a2dp_pcb_t *a2dp_sink_tmp_pcb;
 uint8_t media_codec_cap[20];
 uint16_t media_codec_cap_len;
+
 
 static const uint8_t sbc_snk_codec_caps[] =
 {
@@ -63,32 +68,184 @@ static const uint8_t sbc_snk_codec_caps[] =
                SBC_SNK_MAX_BITPOOL,
 };
 
-static err_t a2dp_sinks_event_handle(struct avdtp_pcb_t *pcb,uint32_t msg_id,struct bt_pbuf_t *p)
+
+static struct a2dp_pcb_t *a2dp_new(struct avdtp_pcb_t *avdtppcb)
 {
-		
-    switch(msg_id)
+    struct a2dp_pcb_t *pcb;
+
+    pcb = bt_memp_malloc(MEMP_A2DP_PCB);
+    if(pcb != NULL)
     {
-    case AVDTP_SI_DISCOVER:
-        break;
-    case AVDTP_SI_GET_CAPABILITIES:
-        break;
-    case AVDTP_SI_SET_CONFIGURATION:
-		{
+        memset(pcb, 0, sizeof(struct a2dp_pcb_t));
+        pcb->avdtppcb = avdtppcb;
+        return pcb;
+    }
 
-        uint8_t * media_codec_cap_temp = (uint8_t * )avdtp_get_spec_cap_value(AVDTP_MEDIA_CODEC,p->payload,p->len,&media_codec_cap_len);
-        BT_A2DP_TRACE_DEBUG("-------------AVDTP_MEDIA_CODEC---len %d----\n",media_codec_cap_len);
+    BT_A2DP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_memp_malloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+    return NULL;
+}
 
-        bt_hex_dump(media_codec_cap,media_codec_cap_len);
-        memcpy(media_codec_cap,media_codec_cap_temp,media_codec_cap_len);
+static struct a2dp_pcb_t *a2dp_get_active_pcb(struct bd_addr_t *bdaddr)
+{
+    struct a2dp_pcb_t *pcb = NULL;
+    for(pcb = a2dp_sink_active_pcbs; pcb != NULL; pcb = pcb->next)
+    {
+        if(bd_addr_cmp(&(pcb->remote_addr),bdaddr))
+        {
+            break;
+        }
+    }
+    return pcb;
+}
 
-        break;
-		}
-    case AVDTP_SI_GET_CONFIGURATION:
-        break;
-    case AVDTP_SI_RECONFIGURE:
-        break;
-    case AVDTP_SI_OPEN:
-        sbc_init(&sbc_context, SBC_FLAGS_DECODER);
+static void a2dp_close(struct a2dp_pcb_t *pcb)
+{
+    if(pcb != NULL)
+    {
+        bt_memp_free(MEMP_A2DP_PCB, pcb);
+        pcb = NULL;
+    }
+}
+
+static err_t a2dp_signal_connect_ind(void *arg, struct avdtp_pcb_t *pcb, err_t err)
+{
+    struct a2dp_pcb_t *a2dppcb;
+
+    if((a2dppcb = a2dp_new(pcb)) == NULL)
+    {
+        BT_A2DP_TRACE_DEBUG("a2dp_signal_connect_ind: Could not alloc a2dp pcb\n");
+
+        return BT_ERR_MEM;
+    }
+    bd_addr_set(&(a2dppcb->remote_addr),&(pcb->remote_bdaddr));
+    A2DP_PCB_REG(&a2dp_sink_active_pcbs, a2dppcb);
+
+    if(a2dp_sink_cbs && a2dp_sink_cbs->a2dp_sink_signal_connect_set_up)
+        a2dp_sink_cbs->a2dp_sink_signal_connect_set_up(&a2dppcb->remote_addr,BT_ERR_OK);
+    return BT_ERR_OK;
+}
+
+static err_t a2dp_stream_connect_ind(void *arg, struct avdtp_pcb_t *pcb, err_t err)
+{
+    struct a2dp_pcb_t *a2dppcb = a2dp_get_active_pcb(&pcb->remote_bdaddr);
+
+    if(a2dppcb == NULL)
+    {
+        BT_A2DP_TRACE_DEBUG("a2dp_stream_connect_ind: Could not find a2dp pcb\n");
+
+        return BT_ERR_MEM;
+    }
+
+    if(a2dp_sink_cbs && a2dp_sink_cbs->a2dp_sink_stream_connect_set_up)
+        a2dp_sink_cbs->a2dp_sink_stream_connect_set_up(&a2dppcb->remote_addr,BT_ERR_OK);
+    return BT_ERR_OK;
+}
+
+static err_t a2dp_signal_disconnect_ind(void *arg, struct avdtp_pcb_t *pcb, err_t err)
+{
+    struct a2dp_pcb_t *a2dppcb;
+
+    if((a2dppcb = a2dp_new(pcb)) == NULL)
+    {
+        BT_A2DP_TRACE_DEBUG("a2dp_signal_connect_ind: Could not alloc a2dp pcb\n");
+
+        return BT_ERR_MEM;
+    }
+    
+
+    if(a2dp_sink_cbs && a2dp_sink_cbs->a2dp_sink_signal_connect_set_up)
+        a2dp_sink_cbs->a2dp_sink_signal_connect_set_up(&a2dppcb->remote_addr,BT_ERR_OK);
+
+	A2DP_PCB_RMV(&a2dp_sink_active_pcbs, a2dppcb);
+	a2dp_close(a2dppcb);
+    return BT_ERR_OK;
+}
+
+static err_t a2dp_stream_disconnect_ind(void *arg, struct avdtp_pcb_t *pcb, err_t err)
+{
+    struct a2dp_pcb_t *a2dppcb = a2dp_get_active_pcb(&pcb->remote_bdaddr);
+
+    if(a2dppcb == NULL)
+    {
+        BT_A2DP_TRACE_DEBUG("a2dp_stream_connect_ind: Could not find a2dp pcb\n");
+
+        return BT_ERR_MEM;
+    }
+
+    if(a2dp_sink_cbs && a2dp_sink_cbs->a2dp_sink_stream_realease)
+        a2dp_sink_cbs->a2dp_sink_stream_realease(&a2dppcb->remote_addr,BT_ERR_OK);
+    return BT_ERR_OK;
+}
+
+
+static err_t a2dp_signal_start_ind(void *arg, struct avdtp_pcb_t *pcb, err_t err)
+{
+    struct a2dp_pcb_t *a2dppcb = a2dp_get_active_pcb(&pcb->remote_bdaddr);
+
+    if(a2dppcb == NULL)
+    {
+        BT_A2DP_TRACE_DEBUG("a2dp_signal_start_ind: Could not find a2dp pcb\n");
+
+        return BT_ERR_MEM;
+    }
+
+    if(a2dp_sink_cbs && a2dp_sink_cbs->a2dp_sink_stream_start)
+        a2dp_sink_cbs->a2dp_sink_stream_start(&a2dppcb->remote_addr,BT_ERR_OK);
+    return BT_ERR_OK;
+}
+
+static err_t a2dp_signal_suspend_ind(void *arg, struct avdtp_pcb_t *pcb, err_t err)
+{
+    struct a2dp_pcb_t *a2dppcb = a2dp_get_active_pcb(&pcb->remote_bdaddr);
+
+    if(a2dppcb == NULL)
+    {
+        BT_A2DP_TRACE_DEBUG("a2dp_signal_start_ind: Could not find a2dp pcb\n");
+
+        return BT_ERR_MEM;
+    }
+
+    if(a2dp_sink_cbs && a2dp_sink_cbs->a2dp_sink_stream_suspend)
+        a2dp_sink_cbs->a2dp_sink_stream_suspend(&a2dppcb->remote_addr,BT_ERR_OK);
+    return BT_ERR_OK;
+}
+
+static err_t a2dp_signal_close_ind(void *arg, struct avdtp_pcb_t *pcb, err_t err)
+{
+    struct a2dp_pcb_t *a2dppcb = a2dp_get_active_pcb(&pcb->remote_bdaddr);
+
+    if(a2dppcb == NULL)
+    {
+        BT_A2DP_TRACE_DEBUG("a2dp_signal_start_ind: Could not find a2dp pcb\n");
+
+        return BT_ERR_MEM;
+    }
+
+    if(a2dp_sink_cbs && a2dp_sink_cbs->a2dp_sink_stream_realease)
+        a2dp_sink_cbs->a2dp_sink_stream_realease(&a2dppcb->remote_addr,BT_ERR_OK);
+    return BT_ERR_OK;
+}
+
+static err_t a2dp_signal_abort_ind(void *arg, struct avdtp_pcb_t *pcb, err_t err)
+{
+    struct a2dp_pcb_t *a2dppcb = a2dp_get_active_pcb(&pcb->remote_bdaddr);
+
+    if(a2dppcb == NULL)
+    {
+        BT_A2DP_TRACE_DEBUG("a2dp_signal_start_ind: Could not find a2dp pcb\n");
+
+        return BT_ERR_MEM;
+    }
+
+    if(a2dp_sink_cbs && a2dp_sink_cbs->a2dp_sink_stream_realease)
+        a2dp_sink_cbs->a2dp_sink_stream_realease(&a2dppcb->remote_addr,BT_ERR_OK);
+    return BT_ERR_OK;
+}
+
+
+static err_t a2dp_sink_get_sbc_context_setting(void)
+{
+	sbc_init(&sbc_context, SBC_FLAGS_DECODER);
         switch (media_codec_cap[2] & 0xF0)
         {
         case AVDTP_SBC_16000 :
@@ -158,16 +315,54 @@ static err_t a2dp_sinks_event_handle(struct avdtp_pcb_t *pcb,uint32_t msg_id,str
         }
 
         sbc_context.bitpool = media_codec_cap[5];
-        BT_A2DP_TRACE_DEBUG("a2dp_sinks_event_handle: AVDTP_SI_OPEN\n");
+        
+
+		return BT_ERR_OK;
+}
+
+
+static err_t a2dp_sink_event_handle(struct avdtp_pcb_t *pcb,uint32_t msg_id,struct bt_pbuf_t *p)
+{
+
+    switch(msg_id)
+    {
+    case AVDTP_SI_DISCOVER:
+        break;
+    case AVDTP_SI_GET_CAPABILITIES:
+        break;
+    case AVDTP_SI_SET_CONFIGURATION:
+    {
+        uint8_t * media_codec_cap_temp = (uint8_t * )avdtp_get_spec_cap_value(AVDTP_MEDIA_CODEC,p->payload,p->len,&media_codec_cap_len);
+
+		BT_A2DP_TRACE_DEBUG("-------------AVDTP_MEDIA_CODEC---len %d----\n",media_codec_cap_len);
+
+        bt_hex_dump(media_codec_cap_temp,media_codec_cap_len);
+        memcpy(media_codec_cap,media_codec_cap_temp,media_codec_cap_len);
 
         break;
+    }
+    case AVDTP_SI_GET_CONFIGURATION:
+        break;
+    case AVDTP_SI_RECONFIGURE:
+        break;
+    case AVDTP_SI_OPEN:
+		BT_A2DP_TRACE_DEBUG("a2dp_sink_event_handle: AVDTP_SI_OPEN codec_type %d\n",pcb->codec_type);
+		if(pcb->codec_type == AVDTP_CODEC_SBC)
+		{
+			a2dp_sink_get_sbc_context_setting();
+		}
+        break;
     case AVDTP_SI_START:
+		a2dp_signal_start_ind(NULL,pcb,BT_ERR_OK);
         break;
     case AVDTP_SI_CLOSE:
+		a2dp_signal_close_ind(NULL,pcb,BT_ERR_OK);
         break;
     case AVDTP_SI_SUSPEND:
+		a2dp_signal_suspend_ind(NULL,pcb,BT_ERR_OK);
         break;
     case AVDTP_SI_ABORT:
+		a2dp_signal_abort_ind(NULL,pcb,BT_ERR_OK);
         break;
     case AVDTP_SI_SECURITY_CONTROL:
         break;
@@ -177,35 +372,37 @@ static err_t a2dp_sinks_event_handle(struct avdtp_pcb_t *pcb,uint32_t msg_id,str
         break;
     /* USER DEFINE */
     case AVDTP_SI_SIGNAL_CONNECT_IND:
-        temp_a2dp_sink = pcb;
-        BT_A2DP_TRACE_DEBUG("a2dp_sinks_event_handle: AVDTP_SI_SIGNAL_CONNECT_IND\n");
-
-        break;
-    case AVDTP_SI_SIGNAL_CONNECT_CFM:
+        BT_A2DP_TRACE_DEBUG("a2dp_sink_event_handle: AVDTP_SI_SIGNAL_CONNECT_IND\n");
+        a2dp_signal_connect_ind(NULL,pcb,BT_ERR_OK);
         break;
     case AVDTP_SI_SIGNAL_DISCON_IND:
+		BT_A2DP_TRACE_DEBUG("a2dp_sink_event_handle: AVDTP_SI_SIGNAL_DISCON_IND\n");
+        a2dp_signal_disconnect_ind(NULL,pcb,BT_ERR_OK);
         break;
     case AVDTP_SI_SIGNAL_DISCON_CFM:
         break;
     case AVDTP_SI_STREAM_CONNECT_IND:
+        BT_A2DP_TRACE_DEBUG("a2dp_sink_event_handle: AVDTP_SI_STREAM_CONNECT_IND\n");
+        a2dp_stream_connect_ind(NULL,pcb,BT_ERR_OK);
         break;
     case AVDTP_SI_STREAM_CONNECT_CFM:
         break;
     case AVDTP_SI_STREAM_DISCON_IND:
+		BT_A2DP_TRACE_DEBUG("a2dp_sink_event_handle: AVDTP_SI_STREAM_DISCON_IND\n");
+        a2dp_stream_disconnect_ind(NULL,pcb,BT_ERR_OK);
         break;
     case AVDTP_SI_STREAM_DISCON_CFM:
         break;
     default:
         break;
     }
-		
-		return BT_ERR_OK;
+
+    return BT_ERR_OK;
 }
 
-uint32_t pcm_data_len;
-uint8_t pcm_data[1024];
 
-static err_t a2dp_sinks_media_handle(struct avdtp_pcb_t *pcb,struct bt_pbuf_t *p)
+
+static err_t a2dp_sink_media_handle(struct avdtp_pcb_t *pcb,struct bt_pbuf_t *p)
 {
     uint8_t frame_index = 0;
     uint8_t *data = (uint8_t *)p->payload;
@@ -216,11 +413,11 @@ static err_t a2dp_sinks_media_handle(struct avdtp_pcb_t *pcb,struct bt_pbuf_t *p
     uint8_t last_packet = (data[0] >> 5) & 0x1;
     uint8_t num_frames = data[0] & 0xf;
 
-	BT_UNUSED_ARG(frame_index);
-	BT_UNUSED_ARG(fragmentation);
-	BT_UNUSED_ARG(starting_packet);
-	BT_UNUSED_ARG(last_packet);
-	BT_UNUSED_ARG(num_frames);
+    BT_UNUSED_ARG(frame_index);
+    BT_UNUSED_ARG(fragmentation);
+    BT_UNUSED_ARG(starting_packet);
+    BT_UNUSED_ARG(last_packet);
+    BT_UNUSED_ARG(num_frames);
     data += 1;
     data_len -= 1;
 
@@ -231,16 +428,16 @@ static err_t a2dp_sinks_media_handle(struct avdtp_pcb_t *pcb,struct bt_pbuf_t *p
         if (sbc_frame_size <= 0)
             break;
 
-	BT_A2DP_TRACE_DEBUG("sbc_frame_size %d,pcm_data_len %d\n",sbc_frame_size,pcm_data_len);
+        BT_A2DP_INFO_TRACE_DEBUG("sbc_frame_size %d,pcm_data_len %d\n",sbc_frame_size,pcm_data_len);
         data += sbc_frame_size;
         data_len -= sbc_frame_size;
     }
-		
-		return BT_ERR_OK;
+
+    return BT_ERR_OK;
 }
 
 
-err_t a2dp_sink_init()
+err_t a2dp_sink_init(a2dp_sink_cbs_t *cb)
 {
     struct sdp_record_t *record;
 
@@ -259,7 +456,8 @@ err_t a2dp_sink_init()
     }
     bt_hex_dump((uint8_t *)a2dp_sink_service_record,sizeof(a2dp_sink_service_record));
 
-    avdtp_init(a2dp_sinks_event_handle,a2dp_sinks_media_handle);
-    avdtp_create_sep((uint8_t *)sbc_snk_codec_caps,sizeof(sbc_snk_codec_caps));
+    a2dp_sink_cbs = cb;
+    avdtp_init(a2dp_sink_event_handle,a2dp_sink_media_handle);
+    avdtp_create_sep(AVDTP_CODEC_SBC,(uint8_t *)sbc_snk_codec_caps,sizeof(sbc_snk_codec_caps));
     return BT_ERR_OK;
 }

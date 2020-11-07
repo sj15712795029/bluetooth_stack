@@ -46,7 +46,6 @@ typedef enum {
   BT_ERR_CONN       = -11,
 /** Low-level netif error    */
   BT_ERR_IF         = -12,
-
 /** Connection aborted.      */
   BT_ERR_ABRT       = -13,
 /** Connection reset.        */
@@ -373,6 +372,7 @@ void bt_be_store_64(uint8_t *buffer,uint16_t pos,uint64_t value);
 uint32_t bt_atoi_spec_size(const uint8_t *str,uint8_t size);
 uint32_t bt_atoi(const uint8_t *str);
 void bt_hex_dump(uint8_t *data,uint32_t len);
+void bt_addr_dump(uint8_t *addr);
 uint8_t bt_parse_cod(uint8_t cod[3],uint16_t *device_service,uint16_t * device_major,uint16_t *device_minor);
 #endif
 

@@ -34,15 +34,27 @@ typedef enum{
     AVDTP_SBC_ALLOCATION_METHOD_SNR      = 2,
 } sbc_allocation_method_t;
 
-struct a2dp_pcb
+struct a2dp_pcb_t
 {
-    struct a2dp_pcb *next; /* For the linked list */
-    void *callback_arg;
-    /* Callback */
+    struct a2dp_pcb_t *next; /* For the linked list */
+	struct avdtp_pcb_t *avdtppcb;
+	struct bd_addr_t remote_addr;
+	uint8_t codec_type;
 };
 
-extern struct a2dp_pcb *a2dp_sink_active_pcbs;  /* List of all active A2DP PCBs */
-extern struct a2dp_pcb *a2dp_sink_tmp_pcb;
+typedef struct
+{
+    void (*a2dp_sink_signal_connect_set_up)(struct bd_addr_t *remote_addr,uint8_t status);
+    void (*a2dp_sink_signal_connect_realease)(struct bd_addr_t *remote_addr,uint8_t status);
+    void (*a2dp_sink_stream_connect_set_up)(struct bd_addr_t *remote_addr,uint8_t status);
+    void (*a2dp_sink_stream_connect_realease)(struct bd_addr_t *remote_addr,uint8_t status);
+    void (*a2dp_sink_stream_start)(struct bd_addr_t *remote_addr,uint8_t value);
+    void (*a2dp_sink_stream_realease)(struct bd_addr_t *remote_addr,uint8_t value);
+    void (*a2dp_sink_stream_suspend)(struct bd_addr_t *remote_addr,uint8_t value);
+    void (*a2dp_sink_stream_abort)(struct bd_addr_t *remote_addr,uint8_t value);
+} a2dp_sink_cbs_t;
+
+
 
 #define A2DP_PCB_REG(pcbs, npcb) do { \
                             npcb->next = *pcbs; \
@@ -61,5 +73,6 @@ extern struct a2dp_pcb *a2dp_sink_tmp_pcb;
                             } while(0)
 
 
-err_t a2dp_sink_init(void);
+err_t a2dp_sink_init(a2dp_sink_cbs_t *cb);
+
 #endif

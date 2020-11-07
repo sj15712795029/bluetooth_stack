@@ -386,7 +386,7 @@ void obex_client_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status,uin
         return;
     BT_PBAP_TRACE_DEBUG("PBAP << OBEX:obex_client_connect_set_up,cid 0x%xaddress is :\n",cid);
 
-    bt_hex_dump(remote_addr->addr,6);
+	bt_addr_dump(remote_addr->addr);
 
     pbappcb->cid = cid;
 
@@ -394,7 +394,7 @@ void obex_client_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status,uin
 void obex_client_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
 {
     BT_PBAP_TRACE_DEBUG("PBAP << OBEX:obex_client_connect_set_up,address is :\n");
-    bt_hex_dump(remote_addr->addr,6);
+	bt_addr_dump(remote_addr->addr);
 }
 
 void obex_client_data_ind(struct bd_addr_t *remote_addr,uint8_t *data,uint16_t data_len,uint8_t status)
@@ -404,7 +404,7 @@ void obex_client_data_ind(struct bd_addr_t *remote_addr,uint8_t *data,uint16_t d
         return;
 
     BT_PBAP_TRACE_DEBUG("PBAP << OBEX:obex_client_data_ind, status 0x%x address is :\n",status);
-    bt_hex_dump(remote_addr->addr,6);
+	bt_addr_dump(remote_addr->addr);
 
 	//BT_PBAP_TRACE_DEBUG("PBAP << OBEX:obex_client_data is :\n");
     //bt_hex_dump(data,data_len);
