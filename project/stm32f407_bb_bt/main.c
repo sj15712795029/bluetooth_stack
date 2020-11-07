@@ -309,9 +309,12 @@ void bt_app_a2dp_signal_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
     printf("bt_app_a2dp_signal_disconnect:\n");
     bt_addr_dump(remote_addr->addr);
 
+	uart_send_json("BT","BT_DISCON_RESULT",(uint8_t*)"SUCCESS","A2DP",0,0,0,0);
+
 }
 void bt_app_a2dp_stream_connect(struct bd_addr_t *remote_addr,uint8_t status)
 {
+	uint8_t addr_buf[32] = {0};
     printf("bt_app_a2dp_stream_connect:\n");
     bt_addr_dump(remote_addr->addr);
 
@@ -320,6 +323,10 @@ void bt_app_a2dp_stream_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("bt_app_a2dp_stream_disconnect:\n");
     bt_addr_dump(remote_addr->addr);
+
+	hw_sprintf((char*)addr_buf,"%02x:%02x:%02x:%02x:%02x:%02x",remote_addr->addr[5],remote_addr->addr[4],remote_addr->addr[3],\
+               remote_addr->addr[2],remote_addr->addr[1],remote_addr->addr[0]);
+    uart_send_json("BT","BT_CON_RESULT",(uint8_t*)"SUCCESS","A2DP",addr_buf,0,0,0);
 
 }
 void bt_app_a2dp_start(struct bd_addr_t *remote_addr,uint8_t value)

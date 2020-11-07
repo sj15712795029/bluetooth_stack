@@ -672,6 +672,12 @@ namespace mcu_bt_tool
                         json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_set_spk_volume, bt_hfp_default_spk_volume.ToString(), null, null, null, null, null);
                     }
 
+                    if (status.PARAM1 == "A2DP")
+                    {
+                        ui_bt_a2dp_con_status(true);
+                        ui_bt_a2dp_con_status(status.PARAM2);
+                    }
+
                 }
 
                 if (status.OPERATE == "BT_DISCON_RESULT")
@@ -694,6 +700,12 @@ namespace mcu_bt_tool
                         ui_bt_hfp_update_batt(null);
                         ui_bt_hfp_update_signal(null);
 
+                    }
+
+                    if (status.PARAM1 == "A2DP")
+                    {
+                        ui_bt_a2dp_con_status(false);
+                        ui_bt_a2dp_con_status(null);
                     }
                 }
 
@@ -822,6 +834,32 @@ namespace mcu_bt_tool
         {
             b_start_inquiry.Enabled = bt_start_show;
             b_stop_inquiry.Enabled = bt_stop_show;
+        }
+
+        /* A2DP 刷新连接状态 */
+        private void ui_bt_a2dp_con_status(bool bt_a2dp_con_status)
+        {
+            if (bt_a2dp_con_status)
+            {
+                l_a2dp_con_status.Text = "已连接";
+            }
+            else
+            {
+                l_a2dp_con_status.Text = "未连接";
+            }
+        }
+
+        /* A2DP 刷新连接地址 */
+        private void ui_bt_a2dp_con_status(string bt_a2dp_con_addr)
+        {
+            if (bt_a2dp_con_addr != null)
+            {
+                l_a2dp_con_addr.Text = bt_a2dp_con_addr;
+            }
+            else
+            {
+                l_a2dp_con_addr.Text = "00:00:00:00:00:00";
+            }
         }
 
         /* SPP tabpage的显示使能 */

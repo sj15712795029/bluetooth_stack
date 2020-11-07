@@ -133,6 +133,15 @@
             this.b_bt_stop = new System.Windows.Forms.Button();
             this.b_bt_start = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.tp_bt_audio = new System.Windows.Forms.TabPage();
+            this.l_a2dp_con_addr = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
+            this.l_a2dp_con_status = new System.Windows.Forms.Label();
+            this.label13 = new System.Windows.Forms.Label();
+            this.l_avrcp_con_addr = new System.Windows.Forms.Label();
+            this.label15 = new System.Windows.Forms.Label();
+            this.l_avrcp_con_status = new System.Windows.Forms.Label();
+            this.label17 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.tc_bt_function.SuspendLayout();
             this.tp_bt_basic_func.SuspendLayout();
@@ -149,6 +158,7 @@
             this.groupBox2.SuspendLayout();
             this.groupBox6.SuspendLayout();
             this.g_log_func.SuspendLayout();
+            this.tp_bt_audio.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -248,6 +258,7 @@
             // 
             this.tc_bt_function.Controls.Add(this.tp_bt_basic_func);
             this.tc_bt_function.Controls.Add(this.tp_bt_hfp_hf);
+            this.tc_bt_function.Controls.Add(this.tp_bt_audio);
             this.tc_bt_function.Controls.Add(this.tp_bt_spp);
             this.tc_bt_function.Location = new System.Drawing.Point(8, 116);
             this.tc_bt_function.Name = "tc_bt_function";
@@ -1238,6 +1249,104 @@
             this.timer1.Interval = 1000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // tp_bt_audio
+            // 
+            this.tp_bt_audio.Controls.Add(this.l_avrcp_con_addr);
+            this.tp_bt_audio.Controls.Add(this.label15);
+            this.tp_bt_audio.Controls.Add(this.l_avrcp_con_status);
+            this.tp_bt_audio.Controls.Add(this.label17);
+            this.tp_bt_audio.Controls.Add(this.l_a2dp_con_addr);
+            this.tp_bt_audio.Controls.Add(this.label11);
+            this.tp_bt_audio.Controls.Add(this.l_a2dp_con_status);
+            this.tp_bt_audio.Controls.Add(this.label13);
+            this.tp_bt_audio.Location = new System.Drawing.Point(4, 25);
+            this.tp_bt_audio.Name = "tp_bt_audio";
+            this.tp_bt_audio.Padding = new System.Windows.Forms.Padding(3);
+            this.tp_bt_audio.Size = new System.Drawing.Size(862, 554);
+            this.tp_bt_audio.TabIndex = 3;
+            this.tp_bt_audio.Text = "蓝牙音频";
+            this.tp_bt_audio.UseVisualStyleBackColor = true;
+            // 
+            // l_a2dp_con_addr
+            // 
+            this.l_a2dp_con_addr.AutoSize = true;
+            this.l_a2dp_con_addr.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.l_a2dp_con_addr.Location = new System.Drawing.Point(576, 22);
+            this.l_a2dp_con_addr.Name = "l_a2dp_con_addr";
+            this.l_a2dp_con_addr.Size = new System.Drawing.Size(229, 31);
+            this.l_a2dp_con_addr.TabIndex = 7;
+            this.l_a2dp_con_addr.Text = "00:00:00:00:00:00";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label11.Location = new System.Drawing.Point(374, 22);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(185, 31);
+            this.label11.TabIndex = 6;
+            this.label11.Text = "A2DP连接地址:";
+            // 
+            // l_a2dp_con_status
+            // 
+            this.l_a2dp_con_status.AutoSize = true;
+            this.l_a2dp_con_status.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.l_a2dp_con_status.Location = new System.Drawing.Point(247, 22);
+            this.l_a2dp_con_status.Name = "l_a2dp_con_status";
+            this.l_a2dp_con_status.Size = new System.Drawing.Size(86, 31);
+            this.l_a2dp_con_status.TabIndex = 5;
+            this.l_a2dp_con_status.Text = "未连接";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label13.Location = new System.Drawing.Point(40, 22);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(185, 31);
+            this.label13.TabIndex = 4;
+            this.label13.Text = "A2DP连接状态:";
+            // 
+            // l_avrcp_con_addr
+            // 
+            this.l_avrcp_con_addr.AutoSize = true;
+            this.l_avrcp_con_addr.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.l_avrcp_con_addr.Location = new System.Drawing.Point(576, 64);
+            this.l_avrcp_con_addr.Name = "l_avrcp_con_addr";
+            this.l_avrcp_con_addr.Size = new System.Drawing.Size(229, 31);
+            this.l_avrcp_con_addr.TabIndex = 11;
+            this.l_avrcp_con_addr.Text = "00:00:00:00:00:00";
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label15.Location = new System.Drawing.Point(374, 64);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(201, 31);
+            this.label15.TabIndex = 10;
+            this.label15.Text = "AVRCP连接地址:";
+            // 
+            // l_avrcp_con_status
+            // 
+            this.l_avrcp_con_status.AutoSize = true;
+            this.l_avrcp_con_status.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.l_avrcp_con_status.Location = new System.Drawing.Point(247, 64);
+            this.l_avrcp_con_status.Name = "l_avrcp_con_status";
+            this.l_avrcp_con_status.Size = new System.Drawing.Size(86, 31);
+            this.l_avrcp_con_status.TabIndex = 9;
+            this.l_avrcp_con_status.Text = "未连接";
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label17.Location = new System.Drawing.Point(40, 64);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(201, 31);
+            this.label17.TabIndex = 8;
+            this.label17.Text = "AVRCP连接状态:";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -1279,6 +1388,8 @@
             this.groupBox6.PerformLayout();
             this.g_log_func.ResumeLayout(false);
             this.g_log_func.PerformLayout();
+            this.tp_bt_audio.ResumeLayout(false);
+            this.tp_bt_audio.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1388,6 +1499,15 @@
         private System.Windows.Forms.Button b_hfp_get_module_name;
         private System.Windows.Forms.TextBox tb_hfp_manu_id;
         private System.Windows.Forms.Button b_hfp_get_manu_id;
+        private System.Windows.Forms.TabPage tp_bt_audio;
+        private System.Windows.Forms.Label l_avrcp_con_addr;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.Label l_avrcp_con_status;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.Label l_a2dp_con_addr;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label l_a2dp_con_status;
+        private System.Windows.Forms.Label label13;
     }
 }
 
