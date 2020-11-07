@@ -26,7 +26,7 @@ void hci_reset_timeout(void *para)
 
 static err_t pin_req_handle(void *arg, struct bd_addr_t *bdaddr)
 {
-    return hci_pin_code_request_reply(bdaddr, 4, pcb->pincode);
+    return hci_pin_code_request_reply(bdaddr, strlen((const char*)pcb->pincode), pcb->pincode);
 }
 
 err_t hci_init(void)
