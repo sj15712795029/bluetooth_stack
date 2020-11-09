@@ -165,16 +165,15 @@ static err_t a2dp_stream_connect_ind(struct avdtp_pcb_t *avdtp_pcb)
 
 static err_t a2dp_signal_disconnect_ind(struct avdtp_pcb_t *avdtp_pcb)
 {
-    struct a2dp_pcb_t *a2dp_pcb;
+    struct a2dp_pcb_t *a2dp_pcb = a2dp_get_active_pcb(&avdtp_pcb->remote_bdaddr);
 
-    if((a2dp_pcb = a2dp_new(avdtp_pcb)) == NULL)
+    if(a2dp_pcb == NULL)
     {
         BT_A2DP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] Could not find a2dp pcb\n",__FILE__,__FUNCTION__,__LINE__);
 
         return BT_ERR_MEM;
     }
     
-
     if(a2dp_sink_cbs && a2dp_sink_cbs->a2dp_sink_signal_connect_realease)
         a2dp_sink_cbs->a2dp_sink_signal_connect_realease(&a2dp_pcb->remote_addr,BT_ERR_OK);
 
@@ -240,8 +239,9 @@ static err_t a2dp_signal_open_ind(struct avdtp_pcb_t *avdtp_pcb)
     bt_hex_dump(a2dp_pcb->media_codec_cap,a2dp_pcb->media_codec_cap_len);
 
 	codec_info_element = avdtp_parse_media_codec_cap(a2dp_pcb->media_codec_cap,&media_type,&media_codec_type);
-
-	switch(media_codec_type)
+	a2dp_pcb->codec_type = media_codec_type;
+	
+	switch(a2dp_pcb->codec_type)
 	{
 		case AVDTP_CODEC_SBC:
 			a2dp_pcb->codec_type = AVDTP_CODEC_SBC;
@@ -307,6 +307,22 @@ static err_t a2dp_signal_close_ind(struct avdtp_pcb_t *avdtp_pcb)
         return BT_ERR_MEM;
     }
 
+	switch(a2dp_pcb->codec_type)
+	{
+		case AVDTP_CODEC_SBC:
+			sbc_finish(&sbc_context);
+			break;
+		case AVDTP_CODEC_MPEG_1_2_AUDIO:
+			break;
+		case AVDTP_CODEC_MPEG_2_4_AAC:
+			break;
+		case AVDTP_CODEC_ATRAC_FAMILY:
+			break;
+		default:
+			break;
+	}
+	
+	
     if(a2dp_sink_cbs && a2dp_sink_cbs->a2dp_sink_stream_realease)
         a2dp_sink_cbs->a2dp_sink_stream_realease(&a2dp_pcb->remote_addr,BT_ERR_OK);
     return BT_ERR_OK;
@@ -468,12 +484,14 @@ static err_t a2dp_sink_event_handle(struct avdtp_pcb_t *avdtp_pcb,uint32_t msg_i
         a2dp_signal_disconnect_ind(avdtp_pcb);
         break;
     case AVDTP_SI_SIGNAL_DISCON_CFM:
+		BT_A2DP_TRACE_DEBUG("a2dp_sink_event_handle: AVDTP_SI_SIGNAL_DISCON_CFM\n");
         break;
     case AVDTP_SI_STREAM_CONNECT_IND:
         BT_A2DP_TRACE_DEBUG("a2dp_sink_event_handle: AVDTP_SI_STREAM_CONNECT_IND\n");
         a2dp_stream_connect_ind(avdtp_pcb);
         break;
     case AVDTP_SI_STREAM_CONNECT_CFM:
+		BT_A2DP_TRACE_DEBUG("a2dp_sink_event_handle: AVDTP_SI_STREAM_CONNECT_CFM\n");
         break;
     case AVDTP_SI_STREAM_DISCON_IND:
 		BT_A2DP_TRACE_DEBUG("a2dp_sink_event_handle: AVDTP_SI_STREAM_DISCON_IND\n");
