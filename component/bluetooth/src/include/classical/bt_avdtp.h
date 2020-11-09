@@ -12,7 +12,6 @@
 
 #include "bt_common.h"
 #include "bt_l2cap.h"
-#include "bt_avdtp.h"
 
 typedef enum
 {
@@ -127,12 +126,7 @@ struct avdtp_pcb_t
     struct l2cap_pcb_t *avdtp_signal_l2cappcb; /* The L2CAP connection */
     struct l2cap_pcb_t *avdtp_media_l2cappcb;
 	struct bd_addr_t remote_bdaddr;
-	uint8_t codec_type;
-	uint8_t content_protection;
-    void *callback_arg;
-    /* Callback */
 };
-
 
 
 typedef struct
@@ -164,51 +158,13 @@ struct service_category_hdr
 	uint8_t losc;
 }BT_PACK_END;
 
- 
+typedef err_t (*avdtp_event_handle)(struct avdtp_pcb_t *avdtp_pcb,uint32_t msg_id,struct bt_pbuf_t *p);
+typedef err_t (*avdtp_media_handle)(struct avdtp_pcb_t *avdtp_pcb,struct bt_pbuf_t *p);
 
-
-typedef err_t (*avdtp_event_handle)(struct avdtp_pcb_t *pcb,uint32_t msg_id,struct bt_pbuf_t *p);
-typedef err_t (*avdtp_media_handle)(struct avdtp_pcb_t *pcb,struct bt_pbuf_t *p);
 err_t avdtp_init(avdtp_event_handle avdtp_evt_handle,avdtp_media_handle avdtp_media_handle);
 err_t avdtp_create_sep(uint8_t codec_type,uint8_t * media_codec_info, uint16_t media_codec_info_len);
 uint8_t *avdtp_get_spec_cap_value(uint8_t category_id,uint8_t *cap,uint16_t cap_len,uint16_t *spec_cap_len);
-
-extern struct avdtp_sep_t *avdtp_local_sep; /* List of all active avdtp seps */
-extern struct avdtp_sep_t *avdtp_tmp_sep;      /* Only used for temporary storage. */
-extern struct avdtp_pcb_t *avdtp_active_pcbs;  /* List of all active AVDTP PCBs */
-extern struct avdtp_pcb_t *avdtp_tmp_pcb;
-
-#define AVDTP_SEP_REG(pcbs, npcb) do { \
-                            npcb->next = *pcbs; \
-                            *pcbs = npcb; \
-                            } while(0)
-#define AVDTP_SEP_RMV(pcbs, npcb) do { \
-                            if(*pcbs == npcb) { \
-                               *pcbs = (*pcbs)->next; \
-                            } else for(avdtp_tmp_sep = *pcbs; avdtp_tmp_sep != NULL; avdtp_tmp_sep = avdtp_tmp_sep->next) { \
-                               if(avdtp_tmp_sep->next != NULL && avdtp_tmp_sep->next == npcb) { \
-                                  avdtp_tmp_sep->next = npcb->next; \
-                                  break; \
-                               } \
-                            } \
-                            npcb->next = NULL; \
-                            } while(0)
-
-#define AVDTP_PCB_REG(pcbs, npcb) do { \
-                            npcb->next = *pcbs; \
-                            *pcbs = npcb; \
-                            } while(0)
-#define AVDTP_PCB_RMV(pcbs, npcb) do { \
-                            if(*pcbs == npcb) { \
-                               *pcbs = (*pcbs)->next; \
-                            } else for(avdtp_tmp_pcb = *pcbs; avdtp_tmp_pcb != NULL; avdtp_tmp_pcb = avdtp_tmp_pcb->next) { \
-                               if(avdtp_tmp_pcb->next != NULL && avdtp_tmp_pcb->next == npcb) { \
-                                  avdtp_tmp_pcb->next = npcb->next; \
-                                  break; \
-                               } \
-                            } \
-                            npcb->next = NULL; \
-                            } while(0)
+uint8_t *avdtp_parse_media_codec_cap(uint8_t *cap,uint8_t *media_type,uint8_t *media_codec_type);
 
 
 #endif

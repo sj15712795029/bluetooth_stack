@@ -13,20 +13,52 @@
 
 uint8_t local_seid = 0;
 uint8_t avdtp_signal_open = 0;
-struct l2cap_pcb_t *avdtp2l2cap_pcb;
 
 struct avdtp_pcb_t *avdtp_active_pcbs;  /* List of all active AVDTP PCBs */
 struct avdtp_pcb_t *avdtp_tmp_pcb;
-
 struct avdtp_sep_t *avdtp_local_sep; /* List of all active avdtp seps */
 struct avdtp_sep_t *avdtp_tmp_sep;      /* Only used for temporary storage. */
+
+#define AVDTP_SEP_REG(pcbs, npcb) do { \
+                            npcb->next = *pcbs; \
+                            *pcbs = npcb; \
+                            } while(0)
+#define AVDTP_SEP_RMV(pcbs, npcb) do { \
+                            if(*pcbs == npcb) { \
+                               *pcbs = (*pcbs)->next; \
+                            } else for(avdtp_tmp_sep = *pcbs; avdtp_tmp_sep != NULL; avdtp_tmp_sep = avdtp_tmp_sep->next) { \
+                               if(avdtp_tmp_sep->next != NULL && avdtp_tmp_sep->next == npcb) { \
+                                  avdtp_tmp_sep->next = npcb->next; \
+                                  break; \
+                               } \
+                            } \
+                            npcb->next = NULL; \
+                            } while(0)
+
+#define AVDTP_PCB_REG(pcbs, npcb) do { \
+                            npcb->next = *pcbs; \
+                            *pcbs = npcb; \
+                            } while(0)
+#define AVDTP_PCB_RMV(pcbs, npcb) do { \
+                            if(*pcbs == npcb) { \
+                               *pcbs = (*pcbs)->next; \
+                            } else for(avdtp_tmp_pcb = *pcbs; avdtp_tmp_pcb != NULL; avdtp_tmp_pcb = avdtp_tmp_pcb->next) { \
+                               if(avdtp_tmp_pcb->next != NULL && avdtp_tmp_pcb->next == npcb) { \
+                                  avdtp_tmp_pcb->next = npcb->next; \
+                                  break; \
+                               } \
+                            } \
+                            npcb->next = NULL; \
+                            } while(0)
+
+
 
 avdtp_event_handle avdtp_event_handler;
 avdtp_media_handle avdtp_media_handler;
 
-static err_t avdtp_connect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err);
-static err_t avdtp_signal_disconnect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err);
-static err_t avdtp_stream_disconnect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err);
+static err_t avdtp_connect_ind(void *arg, struct l2cap_pcb_t *l2cap_pcb, err_t err);
+static err_t avdtp_signal_disconnect_ind(void *arg, struct l2cap_pcb_t *l2cap_pcb, err_t err);
+static err_t avdtp_stream_disconnect_ind(void *arg, struct l2cap_pcb_t *l2cap_pcb, err_t err);
 
 err_t avdtp_signal_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err);
 err_t avdtp_media_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err);
@@ -34,25 +66,25 @@ err_t avdtp_media_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_
 
 struct avdtp_pcb_t *avdtp_new(void)
 {
-    struct avdtp_pcb_t *pcb;
+    struct avdtp_pcb_t *avdtp_pcb;
 
-    pcb = bt_memp_malloc(MEMP_AVDTP_PCB);
-    if(pcb != NULL)
+    avdtp_pcb = bt_memp_malloc(MEMP_AVDTP_PCB);
+    if(avdtp_pcb != NULL)
     {
-        memset(pcb, 0, sizeof(struct avdtp_pcb_t));
-        return pcb;
+        memset(avdtp_pcb, 0, sizeof(struct avdtp_pcb_t));
+        return avdtp_pcb;
     }
 
     BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_memp_malloc fail\n",__FILE__,__FUNCTION__,__LINE__);
     return NULL;
 }
 
-void avdtp_close(struct avdtp_pcb_t *pcb)
+void avdtp_close(struct avdtp_pcb_t *avdtp_pcb)
 {
-    if(pcb != NULL)
+    if(avdtp_pcb != NULL)
     {
-        bt_memp_free(MEMP_AVDTP_PCB,pcb);
-        pcb = NULL;
+        bt_memp_free(MEMP_AVDTP_PCB,avdtp_pcb);
+        avdtp_pcb = NULL;
     }
 }
 
@@ -70,7 +102,7 @@ struct avdtp_sep_t *avdtp_get_sep(uint8_t seid)
 }
 
 
-static err_t avdtp_handle_discovery(struct avdtp_pcb_t *avdtppcb,uint8_t transaction_label)
+static err_t avdtp_handle_discovery(struct avdtp_pcb_t *avdtp_pcb,uint8_t transaction_label)
 {
     uint8_t *cmd_resp;
     uint8_t cmd_resp_pos = 0;
@@ -109,14 +141,14 @@ static err_t avdtp_handle_discovery(struct avdtp_pcb_t *avdtppcb,uint8_t transac
         bt_pbuf_cat(p, q);
     }
 
-    ret = l2cap_datawrite(avdtppcb->avdtp_signal_l2cappcb, p);
+    ret = l2cap_datawrite(avdtp_pcb->avdtp_signal_l2cappcb, p);
     bt_pbuf_free(p);
 
     return BT_ERR_OK;
 }
 
 
-static err_t avdtp_handle_get_capabilities(struct avdtp_pcb_t *avdtppcb,uint8_t transaction_label,uint8_t seid)
+static err_t avdtp_handle_get_capabilities(struct avdtp_pcb_t *avdtp_pcb,uint8_t transaction_label,uint8_t seid)
 {
     uint8_t *cmd_resp;
     uint8_t cmd_resp_pos = 0;
@@ -177,14 +209,14 @@ static err_t avdtp_handle_get_capabilities(struct avdtp_pcb_t *avdtppcb,uint8_t 
     }
     /* TODO:增加其他caplitily */
 
-    ret = l2cap_datawrite(avdtppcb->avdtp_signal_l2cappcb, p);
+    ret = l2cap_datawrite(avdtp_pcb->avdtp_signal_l2cappcb, p);
     bt_pbuf_free(p);
 
     return BT_ERR_OK;
 }
 
 
-static err_t avdtp_handle_get_all_capabilities(struct avdtp_pcb_t *avdtppcb,uint8_t transaction_label)
+static err_t avdtp_handle_get_all_capabilities(struct avdtp_pcb_t *avdtp_pcb,uint8_t transaction_label)
 {
     uint8_t *cmd_resp;
     uint8_t cmd_resp_pos = 0;
@@ -242,7 +274,7 @@ static err_t avdtp_handle_get_all_capabilities(struct avdtp_pcb_t *avdtppcb,uint
     }
     /* TODO:增加其他caplitily */
 
-    ret = l2cap_datawrite(avdtppcb->avdtp_signal_l2cappcb, p);
+    ret = l2cap_datawrite(avdtp_pcb->avdtp_signal_l2cappcb, p);
     bt_pbuf_free(p);
 
     return BT_ERR_OK;
@@ -269,7 +301,15 @@ uint8_t *avdtp_get_spec_cap_value(uint8_t category_id,uint8_t *cap,uint16_t cap_
     return cap_value;
 }
 
-static err_t avdtp_handle_set_configuration(struct avdtp_pcb_t *avdtppcb,uint8_t transaction_label,uint8_t acp_seid,uint8_t int_seid,uint8_t *cap,uint16_t cap_len)
+uint8_t *avdtp_parse_media_codec_cap(uint8_t *cap,uint8_t *media_type,uint8_t *media_codec_type)
+{
+	*media_type = cap[0] >> 4;
+	*media_codec_type = cap[1];
+	return (cap+2);
+}
+
+
+static err_t avdtp_handle_set_configuration(struct avdtp_pcb_t *avdtp_pcb,uint8_t transaction_label,uint8_t acp_seid,uint8_t int_seid,uint8_t *cap,uint16_t cap_len)
 {
     uint8_t *cmd_resp;
     uint8_t cmd_resp_pos = 0;
@@ -278,18 +318,6 @@ static err_t avdtp_handle_set_configuration(struct avdtp_pcb_t *avdtppcb,uint8_t
     err_t ret;
     BT_UNUSED_ARG(ret);
 
-	struct avdtp_sep_t *avdtp_sep= avdtp_get_sep(acp_seid);
-	if(avdtp_sep == NULL)
-	{
-		BT_AVDTP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] can not find sep by seid\n",__FILE__,__FUNCTION__,__LINE__);
-		return BT_ERR_ARG;
-	}
-
-	BT_AVDTP_TRACE_DEBUG("avdtp_sep_t seid %d\n",avdtp_sep->seid);
-	BT_AVDTP_TRACE_DEBUG("avdtp_sep_t codec type %d\n",avdtp_sep->codec_type);
-	avdtppcb->codec_type = avdtp_sep->codec_type;
-	avdtppcb->content_protection = avdtp_sep->content_protection;
-	
     if((p = bt_pbuf_alloc(BT_PBUF_RAW, AVDTP_SIG_HDR_SIZE, BT_PBUF_RAM)) == NULL)
     {
         /* Could not allocate memory for bt_pbuf_t */
@@ -300,13 +328,13 @@ static err_t avdtp_handle_set_configuration(struct avdtp_pcb_t *avdtppcb,uint8_t
 
     cmd_resp[cmd_resp_pos++] = 	(transaction_label << 4) | (AVDTP_SINGLE_PACKET<<2) |AVDTP_RESPONSE_ACCEPT_MSG;
     cmd_resp[cmd_resp_pos++] = AVDTP_SI_SET_CONFIGURATION;
-    ret = l2cap_datawrite(avdtppcb->avdtp_signal_l2cappcb, p);
+    ret = l2cap_datawrite(avdtp_pcb->avdtp_signal_l2cappcb, p);
     bt_pbuf_free(p);
 
     return BT_ERR_OK;
 }
 
-static err_t avdtp_handle_open(struct avdtp_pcb_t *avdtppcb,uint8_t transaction_label)
+static err_t avdtp_handle_open(struct avdtp_pcb_t *avdtp_pcb,uint8_t transaction_label)
 {
     uint8_t *cmd_resp;
     uint8_t cmd_resp_pos = 0;
@@ -324,13 +352,13 @@ static err_t avdtp_handle_open(struct avdtp_pcb_t *avdtppcb,uint8_t transaction_
     cmd_resp[cmd_resp_pos++] = 	(transaction_label << 4) | (AVDTP_SINGLE_PACKET<<2) |AVDTP_RESPONSE_ACCEPT_MSG;
     cmd_resp[cmd_resp_pos++] = AVDTP_SI_OPEN;
     avdtp_signal_open = 1;
-    ret = l2cap_datawrite(avdtppcb->avdtp_signal_l2cappcb, p);
+    ret = l2cap_datawrite(avdtp_pcb->avdtp_signal_l2cappcb, p);
     bt_pbuf_free(p);
 
     return BT_ERR_OK;
 }
 
-static err_t avdtp_handle_start(struct avdtp_pcb_t *avdtppcb,uint8_t transaction_label)
+static err_t avdtp_handle_start(struct avdtp_pcb_t *avdtp_pcb,uint8_t transaction_label)
 {
     uint8_t *cmd_resp;
     uint8_t cmd_resp_pos = 0;
@@ -348,13 +376,13 @@ static err_t avdtp_handle_start(struct avdtp_pcb_t *avdtppcb,uint8_t transaction
 
     cmd_resp[cmd_resp_pos++] = 	(transaction_label << 4) | (AVDTP_SINGLE_PACKET<<2) |AVDTP_RESPONSE_ACCEPT_MSG;
     cmd_resp[cmd_resp_pos++] = AVDTP_SI_START;
-    ret = l2cap_datawrite(avdtppcb->avdtp_signal_l2cappcb, p);
+    ret = l2cap_datawrite(avdtp_pcb->avdtp_signal_l2cappcb, p);
     bt_pbuf_free(p);
 
     return BT_ERR_OK;
 }
 
-static err_t avdtp_handle_suspend(struct avdtp_pcb_t *avdtppcb,uint8_t transaction_label)
+static err_t avdtp_handle_suspend(struct avdtp_pcb_t *avdtp_pcb,uint8_t transaction_label)
 {
     uint8_t *cmd_resp;
     uint8_t cmd_resp_pos = 0;
@@ -371,14 +399,14 @@ static err_t avdtp_handle_suspend(struct avdtp_pcb_t *avdtppcb,uint8_t transacti
 
     cmd_resp[cmd_resp_pos++] = 	(transaction_label << 4) | (AVDTP_SINGLE_PACKET<<2) |AVDTP_RESPONSE_ACCEPT_MSG;
     cmd_resp[cmd_resp_pos++] = AVDTP_SI_SUSPEND;
-    ret = l2cap_datawrite(avdtppcb->avdtp_signal_l2cappcb, p);
+    ret = l2cap_datawrite(avdtp_pcb->avdtp_signal_l2cappcb, p);
     bt_pbuf_free(p);
 
     return BT_ERR_OK;
 }
 
 
-static err_t avdtp_handle_close(struct avdtp_pcb_t *avdtppcb,uint8_t transaction_label)
+static err_t avdtp_handle_close(struct avdtp_pcb_t *avdtp_pcb,uint8_t transaction_label)
 {
     uint8_t *cmd_resp;
     uint8_t cmd_resp_pos = 0;
@@ -395,13 +423,13 @@ static err_t avdtp_handle_close(struct avdtp_pcb_t *avdtppcb,uint8_t transaction
 
     cmd_resp[cmd_resp_pos++] = 	(transaction_label << 4) | (AVDTP_SINGLE_PACKET<<2) |AVDTP_RESPONSE_ACCEPT_MSG;
     cmd_resp[cmd_resp_pos++] = AVDTP_SI_CLOSE;
-    ret = l2cap_datawrite(avdtppcb->avdtp_signal_l2cappcb, p);
+    ret = l2cap_datawrite(avdtp_pcb->avdtp_signal_l2cappcb, p);
     bt_pbuf_free(p);
 
     return BT_ERR_OK;
 }
 
-static err_t avdtp_handle_abort(struct avdtp_pcb_t *avdtppcb,uint8_t transaction_label)
+static err_t avdtp_handle_abort(struct avdtp_pcb_t *avdtp_pcb,uint8_t transaction_label)
 {
     uint8_t *cmd_resp;
     uint8_t cmd_resp_pos = 0;
@@ -418,7 +446,7 @@ static err_t avdtp_handle_abort(struct avdtp_pcb_t *avdtppcb,uint8_t transaction
 
     cmd_resp[cmd_resp_pos++] = 	(transaction_label << 4) | (AVDTP_SINGLE_PACKET<<2) |AVDTP_RESPONSE_ACCEPT_MSG;
     cmd_resp[cmd_resp_pos++] = AVDTP_SI_ABORT;
-    ret = l2cap_datawrite(avdtppcb->avdtp_signal_l2cappcb, p);
+    ret = l2cap_datawrite(avdtp_pcb->avdtp_signal_l2cappcb, p);
     bt_pbuf_free(p);
 
     return BT_ERR_OK;
@@ -428,73 +456,70 @@ static err_t avdtp_handle_abort(struct avdtp_pcb_t *avdtppcb,uint8_t transaction
 
 struct avdtp_pcb_t *avdtp_get_active_pcb( struct bd_addr_t *bdaddr)
 {
-    struct avdtp_pcb_t *pcb;
-    for(pcb = avdtp_active_pcbs; pcb != NULL; pcb = pcb->next)
+    struct avdtp_pcb_t *avdtp_pcb;
+    for(avdtp_pcb = avdtp_active_pcbs; avdtp_pcb != NULL; avdtp_pcb = avdtp_pcb->next)
     {
-        if(bd_addr_cmp(&(pcb->avdtp_signal_l2cappcb->remote_bdaddr),
+        if(bd_addr_cmp(&(avdtp_pcb->avdtp_signal_l2cappcb->remote_bdaddr),
                        bdaddr))
         {
             break;
         }
     }
-    return pcb;
+    return avdtp_pcb;
 }
 
-static err_t avdtp_connect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err)
+static err_t avdtp_connect_ind(void *arg, struct l2cap_pcb_t *l2cap_pcb, err_t err)
 {
-    struct avdtp_pcb_t *avdtppcb;
+    struct avdtp_pcb_t *avdtp_pcb;
 
-    if((avdtppcb = avdtp_get_active_pcb(&pcb->remote_bdaddr)) == NULL)
+    if((avdtp_pcb = avdtp_get_active_pcb(&l2cap_pcb->remote_bdaddr)) == NULL)
     {
-        BT_AVDTP_TRACE_DEBUG("avdtp_connect_ind pcb case 1 0x%p\n",pcb);
-
-        avdtppcb = (struct avdtp_pcb_t *)avdtp_new();
-        avdtppcb->avdtp_signal_l2cappcb = pcb;
-		memcpy(&avdtppcb->remote_bdaddr,&pcb->remote_bdaddr,BD_ADDR_LEN);
-        AVDTP_PCB_REG(&avdtp_active_pcbs,avdtppcb);
-        l2cap_register_disconnect_ind(avdtppcb->avdtp_signal_l2cappcb, avdtp_signal_disconnect_ind);
-        l2cap_register_recv(avdtppcb->avdtp_signal_l2cappcb, avdtp_signal_input);
-        avdtp_event_handler(avdtppcb,AVDTP_SI_SIGNAL_CONNECT_IND,NULL);
+        avdtp_pcb = (struct avdtp_pcb_t *)avdtp_new();
+        avdtp_pcb->avdtp_signal_l2cappcb = l2cap_pcb;
+		memcpy(&avdtp_pcb->remote_bdaddr,&l2cap_pcb->remote_bdaddr,BD_ADDR_LEN);
+        AVDTP_PCB_REG(&avdtp_active_pcbs,avdtp_pcb);
+        l2cap_register_disconnect_ind(avdtp_pcb->avdtp_signal_l2cappcb, avdtp_signal_disconnect_ind);
+        l2cap_register_recv(avdtp_pcb->avdtp_signal_l2cappcb, avdtp_signal_input);
+        avdtp_event_handler(avdtp_pcb,AVDTP_SI_SIGNAL_CONNECT_IND,NULL);
     }
     else
     {
-        BT_AVDTP_TRACE_DEBUG("avdtp_connect_ind pcb case 2 0x%p\n",pcb);
-        avdtppcb->avdtp_media_l2cappcb = pcb;
-        l2cap_register_disconnect_ind(avdtppcb->avdtp_media_l2cappcb, avdtp_stream_disconnect_ind);
-        l2cap_register_recv(avdtppcb->avdtp_media_l2cappcb, avdtp_media_input);
-		avdtp_event_handler(avdtppcb,AVDTP_SI_STREAM_CONNECT_IND,NULL);
+        avdtp_pcb->avdtp_media_l2cappcb = l2cap_pcb;
+        l2cap_register_disconnect_ind(avdtp_pcb->avdtp_media_l2cappcb, avdtp_stream_disconnect_ind);
+        l2cap_register_recv(avdtp_pcb->avdtp_media_l2cappcb, avdtp_media_input);
+		avdtp_event_handler(avdtp_pcb,AVDTP_SI_STREAM_CONNECT_IND,NULL);
     }
 
     return BT_ERR_OK;
 }
 
 
-static err_t avdtp_signal_disconnect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err)
+static err_t avdtp_signal_disconnect_ind(void *arg, struct l2cap_pcb_t *l2cap_pcb, err_t err)
 {
 	struct avdtp_pcb_t *avdtp_pcb = NULL;
-    BT_AVDTP_TRACE_DEBUG("avdtp_signal_disconnect_ind psm 0x%x\n",pcb->psm);
-	if((avdtp_pcb = avdtp_get_active_pcb(&pcb->remote_bdaddr)) != NULL)
+    BT_AVDTP_TRACE_DEBUG("avdtp_signal_disconnect_ind psm 0x%x\n",l2cap_pcb->psm);
+	if((avdtp_pcb = avdtp_get_active_pcb(&l2cap_pcb->remote_bdaddr)) != NULL)
     {
     	avdtp_event_handler(avdtp_pcb,AVDTP_SI_SIGNAL_DISCON_IND,NULL);
 		AVDTP_PCB_RMV(&avdtp_active_pcbs,avdtp_pcb);   
 		avdtp_close(avdtp_pcb);
     }
-    l2cap_close(pcb);
+    l2cap_close(l2cap_pcb);
     return BT_ERR_OK;
 }
 
 
-static err_t avdtp_stream_disconnect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err)
+static err_t avdtp_stream_disconnect_ind(void *arg, struct l2cap_pcb_t *l2cap_pcb, err_t err)
 {
 	struct avdtp_pcb_t *avdtp_pcb = NULL;
-    BT_AVDTP_TRACE_DEBUG("avdtp_stream_disconnect_ind psm 0x%x\n",pcb->psm);
+    BT_AVDTP_TRACE_DEBUG("avdtp_stream_disconnect_ind psm 0x%x\n",l2cap_pcb->psm);
 
-	if((avdtp_pcb = avdtp_get_active_pcb(&pcb->remote_bdaddr)) != NULL)
+	if((avdtp_pcb = avdtp_get_active_pcb(&l2cap_pcb->remote_bdaddr)) != NULL)
     {
     	avdtp_event_handler(avdtp_pcb,AVDTP_SI_STREAM_DISCON_IND,NULL);
     }
 	
-	l2cap_close(pcb);
+	l2cap_close(l2cap_pcb);
     return BT_ERR_OK;
 }
 
@@ -506,7 +531,7 @@ err_t avdtp_media_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_
     uint8_t marker,payload_type;
     uint16_t sequence_number;
     uint32_t timestamp,synchronization_source;
-    struct avdtp_pcb_t *avdtppcb =  avdtp_get_active_pcb(&l2cappcb->remote_bdaddr);
+    struct avdtp_pcb_t *avdtp_pcb =  avdtp_get_active_pcb(&l2cappcb->remote_bdaddr);
     uint8_t *data = (uint8_t *)p->payload;
     uint8_t data_pos = 0;
     uint8_t version = data[data_pos]&0x03;
@@ -533,19 +558,19 @@ err_t avdtp_media_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_
 
 
     bt_pbuf_header(p, -(data_pos));
-    avdtp_media_handler(avdtppcb,p);
+    avdtp_media_handler(avdtp_pcb,p);
 
     return BT_ERR_OK;
 }
 
-err_t avdtp_signal_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err)
+err_t avdtp_signal_input(void *arg, struct l2cap_pcb_t *l2cap_pcb, struct bt_pbuf_t *p, err_t err)
 {
     uint8_t *data = (uint8_t *)p->payload;
     uint8_t transaction_label = data[0] >> 4;
     uint8_t packet_type = ((data[0] >> 2) & 0x03);
     uint8_t message_type = data[0] & 0x03;
 
-    struct avdtp_pcb_t *avdtppcb =  avdtp_get_active_pcb(&l2cappcb->remote_bdaddr);
+    struct avdtp_pcb_t *avdtp_pcb =  avdtp_get_active_pcb(&l2cap_pcb->remote_bdaddr);
 
     BT_AVDTP_TRACE_DEBUG("avdtp_signal_input len:%d transaction_label:%d,packet_type:%d,message_type:%d\n",p->len,transaction_label,packet_type,message_type);
     BT_AVDTP_TRACE_DEBUG("----------------------------------\n");
@@ -562,7 +587,7 @@ err_t avdtp_signal_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf
         {
             BT_AVDTP_TRACE_DEBUG("AVDTP_SI_DISCOVER\n");
 
-            avdtp_handle_discovery(avdtppcb,transaction_label);
+            avdtp_handle_discovery(avdtp_pcb,transaction_label);
 
             break;
         }
@@ -570,20 +595,17 @@ err_t avdtp_signal_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf
         {
             BT_AVDTP_TRACE_DEBUG("AVDTP_SI_GET_CAPABILITIES\n");
 
-            avdtp_handle_get_capabilities(avdtppcb,transaction_label,data[2]>>2);
+            avdtp_handle_get_capabilities(avdtp_pcb,transaction_label,data[2]>>2);
             break;
         }
         case AVDTP_SI_SET_CONFIGURATION:
         {
             BT_AVDTP_TRACE_DEBUG("AVDTP_SI_SET_CONFIGURATION\n");
 
-            avdtp_handle_set_configuration(avdtppcb,transaction_label,data[2]>>2,data[3]>>2,data+4,p->len-4);
+            avdtp_handle_set_configuration(avdtp_pcb,transaction_label,data[2]>>2,data[3]>>2,data+4,p->len-4);
             bt_pbuf_header(p,-4);
 
-			BT_AVDTP_TRACE_DEBUG("-----------111------------------\n");
-    		bt_hex_dump(p->payload,p->len);
-    		BT_AVDTP_TRACE_DEBUG("-----------111--------------------\n");
-            avdtp_event_handler(avdtppcb,AVDTP_SI_SET_CONFIGURATION,p);
+            avdtp_event_handler(avdtp_pcb,AVDTP_SI_SET_CONFIGURATION,p);
             break;
         }
         case AVDTP_SI_GET_CONFIGURATION:
@@ -595,34 +617,34 @@ err_t avdtp_signal_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf
         case AVDTP_SI_OPEN:
         {
             BT_AVDTP_TRACE_DEBUG("AVDTP_SI_OPEN\n");
-            avdtp_handle_open(avdtppcb,transaction_label);
-            avdtp_event_handler(avdtppcb,AVDTP_SI_OPEN,NULL);
+            avdtp_handle_open(avdtp_pcb,transaction_label);
+            avdtp_event_handler(avdtp_pcb,AVDTP_SI_OPEN,NULL);
 
         }
         break;
         case AVDTP_SI_START:
         {
             BT_AVDTP_TRACE_DEBUG("AVDTP_SI_START\n");
-            avdtp_handle_start(avdtppcb,transaction_label);
-			avdtp_event_handler(avdtppcb,AVDTP_SI_START,NULL);
+            avdtp_handle_start(avdtp_pcb,transaction_label);
+			avdtp_event_handler(avdtp_pcb,AVDTP_SI_START,NULL);
             break;
         }
         case AVDTP_SI_CLOSE:
             BT_AVDTP_TRACE_DEBUG("AVDTP_SI_CLOSE\n");
-			avdtp_handle_close(avdtppcb,transaction_label);
-			avdtp_event_handler(avdtppcb,AVDTP_SI_CLOSE,NULL);
+			avdtp_handle_close(avdtp_pcb,transaction_label);
+			avdtp_event_handler(avdtp_pcb,AVDTP_SI_CLOSE,NULL);
             break;
         case AVDTP_SI_SUSPEND:
         {
             BT_AVDTP_TRACE_DEBUG("AVDTP_SI_SUSPEND\n");
-            avdtp_handle_suspend(avdtppcb,transaction_label);
-			avdtp_event_handler(avdtppcb,AVDTP_SI_SUSPEND,NULL);
+            avdtp_handle_suspend(avdtp_pcb,transaction_label);
+			avdtp_event_handler(avdtp_pcb,AVDTP_SI_SUSPEND,NULL);
             break;
         }
         case AVDTP_SI_ABORT:
             BT_AVDTP_TRACE_DEBUG("AVDTP_SI_ABORT\n");
-			avdtp_handle_abort(avdtppcb,transaction_label);
-			avdtp_event_handler(avdtppcb,AVDTP_SI_ABORT,NULL);
+			avdtp_handle_abort(avdtp_pcb,transaction_label);
+			avdtp_event_handler(avdtp_pcb,AVDTP_SI_ABORT,NULL);
             break;
         case AVDTP_SI_SECURITY_CONTROL:
             BT_AVDTP_TRACE_DEBUG("AVDTP_SI_SECURITY_CONTROL\n");
@@ -630,7 +652,7 @@ err_t avdtp_signal_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf
         case AVDTP_SI_GET_ALL_CAPABILITIES:
         {
             BT_AVDTP_TRACE_DEBUG("AVDTP_SI_GET_ALL_CAPABILITIES\n");
-            avdtp_handle_get_all_capabilities(avdtppcb,transaction_label);
+            avdtp_handle_get_all_capabilities(avdtp_pcb,transaction_label);
             break;
         }
         case AVDTP_SI_DELAYREPORT:
