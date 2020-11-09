@@ -199,64 +199,6 @@ struct rfcomm_pcb_listen_t {
   err_t (* accept)(void *arg, struct rfcomm_pcb_t *pcb, err_t err);
 };
 
-#define RFCOMM_EVENT_CONNECTED(pcb,err,ret) \
-                              if((pcb)->connected != NULL) \
-                              (ret = (pcb)->connected((pcb)->callback_arg,(pcb),(err)))
-#define RFCOMM_EVENT_ACCEPT(pcb,err,ret) \
-                              if((pcb)->accept != NULL) \
-                              (ret = (pcb)->accept((pcb)->callback_arg,(pcb),(err)))
-#define RFCOMM_EVENT_DISCONNECTED(pcb,err,ret) \
-                                 if((pcb)->disconnected != NULL) { \
-                                   (ret = (pcb)->disconnected((pcb)->callback_arg,(pcb),(err))); \
-                                 } else { \
-                                   rfcomm_close(pcb); \
-				 }
-#define RFCOMM_EVENT_PN_RSP(pcb,err,ret) \
-                       if((pcb)->pn_rsp != NULL) \
-                       (ret = (pcb)->pn_rsp((pcb)->callback_arg,(pcb),(err)))
-#define RFCOMM_EVENT_TEST(pcb,err,ret) \
-                       if((pcb)->test_rsp != NULL) \
-                       (ret = (pcb)->test_rsp((pcb)->callback_arg,(pcb),(err)))
-#define RFCOMM_EVENT_MSC(pcb,err,ret) \
-                        if((pcb)->msc_rsp != NULL) \
-                        (ret = (pcb)->msc_rsp((pcb)->callback_arg,(pcb),(err)))
-#define RFCOMM_EVENT_RPN(pcb,err,ret) \
-                        if((pcb)->rpn_rsp != NULL) \
-                        (ret = (pcb)->rpn_rsp((pcb)->callback_arg,(pcb),(err)))
-#define RFCOMM_EVENT_RECV(pcb,err,p,ret) \
-                          if((pcb)->recv != NULL) { \
-                            (ret = (pcb)->recv((pcb)->callback_arg,(pcb),(p),(err))); \
-                          } else { \
-                            bt_pbuf_free(p); \
-                          }
-
-
-/* The RFCOMM PCB lists. */
-extern struct rfcomm_pcb_listen_t *rfcomm_listen_pcbs; /* List of all RFCOMM PCBs listening for 
-							 an incomming connection on a specific
-							 server channel */
-extern struct rfcomm_pcb_t *rfcomm_active_pcbs; /* List of all active RFCOMM PCBs */
-
-extern struct rfcomm_pcb_t *rfcomm_tmp_pcb;      /* Only used for temporary storage. */
-
-/* Define two macros, RFCOMM_REG and RFCOMM_RMV that registers a RFCOMM PCB
-   with a PCB list or removes a PCB from a list, respectively. */
-
-#define RFCOMM_REG(pcbs, npcb) do { \
-                            npcb->next = *pcbs; \
-                            *pcbs = npcb; \
-                            } while(0)
-#define RFCOMM_RMV(pcbs, npcb) do { \
-                            if(*pcbs == npcb) { \
-                               *pcbs = (*pcbs)->next; \
-                            } else for(rfcomm_tmp_pcb = *pcbs; rfcomm_tmp_pcb != NULL; rfcomm_tmp_pcb = rfcomm_tmp_pcb->next) { \
-                               if(rfcomm_tmp_pcb->next != NULL && rfcomm_tmp_pcb->next == npcb) { \
-                                  rfcomm_tmp_pcb->next = npcb->next; \
-                                  break; \
-                               } \
-                            } \
-                            npcb->next = NULL; \
-                            } while(0)
 
 
 /* Functions for interfacing with RFCOMM: */

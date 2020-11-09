@@ -102,48 +102,7 @@ struct sdp_pcb_t {
 #define SDP_DE_TYPE(type_size) ((type_size) & 0xF8)
 #define SDP_DE_SIZE(type_size) ((type_size) & 0x07)
 
-#define SDP_ACTION_SERVICE_SEARCHED(pcb,tot_src,curr_src,rhdls) if((pcb)->service_searched != NULL) ((pcb)->service_searched((pcb)->callback_arg,(pcb),(tot_src),(curr_src),(rhdls)))
-#define SDP_ACTION_ATTRIB_RECV(pcb,attribl_bc,p) if((pcb)->attributes_recv != NULL) ((pcb)->attributes_recv((pcb)->callback_arg,(pcb),(attribl_bc),(p)))
-#define SDP_ACTION_ATTRIB_SEARCHED(pcb,attribl_bc,p) if((pcb)-> attributes_searched != NULL) ((pcb)->attributes_searched((pcb)->callback_arg,(pcb),(attribl_bc),(p)))
 
-extern struct sdp_pcb_t *sdp_pcbs; /* List of all SDP PCBs awaiting incoming response to 
-				    a request */
-extern struct sdp_pcb_t *sdp_tmp_pcb; /* Only used for temporary storage. */
-
-extern struct sdp_record_t *sdp_server_records;  /* List of all active service records in the
-						  SDP server */
-extern struct sdp_record_t *sdp_tmp_record;      /* Only used for temporary storage. */
-
-#define SDP_REG(pcbs, npcb) do { \
-                            npcb->next = *pcbs; \
-                            *pcbs = npcb; \
-                            } while(0)
-#define SDP_RMV(pcbs, npcb) do { \
-                            if(*pcbs == npcb) { \
-                               *pcbs = (*pcbs)->next; \
-                            } else for(sdp_tmp_pcb = *pcbs; sdp_tmp_pcb != NULL; sdp_tmp_pcb = sdp_tmp_pcb->next) { \
-                               if(sdp_tmp_pcb->next != NULL && sdp_tmp_pcb->next == npcb) { \
-                                  sdp_tmp_pcb->next = npcb->next; \
-                                  break; \
-                               } \
-                            } \
-                            npcb->next = NULL; \
-                            } while(0)
-#define SDP_RECORD_REG(records, record) do { \
-                                        record->next = *records; \
-                                        *records = record; \
-                                        } while(0)
-#define SDP_RECORD_RMV(records, record) do { \
-                            if(*records == record) { \
-                               *records = (*records)->next; \
-                            } else for(sdp_tmp_record = *records; sdp_tmp_record != NULL; sdp_tmp_record = sdp_tmp_record->next) { \
-                               if(sdp_tmp_record->next != NULL && sdp_tmp_record->next == record) { \
-                                  sdp_tmp_record->next = record->next; \
-                                  break; \
-                               } \
-                            } \
-                            record->next = NULL; \
-                            } while(0)
 
 /**
  * Protocol Identifiers

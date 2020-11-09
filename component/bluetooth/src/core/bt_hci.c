@@ -12,11 +12,85 @@
 #include "bt_l2cap.h"
 #include "bt_timer.h"
 #include "bt_vendor_csr8x11.h"
+#include "bt_vendor_bcm43430a1.h"
 
 /* The HCI LINK lists. */
 struct hci_link_t *hci_active_links;  /* List of all active HCI LINKs */
 struct hci_link_t *hci_tmp_link;
 struct hci_pcb_t *pcb = NULL;
+
+#define HCI_EVENT_PIN_REQ(pcb,bdaddr,ret) \
+                         if((pcb)->pin_req != NULL) { \
+                           (ret = (pcb)->pin_req((pcb)->callback_arg,(bdaddr))); \
+                         } else { \
+                           ret = hci_pin_code_request_neg_reply(bdaddr); \
+			 }
+#define HCI_BT_WORKING(pcb) \
+                              if((pcb)->bt_working != NULL) \
+                              ((pcb)->bt_working((pcb)->callback_arg))
+#define HCI_EVENT_SCO_REQ(pcb,bdaddr,ret) \
+                              if((pcb)->sco_req != NULL) \
+                              (ret = (pcb)->sco_req((pcb)->callback_arg,(bdaddr)))
+#define HCI_EVENT_SCO_CONN_COMPLETE(pcb,status,bdaddr,ret) \
+                              if((pcb)->sco_conn_complete != NULL) \
+                              (ret = (pcb)->sco_conn_complete((pcb)->callback_arg,status,(bdaddr)))
+#define HCI_EVENT_SCO_DISCONN_COMPLETE(pcb,status,bdaddr,ret) \
+                              if((pcb)->sco_disconn_complete != NULL) \
+                              (ret = (pcb)->sco_disconn_complete((pcb)->callback_arg,status,(bdaddr)))
+#define HCI_EVENT_LINK_REQ(pcb,bdaddr,ret) \
+                              if((pcb)->link_key_req != NULL) { \
+                                (ret = (pcb)->link_key_req((pcb)->callback_arg,(bdaddr))); \
+                              	}
+#define HCI_EVENT_LINK_KEY_NOT(pcb,bdaddr,key,key_type,ret) \
+                              if((pcb)->link_key_not != NULL) { \
+                                (ret = (pcb)->link_key_not((pcb)->callback_arg,(bdaddr),(key),(key_type))); \
+                              }
+#define HCI_EVENT_INQ_RESULT(pcb,result,ret)\
+					if((pcb)->inq_result != NULL) \
+                              (ret = (pcb)->inq_result((pcb),(result)))
+#define HCI_EVENT_INQ_COMPLETE(pcb,result,ret) \
+                              if((pcb)->inq_complete != NULL) \
+                              (ret = (pcb)->inq_complete((pcb),(result)))
+#define HCI_EVENT_LE_INQ_RESULT(pcb,result,ret)\
+							  if((pcb)->le_inq_result != NULL) \
+							 (ret = (pcb)->le_inq_result((pcb),(result)))
+#define HCI_EVENT_LE_INQ_COMPLETE(pcb,result,ret) \
+                              if((pcb)->le_inq_complete != NULL) \
+                              (ret = (pcb)->le_inq_complete((pcb),(result)))
+#define HCI_EVENT_REMOTE_NAME_REQ_COMPLETE(pcb,bdaddr,name,ret) \
+                              if((pcb)->name_req_complete != NULL) \
+                              (ret = (pcb)->name_req_complete((pcb),(bdaddr),(name)))
+#define HCI_EVENT_RBD_COMPLETE(pcb,bdaddr,ret) \
+                              if((pcb)->rbd_complete != NULL) \
+                              (ret = (pcb)->rbd_complete((pcb)->callback_arg,(bdaddr)));
+#define HCI_EVENT_WLP_COMPLETE(pcb,bdaddr,ret) \
+                               if((pcb)->wlp_complete != NULL) \
+                               (ret = (pcb)->wlp_complete((pcb)->callback_arg,(bdaddr)));
+#define HCI_EVENT_CONN_COMPLETE(pcb,bdaddr,ret) \
+                               if((pcb)->conn_complete != NULL) \
+                               (ret = (pcb)->conn_complete((pcb)->callback_arg,(bdaddr)));
+#define HCI_EVENT_CMD_COMPLETE(pcb,ogf,ocf,result,ret) \
+                              if((pcb)->cmd_complete != NULL) \
+                              (ret = (pcb)->cmd_complete((pcb)->callback_arg,(pcb),(ogf),(ocf),(result)))
+
+
+#define HCI_REG(links, nlink) do { \
+                            nlink->next = *links; \
+                            *links = nlink; \
+                            } while(0)
+#define HCI_RMV(links, nlink) do { \
+                            if(*links == nlink) { \
+                               *links = (*links)->next; \
+                            } else for(hci_tmp_link = *links; hci_tmp_link != NULL; hci_tmp_link = hci_tmp_link->next) { \
+                               if(hci_tmp_link->next != NULL && hci_tmp_link->next == nlink) { \
+                                  hci_tmp_link->next = nlink->next; \
+                                  break; \
+                               } \
+                            } \
+                            nlink->next = NULL; \
+                            } while(0)
+
+
 
 void hci_reset_timeout(void *para)
 {

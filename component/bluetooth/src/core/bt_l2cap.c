@@ -28,6 +28,88 @@ struct l2cap_sig_t *l2cap_tmp_sig;
 struct l2cap_seg_t *l2cap_insegs;
 struct l2cap_seg_t *l2cap_tmp_inseg;
 
+
+/* Internal functions and global variables */
+#define L2CA_ACTION_CONN_CFM(pcb,result,status,ret) if((pcb)->l2ca_connect_cfm != NULL) (ret = (pcb)->l2ca_connect_cfm((pcb)->callback_arg,(pcb),(result),(status)))
+#define L2CA_ACTION_DISCONN_CFM(pcb,ret) if((pcb)->l2ca_disconnect_cfm != NULL) (ret = (pcb)->l2ca_disconnect_cfm((pcb)->callback_arg,(pcb)))
+#define L2CA_ACTION_PING_CFM(pcb,result,ret) if((pcb)->l2ca_pong != NULL) (ret = (pcb)->l2ca_pong((pcb)->callback_arg,(pcb),(result)))
+
+#define L2CA_ACTION_CONN_IND(pcb,err,ret) if((pcb)->l2ca_connect_ind != NULL) (ret = (pcb)->l2ca_connect_ind((pcb)->callback_arg,(pcb),(err)))
+#define L2CA_ACTION_DISCONN_IND(pcb,err,ret) \
+                                if((pcb)->l2ca_disconnect_ind != NULL) { \
+					BT_L2CAP_TRACE_DEBUG("l2cap_disconnect_ind called\n");\
+                                (ret = (pcb)->l2ca_disconnect_ind((pcb)->callback_arg,(pcb),(err))); \
+                                } else { \
+                                l2cap_close(pcb); \
+                                }
+#define L2CA_ACTION_TO_IND(pcb,err,ret) if((pcb)->l2ca_timeout_ind != NULL) (ret = (pcb)->l2ca_timeout_ind((pcb)->callback_arg,(pcb),(err)))
+#define L2CA_ACTION_RECV(pcb,p,err,ret) \
+                         if((pcb)->l2ca_recv != NULL) { \
+			 (ret = (pcb)->l2ca_recv((pcb)->callback_arg,(pcb),(p),(err))); \
+			 } else { \
+			 bt_pbuf_free(p); \
+                         }
+
+#define L2CAP_OPTH_TYPE(hdr) (((hdr)->type) & 0x7f)
+#define L2CAP_OPTH_TOA(hdr) (((hdr)->type) >> 7)
+
+#define L2CAP_REG(pcbs, npcb) do { \
+                            npcb->next = *pcbs; \
+                            *pcbs = npcb; \
+                            } while(0)
+#define L2CAP_RMV(pcbs, npcb) do { \
+                            if(*pcbs == npcb) { \
+                               *pcbs = (*pcbs)->next; \
+                            } else for(l2cap_tmp_pcb = *pcbs; l2cap_tmp_pcb != NULL; l2cap_tmp_pcb = l2cap_tmp_pcb->next) { \
+                               if(l2cap_tmp_pcb->next != NULL && l2cap_tmp_pcb->next == npcb) { \
+                                  l2cap_tmp_pcb->next = npcb->next; \
+                                  break; \
+                               } \
+                            } \
+                            npcb->next = NULL; \
+                            } while(0)
+
+/* The L2CAP SIG list macros */
+extern struct l2cap_sig_t *l2cap_tmp_sig;      /* Only used for temporary storage. */
+
+#define L2CAP_SIG_REG(ursp_sigs, nsig) do { \
+                            nsig->next = *ursp_sigs; \
+                            *ursp_sigs = nsig; \
+                            } while(0)
+#define L2CAP_SIG_RMV(ursp_sigs, nsig) do { \
+                            if(*ursp_sigs == nsig) { \
+                               *ursp_sigs = (*ursp_sigs)->next; \
+                            } else for(l2cap_tmp_sig = *ursp_sigs; l2cap_tmp_sig != NULL; l2cap_tmp_sig = l2cap_tmp_sig->next) { \
+                               if(l2cap_tmp_sig->next != NULL && l2cap_tmp_sig->next == nsig) { \
+                                  l2cap_tmp_sig->next = nsig->next; \
+                                  break; \
+                               } \
+                            } \
+                            nsig->next = NULL; \
+                            } while(0)
+
+/* The L2CAP incoming segments list macros */
+extern struct l2cap_seg_t *l2cap_tmp_inseg;      /* Only used for temporary storage. */
+
+#define L2CAP_SEG_REG(segs, nseg) do { \
+                            nseg->next = *segs; \
+                            *segs = nseg; \
+                            } while(0)
+#define L2CAP_SEG_RMV(segs, nseg) do { \
+                            if(*segs == nseg) { \
+                               *segs = (*segs)->next; \
+                            } else for(l2cap_tmp_inseg = *segs; l2cap_tmp_inseg != NULL; l2cap_tmp_inseg = l2cap_tmp_inseg->next) { \
+                               if(l2cap_tmp_inseg->next != NULL && l2cap_tmp_inseg->next == nseg) { \
+                                  l2cap_tmp_inseg->next = nseg->next; \
+                                  break; \
+                               } \
+                            } \
+                            nseg->next = NULL; \
+                            } while(0)
+
+
+
+
 /* Forward declarations */
 static uint16_t l2cap_cid_alloc(void);
 static err_t l2cap_config_req(struct l2cap_pcb_t *pcb);

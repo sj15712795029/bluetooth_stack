@@ -30,6 +30,43 @@ const uint8_t sdp_base_uuid[] = { 0x00, 0x00, 0x00, 0x00, /* - */ 0x00, 0x00, /*
                                0x80, 0x00, /* - */ 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
                              };
 
+#define SDP_ACTION_SERVICE_SEARCHED(pcb,tot_src,curr_src,rhdls) if((pcb)->service_searched != NULL) ((pcb)->service_searched((pcb)->callback_arg,(pcb),(tot_src),(curr_src),(rhdls)))
+#define SDP_ACTION_ATTRIB_RECV(pcb,attribl_bc,p) if((pcb)->attributes_recv != NULL) ((pcb)->attributes_recv((pcb)->callback_arg,(pcb),(attribl_bc),(p)))
+#define SDP_ACTION_ATTRIB_SEARCHED(pcb,attribl_bc,p) if((pcb)-> attributes_searched != NULL) ((pcb)->attributes_searched((pcb)->callback_arg,(pcb),(attribl_bc),(p)))
+
+
+#define SDP_REG(pcbs, npcb) do { \
+                            npcb->next = *pcbs; \
+                            *pcbs = npcb; \
+                            } while(0)
+#define SDP_RMV(pcbs, npcb) do { \
+                            if(*pcbs == npcb) { \
+                               *pcbs = (*pcbs)->next; \
+                            } else for(sdp_tmp_pcb = *pcbs; sdp_tmp_pcb != NULL; sdp_tmp_pcb = sdp_tmp_pcb->next) { \
+                               if(sdp_tmp_pcb->next != NULL && sdp_tmp_pcb->next == npcb) { \
+                                  sdp_tmp_pcb->next = npcb->next; \
+                                  break; \
+                               } \
+                            } \
+                            npcb->next = NULL; \
+                            } while(0)
+#define SDP_RECORD_REG(records, record) do { \
+                                        record->next = *records; \
+                                        *records = record; \
+                                        } while(0)
+#define SDP_RECORD_RMV(records, record) do { \
+                            if(*records == record) { \
+                               *records = (*records)->next; \
+                            } else for(sdp_tmp_record = *records; sdp_tmp_record != NULL; sdp_tmp_record = sdp_tmp_record->next) { \
+                               if(sdp_tmp_record->next != NULL && sdp_tmp_record->next == record) { \
+                                  sdp_tmp_record->next = record->next; \
+                                  break; \
+                               } \
+                            } \
+                            record->next = NULL; \
+                            } while(0)
+
+
 static err_t sdp_connect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err);
 static err_t sdp_disconnect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err);
 

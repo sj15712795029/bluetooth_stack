@@ -333,25 +333,6 @@ err_t hfp_hf_get_model_id(struct bd_addr_t *addr);
 err_t hfp_hf_get_revision_id(struct bd_addr_t *addr);
 err_t hfp_hf_get_pid(struct bd_addr_t *addr);
 
-extern struct hfp_pcb_t *hfp_active_pcbs;  /* List of all active HFP PCBs */
-extern struct hfp_pcb_t *hfp_tmp_pcb;
-
-
-#define HFP_PCB_REG(pcbs, npcb) do { \
-                            npcb->next = *pcbs; \
-                            *pcbs = npcb; \
-                            } while(0)
-#define HFP_PCB_RMV(pcbs, npcb) do { \
-                            if(*pcbs == npcb) { \
-                               *pcbs = (*pcbs)->next; \
-                            } else for(hfp_tmp_pcb = *pcbs; hfp_tmp_pcb != NULL; hfp_tmp_pcb = hfp_tmp_pcb->next) { \
-                               if(hfp_tmp_pcb->next != NULL && hfp_tmp_pcb->next == npcb) { \
-                                  hfp_tmp_pcb->next = npcb->next; \
-                                  break; \
-                               } \
-                            } \
-                            npcb->next = NULL; \
-                            } while(0)
 
 
 #endif
