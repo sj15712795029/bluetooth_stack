@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\bsp\cortex-m3\core;..\..\bsp\cortex-m3\inc;..\..\bsp\cortex-m3\STM32_USB-FS-Device_Driver\inc;..\..\board;..\..\board\stm32f10x;..\..\board\stm32f10x\usb_mass_storage;..\..\component\ringbuffer;..\..\component\bluetooth\src\include;..\..\component\bluetooth\src\include\classical;..\..\component\bluetooth\vendor;..\stm32f10x_bb_bt;..\..\component\bluetooth\third_party_lib\sbc;..\..\component\bluetooth\wrapper;..\..\component\cjson;..\..\component\fs;..\..\component\fs\fatfs13\source</IncludePath>
+              <IncludePath>..\..\bsp\cortex-m3\core;..\..\bsp\cortex-m3\inc;..\..\bsp\cortex-m3\STM32_USB-FS-Device_Driver\inc;..\..\board;..\..\board\stm32f10x;..\..\board\stm32f10x\usb_mass_storage;..\..\component\ringbuffer;..\..\component\bluetooth\src\include;..\..\component\bluetooth\src\include\classical;..\..\component\bluetooth\vendor;..\stm32f10x_bb_bt;..\..\component\bluetooth\third_party_lib\sbc\sbc;..\..\component\bluetooth\wrapper;..\..\component\cjson;..\..\component\fs;..\..\component\fs\fatfs13\source</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -753,16 +753,6 @@
               <FilePath>..\..\component\bluetooth\vendor\bt_vendor_csr8x11.c</FilePath>
             </File>
             <File>
-              <FileName>sbc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\component\bluetooth\third_party_lib\sbc\sbc.c</FilePath>
-            </File>
-            <File>
-              <FileName>sbc_tables.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\component\bluetooth\third_party_lib\sbc\sbc_tables.c</FilePath>
-            </File>
-            <File>
               <FileName>bt_wrapper.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\component\bluetooth\wrapper\bt_wrapper.c</FilePath>
@@ -776,6 +766,16 @@
               <FileName>bt_vendor_bcm43430a1.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\component\bluetooth\vendor\bt_vendor_bcm43430a1.c</FilePath>
+            </File>
+            <File>
+              <FileName>sbc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\third_party_lib\sbc\sbc\sbc.c</FilePath>
+            </File>
+            <File>
+              <FileName>sbc_primitives.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\third_party_lib\sbc\sbc\sbc_primitives.c</FilePath>
             </File>
           </Files>
         </Group>

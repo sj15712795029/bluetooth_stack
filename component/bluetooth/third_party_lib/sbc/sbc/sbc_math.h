@@ -23,7 +23,7 @@
  *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-#include "stdint.h"
+
 #define fabs(x) ((x) < 0 ? -(x) : (x))
 /* C does not provide an explicit arithmetic shift right but this will
    always be correct and every compiler *should* generate optimal code */

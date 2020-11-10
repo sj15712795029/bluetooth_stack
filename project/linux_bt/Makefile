@@ -14,7 +14,7 @@ INCUDIRS		:= 	./ \
 								${BTSTACK_ROOT}/component/bluetooth/vendor \
 								${BTSTACK_ROOT}/component/bluetooth/wrapper \
 								${BTSTACK_ROOT}/component/ringbuffer \
-								${BTSTACK_ROOT}/component/bluetooth/third_party_lib/sbc \
+								${BTSTACK_ROOT}/component/bluetooth/third_party_lib/sbc/sbc \
 				 				
 
 # C source code file directory			
@@ -24,7 +24,7 @@ SRCDIRS			:= 	./ \
 								${BTSTACK_ROOT}/component/bluetooth/vendor \
 								${BTSTACK_ROOT}/component/bluetooth/wrapper \
 								${BTSTACK_ROOT}/component/ringbuffer \
-								${BTSTACK_ROOT}/component/bluetooth/third_party_lib/sbc \
+								${BTSTACK_ROOT}/component/bluetooth/third_party_lib/sbc/sbc \
 				 				
 
 

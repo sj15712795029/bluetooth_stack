@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F407xx</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\bsp\cortex-m4\core;..\..\bsp\cortex-m4\inc;..\..\bsp\cortex-m4\inc\Legacy;..\..\board;..\..\board\stm32f407;..\..\component\fs;..\..\component\fs\fatfs13\source;..\..\component\bluetooth\src\include;..\..\component\bluetooth\src\include\classical;..\..\component\bluetooth\third_party_lib\sbc;..\..\component\bluetooth\vendor;..\..\component\bluetooth\wrapper;..\..\component\ringbuffer;..\..\component\cjson;..\stm32f407_bb_bt;..\..\component\memory_manager</IncludePath>
+              <IncludePath>..\..\bsp\cortex-m4\core;..\..\bsp\cortex-m4\inc;..\..\bsp\cortex-m4\inc\Legacy;..\..\board;..\..\board\stm32f407;..\..\component\fs;..\..\component\fs\fatfs13\source;..\..\component\bluetooth\src\include;..\..\component\bluetooth\src\include\classical;..\..\component\bluetooth\third_party_lib\sbc\sbc;..\..\component\bluetooth\vendor;..\..\component\bluetooth\wrapper;..\..\component\ringbuffer;..\..\component\cjson;..\stm32f407_bb_bt;..\..\component\memory_manager</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -643,16 +643,6 @@
               <FilePath>..\..\component\bluetooth\src\core\classical\bt_spp.c</FilePath>
             </File>
             <File>
-              <FileName>sbc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\component\bluetooth\third_party_lib\sbc\sbc.c</FilePath>
-            </File>
-            <File>
-              <FileName>sbc_tables.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\component\bluetooth\third_party_lib\sbc\sbc_tables.c</FilePath>
-            </File>
-            <File>
               <FileName>bt_vendor_csr8x11.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\component\bluetooth\vendor\bt_vendor_csr8x11.c</FilePath>
@@ -671,6 +661,16 @@
               <FileName>bt_vendor_bcm43430a1.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\component\bluetooth\vendor\bt_vendor_bcm43430a1.c</FilePath>
+            </File>
+            <File>
+              <FileName>sbc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\third_party_lib\sbc\sbc\sbc.c</FilePath>
+            </File>
+            <File>
+              <FileName>sbc_primitives.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\third_party_lib\sbc\sbc\sbc_primitives.c</FilePath>
             </File>
           </Files>
         </Group>

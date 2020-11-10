@@ -314,13 +314,13 @@ void bt_app_a2dp_signal_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
 }
 void bt_app_a2dp_stream_connect(struct bd_addr_t *remote_addr,uint8_t status)
 {
-	uint8_t addr_buf[32] = {0};
     printf("bt_app_a2dp_stream_connect:\n");
     bt_addr_dump(remote_addr->addr);
 
 }
 void bt_app_a2dp_stream_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
 {
+		uint8_t addr_buf[32] = {0};
     printf("bt_app_a2dp_stream_disconnect:\n");
     bt_addr_dump(remote_addr->addr);
 

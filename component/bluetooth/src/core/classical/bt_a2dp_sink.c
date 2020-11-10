@@ -347,7 +347,7 @@ static err_t a2dp_signal_abort_ind(struct avdtp_pcb_t *avdtp_pcb)
 
 static err_t a2dp_sink_get_sbc_context_setting(uint8_t *sbc_codec_info)
 {
-	sbc_init(&sbc_context, SBC_FLAGS_DECODER);
+	sbc_init(&sbc_context, 0);
         switch (sbc_codec_info[0] & 0xF0)
         {
         case A2DP_SBC_16000 :

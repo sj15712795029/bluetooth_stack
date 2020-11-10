@@ -40,11 +40,13 @@ static const int sbc_offset8[4][8] = {
 	{ -4, 0, 0, 0, 0, 0, 1, 2 }
 };
 
+/* extra bits of precision for the synthesis filter input data */
+#define SBCDEC_FIXED_EXTRA_BITS 2
 
 #define SS4(val) ASR(val, SCALE_SPROTO4_TBL)
 #define SS8(val) ASR(val, SCALE_SPROTO8_TBL)
-#define SN4(val) ASR(val, SCALE_NPROTO4_TBL)
-#define SN8(val) ASR(val, SCALE_NPROTO8_TBL)
+#define SN4(val) ASR(val, SCALE_NPROTO4_TBL + 1 + SBCDEC_FIXED_EXTRA_BITS)
+#define SN8(val) ASR(val, SCALE_NPROTO8_TBL + 1 + SBCDEC_FIXED_EXTRA_BITS)
 
 static const int32_t sbc_proto_4_40m0[] = {
 	SS4(0x00000000), SS4(0xffa6982f), SS4(0xfba93848), SS4(0x0456c7b8),
@@ -133,10 +135,6 @@ static const int32_t synmatrix8[16][8] = {
 	{ SN8(0xf9592678), SN8(0x018f8b84), SN8(0x07d8a5f0), SN8(0x0471ced0),
 	  SN8(0xfb8e3130), SN8(0xf8275a10), SN8(0xfe70747c), SN8(0x06a6d988) }
 };
-
-/* Uncomment the following line to enable high precision build of SBC encoder */
-
-/* #define SBC_HIGH_PRECISION */
 
 #ifdef SBC_HIGH_PRECISION
 #define FIXED_A int64_t /* data type for fixed point accumulator */
