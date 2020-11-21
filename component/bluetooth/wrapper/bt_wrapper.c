@@ -89,6 +89,7 @@ static err_t bt_ass_eir_data()
     eir_data[data_pos++] = (DID_VERSION_ID_VALUE>>8) & 0xff;
 #endif
 
+
     return 0;
 }
 
@@ -543,7 +544,7 @@ void a2dp_sink_stream_connect_realease(struct bd_addr_t *remote_addr,uint8_t sta
 }
 void a2dp_sink_stream_start(struct bd_addr_t *remote_addr,uint8_t value)
 {
-    printf("WRAPPER << PROFILE:a2dp_sink_stream_connect_realease, address is :\n");
+    printf("WRAPPER << PROFILE:a2dp_sink_stream_start, address is :\n");
     bt_addr_dump(remote_addr->addr);
 
 	if(bt_wrapper_cb && bt_wrapper_cb->app_a2dp_cb && bt_wrapper_cb->app_a2dp_cb->bt_a2dp_start)
@@ -598,6 +599,130 @@ static a2dp_sink_cbs_t a2dp_sink_wrapper_cb =
     a2dp_sink_stream_abort,
 };
 #endif
+
+
+
+#if PROFILE_AVRCP_ENABLE
+void avrcp_av_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("WRAPPER << PROFILE:avrcp_av_connect_set_up, address is :\n");
+	bt_addr_dump(remote_addr->addr);
+	if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_ctl_connect)
+    {
+        bt_wrapper_cb->app_avrcp_cb->bt_avrcp_ctl_connect(remote_addr,status);
+    }
+}
+void avrcp_av_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("WRAPPER << PROFILE:avrcp_av_connect_realease, address is :\n");
+    bt_addr_dump(remote_addr->addr);
+	if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_ctl_disconnect)
+    {
+        bt_wrapper_cb->app_avrcp_cb->bt_avrcp_ctl_disconnect(remote_addr,status);
+    }
+}
+
+void avrcp_support_capabilities(struct bd_addr_t *remote_addr,uint16_t support_cap_mask)
+{
+	printf("WRAPPER << PROFILE:avrcp_support_capabilities mask(0x%x), address is :\n",support_cap_mask);
+    bt_addr_dump(remote_addr->addr);
+	if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_support_capabilities)
+    {
+        bt_wrapper_cb->app_avrcp_cb->bt_avrcp_support_capabilities(remote_addr,support_cap_mask);
+    }
+}
+
+void avrcp_app_setting_attr(struct bd_addr_t *remote_addr,uint16_t setting_attr_mask)
+{
+	printf("WRAPPER << PROFILE:avrcp_app_setting_attr mask(0x%x), address is :\n",setting_attr_mask);
+    bt_addr_dump(remote_addr->addr);
+	if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_app_setting_attr)
+    {
+        bt_wrapper_cb->app_avrcp_cb->bt_avrcp_app_setting_attr(remote_addr,setting_attr_mask);
+    }
+}
+
+void avrcp_play_status_update(struct bd_addr_t *remote_addr,uint8_t play_status)
+{
+	printf("WRAPPER << PROFILE:avrcp_play_status_update play status(%d), address is :\n",play_status);
+    bt_addr_dump(remote_addr->addr);
+	if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_app_setting_attr)
+    {
+        bt_wrapper_cb->app_avrcp_cb->bt_avrcp_app_setting_attr(remote_addr,play_status);
+    }
+}
+
+void avrcp_track_change_update(struct bd_addr_t *remote_addr)
+{
+	printf("WRAPPER << PROFILE:avrcp_track_change_update\n");
+    bt_addr_dump(remote_addr->addr);
+	if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_track_change_update)
+    {
+        bt_wrapper_cb->app_avrcp_cb->bt_avrcp_track_change_update(remote_addr);
+    }
+}
+
+void avrcp_playpos_change_update(struct bd_addr_t *remote_addr,uint32_t millisecond)
+{
+	printf("WRAPPER << PROFILE:avrcp_playpos_change_update ms(%d)\n",millisecond);
+    bt_addr_dump(remote_addr->addr);
+	if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_playpos_change_update)
+    {
+        bt_wrapper_cb->app_avrcp_cb->bt_avrcp_playpos_change_update(remote_addr,millisecond);
+    }
+}
+
+void avrcp_battary_change_update(struct bd_addr_t *remote_addr,uint32_t battary_status)
+{
+	printf("WRAPPER << PROFILE:avrcp_battary_change_update battary_status(%d)\n",battary_status);
+    bt_addr_dump(remote_addr->addr);
+	if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_battary_change_update)
+    {
+        bt_wrapper_cb->app_avrcp_cb->bt_avrcp_battary_change_update(remote_addr,battary_status);
+    }
+}
+
+void avrcp_volume_change_update(struct bd_addr_t *remote_addr,uint8_t volume)
+{
+	printf("WRAPPER << PROFILE:avrcp_volume_change_update volume(%d)\n",volume);
+    bt_addr_dump(remote_addr->addr);
+	if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_volume_change_update)
+    {
+        bt_wrapper_cb->app_avrcp_cb->bt_avrcp_volume_change_update(remote_addr,volume);
+    }
+}
+
+void avrcp_element_attr_update(struct bd_addr_t *remote_addr,now_playing_info_t* now_playing_info)
+{
+	printf("WRAPPER << PROFILE:avrcp_element_attr_update\n");
+    bt_addr_dump(remote_addr->addr);
+	if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_element_attr_update)
+    {
+        bt_wrapper_cb->app_avrcp_cb->bt_avrcp_element_attr_update(remote_addr,now_playing_info->now_playing_title,now_playing_info->now_playing_artist,
+			now_playing_info->now_playing_album,now_playing_info->current_index,now_playing_info->totol_count,now_playing_info->totol_milliseconds);
+    }
+}
+
+
+static avrcp_controller_cbs_t avrcp_controller_wrapper_cb =
+{
+    avrcp_av_connect_set_up,
+    avrcp_av_connect_realease,
+    NULL,
+    NULL,
+    avrcp_support_capabilities,
+    avrcp_app_setting_attr,
+    avrcp_play_status_update,
+    avrcp_track_change_update,
+    avrcp_playpos_change_update,
+    avrcp_battary_change_update,
+    avrcp_volume_change_update,
+    avrcp_element_attr_update,
+};
+
+
+#endif
+
 
 
 #if PROFILE_PBAP_ENABLE
@@ -671,7 +796,7 @@ uint8_t bt_start(bt_app_cb_t *app_cb)
     bt_profile_mask |= BT_PROFILE_A2DP_SINK_MASK;
 #endif
 #if PROFILE_AVRCP_ENABLE
-    avrcp_controller_init();
+    avrcp_controller_init(&avrcp_controller_wrapper_cb);
     bt_profile_mask |= BT_PROFILE_AVRCP_CONTROL_MASK;
 #endif
 
@@ -943,6 +1068,31 @@ uint8_t bt_hfp_hf_get_pid(struct bd_addr_t *addr)
     return 0;
 }
 #endif
+
+
+#if PROFILE_AVRCP_ENABLE
+uint8_t bt_avrcp_controller_list_app_setting_attr(struct bd_addr_t *remote_addr)
+{
+	avrcp_controller_list_app_setting_attr(remote_addr);
+    return 0;
+}
+
+uint8_t bt_avrcp_controller_get_element_attributes(struct bd_addr_t *remote_addr)
+{
+	avrcp_controller_get_element_attributes(remote_addr);
+	return 0;
+}
+
+uint8_t bt_avrcp_controller_control(struct bd_addr_t *remote_addr,uint8_t control_id)
+{
+	avrcp_controller_control(remote_addr,control_id);
+
+	return 0;
+}
+
+
+#endif
+
 
 static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres)
 {

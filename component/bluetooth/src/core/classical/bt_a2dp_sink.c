@@ -78,16 +78,16 @@ static err_t a2dp_sink_get_sbc_context_setting(uint8_t *sbc_codec_info);
 static const uint8_t sbc_snk_codec_caps[] =
 {
     AVDTP_AUDIO<<4,
-               AVDTP_CODEC_SBC,
+   AVDTP_CODEC_SBC,
 
-               A2DP_SBC_48000|A2DP_SBC_44100|A2DP_SBC_32000|A2DP_SBC_16000|\
-               A2DP_SBC_JOINT_STEREO|A2DP_SBC_STEREO|A2DP_SBC_DUAL_CHANNEL|A2DP_SBC_MONO,
+   A2DP_SBC_48000|A2DP_SBC_44100|A2DP_SBC_32000|A2DP_SBC_16000|\
+   A2DP_SBC_JOINT_STEREO|A2DP_SBC_STEREO|A2DP_SBC_DUAL_CHANNEL|A2DP_SBC_MONO,
 
-               A2DP_SBC_BLOCK_LENGTH_16|A2DP_SBC_BLOCK_LENGTH_12|A2DP_SBC_BLOCK_LENGTH_8|A2DP_SBC_BLOCK_LENGTH_4|\
-               A2DP_SBC_SUBBANDS_8|A2DP_SBC_SUBBANDS_4|A2DP_SBC_ALLOCATION_METHOD_LOUDNESS|A2DP_SBC_ALLOCATION_METHOD_SNR,
+   A2DP_SBC_BLOCK_LENGTH_16|A2DP_SBC_BLOCK_LENGTH_12|A2DP_SBC_BLOCK_LENGTH_8|A2DP_SBC_BLOCK_LENGTH_4|\
+   A2DP_SBC_SUBBANDS_8|A2DP_SBC_SUBBANDS_4|A2DP_SBC_ALLOCATION_METHOD_LOUDNESS|A2DP_SBC_ALLOCATION_METHOD_SNR,
 
-               SBC_SNK_MIN_BITPOOL,
-               SBC_SNK_MAX_BITPOOL,
+   SBC_SNK_MIN_BITPOOL,
+   SBC_SNK_MAX_BITPOOL,
 };
 
 
@@ -509,7 +509,6 @@ static err_t a2dp_sink_event_handle(struct avdtp_pcb_t *avdtp_pcb,uint32_t msg_i
 }
 
 
-
 static err_t a2dp_sink_media_handle(struct avdtp_pcb_t *avdtp_pcb,struct bt_pbuf_t *p)
 {
     uint8_t frame_index = 0;
@@ -528,6 +527,7 @@ static err_t a2dp_sink_media_handle(struct avdtp_pcb_t *avdtp_pcb,struct bt_pbuf
     BT_UNUSED_ARG(num_frames);
     data += 1;
     data_len -= 1;
+
 
     while(data_len > 0)
     {

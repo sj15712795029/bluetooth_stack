@@ -65,6 +65,15 @@ struct link_key_record
 #define HFP_VOLUME_MIN 0
 #define HFP_VOLUME_MAX 15
 
+#define AVRCP_CONTROL_ID_PLAY 0x44
+#define AVRCP_CONTROL_ID_PAUSE 0x46
+#define AVRCP_CONTROL_ID_FAST_BACKWARD 0x48
+#define AVRCP_CONTROL_ID_FAST_FORWARD 0x49
+#define AVRCP_CONTROL_ID_FORWARD 0x4b
+#define AVRCP_CONTROL_ID_BACKWARD 0x4c
+
+
+
 typedef struct
 {
 	void (*bt_init_result)(uint8_t status,uint16_t profile_mask);
@@ -113,6 +122,23 @@ typedef struct
 	void (*bt_a2dp_abort)(struct bd_addr_t *remote_addr,uint8_t value);
 }bt_app_a2dp_cb_t;
 
+typedef struct
+{
+	void (*bt_avrcp_ctl_connect)(struct bd_addr_t *remote_addr,uint8_t status);
+	void (*bt_avrcp_ctl_disconnect)(struct bd_addr_t *remote_addr,uint8_t status);
+	void (*bt_avrcp_br_connect)(struct bd_addr_t *remote_addr,uint8_t status);
+	void (*bt_avrcp_br_disconnect)(struct bd_addr_t *remote_addr,uint8_t status);
+	void (*bt_avrcp_support_capabilities)(struct bd_addr_t *remote_addr,uint16_t support_cap_mask);
+	void (*bt_avrcp_app_setting_attr)(struct bd_addr_t *remote_addr,uint16_t setting_attr_mask);
+	void (*bt_avrcp_play_status_update)(struct bd_addr_t *remote_addr,uint8_t play_status);
+	void (*bt_avrcp_track_change_update)(struct bd_addr_t *remote_addr);
+	void (*bt_avrcp_playpos_change_update)(struct bd_addr_t *remote_addr,uint32_t millisecond);
+	void (*bt_avrcp_battary_change_update)(struct bd_addr_t *remote_addr,uint32_t battary_status);
+	void (*bt_avrcp_volume_change_update)(struct bd_addr_t *remote_addr,uint8_t volume);
+	void (*bt_avrcp_element_attr_update)(struct bd_addr_t *remote_addr,uint8_t *title,uint8_t *artist,uint8_t *album,uint32_t current_index,uint32_t totol_count,uint32_t total_milliseconds);
+}bt_app_avrcp_cb_t;
+
+
 
 typedef struct
 {
@@ -120,6 +146,7 @@ typedef struct
 	bt_app_spp_cb_t *app_spp_cb;
 	bt_app_hfp_cb_t * app_hfp_cb;
 	bt_app_a2dp_cb_t *app_a2dp_cb;
+	bt_app_avrcp_cb_t *app_avrcp_cb;
 }bt_app_cb_t;
 
 
@@ -174,6 +201,15 @@ uint8_t bt_hfp_hf_get_revision_id(struct bd_addr_t *addr);
 uint8_t bt_hfp_hf_get_pid(struct bd_addr_t *addr);
 #endif
 
+#if PROFILE_AVRCP_ENABLE
+/************************* AVRCP API ***********************/
+uint8_t bt_avrcp_controller_list_app_setting_attr(struct bd_addr_t *remote_addr);
+uint8_t bt_avrcp_controller_get_element_attributes(struct bd_addr_t *remote_addr);
+uint8_t bt_avrcp_controller_control(struct bd_addr_t *remote_addr,uint8_t control_id);
+
+
+
+#endif
 
 
 

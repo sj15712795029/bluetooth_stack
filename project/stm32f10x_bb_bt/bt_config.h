@@ -93,6 +93,7 @@
 #define MEMP_NUM_AVCTP 7
 #define MEMP_NUM_HFP 7
 #define MEMP_NUM_A2DP 7
+#define MEMP_NUM_AVRCP 7
 #define MEMP_NUM_SPP 7
 #define MEMP_NUM_PBAP 7
 #define MEMP_NUM_BT_PBUF 3
@@ -160,6 +161,14 @@ typedef uintptr_t mem_ptr_t;
 #define SBC_SNK_MIN_BITPOOL 2
 #define SBC_SNK_MAX_BITPOOL 53
 /******************************************************************************************************************************/
+
+
+/***********  AVRCP profile config *******************************************************************************************/
+#define AVRCP_ID3_TITIL_MAX_SIZE 64
+#define AVRCP_ID3_ARTIST_MAX_SIZE 64
+#define AVRCP_ID3_ALBUM_MAX_SIZE 64
+/******************************************************************************************************************************/
+
 
 
 #endif

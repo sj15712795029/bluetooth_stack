@@ -470,6 +470,11 @@ namespace mcu_bt_tool
             json_cmd_send(json_bt_cmd_func, json_bt_cmd_hfp_get_module_id, null, null, null, null, null, null);        
         }
 
+        private void b_musci_play_pause_Click(object sender, EventArgs e)
+        {
+
+        }
+
         /* 串口搜索 */
         private void search_add_serial_port()
         {
@@ -678,6 +683,13 @@ namespace mcu_bt_tool
                         ui_bt_a2dp_con_status(status.PARAM2);
                     }
 
+                    if (status.PARAM1 == "AVRCP")
+                    {
+                        ui_bt_avrcp_show(true);
+                        ui_bt_avrcp_con_status(true);
+                        ui_bt_avrcp_con_status(status.PARAM2);
+                    }
+
                 }
 
                 if (status.OPERATE == "BT_DISCON_RESULT")
@@ -707,6 +719,15 @@ namespace mcu_bt_tool
                         ui_bt_a2dp_con_status(false);
                         ui_bt_a2dp_con_status(null);
                     }
+
+                    if (status.PARAM1 == "AVRCP")
+                    {
+                        ui_bt_avrcp_show(false);
+                        ui_bt_avrcp_con_status(false);
+                        ui_bt_avrcp_con_status(null);
+                    }
+
+
                 }
 
                 if (status.OPERATE == "BT_SPP_RECV")
@@ -805,6 +826,13 @@ namespace mcu_bt_tool
                 {
                     tb_hfp_module_name.Text = status.PARAM1;
                 }
+
+                if (status.OPERATE == "BT_ID3_UPDATE")
+                {
+                    l_music_title.Text = status.PARAM1;
+                    l_music_artist.Text = status.PARAM2;
+                    l_music_album.Text = status.PARAM3;
+                }
             }
         }
 
@@ -859,6 +887,32 @@ namespace mcu_bt_tool
             else
             {
                 l_a2dp_con_addr.Text = "00:00:00:00:00:00";
+            }
+        }
+
+        /* AVRCP 刷新连接状态 */
+        private void ui_bt_avrcp_con_status(bool bt_avrcp_con_status)
+        {
+            if (bt_avrcp_con_status)
+            {
+                l_avrcp_con_status.Text = "已连接";
+            }
+            else
+            {
+                l_avrcp_con_status.Text = "未连接";
+            }
+        }
+
+        /* AVRCP 刷新连接地址 */
+        private void ui_bt_avrcp_con_status(string bt_avrcp_con_addr)
+        {
+            if (bt_avrcp_con_addr != null)
+            {
+                l_avrcp_con_addr.Text = bt_avrcp_con_addr;
+            }
+            else
+            {
+                l_avrcp_con_addr.Text = "00:00:00:00:00:00";
             }
         }
 
@@ -917,33 +971,11 @@ namespace mcu_bt_tool
             if (bt_hfp_show)
             {
                 /* 所有控件显示 */
-#if false
-                b_hfp_num1.Enabled = true;
-                b_hfp_num2.Enabled = true;
-                b_hfp_num3.Enabled = true;
-                b_hfp_num4.Enabled = true;
-                b_hfp_num5.Enabled = true;
-                b_hfp_num6.Enabled = true;
-                b_hfp_num7.Enabled = true;
-                b_hfp_num8.Enabled = true;
-                b_hfp_num9.Enabled = true;
-#endif
                 gb_hfp_test_area.Enabled = true;
             }
             else
             {
                 /* 所有控件灰掉 */
-#if false
-                b_hfp_num1.Enabled = false;
-                b_hfp_num2.Enabled = false;
-                b_hfp_num3.Enabled = false;
-                b_hfp_num4.Enabled = false;
-                b_hfp_num5.Enabled = false;
-                b_hfp_num6.Enabled = false;
-                b_hfp_num7.Enabled = false;
-                b_hfp_num8.Enabled = false;
-                b_hfp_num9.Enabled = false;
-#endif
                 gb_hfp_test_area.Enabled = false;
             }
 
@@ -1028,6 +1060,22 @@ namespace mcu_bt_tool
                 gb_hfp_dtmf.Enabled = false;
         }
 
+        /* HFP tabpage的显示使能 */
+        private void ui_bt_avrcp_show(bool bt_avrcp_show)
+        {
+            if (bt_avrcp_show)
+            {
+                /* 所有控件显示 */
+                gb_music_box.Enabled = true;
+            }
+            else
+            {
+                /* 所有控件灰掉 */
+                gb_music_box.Enabled = false;
+            }
+
+        }
+
         /* 整个UI的初始化 */
         private void ui_init()
         {
@@ -1036,16 +1084,9 @@ namespace mcu_bt_tool
             ui_bt_hfp_show(false);
             ui_bt_hfp_clear_call_num();
             ui_bt_hfp_dtmf_show(false);
+            ui_bt_avrcp_show(false);
             
-        }
-
-        
-
-        
-
-        
-
-        
+        }  
     
       
     }

@@ -21,7 +21,7 @@
 #define BT_SIG_COMPANY_ID 0x001958
 
 typedef enum {
-    AVRCP_MEDIA_ATTR_ALL = 0x0000,
+    AVRCP_MEDIA_ATTR_ALL = 0,
     AVRCP_MEDIA_ATTR_TITLE,
     AVRCP_MEDIA_ATTR_ARTIST,
     AVRCP_MEDIA_ATTR_ALBUM,
@@ -34,8 +34,9 @@ typedef enum {
 
 typedef enum {
     AVRCP_PDU_ID_GET_CAPABILITIES = 0x10,
-    AVRCP_PDU_ID_GetCurrentPlayerApplicationSettingValue = 0x13,
-    AVRCP_PDU_ID_SetPlayerApplicationSettingValue = 0x14,
+	AVRCP_PDU_ID_LIST_APP_SETTING_ARRT = 0x11,
+    AVRCP_PDU_ID_GET_CURRENT_APP_SETTING_VALUE = 0x13,
+    AVRCP_PDU_ID_SET_APP_SETTING_VALUE = 0x14,
     AVRCP_PDU_ID_GET_ELEMENT_ATTRIBUTES = 0x20,
     AVRCP_PDU_ID_GET_PLAY_STATUS = 0x30,
     AVRCP_PDU_ID_REGISTER_NOTIFICATION = 0x31,
@@ -57,20 +58,37 @@ typedef enum {
 } avrcp_pdu_id_e;
 
 typedef enum {
-    AVRCP_NOTIFICATION_EVENT_PLAYBACK_STATUS_CHANGED = 0x01,            // Change in playback status of the current track.
-    AVRCP_NOTIFICATION_EVENT_TRACK_CHANGED = 0x02,                      // Change of current track
-    AVRCP_NOTIFICATION_EVENT_TRACK_REACHED_END = 0x03,                  // Reached end of a track
-    AVRCP_NOTIFICATION_EVENT_TRACK_REACHED_START = 0x04,                // Reached start of a track
-    AVRCP_NOTIFICATION_EVENT_PLAYBACK_POS_CHANGED = 0x05,               // Change in playback position. Returned after the specified playback notification change notification interval
-    AVRCP_NOTIFICATION_EVENT_BATT_STATUS_CHANGED = 0x06,                // Change in battery status
-    AVRCP_NOTIFICATION_EVENT_SYSTEM_STATUS_CHANGED = 0x07,              // Change in system status
-    AVRCP_NOTIFICATION_EVENT_PLAYER_APPLICATION_SETTING_CHANGED = 0x08, // Change in player application setting
-    AVRCP_NOTIFICATION_EVENT_NOW_PLAYING_CONTENT_CHANGED = 0x09,        // The content of the Now Playing list has changed, see 6.9.5.
-    AVRCP_NOTIFICATION_EVENT_AVAILABLE_PLAYERS_CHANGED = 0x0a,          // The available players have changed, see 6.9.4.
-    AVRCP_NOTIFICATION_EVENT_ADDRESSED_PLAYER_CHANGED = 0x0b,           // The Addressed Player has been changed, see 6.9.2.
-    AVRCP_NOTIFICATION_EVENT_UIDS_CHANGED = 0x0c,                       // The UIDs have changed, see 6.10.3.3.
-    AVRCP_NOTIFICATION_EVENT_VOLUME_CHANGED = 0x0d                      // The volume has been changed locally on the TG, see 6.13.3.
+    AVRCP_NOTIFY_EVT_PLAYBACK_STATUS_CHANGED = 0x01,            
+	AVRCP_NOTIFY_EVT_TRACK_CHANGED = 0x02,                      
+	AVRCP_NOTIFY_EVT_TRACK_REACHED_END = 0x03,                  
+	AVRCP_NOTIFY_EVT_TRACK_REACHED_START = 0x04,                
+	AVRCP_NOTIFY_EVT_PLAYBACK_POS_CHANGED = 0x05,               
+	AVRCP_NOTIFY_EVT_BATT_STATUS_CHANGED = 0x06,                
+	AVRCP_NOTIFY_EVT_SYSTEM_STATUS_CHANGED = 0x07,              
+	AVRCP_NOTIFY_EVT_PLAYER_APPLICATION_SETTING_CHANGED = 0x08, 
+	AVRCP_NOTIFY_EVT_NOW_PLAYING_CONTENT_CHANGED = 0x09,        
+	AVRCP_NOTIFY_EVT_AVAILABLE_PLAYERS_CHANGED = 0x0a,          
+	AVRCP_NOTIFY_EVT_ADDRESSED_PLAYER_CHANGED = 0x0b,           
+	AVRCP_NOTIFY_EVT_UIDS_CHANGED = 0x0c,                       
+	AVRCP_NOTIFY_EVT_VOLUME_CHANGED = 0x0d     
 } avrcp_notification_event_id_e;
+
+typedef enum {
+    AVRCP_NOTIFY_EVT_PLAYBACK_STATUS_CHANGED_MASK = 0x01,            
+	AVRCP_NOTIFY_EVT_TRACK_CHANGED_MASK = 0x02,                      
+	AVRCP_NOTIFY_EVT_TRACK_REACHED_END_MASK = 0x04,                  
+	AVRCP_NOTIFY_EVT_TRACK_REACHED_START_MASK = 0x08,                
+	AVRCP_NOTIFY_EVT_PLAYBACK_POS_CHANGED_MASK = 0x10,               
+	AVRCP_NOTIFY_EVT_BATT_STATUS_CHANGED_MASK = 0x20,                
+	AVRCP_NOTIFY_EVT_SYSTEM_STATUS_CHANGED_MASK = 0x40,              
+	AVRCP_NOTIFY_EVT_PLAYER_APPLICATION_SETTING_CHANGED_MASK = 0x80, 
+	AVRCP_NOTIFY_EVT_NOW_PLAYING_CONTENT_CHANGED_MASK = 0x100,        
+	AVRCP_NOTIFY_EVT_AVAILABLE_PLAYERS_CHANGED_MASK = 0x200,          
+	AVRCP_NOTIFY_EVT_ADDRESSED_PLAYER_CHANGED_MASK = 0x400,           
+	AVRCP_NOTIFY_EVT_UIDS_CHANGED_MASK = 0x800,                       
+	AVRCP_NOTIFY_EVT_VOLUME_CHANGED_MASK = 0x1000    
+} avrcp_notification_event_id_mask_e;
+
 
 
 typedef enum {
@@ -90,11 +108,11 @@ typedef enum {
     AVRCP_CTYPE_RESPONSE_NOT_IMPLEMENTED = 8,
     AVRCP_CTYPE_RESPONSE_ACCEPTED,
     AVRCP_CTYPE_RESPONSE_REJECTED,
-    AVRCP_CTYPE_RESPONSE_IN_TRANSITION, // target state is in transition. A subsequent STATUS command, may result in the return of a STABLE status
-    AVRCP_CTYPE_RESPONSE_IMPLEMENTED_STABLE,
+    AVRCP_CTYPE_RESPONSE_IN_TRANSITION,
+    AVRCP_CTYPE_RESPONSE_IMPLEMENTED_STABLE = 0x0c,
     AVRCP_CTYPE_RESPONSE_CHANGED_STABLE,
     AVRCP_CTYPE_RESPONSE_RESERVED,
-    AVRCP_CTYPE_RESPONSE_INTERIM            // target is unable to respond with either ACCEPTED or REJECTED within 100 millisecond
+    AVRCP_CTYPE_RESPONSE_INTERIM
 } avrcp_command_type_e;
 
 typedef enum {
@@ -112,8 +130,7 @@ typedef enum {
     AVRCP_SUBUNIT_TYPE_CAMERA_STORAGE,
     AVRCP_SUBUNIT_TYPE_VENDOR_UNIQUE = 0x1C,
     AVRCP_SUBUNIT_TYPE_RESERVED_FOR_ALL_SUBUNIT_TYPES,
-    AVRCP_SUBUNIT_TYPE_EXTENDED_TO_NEXT_BYTE, // The unit_type field may take value 1E16, which means that the field is extended to the following byte. In that case, an additional byte for extended_unit_type will be added immediately following operand[1].
-                                              // Further extension is possible when the value of extended_unit_type is FF16, in which case another byte will be added.
+    AVRCP_SUBUNIT_TYPE_EXTENDED_TO_NEXT_BYTE,
     AVRCP_SUBUNIT_TYPE_UNIT = 0x1F
 } avrcp_subunit_type_e;
 
@@ -124,19 +141,14 @@ typedef enum {
 
 typedef enum {
     AVRCP_CMD_OPCODE_VENDOR_DEPENDENT = 0x00,
-    // AVRCP_CMD_OPCODE_RESERVE = 0x01,
     AVRCP_CMD_OPCODE_UNIT_INFO = 0x30,
     AVRCP_CMD_OPCODE_SUBUNIT_INFO = 0x31,
     AVRCP_CMD_OPCODE_PASS_THROUGH = 0x7C,
-    // AVRCP_CMD_OPCODE_VERSION = 0xB0,
-    // AVRCP_CMD_OPCODE_POWER = 0xB2,
     AVRCP_CMD_OPCODE_UNDEFINED = 0xFF
 } avrcp_command_opcode_e;
 
-/* reference AV/C subunit spec */
 typedef enum {
-    AVRCP_OPERATION_ID_CHANNEL_UP = 0x30,
-    AVRCP_OPERATION_ID_CHANNEL_DOWN = 0x31,
+    
     AVRCP_OPERATION_ID_SELECT = 0x00,
     AVRCP_OPERATION_ID_UP = 0x01,
     AVRCP_OPERATION_ID_DOWN = 0x02,
@@ -144,6 +156,8 @@ typedef enum {
     AVRCP_OPERATION_ID_RIGHT = 0x04,
     AVRCP_OPERATION_ID_ROOT_MENU = 0x09,
 
+	AVRCP_OPERATION_ID_CHANNEL_UP = 0x30,
+    AVRCP_OPERATION_ID_CHANNEL_DOWN = 0x31,
     AVRCP_OPERATION_ID_SKIP = 0x3C,
     AVRCP_OPERATION_ID_VOLUME_UP = 0x41,
     AVRCP_OPERATION_ID_VOLUME_DOWN = 0x42,
@@ -159,16 +173,117 @@ typedef enum {
     AVRCP_OPERATION_ID_UNDEFINED = 0xFF
 } avrcp_operation_id_e;
 
-err_t avrcp_controller_init(void);
-err_t avrcp_controller_forward(void);
-err_t avrcp_controller_backward(void);
-err_t avrcp_controller_play(void);
-err_t avrcp_controller_stop(void);
-err_t avrcp_controller_pause(void);
-err_t avrcp_controller_get_element_attributes(uint8_t *element_attr, uint8_t element_size);
-err_t avrcp_controller_enable_notification(avrcp_notification_event_id_e event_id);
-err_t avrcp_controller_get_supported_company_ids(void);
-err_t avrcp_controller_get_supported_events(void);
+typedef enum {
+    AVRCP_APP_SETTING_ATTR_ILLEGAL = 0x00,
+	AVRCP_APP_SETTING_ATTR_EQUALIZER = 0x01,
+	AVRCP_APP_SETTING_ATTR_REPEAT = 0x02,
+	AVRCP_APP_SETTING_ATTR_SHUFFLE = 0x03,
+	AVRCP_APP_SETTING_ATTR_SCAN = 0x04,
+} avrcp_app_setting_attr_e;
+
+typedef enum {
+	AVRCP_APP_SETTING_ATTR_EQUALIZER_MASK = 0x01,
+	AVRCP_APP_SETTING_ATTR_REPEAT_MASK = 0x02,
+	AVRCP_APP_SETTING_ATTR_SHUFFLE_MASK = 0x04,
+	AVRCP_APP_SETTING_ATTR_SCAN_MASK = 0x08,
+} avrcp_app_setting_attr_mask_e;
+
+typedef enum{
+	AVRCP_APP_SETTING_ATTR_EQUALIZER_OFF = 0x01,
+	AVRCP_APP_SETTING_ATTR_EQUALIZER_ON = 0x01,
+}avrcp_app_setting_attr_equalizer_status_e;
+
+typedef enum{
+	AVRCP_APP_SETTING_ATTR_REPEAT_OFF = 0x01,
+	AVRCP_APP_SETTING_ATTR_REPEAT_SINGLE = 0x02,
+	AVRCP_APP_SETTING_ATTR_REPEAT_ALL = 0x03,
+	AVRCP_APP_SETTING_ATTR_REPEAT_GROUP = 0x04,
+}avrcp_app_setting_attr_repeat_status_e;
+
+typedef enum{
+	AVRCP_APP_SETTING_ATTR_SHUFFLE_OFF = 0x01,
+	AVRCP_APP_SETTING_ATTR_SHUFFLE_ALL = 0x02,
+	AVRCP_APP_SETTING_ATTR_SHUFFLE_GROUP = 0x03,
+}avrcp_app_setting_attr_shuffle_status_e;
+
+typedef enum{
+	AVRCP_APP_SETTING_ATTR_SCAN_OFF = 0x01,
+	AVRCP_APP_SETTING_ATTR_SCAN_ALL = 0x02,
+	AVRCP_APP_SETTING_ATTR_SCAN_GROUP = 0x03,
+}avrcp_app_setting_attr_scan_status_e;
+
+
+typedef enum{
+    AVRCP_PLAYBACK_STATUS_STOPPED = 0x00,
+    AVRCP_PLAYBACK_STATUS_PLAYING,
+    AVRCP_PLAYBACK_STATUS_PAUSED,
+    AVRCP_PLAYBACK_STATUS_FWD_SEEK,
+    AVRCP_PLAYBACK_STATUS_REV_SEEK,
+    AVRCP_PLAYBACK_STATUS_ERROR = 0xFF
+} avrcp_playback_status_e;
+
+typedef enum{
+    AVRCP_BATTERY_STATUS_NORMAL = 0x00,
+    AVRCP_BATTERY_STATUS_WARNING,
+    AVRCP_BATTERY_STATUS_CRITICAL,
+    AVRCP_BATTERY_STATUS_EXTERNAL,
+    AVRCP_BATTERY_STATUS_FULL_CHARGE
+} avrcp_battery_status_e;
+
+typedef enum{
+    AVRCP_SYSTEM_STATUS_POWER_ON = 0x00,
+	AVRCP_SYSTEM_STATUS_POWER_OFF,
+	AVRCP_SYSTEM_STATUS_UNPLUGGED,
+} avrcp_system_status_e;
+
+
+typedef struct
+{
+	uint8_t now_playing_title[AVRCP_ID3_TITIL_MAX_SIZE];
+	uint8_t now_playing_artist[AVRCP_ID3_ARTIST_MAX_SIZE];
+	uint8_t now_playing_album[AVRCP_ID3_ALBUM_MAX_SIZE];
+	uint32_t current_index;
+	uint32_t totol_count;
+	uint32_t totol_milliseconds;
+}now_playing_info_t;
+
+struct avrcp_pcb_t
+{
+    struct avrcp_pcb_t *next; /* For the linked list */
+	struct avctp_pcb_t *avctppcb;
+	struct bd_addr_t remote_addr;
+	uint16_t remote_notify_mask;
+	uint16_t remote_app_setting_attr_mask;
+	now_playing_info_t now_playing_info;
+	uint8_t pass_though_wait_release;
+};
+
+typedef struct
+{
+    void (*avrcp_ctl_connect_set_up)(struct bd_addr_t *remote_addr,uint8_t status);
+    void (*avrcp_ctl_connect_realease)(struct bd_addr_t *remote_addr,uint8_t status);
+	void (*avrcp_br_connect_set_up)(struct bd_addr_t *remote_addr,uint8_t status);
+    void (*avrcp_br_connect_realease)(struct bd_addr_t *remote_addr,uint8_t status);
+	void (*avrcp_support_capabilities)(struct bd_addr_t *remote_addr,uint16_t support_cap_mask);
+	void (*avrcp_app_setting_attr)(struct bd_addr_t *remote_addr,uint16_t setting_attr_mask);
+	void (*avrcp_play_status_update)(struct bd_addr_t *remote_addr,uint8_t play_status);
+	void (*avrcp_track_change_update)(struct bd_addr_t *remote_addr);
+	void (*avrcp_playpos_change_update)(struct bd_addr_t *remote_addr,uint32_t millisecond);
+	void (*avrcp_battary_change_update)(struct bd_addr_t *remote_addr,uint32_t battary_status);
+	void (*avrcp_volume_change_update)(struct bd_addr_t *remote_addr,uint8_t volume);
+	void (*avrcp_element_attr_update)(struct bd_addr_t *remote_addr,now_playing_info_t* now_playing_info);
+} avrcp_controller_cbs_t;
+
+
+
+err_t avrcp_controller_init(avrcp_controller_cbs_t *cb);
+err_t avrcp_controller_list_app_setting_attr(struct bd_addr_t *remote_addr);
+err_t avrcp_controller_register_notification(struct bd_addr_t *remote_addr,uint8_t notificaion_id);
+err_t avrcp_controller_get_element_attributes(struct bd_addr_t *remote_addr);
+err_t avrcp_controller_control(struct bd_addr_t *remote_addr,uint8_t control_id);
+
+
+
 #endif
 
 

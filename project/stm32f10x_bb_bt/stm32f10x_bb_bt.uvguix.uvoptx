@@ -148,24 +148,7 @@
           <Name>(105=-1,-1,-1,-1,0)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint>
-        <Bp>
-          <Number>0</Number>
-          <Type>0</Type>
-          <LineNumber>211</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134240074</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>D:\project\wlink\锛侊紒锛侊紒浜у搧鍙戝竷璧勬枡\STM32_UBUNTU_BLUETOOTH\0-绯荤粺婧愮爜\1-BLUETOOTH\project\stm32f10x_bb_csr8x11_bt\main.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\stm32f10x_bb_csr8x11\main.c\211</Expression>
-        </Bp>
-      </Breakpoint>
+      <Breakpoint/>
       <WatchWindow1>
         <Ww>
           <count>0</count>

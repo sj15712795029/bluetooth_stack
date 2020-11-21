@@ -17,6 +17,7 @@
 #include "bt_avctp.h"
 #include "bt_hfp_hf.h"
 #include "bt_a2dp_sink.h"
+#include "bt_avrcp_controller.h"
 #include "bt_spp.h"
 #include "bt_pbap_client.h"
 
@@ -47,6 +48,7 @@ static const uint16_t memp_sizes[MEMP_BT_MAX] =
     sizeof(struct avctp_pcb_t),
     sizeof(struct hfp_pcb_t),
     sizeof(struct a2dp_pcb_t),
+    sizeof(struct avrcp_pcb_t),
     sizeof(struct spp_pcb_t),
     sizeof(struct pbap_pcb_t),
     PBUF_POOL_BUFSIZE,
@@ -71,6 +73,7 @@ static const uint16_t memp_num[MEMP_BT_MAX] =
     MEMP_NUM_AVCTP,
     MEMP_NUM_HFP,
     MEMP_NUM_A2DP,
+    MEMP_NUM_AVRCP,
     MEMP_NUM_SPP,
     MEMP_NUM_PBAP,
     MEMP_NUM_BT_PBUF,
@@ -126,6 +129,9 @@ static uint8_t memp_memory[(MEMP_NUM_HCI_PCB *
                                         sizeof(struct bt_memp_t)) +
                          MEMP_NUM_A2DP *
                          MEM_ALIGN_SIZE(sizeof(struct a2dp_pcb_t) +
+                                        sizeof(struct bt_memp_t)) +
+                         MEMP_NUM_AVRCP *
+                         MEM_ALIGN_SIZE(sizeof(struct avrcp_pcb_t) +
                                         sizeof(struct bt_memp_t)) +
                          MEMP_NUM_SPP *
                          MEM_ALIGN_SIZE(sizeof(struct spp_pcb_t) +

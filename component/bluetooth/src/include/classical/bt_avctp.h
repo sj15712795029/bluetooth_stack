@@ -19,10 +19,9 @@ struct avctp_pcb_t
 {
     struct avctp_pcb_t *next; /* For the linked list */
     struct l2cap_pcb_t *l2cappcb; /* The L2CAP connection */
-    void *callback_arg;
+    struct bd_addr_t remote_bdaddr;
     uint8_t local_transaction_label;
 
-    /* Callback */
 };
 
 typedef enum {
@@ -37,29 +36,20 @@ typedef enum {
     AVCTP_RESPONSE_FRAME    
 } avctp_frame_type_t;
 
+typedef enum
+{
+	AVCTP_EVT_CONNECT_IND,
+	AVCTP_EVT_CONNECT_CFM,
+	AVCTP_EVT_DISCON_IND,
+	AVCTP_EVT_DISCON_CFM,    
+} avctp_event_identifier_e;
 
-typedef err_t (*avctp_recv)(struct bt_pbuf_t *p);
-err_t avctp_init(void);
+
+typedef err_t (*avctp_event_handle)(struct avctp_pcb_t *avctp_pcb,uint32_t msg_id,struct bt_pbuf_t *p);
+typedef err_t (*avctp_data_handle)(struct avctp_pcb_t *avctp_pcb,struct bt_pbuf_t *p);
+
+err_t avctp_init(avctp_event_handle avctp_evt_handle,avctp_data_handle avctp_data_handle);
 err_t avctp_datawrite(struct avctp_pcb_t *pcb, struct bt_pbuf_t *p,uint16_t pid);
-err_t avctp_register_callback(avctp_recv recv);
-extern struct avctp_pcb_t *avctp_active_pcbs;  /* List of all active AVDTP PCBs */
-extern struct avctp_pcb_t *avctp_tmp_pcb;
-
-#define AVCTP_PCB_REG(pcbs, npcb) do { \
-                            npcb->next = *pcbs; \
-                            *pcbs = npcb; \
-                            } while(0)
-#define AVCTP_PCB_RMV(pcbs, npcb) do { \
-                            if(*pcbs == npcb) { \
-                               *pcbs = (*pcbs)->next; \
-                            } else for(avctp_tmp_pcb = *pcbs; avctp_tmp_pcb != NULL; avctp_tmp_pcb = avctp_tmp_pcb->next) { \
-                               if(avctp_tmp_pcb->next != NULL && avctp_tmp_pcb->next == npcb) { \
-                                  avctp_tmp_pcb->next = npcb->next; \
-                                  break; \
-                               } \
-                            } \
-                            npcb->next = NULL; \
-                            } while(0)
 
 
 #endif
