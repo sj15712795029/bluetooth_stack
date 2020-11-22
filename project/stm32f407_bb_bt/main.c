@@ -142,6 +142,8 @@ static bt_app_common_cb_t bt_app_common_cb =
 #endif
 };
 
+
+#if PROFILE_HFP_ENABLE > 0
 void bt_app_hfp_connect(struct bd_addr_t *remote_addr,uint8_t status)
 {
     uint8_t addr_buf[32] = {0};
@@ -297,8 +299,11 @@ static bt_app_hfp_cb_t bt_app_hfp_cb =
     bt_app_hfp_manu_id,
     bt_app_hfp_module_id,
 };
+#endif
 
 
+
+#if PROFILE_A2DP_ENABLE > 0
 void bt_app_a2dp_signal_connect(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("bt_app_a2dp_signal_connect:\n");
@@ -314,19 +319,19 @@ void bt_app_a2dp_signal_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
 }
 void bt_app_a2dp_stream_connect(struct bd_addr_t *remote_addr,uint8_t status)
 {
+	uint8_t addr_buf[32] = {0};
     printf("bt_app_a2dp_stream_connect:\n");
-    bt_addr_dump(remote_addr->addr);
-
-}
-void bt_app_a2dp_stream_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
-{
-		uint8_t addr_buf[32] = {0};
-    printf("bt_app_a2dp_stream_disconnect:\n");
     bt_addr_dump(remote_addr->addr);
 
 	hw_sprintf((char*)addr_buf,"%02x:%02x:%02x:%02x:%02x:%02x",remote_addr->addr[5],remote_addr->addr[4],remote_addr->addr[3],\
                remote_addr->addr[2],remote_addr->addr[1],remote_addr->addr[0]);
     uart_send_json("BT","BT_CON_RESULT",(uint8_t*)"SUCCESS","A2DP",addr_buf,0,0,0);
+
+}
+void bt_app_a2dp_stream_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("bt_app_a2dp_stream_disconnect:\n");
+    bt_addr_dump(remote_addr->addr);
 
 }
 void bt_app_a2dp_start(struct bd_addr_t *remote_addr,uint8_t value)
@@ -365,8 +370,9 @@ static bt_app_a2dp_cb_t bt_app_a2dp_cb =
     bt_app_a2dp_suspend,
     bt_app_a2dp_abort,
 };
+#endif
 
-
+#if PROFILE_AVRCP_ENABLE > 0
 void bt_app_avrcp_ctl_connect(struct bd_addr_t *remote_addr,uint8_t status)
 {
 	uint8_t addr_buf[32] = {0};
@@ -477,8 +483,10 @@ static bt_app_avrcp_cb_t bt_app_avrcp_cb =
     bt_app_avrcp_volume_change_update,
     bt_app_avrcp_element_attr_update,
 };
+#endif
 
 
+#if PROFILE_SPP_ENABLE > 0
 void bt_app_spp_connect(struct bd_addr_t *remote_addr,uint8_t status)
 {
     uint8_t addr_buf[32] = {0};
@@ -525,15 +533,35 @@ static bt_app_spp_cb_t bt_app_spp_cb =
     bt_app_spp_disconnect,
     bt_app_spp_recv_data,
 };
-
+#endif
 
 static bt_app_cb_t bt_app_cb =
 {
-    &bt_app_common_cb,
+    &bt_app_common_cb,		
+		
+#if PROFILE_SPP_ENABLE > 0
     &bt_app_spp_cb,
+#else
+	NULL,
+#endif
+
+#if PROFILE_HFP_ENABLE > 0
     &bt_app_hfp_cb,
+#else
+	NULL,
+#endif
+
+#if PROFILE_A2DP_ENABLE > 0
     &bt_app_a2dp_cb,
+#else
+	NULL,
+#endif
+
+#if PROFILE_AVRCP_ENABLE > 0
     &bt_app_avrcp_cb,
+#else
+	NULL,
+#endif
 };
 
 
@@ -599,14 +627,22 @@ static bt_app_cb_t bt_app_cb =
 #define BT_HFP_GET_MANU_ID_DES "HFP get manu name"
 #define BT_HFP_GET_MODULE_ID_CMD "HFP_CGMM"
 #define BT_HFP_GET_MODULE_ID_DES "HFP get module name"
-
-
-
-
-
-
-
-
+#define BT_AVRCP_LIST_APP_ATTR_CMD "AVRCP_LIST_APP_ATTR"
+#define BT_AVRCP_LIST_APP_ATTR_DES "List application seeting attribute"
+#define BT_AVRCP_GET_SONG_INFO_CMD "AVRCP_GET_ID3"
+#define BT_AVRCP_GET_SONG_INFO_DES "Get nowplaying song infomation"
+#define BT_AVRCP_CONTROL_PLAY_CMD "AVRCP_PLAY"
+#define BT_AVRCP_CONTROL_PLAY_DES "AVRCP control:play"
+#define BT_AVRCP_CONTROL_PAUSE_CMD "AVRCP_PAUSE"
+#define BT_AVRCP_CONTROL_PAUSE_DES "AVRCP control:pause"
+#define BT_AVRCP_CONTROL_AVRCP_PREV_CMD "AVRCP_PREV"
+#define BT_AVRCP_CONTROL_AVRCP_PREV_DES "AVRCP control:prev song"
+#define BT_AVRCP_CONTROL_AVRCP_NEXT_CMD "AVRCP_NEXT"
+#define BT_AVRCP_CONTROL_AVRCP_NEXT_DES "AVRCP control:next song"
+#define BT_AVRCP_CONTROL_AVRCP_FF_CMD "AVRCP_FAST_FORWARD"
+#define BT_AVRCP_CONTROL_AVRCP_FF_DES "AVRCP control:fast forward"
+#define BT_AVRCP_CONTROL_AVRCP_FB_CMD "AVRCP_FAST_BACKWARD"
+#define BT_AVRCP_CONTROL_AVRCP_FB_DES "AVRCP control:fast baward"
 
 
 typedef struct
@@ -653,6 +689,17 @@ cmd_desctiption_t cmd_usage[] =
     {(uint8_t *)BT_HFP_VOICE_RECOG_DISABLE_CMD,(uint8_t *)BT_HFP_VOICE_RECOG_DISABLE_DES},
     {(uint8_t *)BT_HFP_GET_MANU_ID_CMD,(uint8_t *)BT_HFP_GET_MANU_ID_DES},
     {(uint8_t *)BT_HFP_GET_MODULE_ID_CMD,(uint8_t *)BT_HFP_GET_MODULE_ID_DES},
+#endif
+
+#if PROFILE_AVRCP_ENABLE > 0
+	{(uint8_t *)BT_AVRCP_LIST_APP_ATTR_CMD,(uint8_t *)BT_AVRCP_LIST_APP_ATTR_DES},
+    {(uint8_t *)BT_AVRCP_GET_SONG_INFO_CMD,(uint8_t *)BT_AVRCP_GET_SONG_INFO_DES},
+    {(uint8_t *)BT_AVRCP_CONTROL_PLAY_CMD,(uint8_t *)BT_AVRCP_CONTROL_PLAY_DES},
+    {(uint8_t *)BT_AVRCP_CONTROL_PAUSE_CMD,(uint8_t *)BT_AVRCP_CONTROL_PAUSE_DES},
+    {(uint8_t *)BT_AVRCP_CONTROL_AVRCP_PREV_CMD,(uint8_t *)BT_AVRCP_CONTROL_AVRCP_PREV_DES},
+    {(uint8_t *)BT_AVRCP_CONTROL_AVRCP_NEXT_CMD,(uint8_t *)BT_AVRCP_CONTROL_AVRCP_NEXT_DES},
+    {(uint8_t *)BT_AVRCP_CONTROL_AVRCP_FF_CMD,(uint8_t *)BT_AVRCP_CONTROL_AVRCP_FF_DES},
+    {(uint8_t *)BT_AVRCP_CONTROL_AVRCP_FB_CMD,(uint8_t *)BT_AVRCP_CONTROL_AVRCP_FB_DES},
 #endif
 };
 
