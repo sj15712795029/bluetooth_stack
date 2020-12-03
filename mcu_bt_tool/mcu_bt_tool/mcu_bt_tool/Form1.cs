@@ -53,6 +53,14 @@ namespace mcu_bt_tool
         string json_bt_cmd_hfp_disable_vg = "HFP_VGD";/* 关闭语音识别 */
         string json_bt_cmd_hfp_get_manu_id = "HFP_CGMI";/* 获取制造商名字 */
         string json_bt_cmd_hfp_get_module_id = "HFP_CGMM";/* 获取组件名字 */
+        string json_bt_cmd_avrcp_play = "AVRCP_PLAY";/* 播放 */
+        string json_bt_cmd_avrcp_pause = "AVRCP_PAUSE";/* 暂停 */
+        string json_bt_cmd_avrcp_prev = "AVRCP_PREV";/* 上一首 */
+        string json_bt_cmd_avrcp_next = "AVRCP_NEXT";/* 下一首 */
+        string json_bt_cmd_avrcp_fast_bw = "AVRCP_FAST_BACKWARD";/* 快退 */
+        string json_bt_cmd_avrcp_fast_fw = "AVRCP_FAST_FORWARD";/* 快进 */
+        
+
 
         /* HFP的call/callsetup status */
         int bt_hfp_default_mic_volume = 9;
@@ -66,6 +74,8 @@ namespace mcu_bt_tool
         public const int HFP_CALL_INCOMING_CALL = 1;
         public const int HFP_CALL_OUTGOING_CALL = 2;
         public const int HFP_CALL_RALERT_OUTGOING_CALL = 3;
+
+        bool avrcp_is_play = false;
 
         public Form1()
         {
@@ -472,8 +482,32 @@ namespace mcu_bt_tool
 
         private void b_musci_play_pause_Click(object sender, EventArgs e)
         {
+            if(avrcp_is_play == true)
+                json_cmd_send(json_bt_cmd_func, json_bt_cmd_avrcp_pause, null, null, null, null, null, null);
+            else
+                json_cmd_send(json_bt_cmd_func, json_bt_cmd_avrcp_play, null, null, null, null, null, null);
+        }
+
+        private void b_musci_next_Click(object sender, EventArgs e)
+        {
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_avrcp_next, null, null, null, null, null, null);
+        }
+
+        private void b_musci_prev_Click(object sender, EventArgs e)
+        {
+			json_cmd_send(json_bt_cmd_func, json_bt_cmd_avrcp_prev, null, null, null, null, null, null);
 
         }
+
+        private void b_musci_fast_forward_Click(object sender, EventArgs e)
+        {
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_avrcp_fast_fw, null, null, null, null, null, null);
+        }
+
+        private void b_musci_fast_backward_Click(object sender, EventArgs e)
+        {
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_avrcp_fast_bw, null, null, null, null, null, null);
+        } 
 
         /* 串口搜索 */
         private void search_add_serial_port()
@@ -833,6 +867,42 @@ namespace mcu_bt_tool
                     l_music_artist.Text = status.PARAM2;
                     l_music_album.Text = status.PARAM3;
                 }
+
+                if (status.OPERATE == "BT_PLAY_STATUS")
+                {
+                    if (status.PARAM1 == "PLAY")
+                    {
+                        ui_bt_avrcp_update_play_status("pause");
+                        avrcp_is_play = true;
+                    }
+                    else if (status.PARAM1 == "PAUSE")
+                    {
+                        ui_bt_avrcp_update_play_status("play");
+                        avrcp_is_play = false;
+                    }
+
+                }
+
+                if (status.OPERATE == "BT_SONG_INFO")
+                {    
+                    pb_music_pos.Maximum = Convert.ToInt32(status.PARAM3);
+                    int total_ms = Convert.ToInt32(status.PARAM3) / 1000;
+                    int hours = total_ms / 3600;
+                    int minutes = (total_ms - hours * 3600) / 60;
+                    int seconds = total_ms - hours * 3600 - minutes * 60;
+                    l_music_total_pos.Text = hours.ToString("00") + ":" + minutes.ToString("00") + ":" + seconds.ToString("00");
+                }
+
+                if (status.OPERATE == "BT_SONG_POS")
+                {
+                    pb_music_pos.Value = Convert.ToInt32(status.PARAM1);
+                    int current_ms = Convert.ToInt32(status.PARAM1) / 1000;
+                    int hours = current_ms / 3600;
+                    int minutes = (current_ms - hours * 3600) / 60;
+                    int seconds = current_ms - hours * 3600 - minutes * 60;
+                    l_music_current_pos.Text = hours.ToString("00") + ":" + minutes.ToString("00") + ":" + seconds.ToString("00");
+                }
+                
             }
         }
 
@@ -1076,6 +1146,17 @@ namespace mcu_bt_tool
 
         }
 
+        /* 刷新AVRCP播放状态图标 */
+        private void ui_bt_avrcp_update_play_status(string picture_name)
+        {
+            if (picture_name != null)
+            {
+                b_musci_play_pause.BackgroundImage = (System.Drawing.Image)Properties.Resources.ResourceManager.GetObject(picture_name);
+                b_musci_play_pause.BackgroundImageLayout = ImageLayout.Zoom;
+                
+            }
+        }
+
         /* 整个UI的初始化 */
         private void ui_init()
         {
@@ -1084,9 +1165,11 @@ namespace mcu_bt_tool
             ui_bt_hfp_show(false);
             ui_bt_hfp_clear_call_num();
             ui_bt_hfp_dtmf_show(false);
-            ui_bt_avrcp_show(false);
+            //ui_bt_avrcp_show(false);
             
-        }  
+        }
+
+         
     
       
     }

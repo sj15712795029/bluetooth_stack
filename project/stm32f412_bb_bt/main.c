@@ -462,6 +462,11 @@ void bt_app_avrcp_play_status_update(struct bd_addr_t *remote_addr,uint8_t play_
 {
 	printf("bt_app_avrcp_play_status_update: play status update(%d)\n",play_status);
     bt_addr_dump(remote_addr->addr);
+
+	if(play_status == 1)
+		uart_send_json("BT","BT_PLAY_STATUS",(uint8_t*)"SUCCESS","PLAY",0,0,0,0);
+	else if(play_status == 2)
+		uart_send_json("BT","BT_PLAY_STATUS",(uint8_t*)"SUCCESS","PAUSE",0,0,0,0);
 }
 
 void bt_app_avrcp_track_change_update(struct bd_addr_t *remote_addr)
@@ -473,8 +478,12 @@ void bt_app_avrcp_track_change_update(struct bd_addr_t *remote_addr)
 
 void bt_app_avrcp_playpos_change_update(struct bd_addr_t *remote_addr,uint32_t millisecond)
 {
+	uint8_t song_pos_buf[16];
 	printf("bt_app_avrcp_playpos_change_update ms(%d)\n",millisecond);
     bt_addr_dump(remote_addr->addr);
+
+	hw_sprintf((char*)song_pos_buf,"%d",millisecond);
+	uart_send_json("BT","BT_SONG_POS",(uint8_t*)"SUCCESS",song_pos_buf,0,0,0,0);
 }
 
 void bt_app_avrcp_battary_change_update(struct bd_addr_t *remote_addr,uint32_t battary_status)
@@ -507,7 +516,7 @@ void bt_app_avrcp_element_attr_update(struct bd_addr_t *remote_addr,uint8_t *tit
 	hw_sprintf((char*)total_count_buf,"%d",totol_count);
 	hw_sprintf((char*)total_song_len_buf,"%d",total_milliseconds);
 	uart_send_json("BT","BT_ID3_UPDATE",(uint8_t*)"SUCCESS",title,artist,album,0,0);
-	uart_send_json("BT","BT_SONG_POS",(uint8_t*)"SUCCESS",current_index_buf,total_count_buf,total_song_len_buf,0,0);
+	uart_send_json("BT","BT_SONG_INFO",(uint8_t*)"SUCCESS",current_index_buf,total_count_buf,total_song_len_buf,0,0);
     
 }
 
@@ -928,7 +937,7 @@ uint8_t shell_json_parse(uint8_t *operate_value,
 
 	if(hw_strncmp("AVRCP_PAUSE",(const char*)operate_value,hw_strlen("AVRCP_PAUSE")) == 0)
     {
-        HW_DEBUG("SHELL:AVRCP_PLAY\n");
+        HW_DEBUG("SHELL:AVRCP_PAUSE\n");
 		bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_PAUSE);
         return HW_ERR_OK;
     }

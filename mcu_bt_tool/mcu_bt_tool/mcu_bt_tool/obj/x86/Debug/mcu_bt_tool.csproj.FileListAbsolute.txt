@@ -16,3 +16,12 @@ D:\project\wlink\！！！！产品发布资料\STM32_UBUNTU_BLUETOOTH\0-系统�
 D:\project\wlink\！！！！产品发布资料\STM32_UBUNTU_BLUETOOTH\0-系统源码\1-BLUETOOTH\mcu_bt_tool\mcu_bt_tool\mcu_bt_tool\obj\x86\Debug\mcu_bt_tool.Form1.resources
 D:\project\wlink\！！！！产品发布资料\STM32_UBUNTU_BLUETOOTH\0-系统源码\1-BLUETOOTH\mcu_bt_tool\mcu_bt_tool\mcu_bt_tool\obj\x86\Debug\mcu_bt_tool.Properties.Resources.resources
 D:\project\wlink\！！！！产品发布资料\STM32_UBUNTU_BLUETOOTH\0-系统源码\1-BLUETOOTH\mcu_bt_tool\mcu_bt_tool\mcu_bt_tool\obj\x86\Debug\mcu_bt_tool.csproj.GenerateResource.Cache
+D:\project\wlink\！！！！产品发布资料\STM32_UBUNTU_BLUETOOTH\0-系统源码\1-BLUETOOTH_source_tree\mcu_bt_tool\mcu_bt_tool\mcu_bt_tool\obj\x86\Debug\mcu_bt_tool.exe
+D:\project\wlink\！！！！产品发布资料\STM32_UBUNTU_BLUETOOTH\0-系统源码\1-BLUETOOTH_source_tree\mcu_bt_tool\mcu_bt_tool\mcu_bt_tool\obj\x86\Debug\mcu_bt_tool.pdb
+D:\project\wlink\！！！！产品发布资料\STM32_UBUNTU_BLUETOOTH\0-系统源码\1-BLUETOOTH_source_tree\mcu_bt_tool\mcu_bt_tool\mcu_bt_tool\bin\Debug\mcu_bt_tool.exe
+D:\project\wlink\！！！！产品发布资料\STM32_UBUNTU_BLUETOOTH\0-系统源码\1-BLUETOOTH_source_tree\mcu_bt_tool\mcu_bt_tool\mcu_bt_tool\bin\Debug\mcu_bt_tool.pdb
+D:\project\wlink\！！！！产品发布资料\STM32_UBUNTU_BLUETOOTH\0-系统源码\1-BLUETOOTH_source_tree\mcu_bt_tool\mcu_bt_tool\mcu_bt_tool\bin\Debug\Newtonsoft.Json.dll
+D:\project\wlink\！！！！产品发布资料\STM32_UBUNTU_BLUETOOTH\0-系统源码\1-BLUETOOTH_source_tree\mcu_bt_tool\mcu_bt_tool\mcu_bt_tool\obj\x86\Debug\mcu_bt_tool.csprojResolveAssemblyReference.cache
+D:\project\wlink\！！！！产品发布资料\STM32_UBUNTU_BLUETOOTH\0-系统源码\1-BLUETOOTH_source_tree\mcu_bt_tool\mcu_bt_tool\mcu_bt_tool\obj\x86\Debug\mcu_bt_tool.Form1.resources
+D:\project\wlink\！！！！产品发布资料\STM32_UBUNTU_BLUETOOTH\0-系统源码\1-BLUETOOTH_source_tree\mcu_bt_tool\mcu_bt_tool\mcu_bt_tool\obj\x86\Debug\mcu_bt_tool.Properties.Resources.resources
+D:\project\wlink\！！！！产品发布资料\STM32_UBUNTU_BLUETOOTH\0-系统源码\1-BLUETOOTH_source_tree\mcu_bt_tool\mcu_bt_tool\mcu_bt_tool\obj\x86\Debug\mcu_bt_tool.csproj.GenerateResource.Cache

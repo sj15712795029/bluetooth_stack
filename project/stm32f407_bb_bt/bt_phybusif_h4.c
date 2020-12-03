@@ -18,11 +18,14 @@ UART_HandleTypeDef huart2;
 
 
 
-#define BT_DMA_BUF_SIZE	(2*1024)
-#define BT_RX_BUF_SIZE (4*1024)
+#define BT_DMA_BUF_SIZE	(4*1024)
+#define BT_RX_BUF_SIZE (32*1024)
 struct ringbuffer bt_ring_buf;
 uint8_t bt_rx_buf[BT_RX_BUF_SIZE];
-uint8_t bt_dma_rx_buf[BT_DMA_BUF_SIZE];
+uint8_t bt_dma_rx_buf1[BT_DMA_BUF_SIZE];
+uint8_t bt_dma_rx_buf2[BT_DMA_BUF_SIZE];
+uint8_t current_buffer = 1;
+
 
 #define BT_TX_BUF_SIZE	1024
 uint8_t bt_tx_buff[BT_TX_BUF_SIZE];
@@ -57,7 +60,8 @@ uint8_t hw_uart_bt_init(uint32_t baud_rate)
         return HW_HAL_EXCU_ERR;
     }
 
-        HAL_UART_Receive_DMA(&huart2, bt_dma_rx_buf, BT_DMA_BUF_SIZE);
+		current_buffer = 1;
+        HAL_UART_Receive_DMA(&huart2, bt_dma_rx_buf1, BT_DMA_BUF_SIZE);
         __HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE);
 
     return HW_ERR_OK;
@@ -83,6 +87,40 @@ void uart_bt_send(uint8_t *buf,uint16_t len)
     }
 }
 
+void uart2_dma_enable(uint32_t recv_len)
+{
+
+	if(current_buffer == 1)
+	{
+	    HAL_UART_Receive_DMA(&huart2,bt_dma_rx_buf2,BT_DMA_BUF_SIZE);
+		current_buffer = 2;
+
+		if(ringbuffer_space_left(&bt_ring_buf) < recv_len)
+            {
+                HW_DEBUG("+++++++++++++++ring buffer is full,recv_len %d,left %d\n",recv_len,ringbuffer_space_left(&bt_ring_buf));
+            }
+            else
+            {
+                ringbuffer_put(&bt_ring_buf,bt_dma_rx_buf1,recv_len);
+            }
+	}
+	else
+	{
+		HAL_UART_Receive_DMA(&huart2,bt_dma_rx_buf1,BT_DMA_BUF_SIZE);
+		current_buffer = 1;
+
+		if(ringbuffer_space_left(&bt_ring_buf) < recv_len)
+            {
+                HW_DEBUG("+++++++++++++++ring buffer is full,recv_len %d,left %d\n",recv_len,ringbuffer_space_left(&bt_ring_buf));
+            }
+            else
+            {
+                ringbuffer_put(&bt_ring_buf,bt_dma_rx_buf2,recv_len);
+            }
+	}
+}
+
+
 /******************************************************************************
  * func name   : USART2_IRQHandler
  * para        : NULL
@@ -102,22 +140,9 @@ void USART2_IRQHandler(void)
 
         recv_len = BT_DMA_BUF_SIZE - huart2.hdmarx->Instance->NDTR;
 
-        if(recv_len > 500)
-        {
-            printf("------ %d ----\n",recv_len);
-        }
-
         if(recv_len > 0)
         {
-            if(ringbuffer_space_left(&bt_ring_buf) < recv_len)
-            {
-                HW_DEBUG("+++++++++++++++ring buffer is full,recv_len %d,left %d\n",recv_len,ringbuffer_space_left(&bt_ring_buf));
-            }
-            else
-            {
-                ringbuffer_put(&bt_ring_buf,bt_dma_rx_buf,recv_len);
-            }
-            HAL_UART_Receive_DMA(&huart2,bt_dma_rx_buf,BT_DMA_BUF_SIZE);
+            uart2_dma_enable(recv_len);
         }
     }
 

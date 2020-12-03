@@ -646,9 +646,9 @@ void avrcp_play_status_update(struct bd_addr_t *remote_addr,uint8_t play_status)
 {
 	printf("WRAPPER << PROFILE:avrcp_play_status_update play status(%d), address is :\n",play_status);
     bt_addr_dump(remote_addr->addr);
-	if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_app_setting_attr)
+	if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_play_status_update)
     {
-        bt_wrapper_cb->app_avrcp_cb->bt_avrcp_app_setting_attr(remote_addr,play_status);
+        bt_wrapper_cb->app_avrcp_cb->bt_avrcp_play_status_update(remote_addr,play_status);
     }
 }
 
