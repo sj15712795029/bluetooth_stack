@@ -278,6 +278,7 @@ typedef struct
 
 err_t avrcp_controller_init(avrcp_controller_cbs_t *cb);
 err_t avrcp_controller_list_app_setting_attr(struct bd_addr_t *remote_addr);
+err_t avrcp_controller_get_play_status(struct bd_addr_t *remote_addr);
 err_t avrcp_controller_register_notification(struct bd_addr_t *remote_addr,uint8_t notificaion_id);
 err_t avrcp_controller_get_element_attributes(struct bd_addr_t *remote_addr);
 err_t avrcp_controller_control(struct bd_addr_t *remote_addr,uint8_t control_id);

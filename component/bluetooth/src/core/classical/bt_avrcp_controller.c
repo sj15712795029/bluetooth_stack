@@ -343,6 +343,33 @@ static err_t avrcp_controller_parse_get_element_attr_rsp(struct avctp_pcb_t *avc
     return BT_ERR_OK;
 }
 
+static err_t avrcp_controller_parse_get_play_status_rsp(struct avctp_pcb_t *avctp_pcb,uint8_t *buffer,uint16_t buffer_len)
+{
+    uint16_t para_len = bt_be_read_16(buffer, 8);
+	uint32_t song_lenght = bt_be_read_32(buffer, 10);
+	uint32_t song_pos = bt_be_read_32(buffer, 14);
+	uint8_t play_status = buffer[18];
+
+    struct avrcp_pcb_t *avrcp_pcb = avrcp_get_active_pcb(&avctp_pcb->remote_bdaddr);
+
+    if(avrcp_pcb == NULL)
+    {
+        BT_AVRCP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] Could not find avrcp pcb\n",__FILE__,__FUNCTION__,__LINE__);
+
+        return BT_ERR_MEM;
+    }
+
+	BT_AVRCP_TRACE_DEBUG("song_lenght(%d)\n",song_lenght);
+	BT_AVRCP_TRACE_DEBUG("song_pos(%d)\n",song_pos);
+	BT_AVRCP_TRACE_DEBUG("play_status(%d)\n",play_status);
+
+
+	if(avrcp_controller_cbs && avrcp_controller_cbs->avrcp_playpos_change_update)
+            avrcp_controller_cbs->avrcp_playpos_change_update(&avrcp_pcb->remote_addr,song_pos);
+    return BT_ERR_OK;
+}
+
+
 
 static err_t _avrcp_controller_play_status_change_handle(struct avrcp_pcb_t *avrcp_pcb,uint8_t play_status)
 {
@@ -534,6 +561,12 @@ static err_t avrcp_controller_parse_vendor_dependent(struct avctp_pcb_t *avctp_p
             avrcp_controller_parse_get_element_attr_rsp(avctp_pcb,buffer,buffer_len);
             break;
         }
+		case AVRCP_PDU_ID_GET_PLAY_STATUS:
+		{
+			BT_AVRCP_TRACE_DEBUG("avrcp_controller_parse_vendor_dependent: AVRCP_PDU_ID_GET_PLAY_STATUS\n");
+			avrcp_controller_parse_get_play_status_rsp(avctp_pcb,buffer,buffer_len);
+			break;
+		}
         default:
         {
             BT_AVRCP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] unknow avrcp pdu id(%d)\n",__FILE__,__FUNCTION__,__LINE__,pdu_id);
@@ -802,6 +835,30 @@ err_t avrcp_controller_list_app_setting_attr(struct bd_addr_t *remote_addr)
     bt_pbuf_free(p);
     return BT_ERR_OK;
 }
+
+err_t avrcp_controller_get_play_status(struct bd_addr_t *remote_addr)
+{
+	struct bt_pbuf_t *p;
+    struct avrcp_pcb_t *avrcp_pcb = avrcp_get_active_pcb(remote_addr);
+
+    if(!avrcp_pcb)
+        return BT_ERR_CONN;
+
+    if((p = bt_pbuf_alloc(BT_PBUF_RAW, AVRCP_VENDOR_DEPENDENT_HDR_SIZE, BT_PBUF_RAM)) == NULL)
+    {
+        /* Could not allocate memory for bt_pbuf_t */
+        BT_AVRCP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_MEM;
+    }
+
+    avrcp_ass_vendor_dependent_hdr(p->payload,AVRCP_SUBUNIT_TYPE_PANEL,
+                                   AVRCP_PDU_ID_GET_PLAY_STATUS,AVRCP_CTYPE_STATUS,0);
+
+    avctp_datawrite(avrcp_pcb->avctppcb, p,BT_SERVICE_CLASS_AV_REMOTE_CONTROL);
+    bt_pbuf_free(p);
+    return BT_ERR_OK;
+}
+
 
 err_t avrcp_controller_register_notification(struct bd_addr_t *remote_addr,uint8_t notificaion_id)
 {

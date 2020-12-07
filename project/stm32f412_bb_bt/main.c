@@ -921,6 +921,13 @@ uint8_t shell_json_parse(uint8_t *operate_value,
         return HW_ERR_OK;
     }
 
+	if(hw_strncmp("AVRCP_PLAY_STATUS",(const char*)operate_value,hw_strlen("AVRCP_PLAY_STATUS")) == 0)
+    {
+        HW_DEBUG("SHELL:AVRCP_PLAY_STATUS\n");
+        bt_avrcp_controller_get_play_status(&connect_addr);
+        return HW_ERR_OK;
+    }
+
 	if(hw_strncmp("AVRCP_GET_ID3",(const char*)operate_value,hw_strlen("AVRCP_GET_ID3")) == 0)
     {
         HW_DEBUG("SHELL:AVRCP_GET_ID3\n");
@@ -1346,6 +1353,13 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:AVRCP_LIST_APP_ATTR\n");
         bt_avrcp_controller_list_app_setting_attr(&connect_addr);
+        return HW_ERR_OK;
+    }
+
+	if(hw_strncmp("AVRCP_PLAY_STATUS",(const char*)shell_string,hw_strlen("AVRCP_PLAY_STATUS")) == 0)
+    {
+        HW_DEBUG("SHELL:AVRCP_PLAY_STATUS\n");
+        bt_avrcp_controller_get_play_status(&connect_addr);
         return HW_ERR_OK;
     }
 

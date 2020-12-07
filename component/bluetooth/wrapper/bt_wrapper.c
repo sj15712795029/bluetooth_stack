@@ -1071,6 +1071,13 @@ uint8_t bt_hfp_hf_get_pid(struct bd_addr_t *addr)
 
 
 #if PROFILE_AVRCP_ENABLE
+
+uint8_t bt_avrcp_controller_get_play_status(struct bd_addr_t *remote_addr)
+{
+	avrcp_controller_get_play_status(remote_addr);
+	return 0;
+}
+
 uint8_t bt_avrcp_controller_list_app_setting_attr(struct bd_addr_t *remote_addr)
 {
 	avrcp_controller_list_app_setting_attr(remote_addr);

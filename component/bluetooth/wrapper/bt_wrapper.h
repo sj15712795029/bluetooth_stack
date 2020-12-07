@@ -203,6 +203,7 @@ uint8_t bt_hfp_hf_get_pid(struct bd_addr_t *addr);
 
 #if PROFILE_AVRCP_ENABLE
 /************************* AVRCP API ***********************/
+uint8_t bt_avrcp_controller_get_play_status(struct bd_addr_t *remote_addr);
 uint8_t bt_avrcp_controller_list_app_setting_attr(struct bd_addr_t *remote_addr);
 uint8_t bt_avrcp_controller_get_element_attributes(struct bd_addr_t *remote_addr);
 uint8_t bt_avrcp_controller_control(struct bd_addr_t *remote_addr,uint8_t control_id);
