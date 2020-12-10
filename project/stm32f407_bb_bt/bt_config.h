@@ -24,7 +24,6 @@
 #define BT_ENABLE_SSP 0
 /* IO_CAP_DISPLAY_ONLY->0x00 IO_CAP_DISPLAY_YES_NO->0x01 IO_CAP_KEYBOARD_ONLY->0x02 IO_CAP_NOINPUT_OUTPUT->0x03 */
 #define BT_SSP_IOCAP_CONF 1
-#define BT_CLASS_OF_DEVICE 0x200408;
 #define BT_LOCAL_NAME "BT_DEMO"
 #define BT_PIN_CODE "0000"
 #define BT_TIMER_COUNT 64 /* TIMER COUNT */
@@ -37,8 +36,17 @@
 #define PROFILE_HFP_ENABLE 0
 #define PROFILE_SPP_ENABLE 0
 #define PROFILE_PBAP_ENABLE 0
-#define PROFILE_A2DP_ENABLE 1
-#define PROFILE_AVRCP_ENABLE 1
+#define PROFILE_A2DP_ENABLE 0
+#define PROFILE_AVRCP_ENABLE 0
+#define PROFILE_HID_ENABLE 1
+#if PROFILE_HID_ENABLE > 0
+#define BT_CLASS_OF_DEVICE 0x0025c0 
+#undef BT_ENABLE_SSP
+#define BT_ENABLE_SSP 1
+#else
+#define BT_CLASS_OF_DEVICE 0x200408
+#endif
+
 /******************************************************************************************************************************/
 
 
@@ -70,6 +78,7 @@
 #define BT_AVCTP_TRACE_LEVEL 3
 #define BT_A2DP_TRACE_LEVEL 3
 #define BT_AVRCP_TRACE_LEVEL 3
+#define BT_HID_TRACE_LEVEL 3
 /******************************************************************************************************************************/
 
 
@@ -96,6 +105,7 @@
 #define MEMP_NUM_AVRCP 7
 #define MEMP_NUM_SPP 7
 #define MEMP_NUM_PBAP 7
+#define MEMP_NUM_HID 7
 #define MEMP_NUM_BT_PBUF 3
 #define MEM_ALIGNMENT 4
 #define MEM_LIBC_MALLOC 1
@@ -168,6 +178,16 @@ typedef uintptr_t mem_ptr_t;
 #define AVRCP_ID3_ARTIST_MAX_SIZE 64
 #define AVRCP_ID3_ALBUM_MAX_SIZE 64
 /******************************************************************************************************************************/
+
+/***********  HID profile config *******************************************************************************************/
+/* !!!!You must only select one, if you want to select multiple, then you need to assemble your own HID Descriptor */
+#define HID_DEVICE_MOUSE_ENABLE 0
+#define HID_DEVICE_KEYBAORD_ENABLE 1
+#define HID_DEVICE_GAMEPAD_ENABLE 0
+#define HID_DEVICE_JOYSTICK_ENABLE 0
+
+/******************************************************************************************************************************/
+
 
 
 #endif

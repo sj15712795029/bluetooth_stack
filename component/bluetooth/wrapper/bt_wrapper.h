@@ -33,6 +33,10 @@
 #if PROFILE_AVRCP_ENABLE > 0
 #include "bt_avrcp_controller.h"
 #endif
+#if PROFILE_HID_ENABLE > 0
+#include "bt_hid_device.h"
+#endif
+
 
 
 #define LINK_KEY_MAX 10
@@ -61,6 +65,7 @@ struct link_key_record
 #define BT_PROFILE_PBAP_PSE_MASK (1<<7)
 #define BT_PROFILE_DID_PSE_MASK (1<<8)
 #define BT_PROFILE_SPP_MASK (1<<9)
+#define BT_PROFILE_HID_DEVICE_MASK (1<<10)
 
 #define HFP_VOLUME_MIN 0
 #define HFP_VOLUME_MAX 15
@@ -138,6 +143,12 @@ typedef struct
 	void (*bt_avrcp_element_attr_update)(struct bd_addr_t *remote_addr,uint8_t *title,uint8_t *artist,uint8_t *album,uint32_t current_index,uint32_t totol_count,uint32_t total_milliseconds);
 }bt_app_avrcp_cb_t;
 
+typedef struct
+{
+	void (*bt_hid_connect)(struct bd_addr_t *remote_addr,uint8_t status);
+	void (*bt_hid_disconnect)(struct bd_addr_t *remote_addr,uint8_t status);
+	void (*bt_hid_interrupt_recv_data)(struct bd_addr_t *remote_addr,uint8_t *data,uint16_t data_len);
+}bt_app_hid_cb_t;
 
 
 typedef struct
@@ -147,6 +158,7 @@ typedef struct
 	bt_app_hfp_cb_t * app_hfp_cb;
 	bt_app_a2dp_cb_t *app_a2dp_cb;
 	bt_app_avrcp_cb_t *app_avrcp_cb;
+	bt_app_hid_cb_t *app_hid_cb;
 }bt_app_cb_t;
 
 
@@ -208,7 +220,12 @@ uint8_t bt_avrcp_controller_list_app_setting_attr(struct bd_addr_t *remote_addr)
 uint8_t bt_avrcp_controller_get_element_attributes(struct bd_addr_t *remote_addr);
 uint8_t bt_avrcp_controller_control(struct bd_addr_t *remote_addr,uint8_t control_id);
 
+#endif
 
+#if PROFILE_HID_ENABLE
+/************************* AVRCP API ***********************/
+uint8_t bt_hid_interupt_report(struct bd_addr_t *remote_addr,uint8_t *report,uint8_t report_size);
+uint8_t bt_hid_find_keycode(uint8_t *keycode,uint8_t find_char);
 
 #endif
 

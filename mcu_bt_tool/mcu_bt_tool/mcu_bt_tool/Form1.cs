@@ -59,6 +59,16 @@ namespace mcu_bt_tool
         string json_bt_cmd_avrcp_next = "AVRCP_NEXT";/* 下一首 */
         string json_bt_cmd_avrcp_fast_bw = "AVRCP_FAST_BACKWARD";/* 快退 */
         string json_bt_cmd_avrcp_fast_fw = "AVRCP_FAST_FORWARD";/* 快进 */
+        string json_bt_cmd_hid_left = "HID_MOUSE_L";/* 鼠标左移 */
+        string json_bt_cmd_hid_right = "HID_MOUSE_R";/* 鼠标右移 */
+        string json_bt_cmd_hid_up = "HID_MOUSE_U";/* 鼠标上移 */
+        string json_bt_cmd_hid_down = "HID_MOUSE_D";/* 鼠标下移 */
+        string json_bt_cmd_hid_lclick_down = "HID_MOUSE_CLICKL_DOWN";/* 鼠标左键点击按下 */
+        string json_bt_cmd_hid_lclick_up = "HID_MOUSE_CLICKL_UP";/* 鼠标左键点击松开 */
+        string json_bt_cmd_hid_rclick_down = "HID_MOUSE_CLICKR_DOWN";/* 鼠标右键点击按下 */
+        string json_bt_cmd_hid_rclick_up = "HID_MOUSE_CLICKR_UP";/* 鼠标右键点击松开 */
+        string json_bt_cmd_hid_keyboard_input = "HID_KEYBOARD_INPUT";
+
         
 
 
@@ -507,7 +517,119 @@ namespace mcu_bt_tool
         private void b_musci_fast_backward_Click(object sender, EventArgs e)
         {
             json_cmd_send(json_bt_cmd_func, json_bt_cmd_avrcp_fast_bw, null, null, null, null, null, null);
-        } 
+        }
+
+        private void b_hid_mouse_left_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int pixel = Convert.ToInt32(textBox1.Text);
+                if ((pixel < 0) || (pixel > 127))
+                {
+                    MessageBox.Show("Error: 数据范围不对，请重新输入", "Error");
+                    return;
+                }
+                json_cmd_send(json_bt_cmd_func, json_bt_cmd_hid_left, pixel.ToString(), null, null, null, null, null);
+                
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: 无效数据"+ex.Message, "Error");
+            }
+
+        }
+
+        private void b_hid_mouse_up_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int pixel = Convert.ToInt32(textBox1.Text);
+                if ((pixel < 0) || (pixel > 127))
+                {
+                    MessageBox.Show("Error: 数据范围不对，请重新输入", "Error");
+                    return;
+                }
+                json_cmd_send(json_bt_cmd_func, json_bt_cmd_hid_up, pixel.ToString(), null, null, null, null, null);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: 无效数据,请重新输入" + ex.Message, "Error");
+            }
+        }
+
+        private void b_hid_mouse_down_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int pixel = Convert.ToInt32(textBox1.Text);
+                if ((pixel < 0) || (pixel > 127))
+                {
+                    MessageBox.Show("Error: 数据范围不对，请重新输入", "Error");
+                    return;
+                }
+                json_cmd_send(json_bt_cmd_func, json_bt_cmd_hid_down, pixel.ToString(), null, null, null, null, null);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: 无效数据,请重新输入" + ex.Message, "Error");
+            }
+        }
+
+        private void b_hid_mouse_right_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int pixel = Convert.ToInt32(textBox1.Text);
+                if ((pixel < 0) || (pixel > 127))
+                {
+                    MessageBox.Show("Error: 数据范围不对，请重新输入", "Error");
+                    return;
+                }
+                json_cmd_send(json_bt_cmd_func, json_bt_cmd_hid_right, pixel.ToString(), null, null, null, null, null);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: 无效数据,请重新输入" + ex.Message, "Error");
+            }
+        }
+
+
+        private void b_hid_mouse_lclick_MouseDown(object sender, MouseEventArgs e)
+        {
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hid_lclick_down, null, null, null, null, null, null);
+        }
+
+        private void b_hid_mouse_lclick_MouseUp(object sender, MouseEventArgs e)
+        {
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hid_lclick_up, null, null, null, null, null, null);
+        }
+
+        private void b_hid_mouse_rclick_MouseDown(object sender, MouseEventArgs e)
+        {
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hid_rclick_down, null, null, null, null, null, null);
+        }
+
+        private void b_hid_mouse_rclick_MouseUp(object sender, MouseEventArgs e)
+        {
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hid_rclick_up, null, null, null, null, null, null);
+        }
+
+        private void tb_hid_keyboard_char_send_Click_1(object sender, EventArgs e)
+        {
+            string char_send = tb_hid_keyboard_char.Text;
+            if ((char_send.Length > 1) || (char_send == ""))
+            {
+                MessageBox.Show("Error: 请输入一个字符", "Error");
+                tb_hid_keyboard_char.Text = null;
+                return;
+            }
+
+            json_cmd_send(json_bt_cmd_func, json_bt_cmd_hid_keyboard_input, char_send, null, null, null, null, null);
+
+        }
 
         /* 串口搜索 */
         private void search_add_serial_port()
@@ -724,6 +846,13 @@ namespace mcu_bt_tool
                         ui_bt_avrcp_con_status(status.PARAM2);
                     }
 
+                    if (status.PARAM1 == "HID")
+                    {
+                        ui_bt_hid_show(true);
+                        ui_bt_hid_con_status(true);
+                        ui_bt_hid_con_status(status.PARAM2);
+                    }
+
                 }
 
                 if (status.OPERATE == "BT_DISCON_RESULT")
@@ -759,6 +888,13 @@ namespace mcu_bt_tool
                         ui_bt_avrcp_show(false);
                         ui_bt_avrcp_con_status(false);
                         ui_bt_avrcp_con_status(null);
+                    }
+
+                    if (status.PARAM1 == "HID")
+                    {
+                        ui_bt_hid_show(false);
+                        ui_bt_hid_con_status(false);
+                        ui_bt_hid_con_status(null);
                     }
 
 
@@ -1077,6 +1213,50 @@ namespace mcu_bt_tool
             }
         }
 
+        /* HID tabpage的显示使能 */
+        private void ui_bt_hid_show(bool bt_hid_show)
+        {
+            if (bt_hid_show)
+            {
+                /* 所有控件显示 */
+                gb_hid_mouse.Enabled = true;
+                gb_hid_keyboard.Enabled = true;
+            }
+            else
+            {
+                /* 所有控件灰掉 */
+                gb_hid_mouse.Enabled = false;
+                gb_hid_keyboard.Enabled = false;
+            }
+
+        }
+
+        /* HID 刷新连接状态 */
+        private void ui_bt_hid_con_status(bool bt_hid_con_status)
+        {
+            if (bt_hid_con_status)
+            {
+                l_hid_con_status.Text = "已连接";
+            }
+            else
+            {
+                l_hid_con_status.Text = "未连接";
+            }
+        }
+
+        /* HID 刷新连接地址 */
+        private void ui_bt_hid_con_status(string bt_hid_con_addr)
+        {
+            if (bt_hid_con_addr != null)
+            {
+                l_hid_con_addr.Text = bt_hid_con_addr;
+            }
+            else
+            {
+                l_hid_con_addr.Text = "00:00:00:00:00:00";
+            }
+        }
+
         /* 刷新HFP信号图标 */
         private void ui_bt_hfp_update_signal(string picture_name)
         {
@@ -1165,12 +1345,20 @@ namespace mcu_bt_tool
             ui_bt_hfp_show(false);
             ui_bt_hfp_clear_call_num();
             ui_bt_hfp_dtmf_show(false);
-            //ui_bt_avrcp_show(false);
+            ui_bt_avrcp_show(false);
+            //ui_bt_hid_show(false);
             
         }
 
-         
-    
+        
+
+        
+
+        
+
+        
+
+        
       
     }
 

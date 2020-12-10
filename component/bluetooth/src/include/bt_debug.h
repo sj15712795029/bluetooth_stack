@@ -403,6 +403,25 @@
       BT_DEBUG(fmt,##__VA_ARGS__); \
   }
 
+#define BT_HID_TRACE_ERROR(fmt,...)                                      \
+  {                                                                \
+    if (BT_HID_TRACE_LEVEL >= BT_TRACE_LEVEL_ERROR)               \
+      BT_DEBUG(fmt,##__VA_ARGS__); \
+  }
+
+#define BT_HID_TRACE_WARNING(fmt,...)                                      \
+  {                                                                \
+    if (BT_HID_TRACE_LEVEL >= BT_TRACE_LEVEL_WARNING)               \
+      BT_DEBUG(fmt,##__VA_ARGS__); \
+  }
+
+#define BT_HID_TRACE_DEBUG(fmt,...)                                      \
+  {                                                                \
+    if (BT_HID_TRACE_LEVEL >= BT_TRACE_LEVEL_DEBUG)               \
+      BT_DEBUG(fmt,##__VA_ARGS__); \
+  }
+
+
 
 #define BT_ERROR(message, expression, handler) do { if (!(expression)) { \
   BT_DEBUG(message); handler;}} while(0)

@@ -109,6 +109,9 @@
             this.label8 = new System.Windows.Forms.Label();
             this.tp_bt_audio = new System.Windows.Forms.TabPage();
             this.gb_music_box = new System.Windows.Forms.GroupBox();
+            this.l_music_current_pos = new System.Windows.Forms.Label();
+            this.l_music_total_pos = new System.Windows.Forms.Label();
+            this.pb_music_pos = new System.Windows.Forms.ProgressBar();
             this.b_musci_fast_backward = new System.Windows.Forms.Button();
             this.b_musci_fast_forward = new System.Windows.Forms.Button();
             this.b_musci_next = new System.Windows.Forms.Button();
@@ -143,6 +146,24 @@
             this.label6 = new System.Windows.Forms.Label();
             this.l_spp_con_status = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
+            this.tp_bt_hid_device = new System.Windows.Forms.TabPage();
+            this.gb_hid_keyboard = new System.Windows.Forms.GroupBox();
+            this.tb_hid_keyboard_char_send = new System.Windows.Forms.Button();
+            this.tb_hid_keyboard_char = new System.Windows.Forms.TextBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.l_hid_con_addr = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.l_hid_con_status = new System.Windows.Forms.Label();
+            this.label16 = new System.Windows.Forms.Label();
+            this.gb_hid_mouse = new System.Windows.Forms.GroupBox();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.b_hid_mouse_rclick = new System.Windows.Forms.Button();
+            this.b_hid_mouse_lclick = new System.Windows.Forms.Button();
+            this.b_hid_mouse_right = new System.Windows.Forms.Button();
+            this.b_hid_mouse_down = new System.Windows.Forms.Button();
+            this.b_hid_mouse_left = new System.Windows.Forms.Button();
+            this.b_hid_mouse_up = new System.Windows.Forms.Button();
             this.g_log_func = new System.Windows.Forms.GroupBox();
             this.b_serial_send = new System.Windows.Forms.Button();
             this.t_data_send = new System.Windows.Forms.TextBox();
@@ -153,9 +174,6 @@
             this.directoryEntry1 = new System.DirectoryServices.DirectoryEntry();
             this.b_bt_stop = new System.Windows.Forms.Button();
             this.b_bt_start = new System.Windows.Forms.Button();
-            this.pb_music_pos = new System.Windows.Forms.ProgressBar();
-            this.l_music_total_pos = new System.Windows.Forms.Label();
-            this.l_music_current_pos = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.tc_bt_function.SuspendLayout();
             this.tp_bt_basic_func.SuspendLayout();
@@ -174,6 +192,9 @@
             this.tp_bt_spp.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox6.SuspendLayout();
+            this.tp_bt_hid_device.SuspendLayout();
+            this.gb_hid_keyboard.SuspendLayout();
+            this.gb_hid_mouse.SuspendLayout();
             this.g_log_func.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -276,6 +297,7 @@
             this.tc_bt_function.Controls.Add(this.tp_bt_hfp_hf);
             this.tc_bt_function.Controls.Add(this.tp_bt_audio);
             this.tc_bt_function.Controls.Add(this.tp_bt_spp);
+            this.tc_bt_function.Controls.Add(this.tp_bt_hid_device);
             this.tc_bt_function.Location = new System.Drawing.Point(8, 116);
             this.tc_bt_function.Name = "tc_bt_function";
             this.tc_bt_function.SelectedIndex = 0;
@@ -1040,6 +1062,32 @@
             this.gb_music_box.TabIndex = 12;
             this.gb_music_box.TabStop = false;
             // 
+            // l_music_current_pos
+            // 
+            this.l_music_current_pos.AutoSize = true;
+            this.l_music_current_pos.Location = new System.Drawing.Point(3, 274);
+            this.l_music_current_pos.Name = "l_music_current_pos";
+            this.l_music_current_pos.Size = new System.Drawing.Size(67, 15);
+            this.l_music_current_pos.TabIndex = 13;
+            this.l_music_current_pos.Text = "播放时间";
+            // 
+            // l_music_total_pos
+            // 
+            this.l_music_total_pos.AutoSize = true;
+            this.l_music_total_pos.Location = new System.Drawing.Point(751, 274);
+            this.l_music_total_pos.Name = "l_music_total_pos";
+            this.l_music_total_pos.Size = new System.Drawing.Size(52, 15);
+            this.l_music_total_pos.TabIndex = 12;
+            this.l_music_total_pos.Text = "总时间";
+            // 
+            // pb_music_pos
+            // 
+            this.pb_music_pos.Location = new System.Drawing.Point(6, 239);
+            this.pb_music_pos.Maximum = 10;
+            this.pb_music_pos.Name = "pb_music_pos";
+            this.pb_music_pos.Size = new System.Drawing.Size(822, 23);
+            this.pb_music_pos.TabIndex = 11;
+            // 
             // b_musci_fast_backward
             // 
             this.b_musci_fast_backward.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
@@ -1390,6 +1438,208 @@
             this.label3.TabIndex = 0;
             this.label3.Text = "SPP连接状态:";
             // 
+            // tp_bt_hid_device
+            // 
+            this.tp_bt_hid_device.Controls.Add(this.gb_hid_keyboard);
+            this.tp_bt_hid_device.Controls.Add(this.l_hid_con_addr);
+            this.tp_bt_hid_device.Controls.Add(this.label12);
+            this.tp_bt_hid_device.Controls.Add(this.l_hid_con_status);
+            this.tp_bt_hid_device.Controls.Add(this.label16);
+            this.tp_bt_hid_device.Controls.Add(this.gb_hid_mouse);
+            this.tp_bt_hid_device.Location = new System.Drawing.Point(4, 25);
+            this.tp_bt_hid_device.Name = "tp_bt_hid_device";
+            this.tp_bt_hid_device.Size = new System.Drawing.Size(862, 554);
+            this.tp_bt_hid_device.TabIndex = 4;
+            this.tp_bt_hid_device.Text = "蓝牙HID设备";
+            this.tp_bt_hid_device.UseVisualStyleBackColor = true;
+            // 
+            // gb_hid_keyboard
+            // 
+            this.gb_hid_keyboard.Controls.Add(this.tb_hid_keyboard_char_send);
+            this.gb_hid_keyboard.Controls.Add(this.tb_hid_keyboard_char);
+            this.gb_hid_keyboard.Controls.Add(this.label14);
+            this.gb_hid_keyboard.Location = new System.Drawing.Point(497, 83);
+            this.gb_hid_keyboard.Name = "gb_hid_keyboard";
+            this.gb_hid_keyboard.Size = new System.Drawing.Size(351, 201);
+            this.gb_hid_keyboard.TabIndex = 1;
+            this.gb_hid_keyboard.TabStop = false;
+            this.gb_hid_keyboard.Text = "蓝牙键盘测试区";
+            // 
+            // tb_hid_keyboard_char_send
+            // 
+            this.tb_hid_keyboard_char_send.Font = new System.Drawing.Font("宋体", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.tb_hid_keyboard_char_send.Location = new System.Drawing.Point(202, 126);
+            this.tb_hid_keyboard_char_send.Name = "tb_hid_keyboard_char_send";
+            this.tb_hid_keyboard_char_send.Size = new System.Drawing.Size(77, 40);
+            this.tb_hid_keyboard_char_send.TabIndex = 8;
+            this.tb_hid_keyboard_char_send.Text = "发送";
+            this.tb_hid_keyboard_char_send.UseVisualStyleBackColor = true;
+            this.tb_hid_keyboard_char_send.Click += new System.EventHandler(this.tb_hid_keyboard_char_send_Click_1);
+            // 
+            // tb_hid_keyboard_char
+            // 
+            this.tb_hid_keyboard_char.Font = new System.Drawing.Font("宋体", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.tb_hid_keyboard_char.Location = new System.Drawing.Point(65, 126);
+            this.tb_hid_keyboard_char.Multiline = true;
+            this.tb_hid_keyboard_char.Name = "tb_hid_keyboard_char";
+            this.tb_hid_keyboard_char.Size = new System.Drawing.Size(81, 40);
+            this.tb_hid_keyboard_char.TabIndex = 8;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Font = new System.Drawing.Font("宋体", 10.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label14.Location = new System.Drawing.Point(70, 47);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(209, 19);
+            this.label14.TabIndex = 0;
+            this.label14.Text = "输入字符（只能一个）";
+            // 
+            // l_hid_con_addr
+            // 
+            this.l_hid_con_addr.AutoSize = true;
+            this.l_hid_con_addr.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.l_hid_con_addr.Location = new System.Drawing.Point(576, 29);
+            this.l_hid_con_addr.Name = "l_hid_con_addr";
+            this.l_hid_con_addr.Size = new System.Drawing.Size(229, 31);
+            this.l_hid_con_addr.TabIndex = 7;
+            this.l_hid_con_addr.Text = "00:00:00:00:00:00";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label12.Location = new System.Drawing.Point(403, 29);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(164, 31);
+            this.label12.TabIndex = 6;
+            this.label12.Text = "HID连接地址:";
+            // 
+            // l_hid_con_status
+            // 
+            this.l_hid_con_status.AutoSize = true;
+            this.l_hid_con_status.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.l_hid_con_status.Location = new System.Drawing.Point(209, 29);
+            this.l_hid_con_status.Name = "l_hid_con_status";
+            this.l_hid_con_status.Size = new System.Drawing.Size(86, 31);
+            this.l_hid_con_status.TabIndex = 5;
+            this.l_hid_con_status.Text = "未连接";
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label16.Location = new System.Drawing.Point(40, 29);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(164, 31);
+            this.label16.TabIndex = 4;
+            this.label16.Text = "HID连接状态:";
+            // 
+            // gb_hid_mouse
+            // 
+            this.gb_hid_mouse.Controls.Add(this.textBox1);
+            this.gb_hid_mouse.Controls.Add(this.label9);
+            this.gb_hid_mouse.Controls.Add(this.b_hid_mouse_rclick);
+            this.gb_hid_mouse.Controls.Add(this.b_hid_mouse_lclick);
+            this.gb_hid_mouse.Controls.Add(this.b_hid_mouse_right);
+            this.gb_hid_mouse.Controls.Add(this.b_hid_mouse_down);
+            this.gb_hid_mouse.Controls.Add(this.b_hid_mouse_left);
+            this.gb_hid_mouse.Controls.Add(this.b_hid_mouse_up);
+            this.gb_hid_mouse.Location = new System.Drawing.Point(20, 83);
+            this.gb_hid_mouse.Name = "gb_hid_mouse";
+            this.gb_hid_mouse.Size = new System.Drawing.Size(471, 201);
+            this.gb_hid_mouse.TabIndex = 0;
+            this.gb_hid_mouse.TabStop = false;
+            this.gb_hid_mouse.Text = "蓝牙鼠标测试区";
+            // 
+            // textBox1
+            // 
+            this.textBox1.Font = new System.Drawing.Font("宋体", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.textBox1.Location = new System.Drawing.Point(24, 87);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(81, 40);
+            this.textBox1.TabIndex = 7;
+            this.textBox1.Text = "111";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Font = new System.Drawing.Font("宋体", 10.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label9.Location = new System.Drawing.Point(20, 47);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(184, 19);
+            this.label9.TabIndex = 6;
+            this.label9.Text = "移动像素（0~127）";
+            // 
+            // b_hid_mouse_rclick
+            // 
+            this.b_hid_mouse_rclick.Font = new System.Drawing.Font("宋体", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.b_hid_mouse_rclick.Location = new System.Drawing.Point(390, 120);
+            this.b_hid_mouse_rclick.Name = "b_hid_mouse_rclick";
+            this.b_hid_mouse_rclick.Size = new System.Drawing.Size(67, 68);
+            this.b_hid_mouse_rclick.TabIndex = 5;
+            this.b_hid_mouse_rclick.Text = "右键";
+            this.b_hid_mouse_rclick.UseVisualStyleBackColor = true;
+            this.b_hid_mouse_rclick.MouseDown += new System.Windows.Forms.MouseEventHandler(this.b_hid_mouse_rclick_MouseDown);
+            this.b_hid_mouse_rclick.MouseUp += new System.Windows.Forms.MouseEventHandler(this.b_hid_mouse_rclick_MouseUp);
+            // 
+            // b_hid_mouse_lclick
+            // 
+            this.b_hid_mouse_lclick.Font = new System.Drawing.Font("宋体", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.b_hid_mouse_lclick.Location = new System.Drawing.Point(390, 39);
+            this.b_hid_mouse_lclick.Name = "b_hid_mouse_lclick";
+            this.b_hid_mouse_lclick.Size = new System.Drawing.Size(67, 68);
+            this.b_hid_mouse_lclick.TabIndex = 4;
+            this.b_hid_mouse_lclick.Text = "左键";
+            this.b_hid_mouse_lclick.UseVisualStyleBackColor = true;
+            this.b_hid_mouse_lclick.MouseDown += new System.Windows.Forms.MouseEventHandler(this.b_hid_mouse_lclick_MouseDown);
+            this.b_hid_mouse_lclick.MouseUp += new System.Windows.Forms.MouseEventHandler(this.b_hid_mouse_lclick_MouseUp);
+            // 
+            // b_hid_mouse_right
+            // 
+            this.b_hid_mouse_right.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("b_hid_mouse_right.BackgroundImage")));
+            this.b_hid_mouse_right.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.b_hid_mouse_right.Location = new System.Drawing.Point(302, 120);
+            this.b_hid_mouse_right.Name = "b_hid_mouse_right";
+            this.b_hid_mouse_right.Size = new System.Drawing.Size(68, 68);
+            this.b_hid_mouse_right.TabIndex = 3;
+            this.b_hid_mouse_right.UseVisualStyleBackColor = true;
+            this.b_hid_mouse_right.Click += new System.EventHandler(this.b_hid_mouse_right_Click);
+            // 
+            // b_hid_mouse_down
+            // 
+            this.b_hid_mouse_down.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("b_hid_mouse_down.BackgroundImage")));
+            this.b_hid_mouse_down.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.b_hid_mouse_down.Location = new System.Drawing.Point(220, 120);
+            this.b_hid_mouse_down.Name = "b_hid_mouse_down";
+            this.b_hid_mouse_down.Size = new System.Drawing.Size(68, 68);
+            this.b_hid_mouse_down.TabIndex = 2;
+            this.b_hid_mouse_down.UseVisualStyleBackColor = true;
+            this.b_hid_mouse_down.Click += new System.EventHandler(this.b_hid_mouse_down_Click);
+            // 
+            // b_hid_mouse_left
+            // 
+            this.b_hid_mouse_left.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("b_hid_mouse_left.BackgroundImage")));
+            this.b_hid_mouse_left.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.b_hid_mouse_left.Location = new System.Drawing.Point(136, 120);
+            this.b_hid_mouse_left.Name = "b_hid_mouse_left";
+            this.b_hid_mouse_left.Size = new System.Drawing.Size(68, 68);
+            this.b_hid_mouse_left.TabIndex = 1;
+            this.b_hid_mouse_left.UseVisualStyleBackColor = true;
+            this.b_hid_mouse_left.Click += new System.EventHandler(this.b_hid_mouse_left_Click);
+            // 
+            // b_hid_mouse_up
+            // 
+            this.b_hid_mouse_up.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("b_hid_mouse_up.BackgroundImage")));
+            this.b_hid_mouse_up.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.b_hid_mouse_up.Location = new System.Drawing.Point(220, 39);
+            this.b_hid_mouse_up.Name = "b_hid_mouse_up";
+            this.b_hid_mouse_up.Size = new System.Drawing.Size(68, 68);
+            this.b_hid_mouse_up.TabIndex = 0;
+            this.b_hid_mouse_up.UseVisualStyleBackColor = true;
+            this.b_hid_mouse_up.Click += new System.EventHandler(this.b_hid_mouse_up_Click);
+            // 
             // g_log_func
             // 
             this.g_log_func.BackColor = System.Drawing.Color.Transparent;
@@ -1477,32 +1727,6 @@
             this.b_bt_start.UseVisualStyleBackColor = true;
             this.b_bt_start.Click += new System.EventHandler(this.b_bt_start_Click);
             // 
-            // pb_music_pos
-            // 
-            this.pb_music_pos.Location = new System.Drawing.Point(6, 239);
-            this.pb_music_pos.Maximum = 10;
-            this.pb_music_pos.Name = "pb_music_pos";
-            this.pb_music_pos.Size = new System.Drawing.Size(822, 23);
-            this.pb_music_pos.TabIndex = 11;
-            // 
-            // l_music_total_pos
-            // 
-            this.l_music_total_pos.AutoSize = true;
-            this.l_music_total_pos.Location = new System.Drawing.Point(751, 274);
-            this.l_music_total_pos.Name = "l_music_total_pos";
-            this.l_music_total_pos.Size = new System.Drawing.Size(52, 15);
-            this.l_music_total_pos.TabIndex = 12;
-            this.l_music_total_pos.Text = "总时间";
-            // 
-            // l_music_current_pos
-            // 
-            this.l_music_current_pos.AutoSize = true;
-            this.l_music_current_pos.Location = new System.Drawing.Point(3, 274);
-            this.l_music_current_pos.Name = "l_music_current_pos";
-            this.l_music_current_pos.Size = new System.Drawing.Size(67, 15);
-            this.l_music_current_pos.TabIndex = 13;
-            this.l_music_current_pos.Text = "播放时间";
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -1547,6 +1771,12 @@
             this.groupBox2.PerformLayout();
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
+            this.tp_bt_hid_device.ResumeLayout(false);
+            this.tp_bt_hid_device.PerformLayout();
+            this.gb_hid_keyboard.ResumeLayout(false);
+            this.gb_hid_keyboard.PerformLayout();
+            this.gb_hid_mouse.ResumeLayout(false);
+            this.gb_hid_mouse.PerformLayout();
             this.g_log_func.ResumeLayout(false);
             this.g_log_func.PerformLayout();
             this.ResumeLayout(false);
@@ -1681,6 +1911,24 @@
         private System.Windows.Forms.ProgressBar pb_music_pos;
         private System.Windows.Forms.Label l_music_current_pos;
         private System.Windows.Forms.Label l_music_total_pos;
+        private System.Windows.Forms.TabPage tp_bt_hid_device;
+        private System.Windows.Forms.GroupBox gb_hid_keyboard;
+        private System.Windows.Forms.Label l_hid_con_addr;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Label l_hid_con_status;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.GroupBox gb_hid_mouse;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Button b_hid_mouse_rclick;
+        private System.Windows.Forms.Button b_hid_mouse_lclick;
+        private System.Windows.Forms.Button b_hid_mouse_right;
+        private System.Windows.Forms.Button b_hid_mouse_down;
+        private System.Windows.Forms.Button b_hid_mouse_left;
+        private System.Windows.Forms.Button b_hid_mouse_up;
+        private System.Windows.Forms.TextBox tb_hid_keyboard_char;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Button tb_hid_keyboard_char_send;
     }
 }
 

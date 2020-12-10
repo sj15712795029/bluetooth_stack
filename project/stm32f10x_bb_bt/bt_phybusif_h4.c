@@ -339,7 +339,7 @@ err_t phybusif_input(struct phybusif_cb *cb)
         }
         case W4_EVENT_PARAM:
         {
-			printf("W4_EVENT_PARAM %d\n",cb->evhdr->len);
+			//printf("W4_EVENT_PARAM %d\n",cb->evhdr->len);
             if(ringbuffer_space_left(&bt_ring_buf) < cb->evhdr->len)
             {
                 printf("+++++++W4_EVENT_PARAM left %d,event size %d\n",ringbuffer_space_left(&bt_ring_buf),cb->evhdr->len);

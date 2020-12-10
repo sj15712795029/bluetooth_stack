@@ -20,6 +20,7 @@
 #include "bt_avrcp_controller.h"
 #include "bt_spp.h"
 #include "bt_pbap_client.h"
+#include "bt_hid_device.h"
 
 
 struct bt_memp_t
@@ -51,6 +52,7 @@ static const uint16_t memp_sizes[MEMP_BT_MAX] =
     sizeof(struct avrcp_pcb_t),
     sizeof(struct spp_pcb_t),
     sizeof(struct pbap_pcb_t),
+    sizeof(struct hid_device_pcb_t),
     PBUF_POOL_BUFSIZE,
 };
 
@@ -76,6 +78,7 @@ static const uint16_t memp_num[MEMP_BT_MAX] =
     MEMP_NUM_AVRCP,
     MEMP_NUM_SPP,
     MEMP_NUM_PBAP,
+    MEMP_NUM_HID,
     MEMP_NUM_BT_PBUF,
 };
 
@@ -138,6 +141,9 @@ static uint8_t memp_memory[(MEMP_NUM_HCI_PCB *
                                         sizeof(struct bt_memp_t)) +
                          MEMP_NUM_PBAP *
                          MEM_ALIGN_SIZE(sizeof(struct pbap_pcb_t) +
+                                        sizeof(struct bt_memp_t)) +
+                         MEMP_NUM_HID *
+                         MEM_ALIGN_SIZE(sizeof(struct hid_device_pcb_t) +
                                         sizeof(struct bt_memp_t)) +
                          MEMP_NUM_BT_PBUF *
                          MEM_ALIGN_SIZE(0x500))];

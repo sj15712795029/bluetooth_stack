@@ -33,6 +33,7 @@ typedef enum {
   MEMP_AVRCP_PCB,
   MEMP_SPP_PCB,
   MEMP_PBAP_PCB,
+  MEMP_HID_PCB,
   MEMP_BT_PBUF_POOL,
   MEMP_BT_MAX
 } bt_memp_t;

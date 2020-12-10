@@ -596,6 +596,44 @@ static bt_app_spp_cb_t bt_app_spp_cb =
 };
 #endif
 
+#if PROFILE_HID_ENABLE > 0
+void bt_app_hid_connect(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("bt_app_hid_connect status %d address:\n",status);
+    bt_addr_dump(remote_addr->addr);
+    connect_addr.addr[5] = remote_addr->addr[5];
+    connect_addr.addr[4] = remote_addr->addr[4];
+    connect_addr.addr[3] = remote_addr->addr[3];
+    connect_addr.addr[2] = remote_addr->addr[2];
+    connect_addr.addr[1] = remote_addr->addr[1];
+    connect_addr.addr[0] = remote_addr->addr[0];
+}
+
+void bt_app_hid_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("bt_app_hid_disconnect status %d address:\n",status);
+    bt_addr_dump(remote_addr->addr);
+    memset(&connect_addr,0,sizeof(connect_addr));
+}
+
+void bt_app_hid_interrupt_recv_data(struct bd_addr_t *remote_addr,uint8_t *data,uint16_t data_len)
+{
+    printf("bt_app_hid_interrupt_recv_data len %d address:\n",data_len);
+    bt_addr_dump(remote_addr->addr);
+    printf("data is :");
+    bt_hex_dump(data,data_len);
+}
+
+static bt_app_hid_cb_t bt_app_hid_cb =
+{
+    bt_app_hid_connect,
+    bt_app_hid_disconnect,
+    bt_app_hid_interrupt_recv_data,
+};
+#endif
+
+
+
 static bt_app_cb_t bt_app_cb =
 {
     &bt_app_common_cb,		
@@ -623,6 +661,13 @@ static bt_app_cb_t bt_app_cb =
 #else
 	NULL,
 #endif
+
+#if PROFILE_HID_ENABLE > 0
+    &bt_app_hid_cb,
+#else
+	NULL,
+#endif
+
 };
 
 
@@ -1036,7 +1081,80 @@ uint8_t shell_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
+#endif
 
+#if PROFILE_HID_ENABLE > 0
+		if(hw_strncmp("HID_MOUSE_L",(const char*)shell_string,hw_strlen("HID_MOUSE_L")) == 0)
+		{
+			uint8_t report[3] = {0,-20,0};
+			HW_DEBUG("SHELL:HID_MOUSE_L\n");
+			
+			bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+			return HW_ERR_OK;
+		}
+	
+		if(hw_strncmp("HID_MOUSE_R",(const char*)shell_string,hw_strlen("HID_MOUSE_R")) == 0)
+		{
+			uint8_t report[3] = {0,20,0};
+			HW_DEBUG("SHELL:HID_MOUSE_R\n");
+			
+			bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+			return HW_ERR_OK;
+		}
+		
+		if(hw_strncmp("HID_MOUSE_U",(const char*)shell_string,hw_strlen("HID_MOUSE_U")) == 0)
+		{
+			uint8_t report[3] = {0,0,-20};
+			HW_DEBUG("SHELL:HID_MOUSE_U\n");
+			
+			bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+			return HW_ERR_OK;
+		}
+	
+		if(hw_strncmp("HID_MOUSE_D",(const char*)shell_string,hw_strlen("HID_MOUSE_D")) == 0)
+		{
+			uint8_t report[3] = {0,0,20};
+			HW_DEBUG("SHELL:HID_MOUSE_D\n");
+			
+			bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+			return HW_ERR_OK;
+		}
+	
+		if(hw_strncmp("HID_MOUSE_L_CLICK",(const char*)shell_string,hw_strlen("HID_MOUSE_L_CLICK")) == 0)
+		{
+			uint8_t report[3] = {1,0,0};
+			HW_DEBUG("SHELL:HID_MOUSE_L_CLICK\n");
+			
+			bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+			return HW_ERR_OK;
+		}
+	
+		if(hw_strncmp("HID_MOUSE_R_CLICK",(const char*)shell_string,hw_strlen("HID_MOUSE_R_CLICK")) == 0)
+		{
+			uint8_t report[3] = {2,0,0};
+			HW_DEBUG("SHELL:HID_MOUSE_R_CLICK\n");
+			
+			bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+			return HW_ERR_OK;
+		}
+
+		if(hw_strncmp("HID_KEYBOARD_INPUT",(const char*)shell_string,hw_strlen("HID_KEYBOARD_INPUT")) == 0)
+		{
+			uint8_t keycode = 0xff;
+			uint8_t report[9] = {0};
+
+			HW_DEBUG("SHELL:HID_KEYBOARD_INPUT\n");
+			bt_hid_find_keycode(&keycode,'a');
+			HW_DEBUG("KEY INDEX %d\n",keycode);
+			report[3] = keycode;
+			
+			bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+
+			usleep(1000*50);
+			memset(report,0,sizeof(report));
+			bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+			return HW_ERR_OK;
+		}
 #endif
 
     show_usage();

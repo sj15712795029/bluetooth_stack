@@ -777,6 +777,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\component\bluetooth\third_party_lib\sbc\sbc\sbc_primitives.c</FilePath>
             </File>
+            <File>
+              <FileName>bt_hid_device.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\src\core\classical\bt_hid_device.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

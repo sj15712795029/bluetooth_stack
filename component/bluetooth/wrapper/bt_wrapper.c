@@ -21,6 +21,115 @@ static uint8_t *bt_le_adv_get_data(bt_le_adv_parse_t *bt_adv_le_parse);
 #endif
 
 
+#if HID_DEVICE_MOUSE_ENABLE
+static uint8_t hid_device_descriptor[] = 
+{
+
+	0x05,0x01,	/*USAGE_PAGE (Generic Desktop)*/
+	0x09,0x02,	/*USAGE (Mouse)*/
+	0xa1,0x01,	/*COLLECTION (Application)*/
+	0x09,0x01,	 /*USAGE (Pointer)*/
+	0xa1,0x00,	 /*COLLECTION (Physical)*/
+
+	0x05,0x09,  /*USAGE_PAGE (Button)*/
+	0x19,0x01,  /*USAGE_MINIMUM (Button 1)*/
+	0x29,0x03,  /*USAGE_MAXIMUM (Button 3)*/
+	0x15,0x00,  /*LOGICAL_MINIMUM (0)*/
+	0x25,0x01,  /*LOGICAL_MAXIMUM (1)*/
+	0x95,0x03,  /*REPORT_COUNT (3)*/
+	0x75,0x01,  /*REPORT_SIZE (1)*/
+	0x81,0x02,  /*INPUT (Data,Var,Abs)*/
+	0x95,0x01,  /*REPORT_COUNT (1)*/
+	0x75,0x05,  /*REPORT_SIZE (5)*/
+	0x81,0x03,  /*INPUT (Cnst,Var,Abs)*/
+
+	0x05, 0x01, /*USAGE_PAGE (Generic Desktop)*/
+    0x09, 0x30, /*USAGE (X)*/
+    0x09, 0x31, /*USAGE (Y)*/
+    0x15, 0x81, /*LOGICAL_MINIMUM (-127)*/
+    0x25, 0x7f, /*LOGICAL_MAXIMUM (127)*/
+    0x75, 0x08, /*REPORT_SIZE (8)*/
+    0x95, 0x02, /*REPORT_COUNT (2)*/
+    0x81, 0x06, /*INPUT (Data,Var,Rel)*/
+	
+	0xc0,       /*END_COLLECTION*/
+	0xc0,        /*END_COLLECTION*/
+};
+#endif
+
+#if HID_DEVICE_KEYBAORD_ENABLE
+#define KEY_UNSUPPORT 0xff
+#define KEY_RETURN     '\n'
+#define KEY_ESCAPE      ' '
+#define KEY_DELETE   0x7f
+#define KEY_TAB         '\t'
+
+static uint8_t keyboard_key_map [] = {
+    KEY_UNSUPPORT, KEY_UNSUPPORT, KEY_UNSUPPORT, KEY_UNSUPPORT,             /*   0-3 */
+    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',                   /*  4-13 */
+    'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',                   /* 14-23 */
+    'u', 'v', 'w', 'x', 'y', 'z',                                       /* 24-29 */
+    '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',                   /* 30-39 */
+    KEY_RETURN, KEY_ESCAPE, KEY_DELETE, KEY_TAB, ' ',            /* 40-44 */
+    '-', '=', '[', ']', '\\', KEY_UNSUPPORT, ';', '\'', 0x60, ',',       /* 45-54 */
+    '.', '/', KEY_UNSUPPORT, KEY_UNSUPPORT, KEY_UNSUPPORT, KEY_UNSUPPORT,   /* 55-60 */
+    KEY_UNSUPPORT, KEY_UNSUPPORT, KEY_UNSUPPORT, KEY_UNSUPPORT,             /* 61-64 */
+    KEY_UNSUPPORT, KEY_UNSUPPORT, KEY_UNSUPPORT, KEY_UNSUPPORT,             /* 65-68 */
+    KEY_UNSUPPORT, KEY_UNSUPPORT, KEY_UNSUPPORT, KEY_UNSUPPORT,             /* 69-72 */
+    KEY_UNSUPPORT, KEY_UNSUPPORT, KEY_UNSUPPORT, KEY_UNSUPPORT,             /* 73-76 */
+    KEY_UNSUPPORT, KEY_UNSUPPORT, KEY_UNSUPPORT, KEY_UNSUPPORT,             /* 77-80 */
+    KEY_UNSUPPORT, KEY_UNSUPPORT, KEY_UNSUPPORT, KEY_UNSUPPORT,             /* 81-84 */
+    '*', '-', '+', '\n', '1', '2', '3', '4', '5',                       /* 85-97 */
+    '6', '7', '8', '9', '0', '.', 0xa7,                                 /* 97-100 */
+}; 
+
+static uint8_t hid_device_descriptor[] = {
+
+    0x05, 0x01,              /* Usage Page (Generic Desktop) */
+    0x09, 0x06,              /* Usage (Keyboard) */
+    0xa1, 0x01,              /* Collection (Application) */
+    
+    /* Modifier byte */
+    0x75, 0x01,              /*   Report Size (1) */
+    0x95, 0x08,              /*   Report Count (8) */
+    0x05, 0x07,              /*   Usage Page (Key codes)*/
+    0x19, 0xe0,              /*   Usage Minimum (Keyboard LeftControl) */
+    0x29, 0xe7,              /*   Usage Maxium (Keyboard Right GUI) */
+    0x15, 0x00,              /*   Logical Minimum (0) */
+    0x25, 0x01,              /*   Logical Maximum (1) */
+    0x81, 0x02,              /*   Input (Data, Variable, Absolute) */
+    
+    /* Reserved byte */
+    0x75, 0x01,              /*   Report Size (1) */
+    0x95, 0x08,              /*   Report Count (8) */
+    0x81, 0x03,              /*   Input (Constant, Variable, Absolute) */
+    
+    /* LED report + padding */
+    0x95, 0x05,              /*   Report Count (5) */
+    0x75, 0x01,              /*   Report Size (1) */
+    0x05, 0x08,              /*   Usage Page (LEDs) */
+    0x19, 0x01,              /*   Usage Minimum (Num Lock) */
+    0x29, 0x05,              /*   Usage Maxium (Kana) */
+    0x91, 0x02,              /*   Output (Data, Variable, Absolute) */
+    0x95, 0x01,              /*   Report Count (1) */
+    0x75, 0x03,              /*   Report Size (3) */
+    0x91, 0x03,              /*   Output (Constant, Variable, Absolute) */
+    
+    /* Keycodes */
+    0x95, 0x06,              /*   Report Count (6) */
+    0x75, 0x08,              /*   Report Size (8) */
+    0x15, 0x00,              /*   Logical Minimum (0) */
+    0x25, 0xff,              /*   Logical Maximum (1) */
+    0x05, 0x07,              /*   Usage Page (Key codes) */
+    0x19, 0x00,              /*   Usage Minimum (Reserved (no event indicated)) */
+    0x29, 0xff,              /*   Usage Maxium (Reserved) */
+    0x81, 0x00,              /*   Input (Data, Array) */
+    
+    0xc0,                    /* End collection   */
+};
+
+#endif
+
 static err_t bt_ass_eir_data()
 {
     uint8_t data_pos =0;
@@ -52,6 +161,10 @@ static err_t bt_ass_eir_data()
 #if PROFILE_AVRCP_ENABLE
     len += 2;
 #endif
+#if PROFILE_HID_ENABLE
+	len += 2;
+#endif
+
     eir_data[data_pos++] = len;
     eir_data[data_pos++] = BT_DT_COMPLETE_LIST_OF_16_BIT_SERVICE_CLASS_UUIDS;
 #if PROFILE_DID_ENABLE
@@ -74,6 +187,11 @@ static err_t bt_ass_eir_data()
     eir_data[data_pos++] = BT_SERVICE_CLASS_AV_REMOTE_CONTROL & 0xff;
     eir_data[data_pos++] = (BT_SERVICE_CLASS_AV_REMOTE_CONTROL>>8) & 0xff;
 #endif
+#if PROFILE_HID_ENABLE
+	eir_data[data_pos++] = BT_SERVICE_CLASS_HUMAN_INTERFACE_DEVICE_SERVICE & 0xff;
+	eir_data[data_pos++] = (BT_SERVICE_CLASS_HUMAN_INTERFACE_DEVICE_SERVICE>>8) & 0xff;
+#endif
+
 
     /* Device ID */
 #if PROFILE_DID_ENABLE
@@ -745,6 +863,49 @@ static pbap_client_cbs_t pbap_client_wrapper_cb =
 
 #endif
 
+#if PROFILE_HID_ENABLE > 0
+void hid_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("WRAPPER << PROFILE:hid_connect_set_up,address is :\n");
+	bt_addr_dump(remote_addr->addr);
+
+    if(bt_wrapper_cb && bt_wrapper_cb->app_hid_cb && bt_wrapper_cb->app_hid_cb->bt_hid_connect)
+    {
+        bt_wrapper_cb->app_hid_cb->bt_hid_connect(remote_addr,status);
+    }
+}
+void hid_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("WRAPPER << PROFILE:hid_connect_realease,address is :\n");
+	bt_addr_dump(remote_addr->addr);
+
+    if(bt_wrapper_cb && bt_wrapper_cb->app_hid_cb && bt_wrapper_cb->app_hid_cb->bt_hid_disconnect)
+    {
+        bt_wrapper_cb->app_hid_cb->bt_hid_disconnect(remote_addr,status);
+    }
+}
+void hid_interrupt_data_ind(struct bd_addr_t *remote_addr,uint8_t *data,uint16_t data_len)
+{
+    printf("WRAPPER << PROFILE:hid_interrupt_data_ind,address is :\n");
+	bt_addr_dump(remote_addr->addr);
+    printf("data len %d,data is:\n",data_len);
+    bt_hex_dump(data,data_len);
+
+    if(bt_wrapper_cb && bt_wrapper_cb->app_hid_cb && bt_wrapper_cb->app_hid_cb->bt_hid_interrupt_recv_data)
+    {
+        bt_wrapper_cb->app_hid_cb->bt_hid_interrupt_recv_data(remote_addr,data,data_len);
+    }
+}
+
+static hid_cbs_t hid_wrapper_cb =
+{
+    hid_connect_set_up,
+    hid_connect_realease,
+    hid_interrupt_data_ind,
+};
+
+#endif
+
 
 
 uint8_t bt_start(bt_app_cb_t *app_cb)
@@ -799,6 +960,13 @@ uint8_t bt_start(bt_app_cb_t *app_cb)
     avrcp_controller_init(&avrcp_controller_wrapper_cb);
     bt_profile_mask |= BT_PROFILE_AVRCP_CONTROL_MASK;
 #endif
+
+#if PROFILE_HID_ENABLE > 0
+	hid_device_init(&hid_wrapper_cb);
+	hid_device_sdp_init(hid_device_descriptor,sizeof(hid_device_descriptor));
+	bt_profile_mask |= BT_PROFILE_HID_DEVICE_MASK;
+#endif
+
 
     phybusif_reset(&uart_if);
     hci_reset();
@@ -1099,6 +1267,34 @@ uint8_t bt_avrcp_controller_control(struct bd_addr_t *remote_addr,uint8_t contro
 
 
 #endif
+
+#if PROFILE_HID_ENABLE
+
+uint8_t bt_hid_interupt_report(struct bd_addr_t *remote_addr,uint8_t *report,uint8_t report_size)
+{
+	hid_device_interupt_report(remote_addr,report,report_size);
+
+	return 0;
+}
+
+uint8_t bt_hid_find_keycode(uint8_t *keycode,uint8_t find_char)
+{
+	uint8_t index = 0;
+	for(index = 0; index < sizeof(keyboard_key_map); index++)
+	{
+		if(keyboard_key_map[index] == find_char)
+		{
+			*keycode = index;
+			break;
+		}
+	}
+	
+	return 0;
+}
+
+
+#endif
+
 
 
 static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres)
