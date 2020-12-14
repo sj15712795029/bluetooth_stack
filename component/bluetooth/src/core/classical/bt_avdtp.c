@@ -189,7 +189,7 @@ static err_t avdtp_handle_get_capabilities(struct avdtp_pcb_t *avdtp_pcb,uint8_t
                 bt_pbuf_cat(p, q);
             }
 
-            if((avdtp_tmp_sep->service_categories_bitmap & AVDTP_MEDIA_CODEC) == AVDTP_MEDIA_CODEC)
+			if((avdtp_tmp_sep->service_categories_bitmap & AVDTP_MEDIA_CODEC_MASK) == AVDTP_MEDIA_CODEC_MASK)
             {
 
                 if((q = bt_pbuf_alloc(BT_PBUF_RAW, AVDTP_CAP_HDR_SIZE+avdtp_tmp_sep->cap.media_codec.media_info_len, BT_PBUF_RAM)) == NULL)
