@@ -131,6 +131,11 @@ err_t hci_init(void)
 		hci_set_chip_name(VENDOR_BCM43430A1_NAME);
 #endif
 
+#if BT_VENDOR_BCM4345C5_SUPPORT > 0
+	hci_set_chip_name(VENDOR_BCM4345C5_NAME);
+#endif
+
+
 	
     return BT_ERR_OK;
 }
@@ -530,11 +535,12 @@ static void vendor_init_done(uint8_t vendor_status)
 	if(vendor_status == VENDOR_STATUS_INITED)
 	{
     	pcb->vendor_init_status = VENDOR_INITED;
-
-		
+#if BT_VENDOR_BCM4345C5_SUPPORT > 0
+		hci_read_local_version_info();
+#else
 		hci_reset();
-	}
- 
+#endif
+	} 
 }
 
 static void vendor_init(uint8_t ogf,uint8_t ocf)

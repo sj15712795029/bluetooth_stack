@@ -11,6 +11,8 @@
 
 extern chip_mgr_t * csr8x11_instance(void);
 extern chip_mgr_t * bcm43430a1_instance(void);
+extern chip_mgr_t * bcm4345c5_instance(void);
+
 
 chip_mgr_t * bt_vendor_get_chip_mrg(const uint8_t *name)
 {
@@ -22,6 +24,11 @@ chip_mgr_t * bt_vendor_get_chip_mrg(const uint8_t *name)
 	if(strcmp(VENDOR_BCM43430A1_NAME,(const char*)name) == 0)
 	{
 		return bcm43430a1_instance();
+	}
+
+	if(strcmp(VENDOR_BCM4345C5_NAME,(const char*)name) == 0)
+	{
+		return bcm4345c5_instance();
 	}
 
 	return NULL;

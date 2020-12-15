@@ -117,6 +117,7 @@ chip_mgr_t csr8x11_mgr =
     /* void  (*vendor_init)(init_done_cb cb,uint8_t ogf,uint8_t ocf);*/&csr8x11_vendor_init,
     /* void (*vendor_deinit)(void);*/&csr8x11_vendor_deinit,
     /* void (*vendor_set_baud_rate)(uint32_t baud_rate);*/&csr8x11_vendor_set_baud_rate,
+    /* void (*vendor_cmd_handle)(uint8_t ogf,uint8_t ocf,uint8_t *payload); */NULL,
 };
 #endif
 

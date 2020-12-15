@@ -1150,9 +1150,6 @@ uint8_t shell_parse(uint8_t *shell_string)
 			
 			bt_hid_interupt_report(&connect_addr,report,sizeof(report));
 
-			usleep(1000*50);
-			memset(report,0,sizeof(report));
-			bt_hid_interupt_report(&connect_addr,report,sizeof(report));
 			return HW_ERR_OK;
 		}
 #endif
