@@ -630,6 +630,34 @@ static bt_app_hid_cb_t bt_app_hid_cb =
 };
 #endif
 
+#if PROFILE_PBAP_ENABLE > 0
+void bt_app_pbap_connect(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("bt_app_pbap_connect status %d address:\n",status);
+    bt_addr_dump(remote_addr->addr);
+    connect_addr.addr[5] = remote_addr->addr[5];
+    connect_addr.addr[4] = remote_addr->addr[4];
+    connect_addr.addr[3] = remote_addr->addr[3];
+    connect_addr.addr[2] = remote_addr->addr[2];
+    connect_addr.addr[1] = remote_addr->addr[1];
+    connect_addr.addr[0] = remote_addr->addr[0];
+}
+
+void bt_app_pbap_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("bt_app_pbap_disconnect status %d address:\n",status);
+    bt_addr_dump(remote_addr->addr);
+    //memset(&connect_addr,0,sizeof(connect_addr));
+}
+
+
+static bt_app_pbap_cb_t bt_app_pbap_cb =
+{
+    bt_app_pbap_connect,
+    bt_app_pbap_disconnect,
+};
+
+#endif
 
 
 static bt_app_cb_t bt_app_cb =
@@ -665,6 +693,13 @@ static bt_app_cb_t bt_app_cb =
 #else
 	NULL,
 #endif
+
+#if PROFILE_PBAP_ENABLE > 0
+    &bt_app_pbap_cb,
+#else
+	NULL,
+#endif
+
 
 };
 
@@ -1132,6 +1167,12 @@ uint8_t shell_json_parse(uint8_t *operate_value,
 
 uint8_t shell_at_cmd_parse(uint8_t *shell_string)
 {
+	connect_addr.addr[5] = 0x9c;
+    connect_addr.addr[4] = 0x0c;
+    connect_addr.addr[3] = 0xdf;
+    connect_addr.addr[2] = 0x24;
+    connect_addr.addr[1] = 0x7f;
+    connect_addr.addr[0] = 0x0a;
 
     if(hw_strcmp(BT_START_CMD,(const char*)shell_string) == 0)
     {
@@ -1212,7 +1253,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
 #endif
 
 #if PROFILE_PBAP_ENABLE > 0
-    if(hw_strcmp("PBAP_CON",(const char*)shell_string) == 0)
+    if(hw_strncmp("PBAP_CON",(const char*)shell_string,hw_strlen("PBAP_CON")) == 0)
     {
         HW_DEBUG("SHELL:operate PBAP CON\n");
 
@@ -1220,23 +1261,23 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("PBAP_DISCON",(const char*)shell_string) == 0)
+    if(hw_strncmp("PBAP_DISCON",(const char*)shell_string,hw_strlen("PBAP_DISCON")) == 0)
     {
-        HW_DEBUG("SHELL:operate PBAP DISCON\n");
+        HW_DEBUG("SHELL:operate PBAP PBAP_DISCON\n");
 
         pbap_client_disconnect(&connect_addr);
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("PBAP_LP",(const char*)shell_string) == 0)
+    if(hw_strncmp("PBAP_LP",(const char*)shell_string,hw_strlen("PBAP_LP")) == 0)
     {
-        HW_DEBUG("SHELL:operate PBAP PBAP_LPB\n");
+        HW_DEBUG("SHELL:operate PBAP PBAP_LP\n");
 
         pbap_client_download_phonebook(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE);
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("PBAP_LI",(const char*)shell_string) == 0)
+    if(hw_strncmp("PBAP_LI",(const char*)shell_string,hw_strlen("PBAP_LI")) == 0)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_LI\n");
 
@@ -1244,89 +1285,89 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("PBAP_LO",(const char*)shell_string) == 0)
+    if(hw_strncmp("PBAP_LO",(const char*)shell_string,hw_strlen("PBAP_LO")) == 0)
     {
-        HW_DEBUG("SHELL:operate PBAP PBAP_LI\n");
+        HW_DEBUG("SHELL:operate PBAP PBAP_LO\n");
 
         pbap_client_download_phonebook(&connect_addr,PB_LOCAL_REPOSITORY,PB_OUTGOING_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("PBAP_LM",(const char*)shell_string) == 0)
+    if(hw_strncmp("PBAP_LM",(const char*)shell_string,hw_strlen("PBAP_LM")) == 0)
     {
-        HW_DEBUG("SHELL:operate PBAP PBAP_LI\n");
+        HW_DEBUG("SHELL:operate PBAP PBAP_LM\n");
 
         pbap_client_download_phonebook(&connect_addr,PB_LOCAL_REPOSITORY,PB_MISSING_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("PBAP_LC",(const char*)shell_string) == 0)
+    if(hw_strncmp("PBAP_LC",(const char*)shell_string,hw_strlen("PBAP_LC")) == 0)
     {
-        HW_DEBUG("SHELL:operate PBAP PBAP_LI\n");
+        HW_DEBUG("SHELL:operate PBAP PBAP_LC\n");
 
         pbap_client_download_phonebook(&connect_addr,PB_LOCAL_REPOSITORY,PB_COMBINE_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("PBAP_LPC",(const char*)shell_string) == 0)
+    if(hw_strncmp("PBAP_LPC",(const char*)shell_string,hw_strlen("PBAP_LPC")) == 0)
     {
-        HW_DEBUG("SHELL:operate PBAP PBAP_LPB\n");
+        HW_DEBUG("SHELL:operate PBAP PBAP_LPC\n");
 
         pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE);
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("PBAP_LIC",(const char*)shell_string) == 0)
+    if(hw_strncmp("PBAP_LIC",(const char*)shell_string,hw_strlen("PBAP_LIC")) == 0)
     {
-        HW_DEBUG("SHELL:operate PBAP PBAP_LI\n");
+        HW_DEBUG("SHELL:operate PBAP PBAP_LIC\n");
 
         pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_INCOMING_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("PBAP_LOC",(const char*)shell_string) == 0)
+    if(hw_strncmp("PBAP_LOC",(const char*)shell_string,hw_strlen("PBAP_LOC")) == 0)
     {
-        HW_DEBUG("SHELL:operate PBAP PBAP_LI\n");
+        HW_DEBUG("SHELL:operate PBAP PBAP_LOC\n");
 
         pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_OUTGOING_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("PBAP_LMC",(const char*)shell_string) == 0)
+    if(hw_strncmp("PBAP_LMC",(const char*)shell_string,hw_strlen("PBAP_LMC")) == 0)
     {
-        HW_DEBUG("SHELL:operate PBAP PBAP_LI\n");
+        HW_DEBUG("SHELL:operate PBAP PBAP_LMC\n");
 
         pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_MISSING_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("PBAP_LCC",(const char*)shell_string) == 0)
+    if(hw_strncmp("PBAP_LCC",(const char*)shell_string,hw_strlen("PBAP_LCC")) == 0)
     {
-        HW_DEBUG("SHELL:operate PBAP PBAP_LI\n");
+        HW_DEBUG("SHELL:operate PBAP PBAP_LCC\n");
 
         pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_COMBINE_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("PBAP_SP",(const char*)shell_string) == 0)
+    if(hw_strncmp("PBAP_SP",(const char*)shell_string,hw_strlen("PBAP_SP")) == 0)
     {
-        HW_DEBUG("SHELL:operate PBAP PBAP_LPB\n");
+        HW_DEBUG("SHELL:operate PBAP PBAP_SP\n");
 
         pbap_client_set_path(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE);
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("PBAP_SPL",(const char*)shell_string) == 0)
+    if(hw_strncmp("PBAP_SPL",(const char*)shell_string,hw_strlen("PBAP_SPL")) == 0)
     {
-        HW_DEBUG("SHELL:operate PBAP PBAP_LPB\n");
+        HW_DEBUG("SHELL:operate PBAP PBAP_SPL\n");
 
         pbap_client_download_vcard_list(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE);
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("PBAP_DVE",(const char*)shell_string) == 0)
+    if(hw_strncmp("PBAP_DVE",(const char*)shell_string,hw_strlen("PBAP_DVE")) == 0)
     {
-        HW_DEBUG("SHELL:operate PBAP PBAP_LPB\n");
+        HW_DEBUG("SHELL:operate PBAP PBAP_DVE\n");
 
         pbap_client_download_vcard_entry(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE,1);
         return HW_ERR_OK;

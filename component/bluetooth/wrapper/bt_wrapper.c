@@ -848,11 +848,21 @@ void pbap_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("WRAPPER << PROFILE:pbap_connect_set_up,address is :\n");
     bt_addr_dump(remote_addr->addr);
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_pbap_cb && bt_wrapper_cb->app_pbap_cb->bt_pbap_connect)
+    {
+        bt_wrapper_cb->app_pbap_cb->bt_pbap_connect(remote_addr,status);
+    }
 }
 void pbap_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("WRAPPER << PROFILE:pbap_connect_realease,address is :\n");
     bt_addr_dump(remote_addr->addr);
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_pbap_cb && bt_wrapper_cb->app_pbap_cb->bt_pbap_disconnect)
+    {
+        bt_wrapper_cb->app_pbap_cb->bt_pbap_disconnect(remote_addr,status);
+    }
 }
 
 static pbap_client_cbs_t pbap_client_wrapper_cb =

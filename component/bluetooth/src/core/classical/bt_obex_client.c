@@ -88,6 +88,27 @@ static err_t obex_client_parse_get_resp(struct obex_pcb_t *pcb, struct bt_pbuf_t
     return BT_ERR_OK;
 }
 
+static err_t obex_client_disconnected(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
+{
+	struct obex_pcb_t *obex_pcb;
+
+	BT_PBAP_TRACE_DEBUG("pbap_client_disconnected: CN = %d\n", rfcomm_cn(pcb));
+	obex_pcb = obex_get_active_pcb(&(pcb->l2cappcb->remote_bdaddr));
+    if(obex_pcb)
+    {
+        obex_close(obex_pcb);
+    }
+	
+	if(obex_pcb->obex_client_cbs && obex_pcb->obex_client_cbs->obex_client_connect_realease)
+    	obex_pcb->obex_client_cbs->obex_client_connect_realease(&obex_pcb->remote_addr,BT_ERR_OK);
+	
+    rfcomm_close(pcb);
+
+    
+    return BT_ERR_OK;
+}
+
+
 static err_t obex_client_recv(void *arg, struct rfcomm_pcb_t *pcb, struct bt_pbuf_t *p, err_t err)
 {
     struct obex_pcb_t *obexpcb = obex_get_active_pcb(&(pcb->l2cappcb->remote_bdaddr));
@@ -95,7 +116,7 @@ static err_t obex_client_recv(void *arg, struct rfcomm_pcb_t *pcb, struct bt_pbu
         return BT_ERR_CONN;
 
     BT_OBEX_TRACE_DEBUG("obex_client_recv: p->len == %d p->tot_len == %d,last op 0x%x\n", p->len, p->tot_len,obexpcb->last_opcode);
-    bt_hex_dump(p->payload,p->len);
+    //bt_hex_dump(p->payload,p->len);
 
     if(obexpcb->last_opcode == OBEX_OPCODE_CONNECT)
     {
@@ -126,6 +147,7 @@ err_t obex_client_connect(struct rfcomm_pcb_t *rfcommpcb,obex_client_cbs_t *cb,u
     obexpcb->last_opcode = OBEX_OPCODE_CONNECT;
     OBEX_PCB_REG(&obex_active_pcbs, obexpcb);
     rfcomm_recv(rfcommpcb, obex_client_recv);
+	rfcomm_disc(rfcommpcb, obex_client_disconnected);
     if((p = bt_pbuf_alloc(BT_PBUF_RAW, OBEX_CONNECT_FIELD_LEN+obex_header_offset, BT_PBUF_RAM)) == NULL)
     {
         /* Could not allocate memory for bt_pbuf_t */

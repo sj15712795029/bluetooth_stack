@@ -379,7 +379,7 @@ err_t pbap_client_pull_phone_book(struct pbap_pcb_t *pcb,uint8_t repositories,ui
 	return BT_ERR_OK;
 }
 
-void obex_client_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status,uint32_t cid)
+void pbap_obex_client_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status,uint32_t cid)
 {
     struct pbap_pcb_t *pbappcb = pbap_get_active_pcb(remote_addr);
     if(!pbappcb)
@@ -390,14 +390,34 @@ void obex_client_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status,uin
 
     pbappcb->cid = cid;
 
+	if(pbappcb)
+    {
+        BT_PBAP_TRACE_DEBUG("pbap_obex_client_connect_set_up\n");
+
+        pbappcb->state = PBAP_OBEX_CONNECTED;
+        pbap_client_run(pbappcb);
+
+    }
+
 }
-void obex_client_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
+void pbap_obex_client_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
 {
+	struct pbap_pcb_t *pbappcb;
     BT_PBAP_TRACE_DEBUG("PBAP << OBEX:obex_client_connect_set_up,address is :\n");
 	bt_addr_dump(remote_addr->addr);
+
+	pbappcb = pbap_get_active_pcb(remote_addr);
+    if(pbappcb)
+    {
+        BT_PBAP_TRACE_DEBUG("pbap_client_disconnected: close pbap active pcb\n");
+
+        pbappcb->state = PBAP_W4_RFCOMM_DISCONNECTED_AND_RESTART;
+        pbap_client_run(pbappcb);
+
+    }
 }
 
-void obex_client_data_ind(struct bd_addr_t *remote_addr,uint8_t *data,uint16_t data_len,uint8_t status)
+void pbap_obex_client_data_ind(struct bd_addr_t *remote_addr,uint8_t *data,uint16_t data_len,uint8_t status)
 {
     struct pbap_pcb_t *pbappcb = pbap_get_active_pcb(remote_addr);
     if(!pbappcb)
@@ -436,9 +456,9 @@ void obex_client_data_ind(struct bd_addr_t *remote_addr,uint8_t *data,uint16_t d
 
 obex_client_cbs_t pbap_obex_client_cbs =
 {
-    obex_client_connect_set_up,
-    obex_client_connect_realease,
-    obex_client_data_ind,
+    pbap_obex_client_connect_set_up,
+    pbap_obex_client_connect_realease,
+    pbap_obex_client_data_ind,
 };
 
 static struct pbap_pcb_t *pbap_new(struct rfcomm_pcb_t *rfcommpcb)
@@ -609,27 +629,6 @@ static void pbap_client_sdp_attributes_recv(void *arg, struct sdp_pcb_t *sdppcb,
 }
 
 
-
-static err_t pbap_client_disconnected(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
-{
-    struct pbap_pcb_t *pbappcb;
-    BT_PBAP_TRACE_DEBUG("pbap_client_disconnected: CN = %d\n", rfcomm_cn(pcb));
-
-    rfcomm_close(pcb);
-
-    pbappcb = pbap_get_active_pcb(&(pcb->l2cappcb->remote_bdaddr));
-    if(pbappcb)
-    {
-        BT_PBAP_TRACE_DEBUG("pbap_client_disconnected: close pbap active pcb\n");
-
-        pbappcb->state = PBAP_W4_RFCOMM_DISCONNECTED_AND_RESTART;
-        pbap_client_run(pbappcb);
-
-    }
-    return BT_ERR_OK;
-}
-
-
 static err_t pbap_client_rf_connect_cfm(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
 {
 
@@ -638,7 +637,7 @@ static err_t pbap_client_rf_connect_cfm(void *arg, struct rfcomm_pcb_t *pcb, err
     if(err == BT_ERR_OK)
     {
         BT_PBAP_TRACE_DEBUG("pbap_client_rf_connect_cfm. CN = %d\n", rfcomm_cn(pcb));
-        rfcomm_disc(pcb, pbap_client_disconnected);
+        
         pbappcb->rfcommpcb = pcb;
         pbappcb->state = PBAP_W2_OBEX_CONNECTED;
         pbap_client_run(pbappcb);
@@ -755,13 +754,14 @@ static err_t pbap_client_run(struct pbap_pcb_t *pcb)
         if(pbap_client_cbs && pbap_client_cbs->pbap_client_connect_set_up)
             pbap_client_cbs->pbap_client_connect_set_up(&pcb->remote_addr,BT_ERR_OK);
         pcb->state = PBAP_OPERATE_IDLE;
+		break;
     case PBAP_W2_DISCONNECT_RFCOMM:
         rfcomm_disconnect(pcb->rfcommpcb);
         //l2cap_disconnect_req(pcb->rfcommpcb->l2cappcb, l2cap_disconnect_cfm);
         break;
     case PBAP_W4_RFCOMM_DISCONNECTED_AND_RESTART:
         if(pbap_client_cbs && pbap_client_cbs->pbap_client_connect_set_up)
-            pbap_client_cbs->pbap_client_connect_set_up(&pcb->remote_addr,BT_ERR_OK);
+            pbap_client_cbs->pbap_client_connect_realease(&pcb->remote_addr,BT_ERR_OK);
         pcb->state = PBAP_IDLE;
         PBAP_PCB_RMV(&pbap_active_pcbs, pcb);
         pbap_close(pcb);

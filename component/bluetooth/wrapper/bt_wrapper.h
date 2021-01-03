@@ -150,6 +150,13 @@ typedef struct
 	void (*bt_hid_interrupt_recv_data)(struct bd_addr_t *remote_addr,uint8_t *data,uint16_t data_len);
 }bt_app_hid_cb_t;
 
+typedef struct
+{
+	void (*bt_pbap_connect)(struct bd_addr_t *remote_addr,uint8_t status);
+	void (*bt_pbap_disconnect)(struct bd_addr_t *remote_addr,uint8_t status);
+}bt_app_pbap_cb_t;
+
+
 
 typedef struct
 {
@@ -159,6 +166,7 @@ typedef struct
 	bt_app_a2dp_cb_t *app_a2dp_cb;
 	bt_app_avrcp_cb_t *app_avrcp_cb;
 	bt_app_hid_cb_t *app_hid_cb;
+	bt_app_pbap_cb_t *app_pbap_cb;
 }bt_app_cb_t;
 
 
