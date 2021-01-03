@@ -314,16 +314,16 @@ void bt_app_a2dp_signal_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
     printf("bt_app_a2dp_signal_disconnect:\n");
     bt_addr_dump(remote_addr->addr);
 
-	uart_send_json("BT","BT_DISCON_RESULT",(uint8_t*)"SUCCESS","A2DP",0,0,0,0);
+    uart_send_json("BT","BT_DISCON_RESULT",(uint8_t*)"SUCCESS","A2DP",0,0,0,0);
 
 }
 void bt_app_a2dp_stream_connect(struct bd_addr_t *remote_addr,uint8_t status)
 {
-	uint8_t addr_buf[32] = {0};
+    uint8_t addr_buf[32] = {0};
     printf("bt_app_a2dp_stream_connect:\n");
     bt_addr_dump(remote_addr->addr);
 
-	hw_sprintf((char*)addr_buf,"%02x:%02x:%02x:%02x:%02x:%02x",remote_addr->addr[5],remote_addr->addr[4],remote_addr->addr[3],\
+    hw_sprintf((char*)addr_buf,"%02x:%02x:%02x:%02x:%02x:%02x",remote_addr->addr[5],remote_addr->addr[4],remote_addr->addr[3],\
                remote_addr->addr[2],remote_addr->addr[1],remote_addr->addr[0]);
     uart_send_json("BT","BT_CON_RESULT",(uint8_t*)"SUCCESS","A2DP",addr_buf,0,0,0);
 
@@ -375,105 +375,105 @@ static bt_app_a2dp_cb_t bt_app_a2dp_cb =
 #if PROFILE_AVRCP_ENABLE > 0
 void bt_app_avrcp_ctl_connect(struct bd_addr_t *remote_addr,uint8_t status)
 {
-	uint8_t addr_buf[32] = {0};
+    uint8_t addr_buf[32] = {0};
     printf("bt_app_avrcp_ctl_connect:\n");
     bt_addr_dump(remote_addr->addr);
 
-	connect_addr.addr[5] = remote_addr->addr[5];
+    connect_addr.addr[5] = remote_addr->addr[5];
     connect_addr.addr[4] = remote_addr->addr[4];
     connect_addr.addr[3] = remote_addr->addr[3];
     connect_addr.addr[2] = remote_addr->addr[2];
     connect_addr.addr[1] = remote_addr->addr[1];
     connect_addr.addr[0] = remote_addr->addr[0];
 
-	hw_sprintf((char*)addr_buf,"%02x:%02x:%02x:%02x:%02x:%02x",remote_addr->addr[5],remote_addr->addr[4],remote_addr->addr[3],\
+    hw_sprintf((char*)addr_buf,"%02x:%02x:%02x:%02x:%02x:%02x",remote_addr->addr[5],remote_addr->addr[4],remote_addr->addr[3],\
                remote_addr->addr[2],remote_addr->addr[1],remote_addr->addr[0]);
     uart_send_json("BT","BT_CON_RESULT",(uint8_t*)"SUCCESS","AVRCP",addr_buf,0,0,0);
-	
+
 }
 void bt_app_avrcp_ctl_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("bt_app_avrcp_ctl_disconnect:\n");
     bt_addr_dump(remote_addr->addr);
 
-	memset(&connect_addr,0,sizeof(connect_addr));
+    memset(&connect_addr,0,sizeof(connect_addr));
 
-	uart_send_json("BT","BT_DISCON_RESULT",(uint8_t*)"SUCCESS","AVRCP",0,0,0,0);
+    uart_send_json("BT","BT_DISCON_RESULT",(uint8_t*)"SUCCESS","AVRCP",0,0,0,0);
 
 }
 
 void bt_app_avrcp_support_capabilities(struct bd_addr_t *remote_addr,uint16_t support_cap_mask)
 {
-	printf("bt_app_avrcp_support_capabilities: mask(0x%x)\n",support_cap_mask);
+    printf("bt_app_avrcp_support_capabilities: mask(0x%x)\n",support_cap_mask);
     bt_addr_dump(remote_addr->addr);
 }
 
 void bt_app_avrcp_app_setting_attr(struct bd_addr_t *remote_addr,uint16_t setting_attr_mask)
 {
-	printf("bt_app_avrcp_app_setting_attr: mask(0x%x)\n",setting_attr_mask);
+    printf("bt_app_avrcp_app_setting_attr: mask(0x%x)\n",setting_attr_mask);
     bt_addr_dump(remote_addr->addr);
 }
 
 void bt_app_avrcp_play_status_update(struct bd_addr_t *remote_addr,uint8_t play_status)
 {
-	printf("bt_app_avrcp_play_status_update: play status update(%d)\n",play_status);
+    printf("bt_app_avrcp_play_status_update: play status update(%d)\n",play_status);
     bt_addr_dump(remote_addr->addr);
 
-	if(play_status == 1)
-		uart_send_json("BT","BT_PLAY_STATUS",(uint8_t*)"SUCCESS","PLAY",0,0,0,0);
-	else if(play_status == 2)
-		uart_send_json("BT","BT_PLAY_STATUS",(uint8_t*)"SUCCESS","PAUSE",0,0,0,0);
+    if(play_status == 1)
+        uart_send_json("BT","BT_PLAY_STATUS",(uint8_t*)"SUCCESS","PLAY",0,0,0,0);
+    else if(play_status == 2)
+        uart_send_json("BT","BT_PLAY_STATUS",(uint8_t*)"SUCCESS","PAUSE",0,0,0,0);
 }
 
 void bt_app_avrcp_track_change_update(struct bd_addr_t *remote_addr)
 {
-	printf("bt_app_avrcp_track_change_update\n");
+    printf("bt_app_avrcp_track_change_update\n");
     bt_addr_dump(remote_addr->addr);
-	bt_avrcp_controller_get_element_attributes(remote_addr);
+    bt_avrcp_controller_get_element_attributes(remote_addr);
 }
 
 void bt_app_avrcp_playpos_change_update(struct bd_addr_t *remote_addr,uint32_t millisecond)
 {
-	uint8_t song_pos_buf[16];
-	printf("bt_app_avrcp_playpos_change_update ms(%d)\n",millisecond);
+    uint8_t song_pos_buf[16];
+    printf("bt_app_avrcp_playpos_change_update ms(%d)\n",millisecond);
     bt_addr_dump(remote_addr->addr);
 
-	hw_sprintf((char*)song_pos_buf,"%d",millisecond);
-	uart_send_json("BT","BT_SONG_POS",(uint8_t*)"SUCCESS",song_pos_buf,0,0,0,0);
+    hw_sprintf((char*)song_pos_buf,"%d",millisecond);
+    uart_send_json("BT","BT_SONG_POS",(uint8_t*)"SUCCESS",song_pos_buf,0,0,0,0);
 }
 
 void bt_app_avrcp_battary_change_update(struct bd_addr_t *remote_addr,uint32_t battary_status)
 {
-	printf("bt_app_avrcp_battary_change_update battary_status(%d)\n",battary_status);
+    printf("bt_app_avrcp_battary_change_update battary_status(%d)\n",battary_status);
     bt_addr_dump(remote_addr->addr);
 }
 
 void bt_app_avrcp_volume_change_update(struct bd_addr_t *remote_addr,uint8_t volume)
 {
-	printf("bt_app_avrcp_volume_change_update volume(%d)\n",volume);
+    printf("bt_app_avrcp_volume_change_update volume(%d)\n",volume);
     bt_addr_dump(remote_addr->addr);
 }
 
 void bt_app_avrcp_element_attr_update(struct bd_addr_t *remote_addr,uint8_t *title,uint8_t *artist,uint8_t *album,uint32_t current_index,uint32_t totol_count,uint32_t total_milliseconds)
 {
-	uint8_t current_index_buf[8];
-	uint8_t total_count_buf[8];
-	uint8_t total_song_len_buf[16];
-	printf("bt_app_avrcp_element_attr_update\n");
-	bt_addr_dump(remote_addr->addr);
-	
-	printf("title(%s)\n",title);
-	printf("artist(%s)\n",artist);
-	printf("album(%s)\n",album);
-	printf("current_index(%d/%d)\n",current_index,totol_count);
-	printf("total_milliseconds(%d)\n",total_milliseconds);
+    uint8_t current_index_buf[8];
+    uint8_t total_count_buf[8];
+    uint8_t total_song_len_buf[16];
+    printf("bt_app_avrcp_element_attr_update\n");
+    bt_addr_dump(remote_addr->addr);
 
-	hw_sprintf((char*)current_index_buf,"%d",current_index);
-	hw_sprintf((char*)total_count_buf,"%d",totol_count);
-	hw_sprintf((char*)total_song_len_buf,"%d",total_milliseconds);
-	uart_send_json("BT","BT_ID3_UPDATE",(uint8_t*)"SUCCESS",title,artist,album,0,0);
-	uart_send_json("BT","BT_SONG_INFO",(uint8_t*)"SUCCESS",current_index_buf,total_count_buf,total_song_len_buf,0,0);
-    
+    printf("title(%s)\n",title);
+    printf("artist(%s)\n",artist);
+    printf("album(%s)\n",album);
+    printf("current_index(%d/%d)\n",current_index,totol_count);
+    printf("total_milliseconds(%d)\n",total_milliseconds);
+
+    hw_sprintf((char*)current_index_buf,"%d",current_index);
+    hw_sprintf((char*)total_count_buf,"%d",totol_count);
+    hw_sprintf((char*)total_song_len_buf,"%d",total_milliseconds);
+    uart_send_json("BT","BT_ID3_UPDATE",(uint8_t*)"SUCCESS",title,artist,album,0,0);
+    uart_send_json("BT","BT_SONG_INFO",(uint8_t*)"SUCCESS",current_index_buf,total_count_buf,total_song_len_buf,0,0);
+
 }
 
 
@@ -618,30 +618,30 @@ static bt_app_pbap_cb_t bt_app_pbap_cb =
 
 static bt_app_cb_t bt_app_cb =
 {
-    &bt_app_common_cb,		
-		
+    &bt_app_common_cb,
+
 #if PROFILE_SPP_ENABLE > 0
     &bt_app_spp_cb,
 #else
-	NULL,
+    NULL,
 #endif
 
 #if PROFILE_HFP_ENABLE > 0
     &bt_app_hfp_cb,
 #else
-	NULL,
+    NULL,
 #endif
 
 #if PROFILE_A2DP_ENABLE > 0
     &bt_app_a2dp_cb,
 #else
-	NULL,
+    NULL,
 #endif
 
 #if PROFILE_AVRCP_ENABLE > 0
     &bt_app_avrcp_cb,
 #else
-	NULL,
+    NULL,
 #endif
 
 #if PROFILE_HID_ENABLE > 0
@@ -787,7 +787,7 @@ cmd_desctiption_t cmd_usage[] =
 #endif
 
 #if PROFILE_AVRCP_ENABLE > 0
-	{(uint8_t *)BT_AVRCP_LIST_APP_ATTR_CMD,(uint8_t *)BT_AVRCP_LIST_APP_ATTR_DES},
+    {(uint8_t *)BT_AVRCP_LIST_APP_ATTR_CMD,(uint8_t *)BT_AVRCP_LIST_APP_ATTR_DES},
     {(uint8_t *)BT_AVRCP_GET_SONG_INFO_CMD,(uint8_t *)BT_AVRCP_GET_SONG_INFO_DES},
     {(uint8_t *)BT_AVRCP_CONTROL_PLAY_CMD,(uint8_t *)BT_AVRCP_CONTROL_PLAY_DES},
     {(uint8_t *)BT_AVRCP_CONTROL_PAUSE_CMD,(uint8_t *)BT_AVRCP_CONTROL_PAUSE_DES},
@@ -956,163 +956,163 @@ uint8_t shell_json_parse(uint8_t *operate_value,
 #endif
 
 #if PROFILE_AVRCP_ENABLE > 0
-		if(hw_strncmp("AVRCP_LIST_APP_ATTR",(const char*)operate_value,hw_strlen("AVRCP_LIST_APP_ATTR")) == 0)
-		{
-			HW_DEBUG("SHELL:AVRCP_LIST_APP_ATTR\n");
-			bt_avrcp_controller_list_app_setting_attr(&connect_addr);
-			return HW_ERR_OK;
-		}
+    if(hw_strncmp("AVRCP_LIST_APP_ATTR",(const char*)operate_value,hw_strlen("AVRCP_LIST_APP_ATTR")) == 0)
+    {
+        HW_DEBUG("SHELL:AVRCP_LIST_APP_ATTR\n");
+        bt_avrcp_controller_list_app_setting_attr(&connect_addr);
+        return HW_ERR_OK;
+    }
 
-		if(hw_strncmp("AVRCP_PLAY_STATUS",(const char*)operate_value,hw_strlen("AVRCP_PLAY_STATUS")) == 0)
-	    {
-	        HW_DEBUG("SHELL:AVRCP_PLAY_STATUS\n");
-	        bt_avrcp_controller_get_play_status(&connect_addr);
-	        return HW_ERR_OK;
-	    }
-	
-		if(hw_strncmp("AVRCP_GET_ID3",(const char*)operate_value,hw_strlen("AVRCP_GET_ID3")) == 0)
-		{
-			HW_DEBUG("SHELL:AVRCP_GET_ID3\n");
-			bt_avrcp_controller_get_element_attributes(&connect_addr);
-			return HW_ERR_OK;
-		}
-	
-		if(hw_strncmp("AVRCP_PLAY",(const char*)operate_value,hw_strlen("AVRCP_PLAY")) == 0)
-		{
-			HW_DEBUG("SHELL:AVRCP_PLAY\n");
-			bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_PLAY);
-			return HW_ERR_OK;
-		}
-	
-		if(hw_strncmp("AVRCP_PAUSE",(const char*)operate_value,hw_strlen("AVRCP_PAUSE")) == 0)
-		{
-			HW_DEBUG("SHELL:AVRCP_PAUSE\n");
-			bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_PAUSE);
-			return HW_ERR_OK;
-		}
-	
-		if(hw_strncmp("AVRCP_PREV",(const char*)operate_value,hw_strlen("AVRCP_PREV")) == 0)
-		{
-			HW_DEBUG("SHELL:AVRCP_PREV\n");
-			bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_BACKWARD);
-			return HW_ERR_OK;
-		}
-	
-		if(hw_strncmp("AVRCP_NEXT",(const char*)operate_value,hw_strlen("AVRCP_NEXT")) == 0)
-		{
-			HW_DEBUG("SHELL:AVRCP_NEXT\n");
-			bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_FORWARD);
-			return HW_ERR_OK;
-		}
-	
-		if(hw_strncmp("AVRCP_FAST_BACKWARD",(const char*)operate_value,hw_strlen("AVRCP_FAST_BACKWARD")) == 0)
-		{
-			HW_DEBUG("SHELL:AVRCP_FAST_BACKWARD\n");
-			bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_FAST_BACKWARD);
-			return HW_ERR_OK;
-		}
-	
-		if(hw_strncmp("AVRCP_FAST_FORWARD",(const char*)operate_value,hw_strlen("AVRCP_FAST_FORWARD")) == 0)
-		{
-			HW_DEBUG("SHELL:AVRCP_FAST_FORWARD\n");
-			bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_FAST_FORWARD);
-			return HW_ERR_OK;
-		}
-	
-	
+    if(hw_strncmp("AVRCP_PLAY_STATUS",(const char*)operate_value,hw_strlen("AVRCP_PLAY_STATUS")) == 0)
+    {
+        HW_DEBUG("SHELL:AVRCP_PLAY_STATUS\n");
+        bt_avrcp_controller_get_play_status(&connect_addr);
+        return HW_ERR_OK;
+    }
+
+    if(hw_strncmp("AVRCP_GET_ID3",(const char*)operate_value,hw_strlen("AVRCP_GET_ID3")) == 0)
+    {
+        HW_DEBUG("SHELL:AVRCP_GET_ID3\n");
+        bt_avrcp_controller_get_element_attributes(&connect_addr);
+        return HW_ERR_OK;
+    }
+
+    if(hw_strncmp("AVRCP_PLAY",(const char*)operate_value,hw_strlen("AVRCP_PLAY")) == 0)
+    {
+        HW_DEBUG("SHELL:AVRCP_PLAY\n");
+        bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_PLAY);
+        return HW_ERR_OK;
+    }
+
+    if(hw_strncmp("AVRCP_PAUSE",(const char*)operate_value,hw_strlen("AVRCP_PAUSE")) == 0)
+    {
+        HW_DEBUG("SHELL:AVRCP_PAUSE\n");
+        bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_PAUSE);
+        return HW_ERR_OK;
+    }
+
+    if(hw_strncmp("AVRCP_PREV",(const char*)operate_value,hw_strlen("AVRCP_PREV")) == 0)
+    {
+        HW_DEBUG("SHELL:AVRCP_PREV\n");
+        bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_BACKWARD);
+        return HW_ERR_OK;
+    }
+
+    if(hw_strncmp("AVRCP_NEXT",(const char*)operate_value,hw_strlen("AVRCP_NEXT")) == 0)
+    {
+        HW_DEBUG("SHELL:AVRCP_NEXT\n");
+        bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_FORWARD);
+        return HW_ERR_OK;
+    }
+
+    if(hw_strncmp("AVRCP_FAST_BACKWARD",(const char*)operate_value,hw_strlen("AVRCP_FAST_BACKWARD")) == 0)
+    {
+        HW_DEBUG("SHELL:AVRCP_FAST_BACKWARD\n");
+        bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_FAST_BACKWARD);
+        return HW_ERR_OK;
+    }
+
+    if(hw_strncmp("AVRCP_FAST_FORWARD",(const char*)operate_value,hw_strlen("AVRCP_FAST_FORWARD")) == 0)
+    {
+        HW_DEBUG("SHELL:AVRCP_FAST_FORWARD\n");
+        bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_FAST_FORWARD);
+        return HW_ERR_OK;
+    }
+
+
 #endif
 
 #if PROFILE_HID_ENABLE > 0
-	if(hw_strncmp("HID_MOUSE_L",(const char*)operate_value,hw_strlen("HID_MOUSE_L")) == 0)
-	{
-		int8_t pixel = -atoi((const char*)para1);
-		uint8_t report[3] = {0,pixel,0};
-		HW_DEBUG("SHELL:HID_MOUSE_L\n");
+    if(hw_strncmp("HID_MOUSE_L",(const char*)operate_value,hw_strlen("HID_MOUSE_L")) == 0)
+    {
+        int8_t pixel = -atoi((const char*)para1);
+        uint8_t report[3] = {0,pixel,0};
+        HW_DEBUG("SHELL:HID_MOUSE_L\n");
 
-		bt_hid_interupt_report(&connect_addr,report,sizeof(report));
-		return HW_ERR_OK;
-	}
+        bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+        return HW_ERR_OK;
+    }
 
-	if(hw_strncmp("HID_MOUSE_R",(const char*)operate_value,hw_strlen("HID_MOUSE_R")) == 0)
-	{
-		int8_t pixel = atoi((const char*)para1);
-		uint8_t report[3] = {0,pixel,0};
-		HW_DEBUG("SHELL:HID_MOUSE_R\n");
+    if(hw_strncmp("HID_MOUSE_R",(const char*)operate_value,hw_strlen("HID_MOUSE_R")) == 0)
+    {
+        int8_t pixel = atoi((const char*)para1);
+        uint8_t report[3] = {0,pixel,0};
+        HW_DEBUG("SHELL:HID_MOUSE_R\n");
 
-		bt_hid_interupt_report(&connect_addr,report,sizeof(report));
-		return HW_ERR_OK;
-	}
+        bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+        return HW_ERR_OK;
+    }
 
-	if(hw_strncmp("HID_MOUSE_U",(const char*)operate_value,hw_strlen("HID_MOUSE_U")) == 0)
-	{
-		int8_t pixel = -atoi((const char*)para1);
-		uint8_t report[3] = {0,0,pixel};
-		HW_DEBUG("SHELL:HID_MOUSE_U\n");
+    if(hw_strncmp("HID_MOUSE_U",(const char*)operate_value,hw_strlen("HID_MOUSE_U")) == 0)
+    {
+        int8_t pixel = -atoi((const char*)para1);
+        uint8_t report[3] = {0,0,pixel};
+        HW_DEBUG("SHELL:HID_MOUSE_U\n");
 
-		bt_hid_interupt_report(&connect_addr,report,sizeof(report));
-		return HW_ERR_OK;
-	}
+        bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+        return HW_ERR_OK;
+    }
 
-	if(hw_strncmp("HID_MOUSE_D",(const char*)operate_value,hw_strlen("HID_MOUSE_D")) == 0)
-	{
-		int8_t pixel = atoi((const char*)para1);
-		uint8_t report[3] = {0,0,pixel};
-		HW_DEBUG("SHELL:HID_MOUSE_D\n");
+    if(hw_strncmp("HID_MOUSE_D",(const char*)operate_value,hw_strlen("HID_MOUSE_D")) == 0)
+    {
+        int8_t pixel = atoi((const char*)para1);
+        uint8_t report[3] = {0,0,pixel};
+        HW_DEBUG("SHELL:HID_MOUSE_D\n");
 
-		bt_hid_interupt_report(&connect_addr,report,sizeof(report));
-		return HW_ERR_OK;
-	}
+        bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+        return HW_ERR_OK;
+    }
 
-	if(hw_strncmp("HID_MOUSE_CLICKL_DOWN",(const char*)operate_value,hw_strlen("HID_MOUSE_CLICKL_DOWN")) == 0)
-	{
-		uint8_t report[3] = {1,0,0};
-		HW_DEBUG("SHELL:HID_MOUSE_CLICKL_DOWN\n");
+    if(hw_strncmp("HID_MOUSE_CLICKL_DOWN",(const char*)operate_value,hw_strlen("HID_MOUSE_CLICKL_DOWN")) == 0)
+    {
+        uint8_t report[3] = {1,0,0};
+        HW_DEBUG("SHELL:HID_MOUSE_CLICKL_DOWN\n");
 
-		bt_hid_interupt_report(&connect_addr,report,sizeof(report));
-		return HW_ERR_OK;
-	}
+        bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+        return HW_ERR_OK;
+    }
 
-	if(hw_strncmp("HID_MOUSE_CLICKL_UP",(const char*)operate_value,hw_strlen("HID_MOUSE_CLICKL_UP")) == 0)
-	{
-		uint8_t report[3] = {0,0,0};
-		HW_DEBUG("SHELL:HID_MOUSE_CLICKL_UP\n");
+    if(hw_strncmp("HID_MOUSE_CLICKL_UP",(const char*)operate_value,hw_strlen("HID_MOUSE_CLICKL_UP")) == 0)
+    {
+        uint8_t report[3] = {0,0,0};
+        HW_DEBUG("SHELL:HID_MOUSE_CLICKL_UP\n");
 
-		bt_hid_interupt_report(&connect_addr,report,sizeof(report));
-		return HW_ERR_OK;
-	}
+        bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+        return HW_ERR_OK;
+    }
 
-	if(hw_strncmp("HID_MOUSE_CLICKR_DOWN",(const char*)operate_value,hw_strlen("HID_MOUSE_CLICKR_DOWN")) == 0)
-	{
-		uint8_t report[3] = {2,0,0};
-		HW_DEBUG("SHELL:HID_MOUSE_CLICKR_DOWN\n");
+    if(hw_strncmp("HID_MOUSE_CLICKR_DOWN",(const char*)operate_value,hw_strlen("HID_MOUSE_CLICKR_DOWN")) == 0)
+    {
+        uint8_t report[3] = {2,0,0};
+        HW_DEBUG("SHELL:HID_MOUSE_CLICKR_DOWN\n");
 
-		bt_hid_interupt_report(&connect_addr,report,sizeof(report));
-		return HW_ERR_OK;
-	}
+        bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+        return HW_ERR_OK;
+    }
 
-	if(hw_strncmp("HID_MOUSE_CLICKR_UP",(const char*)operate_value,hw_strlen("HID_MOUSE_CLICKR_UP")) == 0)
-	{
-		uint8_t report[3] = {0,0,0};
-		HW_DEBUG("SHELL:HID_MOUSE_CLICKR_UP\n");
+    if(hw_strncmp("HID_MOUSE_CLICKR_UP",(const char*)operate_value,hw_strlen("HID_MOUSE_CLICKR_UP")) == 0)
+    {
+        uint8_t report[3] = {0,0,0};
+        HW_DEBUG("SHELL:HID_MOUSE_CLICKR_UP\n");
 
-		bt_hid_interupt_report(&connect_addr,report,sizeof(report));
-		return HW_ERR_OK;
-	}
+        bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+        return HW_ERR_OK;
+    }
 
-	if(hw_strncmp("HID_KEYBOARD_INPUT",(const char*)operate_value,hw_strlen("HID_KEYBOARD_INPUT")) == 0)
-	{
-		uint8_t keycode = 0xff;
-		uint8_t report[9] = {0};
+    if(hw_strncmp("HID_KEYBOARD_INPUT",(const char*)operate_value,hw_strlen("HID_KEYBOARD_INPUT")) == 0)
+    {
+        uint8_t keycode = 0xff;
+        uint8_t report[9] = {0};
 
-		HW_DEBUG("SHELL:HID_KEYBOARD_INPUT\n");
-		bt_hid_find_keycode(&keycode,para1[0]);
-		HW_DEBUG("KEY INDEX %d\n",keycode);
-		report[3] = keycode;
-		
-		bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+        HW_DEBUG("SHELL:HID_KEYBOARD_INPUT\n");
+        bt_hid_find_keycode(&keycode,para1[0]);
+        HW_DEBUG("KEY INDEX %d\n",keycode);
+        report[3] = keycode;
 
-		return HW_ERR_OK;
-	}
+        bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+
+        return HW_ERR_OK;
+    }
 #endif
 
 
@@ -1490,66 +1490,66 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
 
 
 #if PROFILE_AVRCP_ENABLE > 0
-	if(hw_strncmp("AVRCP_LIST_APP_ATTR",(const char*)shell_string,hw_strlen("AVRCP_LIST_APP_ATTR")) == 0)
+    if(hw_strncmp("AVRCP_LIST_APP_ATTR",(const char*)shell_string,hw_strlen("AVRCP_LIST_APP_ATTR")) == 0)
     {
         HW_DEBUG("SHELL:AVRCP_LIST_APP_ATTR\n");
         bt_avrcp_controller_list_app_setting_attr(&connect_addr);
         return HW_ERR_OK;
     }
 
-	if(hw_strncmp("AVRCP_PLAY_STATUS",(const char*)shell_string,hw_strlen("AVRCP_PLAY_STATUS")) == 0)
+    if(hw_strncmp("AVRCP_PLAY_STATUS",(const char*)shell_string,hw_strlen("AVRCP_PLAY_STATUS")) == 0)
     {
         HW_DEBUG("SHELL:AVRCP_PLAY_STATUS\n");
         bt_avrcp_controller_get_play_status(&connect_addr);
         return HW_ERR_OK;
     }
 
-	if(hw_strncmp("AVRCP_GET_ID3",(const char*)shell_string,hw_strlen("AVRCP_GET_ID3")) == 0)
+    if(hw_strncmp("AVRCP_GET_ID3",(const char*)shell_string,hw_strlen("AVRCP_GET_ID3")) == 0)
     {
         HW_DEBUG("SHELL:AVRCP_GET_ID3\n");
         bt_avrcp_controller_get_element_attributes(&connect_addr);
         return HW_ERR_OK;
     }
 
-	if(hw_strncmp("AVRCP_PLAY",(const char*)shell_string,hw_strlen("AVRCP_PLAY")) == 0)
+    if(hw_strncmp("AVRCP_PLAY",(const char*)shell_string,hw_strlen("AVRCP_PLAY")) == 0)
     {
         HW_DEBUG("SHELL:AVRCP_PLAY\n");
         bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_PLAY);
         return HW_ERR_OK;
     }
 
-	if(hw_strncmp("AVRCP_PAUSE",(const char*)shell_string,hw_strlen("AVRCP_PAUSE")) == 0)
+    if(hw_strncmp("AVRCP_PAUSE",(const char*)shell_string,hw_strlen("AVRCP_PAUSE")) == 0)
     {
         HW_DEBUG("SHELL:AVRCP_PLAY\n");
-		bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_PAUSE);
+        bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_PAUSE);
         return HW_ERR_OK;
     }
 
-	if(hw_strncmp("AVRCP_PREV",(const char*)shell_string,hw_strlen("AVRCP_PREV")) == 0)
+    if(hw_strncmp("AVRCP_PREV",(const char*)shell_string,hw_strlen("AVRCP_PREV")) == 0)
     {
         HW_DEBUG("SHELL:AVRCP_PREV\n");
-		bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_BACKWARD);
+        bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_BACKWARD);
         return HW_ERR_OK;
     }
 
-	if(hw_strncmp("AVRCP_NEXT",(const char*)shell_string,hw_strlen("AVRCP_NEXT")) == 0)
+    if(hw_strncmp("AVRCP_NEXT",(const char*)shell_string,hw_strlen("AVRCP_NEXT")) == 0)
     {
         HW_DEBUG("SHELL:AVRCP_NEXT\n");
-		bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_FORWARD);
+        bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_FORWARD);
         return HW_ERR_OK;
     }
 
-	if(hw_strncmp("AVRCP_FAST_BACKWARD",(const char*)shell_string,hw_strlen("AVRCP_FAST_BACKWARD")) == 0)
+    if(hw_strncmp("AVRCP_FAST_BACKWARD",(const char*)shell_string,hw_strlen("AVRCP_FAST_BACKWARD")) == 0)
     {
         HW_DEBUG("SHELL:AVRCP_FAST_BACKWARD\n");
-		bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_FAST_BACKWARD);
+        bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_FAST_BACKWARD);
         return HW_ERR_OK;
     }
 
-	if(hw_strncmp("AVRCP_FAST_FORWARD",(const char*)shell_string,hw_strlen("AVRCP_FAST_FORWARD")) == 0)
+    if(hw_strncmp("AVRCP_FAST_FORWARD",(const char*)shell_string,hw_strlen("AVRCP_FAST_FORWARD")) == 0)
     {
         HW_DEBUG("SHELL:AVRCP_FAST_FORWARD\n");
-		bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_FAST_FORWARD);
+        bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_FAST_FORWARD);
         return HW_ERR_OK;
     }
 
@@ -1594,42 +1594,41 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     }
 
     if(hw_strncmp("HID_MOUSE_CLICKL_DOWN",(const char*)shell_string,hw_strlen("HID_MOUSE_CLICKL_DOWN")) == 0)
-	{
-		uint8_t report[3] = {1,0,0};
-		HW_DEBUG("SHELL:HID_MOUSE_CLICKL_DOWN\n");
+    {
+        uint8_t report[3] = {1,0,0};
+        HW_DEBUG("SHELL:HID_MOUSE_CLICKL_DOWN\n");
 
-		bt_hid_interupt_report(&connect_addr,report,sizeof(report));
-		return HW_ERR_OK;
-	}
+        bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+        return HW_ERR_OK;
+    }
 
-	if(hw_strncmp("HID_MOUSE_CLICKL_UP",(const char*)shell_string,hw_strlen("HID_MOUSE_CLICKL_UP")) == 0)
-	{
-		uint8_t report[3] = {0,0,0};
-		HW_DEBUG("SHELL:HID_MOUSE_CLICKL_UP\n");
+    if(hw_strncmp("HID_MOUSE_CLICKL_UP",(const char*)shell_string,hw_strlen("HID_MOUSE_CLICKL_UP")) == 0)
+    {
+        uint8_t report[3] = {0,0,0};
+        HW_DEBUG("SHELL:HID_MOUSE_CLICKL_UP\n");
 
-		bt_hid_interupt_report(&connect_addr,report,sizeof(report));
-		return HW_ERR_OK;
-	}
+        bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+        return HW_ERR_OK;
+    }
 
-	if(hw_strncmp("HID_MOUSE_CLICKR_DOWN",(const char*)shell_string,hw_strlen("HID_MOUSE_CLICKR_DOWN")) == 0)
-	{
-		uint8_t report[3] = {2,0,0};
-		HW_DEBUG("SHELL:HID_MOUSE_CLICKR_DOWN\n");
+    if(hw_strncmp("HID_MOUSE_CLICKR_DOWN",(const char*)shell_string,hw_strlen("HID_MOUSE_CLICKR_DOWN")) == 0)
+    {
+        uint8_t report[3] = {2,0,0};
+        HW_DEBUG("SHELL:HID_MOUSE_CLICKR_DOWN\n");
 
-		bt_hid_interupt_report(&connect_addr,report,sizeof(report));
-		return HW_ERR_OK;
-	}
+        bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+        return HW_ERR_OK;
+    }
 
-	if(hw_strncmp("HID_MOUSE_CLICKR_UP",(const char*)shell_string,hw_strlen("HID_MOUSE_CLICKR_UP")) == 0)
-	{
-		uint8_t report[3] = {0,0,0};
-		HW_DEBUG("SHELL:HID_MOUSE_CLICKR_UP\n");
+    if(hw_strncmp("HID_MOUSE_CLICKR_UP",(const char*)shell_string,hw_strlen("HID_MOUSE_CLICKR_UP")) == 0)
+    {
+        uint8_t report[3] = {0,0,0};
+        HW_DEBUG("SHELL:HID_MOUSE_CLICKR_UP\n");
 
-		bt_hid_interupt_report(&connect_addr,report,sizeof(report));
-		return HW_ERR_OK;
-	}
+        bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+        return HW_ERR_OK;
+    }
 #endif
-
 
 
 
@@ -1668,7 +1667,15 @@ uint8_t shell_parse(uint8_t *shell_string)
 
 void bt_reset_chip(void)
 {
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
     __HAL_RCC_GPIOF_CLK_ENABLE();
+
+    /*Configure GPIO pins : bt reset */
+    GPIO_InitStruct.Pin = GPIO_PIN_10;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
     HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_RESET);
     hw_delay_ms(200);
