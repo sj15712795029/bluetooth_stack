@@ -127,7 +127,7 @@ void uart2_dma_enable(DMA_Channel_TypeDef*DMA_CHx)
 ******************************************************************************/
 void uart_bt_send(uint8_t *buf,uint16_t len)
 {
-    uint8_t index;
+    uint16_t index;
     for(index = 0; index < len ; index++)
     {
         /* Wait until the last send is complete, then send the data */
