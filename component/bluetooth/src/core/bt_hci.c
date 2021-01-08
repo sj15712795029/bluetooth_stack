@@ -366,7 +366,6 @@ uint8_t hci_is_connected(struct bd_addr_t *bdaddr)
 
     if(link == NULL)
     {
-        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] Connection does not existl\n",__FILE__,__FUNCTION__,__LINE__);
         return 0;
     }
     return 1;

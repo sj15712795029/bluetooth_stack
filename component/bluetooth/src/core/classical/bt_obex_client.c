@@ -89,7 +89,7 @@ err_t obex_header_para_get(uint8_t hdr_id,uint8_t *data_in,uint16_t data_in_len,
 {
 	uint16_t index = 0;
 	uint8_t hi;
-	uint8_t temp_offset = 0;
+	uint16_t temp_offset = 0;
 	
 	for(index = 0; index < data_in_len; index += temp_offset)
 	{

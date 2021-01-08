@@ -877,12 +877,35 @@ void pbap_query_repositories_size(struct bd_addr_t *remote_addr,uint8_t reposito
     }
 }
 
+void pbap_download_phonebook_status(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint8_t status)
+{
+	printf("WRAPPER << PROFILE:pbap_download_phonebook_status,address is :\n");
+    bt_addr_dump(remote_addr->addr);
+	printf("repositories(%d) type(%d) status(%d)\n",repositories,type,status);
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_pbap_cb && bt_wrapper_cb->app_pbap_cb->bt_pbap_download_pb_status)
+    {
+        bt_wrapper_cb->app_pbap_cb->bt_pbap_download_pb_status(remote_addr,repositories,type,status);
+    }	
+}
+
+void pbap_download_phonebook_data(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint8_t *data,uint16_t data_len)
+{
+	printf("WRAPPER << PROFILE:pbap_download_phonebook_data,address is :\n");
+    bt_addr_dump(remote_addr->addr);
+	printf("repositories(%d) type(%d) data_len(%d)\n",repositories,type,data_len);
+
+	//bt_hex_dump(data,data_len);
+}
+
 
 static pbap_client_cbs_t pbap_client_wrapper_cb =
 {
     pbap_connect_set_up,
     pbap_connect_realease,
     pbap_query_repositories_size,
+    pbap_download_phonebook_status,
+    pbap_download_phonebook_data,
 };
 
 #endif

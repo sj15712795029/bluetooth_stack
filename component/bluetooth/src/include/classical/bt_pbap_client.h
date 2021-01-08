@@ -17,8 +17,6 @@
 #include "bt_obex_client.h"
 
 
-#define PBAP_APP_PARA_MAX_SIZE 128
-
 #define PBAP_NONE_REPOSITORY 0
 #define PB_LOCAL_REPOSITORY 1
 #define PB_SIM_REPOSITORY 2
@@ -29,6 +27,11 @@
 #define PB_OUTGOING_BOOK_TYPE 3
 #define PB_MISSING_BOOK_TYPE 4
 #define PB_COMBINE_BOOK_TYPE 5
+
+#define PBAP_DN_PB_NONE 0
+#define PBAP_DN_PB_START 1
+#define PBAP_DN_PB_CONTINUE 2
+#define PBAP_DN_PB_END 3
 
 #define PBAP_APP_PARAM_ORDER 0x01 /*Order - 0x01 - 1 byte: 0x00 = indexed 0x01 = alphanumeric 0x02 = phonetic */
 #define PBAP_APP_PARAM_SEARCH_VALUE 0x02 /* SearchValue - 0x02 - variable - Text */
@@ -128,6 +131,8 @@ typedef struct
     void (*pbap_client_connect_set_up)(struct bd_addr_t *remote_addr,uint8_t status);
     void (*pbap_client_connect_realease)(struct bd_addr_t *remote_addr,uint8_t status);
 	void (*pbap_query_repositories_size)(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint16_t size);
+	void (*pbap_download_phonebook_status)(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint8_t status);
+	void (*pbap_download_phonebook_data)(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint8_t *data,uint16_t data_len);
 } pbap_client_cbs_t;
 
 struct pbap_pcb_t
@@ -148,6 +153,9 @@ struct pbap_pcb_t
 
 	uint8_t query_repositories;
 	uint8_t query_type;
+
+	uint8_t dn_pb_repositories;
+	uint8_t dn_pb_type;
 };
 
 err_t pbap_client_init(pbap_client_cbs_t *cb);

@@ -18,17 +18,23 @@ chip_mgr_t * bt_vendor_get_chip_mrg(const uint8_t *name)
 {
 	if(strcmp(VENDOR_CSR8X11_NAME,(const char*)name) == 0)
 	{
+#if BT_VENDOR_CSR8X11_SUPPORT > 0
 		return csr8x11_instance();
+#endif
 	}
 
 	if(strcmp(VENDOR_BCM43430A1_NAME,(const char*)name) == 0)
 	{
+#if BT_VENDOR_BCM43430A1_SUPPORT > 0
 		return bcm43430a1_instance();
+#endif
 	}
 
 	if(strcmp(VENDOR_BCM4345C5_NAME,(const char*)name) == 0)
 	{
+#if BT_VENDOR_BCM4345C5_SUPPORT > 0
 		return bcm4345c5_instance();
+#endif
 	}
 
 	return NULL;

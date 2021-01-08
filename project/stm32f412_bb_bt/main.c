@@ -657,12 +657,19 @@ void bt_app_pbap_query_repositories_size(struct bd_addr_t *remote_addr,uint8_t r
 	printf("repositories(%d) type(%d) size(%d)\n",repositories,type,size);
 }
 
+void bt_app_pbap_download_pb_status(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint8_t status)
+{
+	printf("bt_app_pbap_download_pb_status,address is :\n");
+    bt_addr_dump(remote_addr->addr);
+	printf("repositories(%d) type(%d) status(%d)\n",repositories,type,status);
+}
 
 static bt_app_pbap_cb_t bt_app_pbap_cb =
 {
     bt_app_pbap_connect,
     bt_app_pbap_disconnect,
     bt_app_pbap_query_repositories_size,
+    bt_app_pbap_download_pb_status,
 };
 
 #endif

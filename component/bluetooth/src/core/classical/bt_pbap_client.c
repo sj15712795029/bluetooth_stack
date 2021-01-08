@@ -9,6 +9,7 @@
 
 #include "bt_pbap_client.h"
 
+uint8_t pbap_client_vcard_format = PBAP_DN_VCARD_FORMAT;
 
 static  uint8_t pbap_client_service_record[] =
 {
@@ -56,14 +57,17 @@ err_t pbap_client_pull_phone_book(struct pbap_pcb_t *pcb,uint8_t repositories,ui
 
 static err_t pbap_client_run(struct pbap_pcb_t *pcb);
 
+
 err_t pbap_app_para_append(uint8_t para_id,uint8_t *para_data,uint8_t para_data_len)
 {
+	uint8_t index = 0;
     pbap_app_para[pbap_app_para_offset++] = para_id;
     pbap_app_para[pbap_app_para_offset++] = para_data_len;
     memcpy(pbap_app_para+pbap_app_para_offset,para_data,para_data_len);
     pbap_app_para_offset += para_data_len;
 	return BT_ERR_OK;
 }
+
 
 err_t pbap_app_para_reset()
 {
@@ -135,8 +139,13 @@ err_t pbap_client_download_phonebook(struct bd_addr_t *addr,uint8_t repositories
         return BT_ERR_CONN;
 
     pbappcb->state = PBAP_OPERATE_PULL_PHONEBOOK;
-    pbap_client_pull_phone_book(pbappcb,repositories,type,0xffff,0x0,PBAP_PROPERTY_MASK_DEFAULT,PBAP_VCARD_FORMAT3_0);
+	pbappcb->dn_pb_repositories = repositories;
+	pbappcb->dn_pb_type = type;
+    pbap_client_pull_phone_book(pbappcb,repositories,type,0xffff,0x0,PBAP_PROPERTY_MASK_DEFAULT,pbap_client_vcard_format);
 
+	if(pbap_client_cbs && pbap_client_cbs->pbap_download_phonebook_status)
+		pbap_client_cbs->pbap_download_phonebook_status(&pbappcb->remote_addr,pbappcb->dn_pb_repositories,pbappcb->dn_pb_type,PBAP_DN_PB_START);
+	
 	return BT_ERR_OK;
 }
 
@@ -149,7 +158,7 @@ err_t pbap_client_query_phonebook_size(struct bd_addr_t *addr,uint8_t repositori
     pbappcb->state = PBAP_OPERATE_QUERY_PHONEBOOK_SIZE;
 	pbappcb->query_repositories = repositories;
 	pbappcb->query_type = type;
-    pbap_client_pull_phone_book(pbappcb,repositories,type,0x0,0x0,PBAP_PROPERTY_MASK_DEFAULT,PBAP_VCARD_FORMAT3_0);
+    pbap_client_pull_phone_book(pbappcb,repositories,type,0x0,0x0,PBAP_PROPERTY_MASK_DEFAULT,pbap_client_vcard_format);
 		
 		return BT_ERR_OK;
 
@@ -299,6 +308,8 @@ err_t pbap_client_pull_phone_book(struct pbap_pcb_t *pcb,uint8_t repositories,ui
     uint8_t index = 0;
     uint8_t name_string_temp[20] = {0};
     uint8_t name_string[40] = {0};
+	uint8_t max_list_count[2] = {0};
+	uint8_t offset_buf[2] = {0};
     obex_header_para_append(OBEX_HEADER_CONNECTION_ID,(uint8_t *)&(pcb->cid),sizeof(pcb->cid));
     obex_header_para_append(OBEX_HEADER_TYPE,(uint8_t *)pbap_phonebook_type,sizeof(pbap_phonebook_type));
     if(repositories == PB_LOCAL_REPOSITORY)
@@ -355,12 +366,15 @@ err_t pbap_client_pull_phone_book(struct pbap_pcb_t *pcb,uint8_t repositories,ui
     }
 
     obex_header_para_append(OBEX_HEADER_NAME,name_string,(strlen((const char *)name_string_temp) + 1)*2);
+
     /* PBAP app para ass */
-    pbap_app_para_append(PBAP_APP_PARAM_MAX_LIST_COUNT,(uint8_t *)&count,sizeof(count));
+	bt_be_store_16(max_list_count,0,count);
+    pbap_app_para_append(PBAP_APP_PARAM_MAX_LIST_COUNT,max_list_count,sizeof(max_list_count));
 
     if(count != 0)
     {
-        pbap_app_para_append(PBAP_APP_PARAM_LIST_START_OFFSET,(uint8_t *)&offset,sizeof(offset));
+    	bt_be_store_16(offset_buf,0,offset);
+        pbap_app_para_append(PBAP_APP_PARAM_LIST_START_OFFSET,offset_buf,sizeof(offset_buf));
         {
             // test
             //pbap_app_para_append(PBAP_APP_PARAM_PROPERTY_SELECTOR,&property_mask,sizeof(property_mask));
@@ -678,14 +692,29 @@ static err_t pbap_client_parse_pull_vcard_list_resp(struct pbap_pcb_t *pcb,uint8
 
 static err_t pbap_client_parse_pull_phonebook_resp(struct pbap_pcb_t *pcb,uint8_t *data,uint16_t data_len,uint8_t status)
 {
-    /* TODO:parse */
+    uint16_t vcard_length;
+	uint16_t data_offset;
+		
     if(status == OBEX_RESP_CONTINUE)
     {
+    	
+    	if(obex_header_para_get(OBEX_HEADER_BODY,data,data_len,&data_offset,&vcard_length) == BT_ERR_OK)
+    	{
+    		if(pbap_client_cbs && pbap_client_cbs->pbap_download_phonebook_data)
+				pbap_client_cbs->pbap_download_phonebook_data(&pcb->remote_addr,pcb->dn_pb_repositories,pcb->dn_pb_type,data+data_offset+3,vcard_length-3);
+    	}
         pbap_client_pull_next(pcb);
     }
     else if(status == OBEX_RESP_SUCCESS)
     {
-
+    	if(obex_header_para_get(OBEX_HEADER_END_OF_BODY,data,data_len,&data_offset,&vcard_length) == BT_ERR_OK)
+    	{
+    		if(pbap_client_cbs && pbap_client_cbs->pbap_download_phonebook_data)
+				pbap_client_cbs->pbap_download_phonebook_data(&pcb->remote_addr,pcb->dn_pb_repositories,pcb->dn_pb_type,data+data_offset+3,vcard_length-3);
+    	}
+		BT_PBAP_TRACE_DEBUG("pbap_client_parse_pull_phonebook_resp download complete\n");
+		if(pbap_client_cbs && pbap_client_cbs->pbap_download_phonebook_status)
+			pbap_client_cbs->pbap_download_phonebook_status(&pcb->remote_addr,pcb->dn_pb_repositories,pcb->dn_pb_type,PBAP_DN_PB_END);
     }
     else
     {

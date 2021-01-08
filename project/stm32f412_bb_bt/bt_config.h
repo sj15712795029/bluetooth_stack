@@ -32,6 +32,7 @@
 /* CHIP select,!!!must select one(only) */
 #define BT_VENDOR_CSR8X11_SUPPORT 1
 #define BT_VENDOR_BCM43430A1_SUPPORT 0
+#define BT_VENDOR_BCM4345C5_SUPPORT 0
 #define PROFILE_DID_ENABLE 1
 #define PROFILE_HFP_ENABLE 0
 #define PROFILE_SPP_ENABLE 0
@@ -185,7 +186,9 @@ typedef uintptr_t mem_ptr_t;
 
 
 /***********   PBAP profile config *******************************************************************************************/
+#define PBAP_APP_PARA_MAX_SIZE 128
 #define PBAP_CONNECT_MTU 640
+#define PBAP_DN_VCARD_FORMAT 1 /* 0:vCard2.1 1:vCard3.0 */
 /******************************************************************************************************************************/
 
 

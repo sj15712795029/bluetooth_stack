@@ -155,6 +155,7 @@ typedef struct
 	void (*bt_pbap_connect)(struct bd_addr_t *remote_addr,uint8_t status);
 	void (*bt_pbap_disconnect)(struct bd_addr_t *remote_addr,uint8_t status);
 	void (*bt_pbap_query_repositories_size)(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint16_t size);
+	void (*bt_pbap_download_pb_status)(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint8_t status);
 }bt_app_pbap_cb_t;
 
 
