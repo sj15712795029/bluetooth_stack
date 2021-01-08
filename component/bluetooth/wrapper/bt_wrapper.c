@@ -1366,6 +1366,11 @@ uint8_t bt_pbap_client_download_phonebook(struct bd_addr_t *addr,uint8_t reposit
 	return 0;
 }
 
+uint8_t bt_pbap_client_set_path(struct bd_addr_t *addr,uint8_t repositories,uint8_t type)
+{
+	pbap_client_set_path(addr,repositories,type);
+	return 0;
+}
 
 #endif
 

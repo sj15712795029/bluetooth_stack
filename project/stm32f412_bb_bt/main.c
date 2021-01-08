@@ -1368,7 +1368,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_SP\n");
 
-        pbap_client_set_path(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE);
+        bt_pbap_client_set_path(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE);
         return HW_ERR_OK;
     }
 
