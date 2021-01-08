@@ -59,9 +59,6 @@
 #define OBEX_HEADER_SINGLE_RESPONSE_MODE_PARAMETER 0x98
 
 
-#define OBEX_VERSION                       0x13
-
-
 #define OBEX_CONNECTION_ID_INVALID         0xFFFFFFFF
 
 /* SRM header values */
@@ -96,29 +93,14 @@ struct obex_pcb_t
     struct bd_addr_t remote_addr;
 };
 
-err_t obex_header_para_append(uint8_t hdr_id,uint8_t *hdr_data,uint8_t hdr_data_len);
+
 err_t obex_client_connect(struct rfcomm_pcb_t *rfcommpcb,obex_client_cbs_t *cb,uint16_t mtu,uint8_t scn);
 err_t obex_client_get(struct rfcomm_pcb_t *rfcommpcb);
 err_t obex_client_setpath(struct rfcomm_pcb_t *rfcommpcb);
+err_t obex_header_para_append(uint8_t hdr_id,uint8_t *hdr_data,uint8_t hdr_data_len);
+err_t obex_header_para_get(uint8_t hdr_id,uint8_t *data_in,uint16_t data_in_len,uint16_t *find_offset,uint16_t *hdr_data_len);
 
-extern struct obex_pcb_t *obex_active_pcbs;  /* List of all active PBAP PCBs */
-extern struct obex_pcb_t *obex_tmp_pcb;
 
 
-#define OBEX_PCB_REG(pcbs, npcb) do { \
-                            npcb->next = *pcbs; \
-                            *pcbs = npcb; \
-                            } while(0)
-#define OBEX_PCB_RMV(pcbs, npcb) do { \
-                            if(*pcbs == npcb) { \
-                               *pcbs = (*pcbs)->next; \
-                            } else for(obex_tmp_pcb = *pcbs; obex_tmp_pcb != NULL; obex_tmp_pcb = obex_tmp_pcb->next) { \
-                               if(obex_tmp_pcb->next != NULL && obex_tmp_pcb->next == npcb) { \
-                                  obex_tmp_pcb->next = npcb->next; \
-                                  break; \
-                               } \
-                            } \
-                            npcb->next = NULL; \
-                            } while(0)
 #endif
 

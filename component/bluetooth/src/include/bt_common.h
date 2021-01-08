@@ -53,7 +53,7 @@ typedef enum {
 /** Connection closed.       */
   BT_ERR_CLSD       = -15,
 /** Illegal argument.        */
-  BT_ERR_ARG        = -16
+  BT_ERR_ARG        = -16,
 } bt_err_enum_t;
 
 

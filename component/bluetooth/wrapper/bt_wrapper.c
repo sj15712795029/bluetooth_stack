@@ -865,10 +865,24 @@ void pbap_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
     }
 }
 
+void pbap_query_repositories_size(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint16_t size)
+{
+	printf("WRAPPER << PROFILE:pbap_query_repositories_size,address is :\n");
+    bt_addr_dump(remote_addr->addr);
+	printf("repositories(%d) type(%d) size(%d)\n",repositories,type,size);
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_pbap_cb && bt_wrapper_cb->app_pbap_cb->bt_pbap_query_repositories_size)
+    {
+        bt_wrapper_cb->app_pbap_cb->bt_pbap_query_repositories_size(remote_addr,repositories,type,size);
+    }
+}
+
+
 static pbap_client_cbs_t pbap_client_wrapper_cb =
 {
     pbap_connect_set_up,
     pbap_connect_realease,
+    pbap_query_repositories_size,
 };
 
 #endif
@@ -1303,6 +1317,20 @@ uint8_t bt_hid_find_keycode(uint8_t *keycode,uint8_t find_char)
 }
 
 
+#endif
+
+#if PROFILE_PBAP_ENABLE
+/************************* PBAP client API ***********************/
+uint8_t bt_pbap_client_connect(struct bd_addr_t *remote_addr)
+{
+	pbap_client_connect(remote_addr);
+	return 0;
+}
+uint8_t bt_pbap_client_disconnect(struct bd_addr_t *remote_addr)
+{
+	pbap_client_disconnect(remote_addr);
+	return 0;
+}
 #endif
 
 

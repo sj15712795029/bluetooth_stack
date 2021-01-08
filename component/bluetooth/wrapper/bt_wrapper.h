@@ -154,6 +154,7 @@ typedef struct
 {
 	void (*bt_pbap_connect)(struct bd_addr_t *remote_addr,uint8_t status);
 	void (*bt_pbap_disconnect)(struct bd_addr_t *remote_addr,uint8_t status);
+	void (*bt_pbap_query_repositories_size)(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint16_t size);
 }bt_app_pbap_cb_t;
 
 
@@ -200,7 +201,7 @@ uint8_t bt_le_set_adv_disable(void);
 
 
 #if PROFILE_HFP_ENABLE
-/************************* HFP API ***********************/
+/************************* HFP hf API ***********************/
 uint8_t bt_hfp_hf_get_operator(struct bd_addr_t *bdaddr);
 uint8_t bt_hfp_hf_audio_transfer(struct bd_addr_t *bdaddr);
 uint8_t bt_hfp_hf_accept_incoming_call(struct bd_addr_t *bdaddr);
@@ -222,7 +223,7 @@ uint8_t bt_hfp_hf_get_pid(struct bd_addr_t *addr);
 #endif
 
 #if PROFILE_AVRCP_ENABLE
-/************************* AVRCP API ***********************/
+/************************* AVRCP controller API ***********************/
 uint8_t bt_avrcp_controller_get_play_status(struct bd_addr_t *remote_addr);
 uint8_t bt_avrcp_controller_list_app_setting_attr(struct bd_addr_t *remote_addr);
 uint8_t bt_avrcp_controller_get_element_attributes(struct bd_addr_t *remote_addr);
@@ -234,7 +235,12 @@ uint8_t bt_avrcp_controller_control(struct bd_addr_t *remote_addr,uint8_t contro
 /************************* AVRCP API ***********************/
 uint8_t bt_hid_interupt_report(struct bd_addr_t *remote_addr,uint8_t *report,uint8_t report_size);
 uint8_t bt_hid_find_keycode(uint8_t *keycode,uint8_t find_char);
+#endif
 
+#if PROFILE_PBAP_ENABLE
+/************************* PBAP client API ***********************/
+uint8_t bt_pbap_client_connect(struct bd_addr_t *remote_addr);
+uint8_t bt_pbap_client_disconnect(struct bd_addr_t *remote_addr);
 #endif
 
 

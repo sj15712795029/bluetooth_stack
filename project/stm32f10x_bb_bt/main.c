@@ -651,11 +651,18 @@ void bt_app_pbap_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
     //memset(&connect_addr,0,sizeof(connect_addr));
 }
 
+void bt_app_pbap_query_repositories_size(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint16_t size)
+{
+	printf("bt_app_pbap_query_repositories_size,address is :\n");
+    bt_addr_dump(remote_addr->addr);
+	printf("repositories(%d) type(%d) size(%d)\n",repositories,type,size);
+}
 
 static bt_app_pbap_cb_t bt_app_pbap_cb =
 {
     bt_app_pbap_connect,
     bt_app_pbap_disconnect,
+    bt_app_pbap_query_repositories_size,
 };
 
 #endif
@@ -1310,41 +1317,41 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-    if(hw_strncmp("PBAP_LPC",(const char*)shell_string,hw_strlen("PBAP_LPC")) == 0)
+    if(hw_strncmp("PBAP_QUEQY_LP",(const char*)shell_string,hw_strlen("PBAP_QUEQY_LP")) == 0)
     {
-        HW_DEBUG("SHELL:operate PBAP PBAP_LPC\n");
+        HW_DEBUG("SHELL:operate PBAP PBAP_QUEQY_LP\n");
 
         pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE);
         return HW_ERR_OK;
     }
 
-    if(hw_strncmp("PBAP_LIC",(const char*)shell_string,hw_strlen("PBAP_LIC")) == 0)
+    if(hw_strncmp("PBAP_QUEQY_LIC",(const char*)shell_string,hw_strlen("PBAP_QUEQY_LIC")) == 0)
     {
-        HW_DEBUG("SHELL:operate PBAP PBAP_LIC\n");
+        HW_DEBUG("SHELL:operate PBAP PBAP_QUEQY_LIC\n");
 
         pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_INCOMING_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
-    if(hw_strncmp("PBAP_LOC",(const char*)shell_string,hw_strlen("PBAP_LOC")) == 0)
+    if(hw_strncmp("PBAP_QUEQY_LOC",(const char*)shell_string,hw_strlen("PBAP_QUEQY_LOC")) == 0)
     {
-        HW_DEBUG("SHELL:operate PBAP PBAP_LOC\n");
+        HW_DEBUG("SHELL:operate PBAP PBAP_QUEQY_LOC\n");
 
         pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_OUTGOING_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
-    if(hw_strncmp("PBAP_LMC",(const char*)shell_string,hw_strlen("PBAP_LMC")) == 0)
+    if(hw_strncmp("PBAP_QUEQY_LMC",(const char*)shell_string,hw_strlen("PBAP_QUEQY_LMC")) == 0)
     {
-        HW_DEBUG("SHELL:operate PBAP PBAP_LMC\n");
+        HW_DEBUG("SHELL:operate PBAP PBAP_QUEQY_LMC\n");
 
         pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_MISSING_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
-    if(hw_strncmp("PBAP_LCC",(const char*)shell_string,hw_strlen("PBAP_LCC")) == 0)
+    if(hw_strncmp("PBAP_QUEQY_LCC",(const char*)shell_string,hw_strlen("PBAP_QUEQY_LCC")) == 0)
     {
-        HW_DEBUG("SHELL:operate PBAP PBAP_LCC\n");
+        HW_DEBUG("SHELL:operate PBAP PBAP_QUEQY_LCC\n");
 
         pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_COMBINE_BOOK_TYPE);
         return HW_ERR_OK;

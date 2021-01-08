@@ -14,8 +14,28 @@
 struct obex_pcb_t *obex_active_pcbs;  /* List of all active PBAP PCBs */
 struct obex_pcb_t *obex_tmp_pcb;
 
+
+#define OBEX_PCB_REG(pcbs, npcb) do { \
+                            npcb->next = *pcbs; \
+                            *pcbs = npcb; \
+                            } while(0)
+#define OBEX_PCB_RMV(pcbs, npcb) do { \
+                            if(*pcbs == npcb) { \
+                               *pcbs = (*pcbs)->next; \
+                            } else for(obex_tmp_pcb = *pcbs; obex_tmp_pcb != NULL; obex_tmp_pcb = obex_tmp_pcb->next) { \
+                               if(obex_tmp_pcb->next != NULL && obex_tmp_pcb->next == npcb) { \
+                                  obex_tmp_pcb->next = npcb->next; \
+                                  break; \
+                               } \
+                            } \
+                            npcb->next = NULL; \
+                            } while(0)
+
+
 uint8_t obex_header_para[OBEX_HEADER_MAX_SIZE] = {0};
 uint8_t obex_header_offset = 0;
+
+
 
 static struct obex_pcb_t *obex_new(struct rfcomm_pcb_t *rfcommpcb);
 static struct obex_pcb_t *obex_get_active_pcb(struct bd_addr_t *bdaddr);
@@ -24,27 +44,75 @@ static void obex_close(struct obex_pcb_t *pcb);
 
 err_t obex_header_para_append(uint8_t hdr_id,uint8_t *hdr_data,uint8_t hdr_data_len)
 {
-    if(hdr_id == OBEX_HEADER_CONNECTION_ID)
-    {
-        obex_header_para[obex_header_offset++] = hdr_id;
-        bt_be_store_32(obex_header_para,obex_header_offset,*(uint32_t *)hdr_data);
-        obex_header_offset += 4;
-    }
-    else
-    {
-        obex_header_para[obex_header_offset++] = hdr_id;
-        bt_be_store_16(obex_header_para,obex_header_offset,3+hdr_data_len);
-        obex_header_offset += 2;
-        if(hdr_data_len != 0)
-        {
-            memcpy(obex_header_para+obex_header_offset,hdr_data,hdr_data_len);
-        }
-        obex_header_offset += hdr_data_len;
+	uint8_t hi = hdr_id >> 6;
 
-    }
+	switch(hi)
+	{
+		case 0:
+		case 1:
+		{
+			BT_OBEX_TRACE_DEBUG("obex_header_para_append:hi 0/1\n");
+			obex_header_para[obex_header_offset++] = hdr_id;
+	        bt_be_store_16(obex_header_para,obex_header_offset,3+hdr_data_len);
+	        obex_header_offset += 2;
+	        if(hdr_data_len != 0)
+	        {
+	            memcpy(obex_header_para+obex_header_offset,hdr_data,hdr_data_len);
+	        }
+	        obex_header_offset += hdr_data_len;
+			break;
+		}
+			
+		case 2:
+			BT_OBEX_TRACE_DEBUG("obex_header_para_append:hi 2\n");
+			break;
+		case 3:
+		{
+			BT_OBEX_TRACE_DEBUG("obex_header_para_append:hi 3\n");
+			obex_header_para[obex_header_offset++] = hdr_id;
+	        bt_be_store_32(obex_header_para,obex_header_offset,*(uint32_t *)hdr_data);
+	        obex_header_offset += 4;
+			break;
+		}
+		default:
+		{
+			BT_OBEX_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] obex_header_para_append invalid id\n",__FILE__,__FUNCTION__,__LINE__);
+			return BT_ERR_ARG;
+		}		
+			
+	}
 
     return BT_ERR_OK;
 }
+
+err_t obex_header_para_get(uint8_t hdr_id,uint8_t *data_in,uint16_t data_in_len,uint16_t *find_offset,uint16_t *hdr_data_len)
+{
+	uint16_t index = 0;
+	uint8_t hi;
+	uint8_t temp_offset = 0;
+	
+	for(index = 0; index < data_in_len; index += temp_offset)
+	{
+		hi = data_in[index]>>6;
+		if((hi == 0) || (hi == 1))
+			temp_offset = (data_in[index+1]<<8) + data_in[index+2];
+		else if(hi == 2)
+			temp_offset = 2;
+		else if(hi == 3)
+			temp_offset = 5;
+
+		if(data_in[index] == hdr_id)
+		{
+			*find_offset = index;
+			*hdr_data_len = temp_offset;
+			return BT_ERR_OK;
+		}		
+	}
+
+	return BT_ERR_VAL;
+}
+
+
 
 err_t obex_reset_header_para()
 {

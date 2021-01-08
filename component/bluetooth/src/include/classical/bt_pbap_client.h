@@ -16,7 +16,7 @@
 #include "bt_rfcomm.h"
 #include "bt_obex_client.h"
 
-#define PBAP_CONNECT_MTU 640
+
 #define PBAP_APP_PARA_MAX_SIZE 128
 
 #define PBAP_NONE_REPOSITORY 0
@@ -51,38 +51,39 @@
 #define PBAP_VCARD_FORMAT3_0 0x01
 
 /* PBAP Property Mask - also used for vCardSelector */
-#define PBAP_PROPERTY_MASK_VERSION              (1<< 0) // vCard Version
-#define PBAP_PROPERTY_MASK_FN                   (1<< 1) // Formatted Name
-#define PBAP_PROPERTY_MASK_N                    (1<< 2) // Structured Presentation of Name
-#define PBAP_PROPERTY_MASK_PHOTO                (1<< 3) // Associated Image or Photo
-#define PBAP_PROPERTY_MASK_BDAY                 (1<< 4) // Birthday
-#define PBAP_PROPERTY_MASK_ADR                  (1<< 5) // Delivery Address
-#define PBAP_PROPERTY_MASK_LABEL                (1<< 6) // Delivery
-#define PBAP_PROPERTY_MASK_TEL                  (1<< 7) // Telephone Number
-#define PBAP_PROPERTY_MASK_EMAIL                (1<< 8) // Electronic Mail Address
-#define PBAP_PROPERTY_MASK_MAILER               (1<< 9) // Electronic Mail
-#define PBAP_PROPERTY_MASK_TZ                   (1<<10) // Time Zone
-#define PBAP_PROPERTY_MASK_GEO                  (1<<11) // Geographic Position
-#define PBAP_PROPERTY_MASK_TITLE                (1<<12) // Job
-#define PBAP_PROPERTY_MASK_ROLE                 (1<<13) // Role within the Organization
-#define PBAP_PROPERTY_MASK_LOGO                 (1<<14) // Organization Logo
-#define PBAP_PROPERTY_MASK_AGENT                (1<<15) // vCard of Person Representing
-#define PBAP_PROPERTY_MASK_ORG                  (1<<16) // Name of Organization
-#define PBAP_PROPERTY_MASK_NOTE                 (1<<17) // Comments
-#define PBAP_PROPERTY_MASK_REV                  (1<<18) // Revision
-#define PBAP_PROPERTY_MASK_SOUND                (1<<19) // Pronunciation of Name
-#define PBAP_PROPERTY_MASK_URL                  (1<<20) // Uniform Resource Locator
-#define PBAP_PROPERTY_MASK_UID                  (1<<21) // Unique ID
-#define PBAP_PROPERTY_MASK_KEY                  (1<<22) // Public Encryption Key
-#define PBAP_PROPERTY_MASK_NICKNAME             (1<<23) // Nickname
-#define PBAP_PROPERTY_MASK_CATEGORIES           (1<<24) // Categories
-#define PBAP_PROPERTY_MASK_PROID                (1<<25) // Product ID
-#define PBAP_PROPERTY_MASK_CLASS                (1<<26) // Class information
-#define PBAP_PROPERTY_MASK_SORT_STRING          (1<<27) // String used for sorting operations
-#define PBAP_PROPERTY_MASK_X_IRMC_CALL_DATETIME (1<<28) // Time stamp
-#define PBAP_PROPERTY_MASK_X_BT_SPEEDDIALKEY    (1<<29) // Speed-dial shortcut
-#define PBAP_PROPERTY_MASK_X_BT_UCI             (1<<30) // Uniform Caller Identifier
-#define PBAP_PROPERTY_MASK_X_BT_UID             (1<<31) // Bluetooth Contact Unique Identifier
+#define PBAP_PROPERTY_MASK_VERSION              (1<< 0) /* vCard Version                       */
+#define PBAP_PROPERTY_MASK_FN                   (1<< 1) /* Formatted Name                      */
+#define PBAP_PROPERTY_MASK_N                    (1<< 2) /* Structured Presentation of Name     */
+#define PBAP_PROPERTY_MASK_PHOTO                (1<< 3) /* Associated Image or Photo           */
+#define PBAP_PROPERTY_MASK_BDAY                 (1<< 4) /* Birthday                            */
+#define PBAP_PROPERTY_MASK_ADR                  (1<< 5) /* Delivery Address                    */
+#define PBAP_PROPERTY_MASK_LABEL                (1<< 6) /* Delivery                            */
+#define PBAP_PROPERTY_MASK_TEL                  (1<< 7) /* Telephone Number                    */
+#define PBAP_PROPERTY_MASK_EMAIL                (1<< 8) /* Electronic Mail Address             */
+#define PBAP_PROPERTY_MASK_MAILER               (1<< 9) /* Electronic Mail                     */
+#define PBAP_PROPERTY_MASK_TZ                   (1<<10) /* Time Zone                           */
+#define PBAP_PROPERTY_MASK_GEO                  (1<<11) /* Geographic Position                 */
+#define PBAP_PROPERTY_MASK_TITLE                (1<<12) /* Job                                 */
+#define PBAP_PROPERTY_MASK_ROLE                 (1<<13) /* Role within the Organization        */
+#define PBAP_PROPERTY_MASK_LOGO                 (1<<14) /* Organization Logo                   */
+#define PBAP_PROPERTY_MASK_AGENT                (1<<15) /* vCard of Person Representing        */
+#define PBAP_PROPERTY_MASK_ORG                  (1<<16) /* Name of Organization                */
+#define PBAP_PROPERTY_MASK_NOTE                 (1<<17) /* Comments                            */
+#define PBAP_PROPERTY_MASK_REV                  (1<<18) /* Revision                            */
+#define PBAP_PROPERTY_MASK_SOUND                (1<<19) /* Pronunciation of Name               */
+#define PBAP_PROPERTY_MASK_URL                  (1<<20) /* Uniform Resource Locator            */
+#define PBAP_PROPERTY_MASK_UID                  (1<<21) /* Unique ID                           */
+#define PBAP_PROPERTY_MASK_KEY                  (1<<22) /* Public Encryption Key               */
+#define PBAP_PROPERTY_MASK_NICKNAME             (1<<23) /* Nickname                            */
+#define PBAP_PROPERTY_MASK_CATEGORIES           (1<<24) /* Categories                          */
+#define PBAP_PROPERTY_MASK_PROID                (1<<25) /* Product ID                          */
+#define PBAP_PROPERTY_MASK_CLASS                (1<<26) /* Class information                   */
+#define PBAP_PROPERTY_MASK_SORT_STRING          (1<<27) /* String used for sorting operations  */
+#define PBAP_PROPERTY_MASK_X_IRMC_CALL_DATETIME (1<<28) /* Time stamp                          */
+#define PBAP_PROPERTY_MASK_X_BT_SPEEDDIALKEY    (1<<29) /* Speed-dial shortcut                 */
+#define PBAP_PROPERTY_MASK_X_BT_UCI             (1<<30) /* Uniform Caller Identifier           */
+#define PBAP_PROPERTY_MASK_X_BT_UID             (1<<31) /* Bluetooth Contact Unique Identifier */
+
 
 #define PBAP_PROPERTY_MASK 0xffffffffffffffff
 #define PBAP_PROPERTY_MASK_DEFAULT ((PBAP_PROPERTY_MASK_VERSION |PBAP_PROPERTY_MASK_FN |\
@@ -126,6 +127,7 @@ typedef struct
 {
     void (*pbap_client_connect_set_up)(struct bd_addr_t *remote_addr,uint8_t status);
     void (*pbap_client_connect_realease)(struct bd_addr_t *remote_addr,uint8_t status);
+	void (*pbap_query_repositories_size)(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint16_t size);
 } pbap_client_cbs_t;
 
 struct pbap_pcb_t
@@ -143,6 +145,9 @@ struct pbap_pcb_t
 
     uint8_t current_repositories;
     uint8_t current_type;
+
+	uint8_t query_repositories;
+	uint8_t query_type;
 };
 
 err_t pbap_client_init(pbap_client_cbs_t *cb);

@@ -147,6 +147,8 @@ err_t pbap_client_query_phonebook_size(struct bd_addr_t *addr,uint8_t repositori
         return BT_ERR_CONN;
 
     pbappcb->state = PBAP_OPERATE_QUERY_PHONEBOOK_SIZE;
+	pbappcb->query_repositories = repositories;
+	pbappcb->query_type = type;
     pbap_client_pull_phone_book(pbappcb,repositories,type,0x0,0x0,PBAP_PROPERTY_MASK_DEFAULT,PBAP_VCARD_FORMAT3_0);
 		
 		return BT_ERR_OK;
@@ -696,7 +698,31 @@ static err_t pbap_client_parse_pull_phonebook_resp(struct pbap_pcb_t *pcb,uint8_
 static err_t pbap_client_parse_get_phonebook_size_resp(struct pbap_pcb_t *pcb,uint8_t *data,uint16_t data_len,uint8_t status)
 {
     if(status == OBEX_RESP_SUCCESS)
-    {
+    {	
+    	uint16_t data_offset = 0;
+		uint16_t hdr_length = 0;
+    	BT_PBAP_TRACE_DEBUG("pbap_client_parse_get_phonebook_size_resp: data\n");
+		bt_hex_dump(data,data_len);
+		if(obex_header_para_get(OBEX_HEADER_APPLICATION_PARAMETERS,data,data_len,&data_offset,&hdr_length) == BT_ERR_OK)
+		{
+			uint8_t index = 0;
+			uint8_t temp_offset;
+			uint8_t *hdr_data = data+data_offset;
+			BT_PBAP_TRACE_DEBUG("data_offset(%d) hdr_length(%d)\n",data_offset,hdr_length);
+			bt_hex_dump(hdr_data,hdr_length);
+			for(index = 3; index < hdr_length; index+=temp_offset)
+			{
+				temp_offset = hdr_data[index+1]+2;
+				if(hdr_data[index] == PBAP_APP_PARAM_PHONEBOOK_SIZE)
+				{
+					uint16_t phonebook_size = bt_be_read_16(hdr_data+index,2);
+					BT_PBAP_TRACE_DEBUG("repositories(%d)type(%d) size(%d)\n",pcb->query_repositories,pcb->query_type,phonebook_size);
+					if(pbap_client_cbs && pbap_client_cbs->pbap_query_repositories_size)
+            			pbap_client_cbs->pbap_query_repositories_size(&pcb->remote_addr,pcb->query_repositories,pcb->query_type,phonebook_size);
+				}
+			}
+		}
+		
     }
     else
     {
