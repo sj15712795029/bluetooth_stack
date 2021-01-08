@@ -242,6 +242,9 @@ uint8_t bt_hid_find_keycode(uint8_t *keycode,uint8_t find_char);
 /************************* PBAP client API ***********************/
 uint8_t bt_pbap_client_connect(struct bd_addr_t *remote_addr);
 uint8_t bt_pbap_client_disconnect(struct bd_addr_t *remote_addr);
+uint8_t bt_pbap_client_query_phonebook_size(struct bd_addr_t *addr,uint8_t repositories,uint8_t type);
+uint8_t bt_pbap_client_download_phonebook(struct bd_addr_t *addr,uint8_t repositories,uint8_t type);
+
 #endif
 
 

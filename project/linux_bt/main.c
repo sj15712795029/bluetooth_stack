@@ -828,7 +828,7 @@ uint8_t shell_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP CON\n");
 
-        pbap_client_connect(&connect_addr);
+        bt_pbap_client_connect(&connect_addr);
         return HW_ERR_OK;
     }
 
@@ -836,7 +836,7 @@ uint8_t shell_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_DISCON\n");
 
-        pbap_client_disconnect(&connect_addr);
+        bt_pbap_client_disconnect(&connect_addr);
         return HW_ERR_OK;
     }
 
@@ -844,7 +844,7 @@ uint8_t shell_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_LP\n");
 
-        pbap_client_download_phonebook(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE);
+        bt_pbap_client_download_phonebook(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE);
         return HW_ERR_OK;
     }
 
@@ -852,7 +852,7 @@ uint8_t shell_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_LI\n");
 
-        pbap_client_download_phonebook(&connect_addr,PB_LOCAL_REPOSITORY,PB_INCOMING_BOOK_TYPE);
+        bt_pbap_client_download_phonebook(&connect_addr,PB_LOCAL_REPOSITORY,PB_INCOMING_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
@@ -860,7 +860,7 @@ uint8_t shell_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_LO\n");
 
-        pbap_client_download_phonebook(&connect_addr,PB_LOCAL_REPOSITORY,PB_OUTGOING_BOOK_TYPE);
+        bt_pbap_client_download_phonebook(&connect_addr,PB_LOCAL_REPOSITORY,PB_OUTGOING_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
@@ -868,7 +868,7 @@ uint8_t shell_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_LM\n");
 
-        pbap_client_download_phonebook(&connect_addr,PB_LOCAL_REPOSITORY,PB_MISSING_BOOK_TYPE);
+        bt_pbap_client_download_phonebook(&connect_addr,PB_LOCAL_REPOSITORY,PB_MISSING_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
@@ -876,7 +876,7 @@ uint8_t shell_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_LC\n");
 
-        pbap_client_download_phonebook(&connect_addr,PB_LOCAL_REPOSITORY,PB_COMBINE_BOOK_TYPE);
+        bt_pbap_client_download_phonebook(&connect_addr,PB_LOCAL_REPOSITORY,PB_COMBINE_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
@@ -884,7 +884,7 @@ uint8_t shell_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_QUEQY_LP\n");
 
-        pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE);
+        bt_pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE);
         return HW_ERR_OK;
     }
 
@@ -892,7 +892,7 @@ uint8_t shell_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_QUEQY_LIC\n");
 
-        pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_INCOMING_BOOK_TYPE);
+        bt_pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_INCOMING_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
@@ -900,7 +900,7 @@ uint8_t shell_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_QUEQY_LOC\n");
 
-        pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_OUTGOING_BOOK_TYPE);
+        bt_pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_OUTGOING_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
@@ -908,7 +908,7 @@ uint8_t shell_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_QUEQY_LMC\n");
 
-        pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_MISSING_BOOK_TYPE);
+        bt_pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_MISSING_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
@@ -916,7 +916,7 @@ uint8_t shell_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_QUEQY_LCC\n");
 
-        pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_COMBINE_BOOK_TYPE);
+        bt_pbap_client_query_phonebook_size(&connect_addr,PB_LOCAL_REPOSITORY,PB_COMBINE_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
@@ -928,9 +928,9 @@ uint8_t shell_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-    if(hw_strncmp("PBAP_SPL",(const char*)shell_string,hw_strlen("PBAP_SPL")) == 0)
+    if(hw_strncmp("PBAP_DVL",(const char*)shell_string,hw_strlen("PBAP_DVL")) == 0)
     {
-        HW_DEBUG("SHELL:operate PBAP PBAP_SPL\n");
+        HW_DEBUG("SHELL:operate PBAP PBAP_DVL\n");
 
         pbap_client_download_vcard_list(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE);
         return HW_ERR_OK;

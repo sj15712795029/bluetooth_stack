@@ -1354,6 +1354,19 @@ uint8_t bt_pbap_client_disconnect(struct bd_addr_t *remote_addr)
 	pbap_client_disconnect(remote_addr);
 	return 0;
 }
+
+uint8_t bt_pbap_client_query_phonebook_size(struct bd_addr_t *addr,uint8_t repositories,uint8_t type)
+{
+	pbap_client_query_phonebook_size(addr,repositories,type);
+	return 0;
+}
+uint8_t bt_pbap_client_download_phonebook(struct bd_addr_t *addr,uint8_t repositories,uint8_t type)
+{
+	pbap_client_download_phonebook(addr,repositories,type);
+	return 0;
+}
+
+
 #endif
 
 
