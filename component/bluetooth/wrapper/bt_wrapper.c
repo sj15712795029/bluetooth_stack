@@ -1416,6 +1416,12 @@ uint8_t bt_pbap_client_download_vcard_entry(struct bd_addr_t *addr,uint8_t repos
 	return 0;
 }
 
+uint8_t bt_pbap_client_download_abort(struct bd_addr_t *addr)
+{
+	pbap_client_download_abort(addr);
+	return 0;
+}
+
 #endif
 
 

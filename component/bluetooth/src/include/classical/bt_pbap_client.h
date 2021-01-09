@@ -32,10 +32,13 @@
 #define PBAP_DN_PB_START 1
 #define PBAP_DN_PB_CONTINUE 2
 #define PBAP_DN_PB_END 3
+#define PBAP_DN_PB_ABORT 4
 #define PBAP_DN_VCARD_LIST_NONE 0
 #define PBAP_DN_VCARD_LIST_START 1
 #define PBAP_DN_VCARD_LIST_CONTINUE 2
 #define PBAP_DN_VCARD_LIST_END 3
+#define PBAP_DN_VCARD_LIST_ABORT 4
+
 
 
 #define PBAP_APP_PARAM_ORDER 0x01 /*Order - 0x01 - 1 byte: 0x00 = indexed 0x01 = alphanumeric 0x02 = phonetic */
@@ -122,6 +125,7 @@ typedef enum
     PBAP_OPERATE_SET_PATH,
     PBAP_OPERATE_PULL_VCARD_LIST,
     PBAP_OPERATE_PULL_VCARD_ENTRY,
+    PBAP_OPERATE_ABORT,
 
     PBAP_W2_DISCONNECT_RFCOMM,
     PBAP_W4_RFCOMM_DISCONNECTED,
@@ -156,6 +160,8 @@ struct pbap_pcb_t
     uint8_t remote_cn;
     pbap_state_e state;
 
+	uint8_t dn_operate;
+
     uint8_t current_repositories;
     uint8_t current_type;
 
@@ -177,27 +183,6 @@ err_t pbap_client_set_path(struct bd_addr_t *addr,uint8_t repositories,uint8_t t
 err_t pbap_client_download_vcard_list(struct bd_addr_t *addr,uint8_t repositories,uint8_t type);
 err_t pbap_client_download_vcard_entry(struct bd_addr_t *addr,uint8_t repositories,uint8_t type,uint16_t entry_number);
 err_t pbap_client_download_abort(struct bd_addr_t *addr);
-
-
-extern struct pbap_pcb_t *pbap_active_pcbs;  /* List of all active PBAP PCBs */
-extern struct pbap_pcb_t *pbap_tmp_pcb;
-
-
-#define PBAP_PCB_REG(pcbs, npcb) do { \
-                            npcb->next = *pcbs; \
-                            *pcbs = npcb; \
-                            } while(0)
-#define PBAP_PCB_RMV(pcbs, npcb) do { \
-                            if(*pcbs == npcb) { \
-                               *pcbs = (*pcbs)->next; \
-                            } else for(pbap_tmp_pcb = *pcbs; pbap_tmp_pcb != NULL; pbap_tmp_pcb = pbap_tmp_pcb->next) { \
-                               if(pbap_tmp_pcb->next != NULL && pbap_tmp_pcb->next == npcb) { \
-                                  pbap_tmp_pcb->next = npcb->next; \
-                                  break; \
-                               } \
-                            } \
-                            npcb->next = NULL; \
-                            } while(0)
 
 #endif
 

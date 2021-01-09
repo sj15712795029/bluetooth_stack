@@ -18,6 +18,8 @@
 #define OBEX_CONNECT_FIELD_LEN 7
 #define OBEX_GET_FIELD_LEN 3
 #define OBEX_SETPATH_FIELD_LEN 5
+#define OBEX_ABORT_FIELD_LEN 3
+
 
 #define OBEX_OPCODE_CONNECT                0x80
 #define OBEX_OPCODE_DISCONNECT             0x81
@@ -77,6 +79,7 @@ typedef struct
     void (*obex_client_connect_set_up)(struct bd_addr_t *remote_addr,uint8_t status,uint32_t cid);
     void (*obex_client_connect_realease)(struct bd_addr_t *remote_addr,uint8_t status);
 	void (*obex_client_data_ind)(struct bd_addr_t *remote_addr,uint8_t *data,uint16_t data_len,uint8_t status);
+	void (*obex_client_abort)(struct bd_addr_t *remote_addr,uint8_t status);
 } obex_client_cbs_t;
 
 struct obex_pcb_t
@@ -97,6 +100,7 @@ struct obex_pcb_t
 err_t obex_client_connect(struct rfcomm_pcb_t *rfcommpcb,obex_client_cbs_t *cb,uint16_t mtu,uint8_t scn);
 err_t obex_client_get(struct rfcomm_pcb_t *rfcommpcb);
 err_t obex_client_setpath(struct rfcomm_pcb_t *rfcommpcb);
+err_t obex_client_abort(struct rfcomm_pcb_t *rfcommpcb);
 err_t obex_header_para_append(uint8_t hdr_id,uint8_t *hdr_data,uint8_t hdr_data_len);
 err_t obex_header_para_get(uint8_t hdr_id,uint8_t *data_in,uint16_t data_in_len,uint16_t *find_offset,uint16_t *hdr_data_len);
 

@@ -29,6 +29,22 @@ static  uint8_t pbap_client_service_record[] =
 struct pbap_pcb_t *pbap_active_pcbs;  /* List of all active PBAP PCBs */
 struct pbap_pcb_t *pbap_tmp_pcb;
 
+#define PBAP_PCB_REG(pcbs, npcb) do { \
+                            npcb->next = *pcbs; \
+                            *pcbs = npcb; \
+                            } while(0)
+#define PBAP_PCB_RMV(pcbs, npcb) do { \
+                            if(*pcbs == npcb) { \
+                               *pcbs = (*pcbs)->next; \
+                            } else for(pbap_tmp_pcb = *pcbs; pbap_tmp_pcb != NULL; pbap_tmp_pcb = pbap_tmp_pcb->next) { \
+                               if(pbap_tmp_pcb->next != NULL && pbap_tmp_pcb->next == npcb) { \
+                                  pbap_tmp_pcb->next = npcb->next; \
+                                  break; \
+                               } \
+                            } \
+                            npcb->next = NULL; \
+                            } while(0)
+
 
 uint8_t pbap_app_para[PBAP_APP_PARA_MAX_SIZE] = {0};
 uint8_t pbap_app_para_offset = 0;
@@ -58,7 +74,7 @@ static err_t pbap_client_parse_pull_phonebook_resp(struct pbap_pcb_t *pcb,uint8_
 static err_t pbap_client_parse_get_phonebook_size_resp(struct pbap_pcb_t *pcb,uint8_t *data,uint16_t data_len,uint8_t status);
 static err_t pbap_client_parse_pull_vcard_list_resp(struct pbap_pcb_t *pcb,uint8_t *data,uint16_t data_len,uint8_t status);
 static err_t pbap_client_parse_pull_vcard_entry_resp(struct pbap_pcb_t *pcb,uint8_t *data,uint16_t data_len,uint8_t status);
-err_t pbap_client_pull_phone_book(struct pbap_pcb_t *pcb,uint8_t repositories,uint8_t type,uint16_t count,uint16_t offset,uint64_t property_mask,uint8_t vcard_format);
+static err_t pbap_client_pull_phone_book(struct pbap_pcb_t *pcb,uint8_t repositories,uint8_t type,uint16_t count,uint16_t offset,uint64_t property_mask,uint8_t vcard_format);
 
 static err_t pbap_client_run(struct pbap_pcb_t *pcb);
 
@@ -146,6 +162,7 @@ err_t pbap_client_download_phonebook(struct bd_addr_t *addr,uint8_t repositories
     pbappcb->state = PBAP_OPERATE_PULL_PHONEBOOK;
     pbappcb->dn_pb_repositories = repositories;
     pbappcb->dn_pb_type = type;
+	pbappcb->dn_operate = PBAP_OPERATE_PULL_PHONEBOOK;
     pbap_client_pull_phone_book(pbappcb,repositories,type,0xffff,0x0,PBAP_PROPERTY_MASK_DEFAULT,pbap_client_vcard_format);
 
     if(pbap_client_cbs && pbap_client_cbs->pbap_download_phonebook_status)
@@ -260,6 +277,7 @@ err_t pbap_client_download_vcard_list(struct bd_addr_t *addr,uint8_t repositorie
         return BT_ERR_ARG;
 
     pbappcb->state = PBAP_OPERATE_PULL_VCARD_LIST;
+	pbappcb->dn_operate = PBAP_OPERATE_PULL_VCARD_LIST;
 
     obex_header_para_append(OBEX_HEADER_CONNECTION_ID,(uint8_t *)&(pbappcb->cid),sizeof(pbappcb->cid));
     obex_header_para_append(OBEX_HEADER_TYPE,(uint8_t *)pbap_vcardlisting_type,sizeof(pbap_vcardlisting_type));
@@ -311,6 +329,14 @@ err_t pbap_client_download_vcard_entry(struct bd_addr_t *addr,uint8_t repositori
 
 err_t pbap_client_download_abort(struct bd_addr_t *addr)
 {
+	struct pbap_pcb_t *pbappcb = pbap_get_active_pcb(addr);
+    if(!pbappcb)
+        return BT_ERR_CONN;
+	
+	pbappcb->state = PBAP_OPERATE_ABORT;
+
+	obex_header_para_append(OBEX_HEADER_CONNECTION_ID,(uint8_t *)&(pbappcb->cid),sizeof(pbappcb->cid));
+	obex_client_abort(pbappcb->rfcommpcb);
     return BT_ERR_OK;
 }
 
@@ -322,7 +348,7 @@ err_t pbap_client_pull_next(struct pbap_pcb_t *pcb)
 }
 
 
-err_t pbap_client_pull_phone_book(struct pbap_pcb_t *pcb,uint8_t repositories,uint8_t type,uint16_t count,uint16_t offset,
+static err_t pbap_client_pull_phone_book(struct pbap_pcb_t *pcb,uint8_t repositories,uint8_t type,uint16_t count,uint16_t offset,
                                   uint64_t property_mask,uint8_t vcard_format)
 {
     uint8_t index = 0;
@@ -496,11 +522,42 @@ void pbap_obex_client_data_ind(struct bd_addr_t *remote_addr,uint8_t *data,uint1
 
 }
 
+void pbap_obex_client_abort(struct bd_addr_t *remote_addr,uint8_t status)
+{
+	struct pbap_pcb_t *pbappcb = pbap_get_active_pcb(remote_addr);
+    if(!pbappcb)
+        return;
+
+    BT_PBAP_TRACE_DEBUG("PBAP << OBEX:pbap_obex_client_abort, pbappcb->dn_operate(%d) status 0x%x address is :\n",pbappcb->dn_operate,status);
+    bt_addr_dump(remote_addr->addr);
+
+	switch(pbappcb->dn_operate)
+    {
+    case PBAP_OPERATE_PULL_PHONEBOOK:
+    {
+        if(pbap_client_cbs && pbap_client_cbs->pbap_download_phonebook_status)
+        	pbap_client_cbs->pbap_download_phonebook_status(&pbappcb->remote_addr,pbappcb->dn_pb_repositories,pbappcb->dn_pb_type,PBAP_DN_PB_ABORT);
+        break;
+    }
+    case PBAP_OPERATE_PULL_VCARD_LIST:
+    {
+        if(pbap_client_cbs && pbap_client_cbs->pbap_download_vcardlist_status)
+        	pbap_client_cbs->pbap_download_vcardlist_status(&pbappcb->remote_addr,pbappcb->current_repositories,pbappcb->current_type,PBAP_DN_VCARD_LIST_ABORT);
+        break;
+    }
+    default:
+        break;
+
+    }
+}
+
+
 obex_client_cbs_t pbap_obex_client_cbs =
 {
     pbap_obex_client_connect_set_up,
     pbap_obex_client_connect_realease,
     pbap_obex_client_data_ind,
+    pbap_obex_client_abort,
 };
 
 static struct pbap_pcb_t *pbap_new(struct rfcomm_pcb_t *rfcommpcb)
