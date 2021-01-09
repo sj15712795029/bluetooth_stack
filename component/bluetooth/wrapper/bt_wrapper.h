@@ -247,6 +247,7 @@ uint8_t bt_pbap_client_query_phonebook_size(struct bd_addr_t *addr,uint8_t repos
 uint8_t bt_pbap_client_download_phonebook(struct bd_addr_t *addr,uint8_t repositories,uint8_t type);
 uint8_t bt_pbap_client_set_path(struct bd_addr_t *addr,uint8_t repositories,uint8_t type);
 uint8_t bt_pbap_client_download_vcard_list(struct bd_addr_t *addr,uint8_t repositories,uint8_t type);
+uint8_t bt_pbap_client_download_vcard_entry(struct bd_addr_t *addr,uint8_t repositories,uint8_t type,uint16_t entry_number);
 
 #endif
 

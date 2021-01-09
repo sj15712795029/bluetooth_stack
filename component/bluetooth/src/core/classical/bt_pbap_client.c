@@ -9,7 +9,7 @@
 
 #include "bt_pbap_client.h"
 
-uint8_t pbap_client_vcard_format = PBAP_DN_VCARD_FORMAT;
+
 
 static  uint8_t pbap_client_service_record[] =
 {
@@ -29,10 +29,14 @@ static  uint8_t pbap_client_service_record[] =
 struct pbap_pcb_t *pbap_active_pcbs;  /* List of all active PBAP PCBs */
 struct pbap_pcb_t *pbap_tmp_pcb;
 
+
 uint8_t pbap_app_para[PBAP_APP_PARA_MAX_SIZE] = {0};
 uint8_t pbap_app_para_offset = 0;
 
+
 pbap_client_cbs_t *pbap_client_cbs;
+uint8_t pbap_client_vcard_format = PBAP_DN_VCARD_FORMAT;
+
 static const uint8_t pbap_target_id[] = { 0x79, 0x61, 0x35, 0xf0, 0xf0, 0xc5, 0x11, 0xd8, 0x09, 0x66, 0x08, 0x00, 0x20, 0x0c, 0x9a, 0x66};
 static const uint8_t pbap_phonebook_type[] = "x-bt/phonebook";
 static const uint8_t pbap_vcardlisting_type[] =  "x-bt/vcard-listing";
@@ -53,6 +57,7 @@ static void pbap_close(struct pbap_pcb_t *pcb);
 static err_t pbap_client_parse_pull_phonebook_resp(struct pbap_pcb_t *pcb,uint8_t *data,uint16_t data_len,uint8_t status);
 static err_t pbap_client_parse_get_phonebook_size_resp(struct pbap_pcb_t *pcb,uint8_t *data,uint16_t data_len,uint8_t status);
 static err_t pbap_client_parse_pull_vcard_list_resp(struct pbap_pcb_t *pcb,uint8_t *data,uint16_t data_len,uint8_t status);
+static err_t pbap_client_parse_pull_vcard_entry_resp(struct pbap_pcb_t *pcb,uint8_t *data,uint16_t data_len,uint8_t status);
 err_t pbap_client_pull_phone_book(struct pbap_pcb_t *pcb,uint8_t repositories,uint8_t type,uint16_t count,uint16_t offset,uint64_t property_mask,uint8_t vcard_format);
 
 static err_t pbap_client_run(struct pbap_pcb_t *pcb);
@@ -60,12 +65,12 @@ static err_t pbap_client_run(struct pbap_pcb_t *pcb);
 
 err_t pbap_app_para_append(uint8_t para_id,uint8_t *para_data,uint8_t para_data_len)
 {
-	uint8_t index = 0;
+    uint8_t index = 0;
     pbap_app_para[pbap_app_para_offset++] = para_id;
     pbap_app_para[pbap_app_para_offset++] = para_data_len;
     memcpy(pbap_app_para+pbap_app_para_offset,para_data,para_data_len);
     pbap_app_para_offset += para_data_len;
-	return BT_ERR_OK;
+    return BT_ERR_OK;
 }
 
 
@@ -73,7 +78,7 @@ err_t pbap_app_para_reset()
 {
     memset(pbap_app_para,0,PBAP_APP_PARA_MAX_SIZE);
     pbap_app_para_offset = 0;
-	return BT_ERR_OK;
+    return BT_ERR_OK;
 }
 
 
@@ -139,14 +144,14 @@ err_t pbap_client_download_phonebook(struct bd_addr_t *addr,uint8_t repositories
         return BT_ERR_CONN;
 
     pbappcb->state = PBAP_OPERATE_PULL_PHONEBOOK;
-	pbappcb->dn_pb_repositories = repositories;
-	pbappcb->dn_pb_type = type;
+    pbappcb->dn_pb_repositories = repositories;
+    pbappcb->dn_pb_type = type;
     pbap_client_pull_phone_book(pbappcb,repositories,type,0xffff,0x0,PBAP_PROPERTY_MASK_DEFAULT,pbap_client_vcard_format);
 
-	if(pbap_client_cbs && pbap_client_cbs->pbap_download_phonebook_status)
-		pbap_client_cbs->pbap_download_phonebook_status(&pbappcb->remote_addr,pbappcb->dn_pb_repositories,pbappcb->dn_pb_type,PBAP_DN_PB_START);
-	
-	return BT_ERR_OK;
+    if(pbap_client_cbs && pbap_client_cbs->pbap_download_phonebook_status)
+        pbap_client_cbs->pbap_download_phonebook_status(&pbappcb->remote_addr,pbappcb->dn_pb_repositories,pbappcb->dn_pb_type,PBAP_DN_PB_START);
+
+    return BT_ERR_OK;
 }
 
 err_t pbap_client_query_phonebook_size(struct bd_addr_t *addr,uint8_t repositories,uint8_t type)
@@ -156,11 +161,11 @@ err_t pbap_client_query_phonebook_size(struct bd_addr_t *addr,uint8_t repositori
         return BT_ERR_CONN;
 
     pbappcb->state = PBAP_OPERATE_QUERY_PHONEBOOK_SIZE;
-	pbappcb->query_repositories = repositories;
-	pbappcb->query_type = type;
+    pbappcb->query_repositories = repositories;
+    pbappcb->query_type = type;
     pbap_client_pull_phone_book(pbappcb,repositories,type,0x0,0x0,PBAP_PROPERTY_MASK_DEFAULT,pbap_client_vcard_format);
-		
-		return BT_ERR_OK;
+
+    return BT_ERR_OK;
 
 }
 
@@ -182,8 +187,8 @@ err_t pbap_client_set_path(struct bd_addr_t *addr,uint8_t repositories,uint8_t t
         switch(type)
         {
         case PBAP_NONE_TYPE:
-			sprintf((char *)name_string_temp, "%s", pbap_telecom_repositories);
-			break;
+            sprintf((char *)name_string_temp, "%s", pbap_telecom_repositories);
+            break;
         case PB_PHONEBOOK_TYPE:
             sprintf((char *)name_string_temp, "%s/%s", pbap_telecom_repositories,pbap_pb_name);
             break;
@@ -200,6 +205,7 @@ err_t pbap_client_set_path(struct bd_addr_t *addr,uint8_t repositories,uint8_t t
             sprintf((char *)name_string_temp, "%s/%s", pbap_telecom_repositories,pbap_cch_name);
             break;
         default:
+
             break;
         }
     }
@@ -208,8 +214,8 @@ err_t pbap_client_set_path(struct bd_addr_t *addr,uint8_t repositories,uint8_t t
         switch(type)
         {
         case PBAP_NONE_TYPE:
-			sprintf((char *)name_string_temp, "%s", pbap_telecom_repositories);
-			break;
+            sprintf((char *)name_string_temp, "%s", pbap_telecom_repositories);
+            break;
         case PB_PHONEBOOK_TYPE:
             sprintf((char *)name_string_temp, "%s/%s/%s", pbap_sim_repositories,pbap_telecom_repositories,pbap_pb_name);
             break;
@@ -240,7 +246,7 @@ err_t pbap_client_set_path(struct bd_addr_t *addr,uint8_t repositories,uint8_t t
     pbappcb->current_type = type;
     obex_client_setpath(pbappcb->rfcommpcb);
 
-	return BT_ERR_OK;
+    return BT_ERR_OK;
 
 }
 
@@ -262,10 +268,10 @@ err_t pbap_client_download_vcard_list(struct bd_addr_t *addr,uint8_t repositorie
 
     obex_client_get(pbappcb->rfcommpcb);
 
-	if(pbap_client_cbs && pbap_client_cbs->pbap_download_vcardlist_status)
-		pbap_client_cbs->pbap_download_vcardlist_status(&pbappcb->remote_addr,pbappcb->current_repositories,pbappcb->current_type,PBAP_DN_VCARD_LIST_START);
+    if(pbap_client_cbs && pbap_client_cbs->pbap_download_vcardlist_status)
+        pbap_client_cbs->pbap_download_vcardlist_status(&pbappcb->remote_addr,pbappcb->current_repositories,pbappcb->current_type,PBAP_DN_VCARD_LIST_START);
 
-	return BT_ERR_OK;
+    return BT_ERR_OK;
 }
 
 err_t pbap_client_download_vcard_entry(struct bd_addr_t *addr,uint8_t repositories,uint8_t type,uint16_t entry_number)
@@ -281,6 +287,7 @@ err_t pbap_client_download_vcard_entry(struct bd_addr_t *addr,uint8_t repositori
         return BT_ERR_ARG;
 
     pbappcb->state = PBAP_OPERATE_PULL_VCARD_ENTRY;
+    pbappcb->dn_ventry_number = entry_number;
 
     obex_header_para_append(OBEX_HEADER_CONNECTION_ID,(uint8_t *)&(pbappcb->cid),sizeof(pbappcb->cid));
     obex_header_para_append(OBEX_HEADER_TYPE,(uint8_t *)pbap_vcardentry_type,sizeof(pbap_vcardentry_type));
@@ -292,22 +299,26 @@ err_t pbap_client_download_vcard_entry(struct bd_addr_t *addr,uint8_t repositori
     }
     obex_header_para_append(OBEX_HEADER_NAME,name_string,(strlen((const char *)name_string_temp) + 1)*2);
 
+    pbap_app_para_append(PBAP_APP_PARAM_FORMAT,&pbap_client_vcard_format,sizeof(pbap_client_vcard_format));
+    obex_header_para_append(OBEX_HEADER_APPLICATION_PARAMETERS,pbap_app_para,pbap_app_para_offset);
+    pbap_app_para_reset();
+
     obex_client_get(pbappcb->rfcommpcb);
 
-	return BT_ERR_OK;
+    return BT_ERR_OK;
 
 }
 
 err_t pbap_client_download_abort(struct bd_addr_t *addr)
 {
-	return BT_ERR_OK;
+    return BT_ERR_OK;
 }
 
 err_t pbap_client_pull_next(struct pbap_pcb_t *pcb)
 {
     obex_header_para_append(OBEX_HEADER_CONNECTION_ID,(uint8_t *)&(pcb->cid),sizeof(pcb->cid));
     obex_client_get(pcb->rfcommpcb);
-	return BT_ERR_OK;
+    return BT_ERR_OK;
 }
 
 
@@ -317,8 +328,8 @@ err_t pbap_client_pull_phone_book(struct pbap_pcb_t *pcb,uint8_t repositories,ui
     uint8_t index = 0;
     uint8_t name_string_temp[20] = {0};
     uint8_t name_string[40] = {0};
-	uint8_t max_list_count[2] = {0};
-	uint8_t offset_buf[2] = {0};
+    uint8_t max_list_count[2] = {0};
+    uint8_t offset_buf[2] = {0};
     obex_header_para_append(OBEX_HEADER_CONNECTION_ID,(uint8_t *)&(pcb->cid),sizeof(pcb->cid));
     obex_header_para_append(OBEX_HEADER_TYPE,(uint8_t *)pbap_phonebook_type,sizeof(pbap_phonebook_type));
     if(repositories == PB_LOCAL_REPOSITORY)
@@ -377,12 +388,12 @@ err_t pbap_client_pull_phone_book(struct pbap_pcb_t *pcb,uint8_t repositories,ui
     obex_header_para_append(OBEX_HEADER_NAME,name_string,(strlen((const char *)name_string_temp) + 1)*2);
 
     /* PBAP app para ass */
-	bt_be_store_16(max_list_count,0,count);
+    bt_be_store_16(max_list_count,0,count);
     pbap_app_para_append(PBAP_APP_PARAM_MAX_LIST_COUNT,max_list_count,sizeof(max_list_count));
 
     if(count != 0)
     {
-    	bt_be_store_16(offset_buf,0,offset);
+        bt_be_store_16(offset_buf,0,offset);
         pbap_app_para_append(PBAP_APP_PARAM_LIST_START_OFFSET,offset_buf,sizeof(offset_buf));
         {
             // test
@@ -401,7 +412,7 @@ err_t pbap_client_pull_phone_book(struct pbap_pcb_t *pcb,uint8_t repositories,ui
 
     obex_client_get(pcb->rfcommpcb);
 
-	return BT_ERR_OK;
+    return BT_ERR_OK;
 }
 
 void pbap_obex_client_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status,uint32_t cid)
@@ -411,11 +422,11 @@ void pbap_obex_client_connect_set_up(struct bd_addr_t *remote_addr,uint8_t statu
         return;
     BT_PBAP_TRACE_DEBUG("PBAP << OBEX:obex_client_connect_set_up,cid 0x%xaddress is :\n",cid);
 
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
 
     pbappcb->cid = cid;
 
-	if(pbappcb)
+    if(pbappcb)
     {
         BT_PBAP_TRACE_DEBUG("pbap_obex_client_connect_set_up\n");
 
@@ -427,11 +438,11 @@ void pbap_obex_client_connect_set_up(struct bd_addr_t *remote_addr,uint8_t statu
 }
 void pbap_obex_client_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
 {
-	struct pbap_pcb_t *pbappcb;
+    struct pbap_pcb_t *pbappcb;
     BT_PBAP_TRACE_DEBUG("PBAP << OBEX:obex_client_connect_set_up,address is :\n");
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
 
-	pbappcb = pbap_get_active_pcb(remote_addr);
+    pbappcb = pbap_get_active_pcb(remote_addr);
     if(pbappcb)
     {
         BT_PBAP_TRACE_DEBUG("pbap_client_disconnected: close pbap active pcb\n");
@@ -448,33 +459,39 @@ void pbap_obex_client_data_ind(struct bd_addr_t *remote_addr,uint8_t *data,uint1
     if(!pbappcb)
         return;
 
-    BT_PBAP_TRACE_DEBUG("PBAP << OBEX:obex_client_data_ind, status 0x%x address is :\n",status);
-	bt_addr_dump(remote_addr->addr);
+    BT_PBAP_TRACE_DEBUG("PBAP << OBEX:obex_client_data_ind, pbappcb->state(%d) status 0x%x address is :\n",pbappcb->state,status);
+    bt_addr_dump(remote_addr->addr);
 
-	//BT_PBAP_TRACE_DEBUG("PBAP << OBEX:obex_client_data is :\n");
+    //BT_PBAP_TRACE_DEBUG("PBAP << OBEX:obex_client_data is :\n");
     //bt_hex_dump(data,data_len);
 
-    if(pbappcb->state == PBAP_OPERATE_PULL_PHONEBOOK)
+    switch(pbappcb->state)
+    {
+    case PBAP_OPERATE_PULL_PHONEBOOK:
     {
         pbap_client_parse_pull_phonebook_resp(pbappcb,data,data_len,status);
-
+        break;
     }
-
-    if(pbappcb->state == PBAP_OPERATE_QUERY_PHONEBOOK_SIZE)
+    case PBAP_OPERATE_QUERY_PHONEBOOK_SIZE:
     {
         pbap_client_parse_get_phonebook_size_resp(pbappcb,data,data_len,status);
-
+        break;
     }
-
-    if(pbappcb->state == PBAP_OPERATE_SET_PATH)
-    {
-
-
-    }
-
-    if(pbappcb->state == PBAP_OPERATE_PULL_VCARD_LIST)
+    case PBAP_OPERATE_PULL_VCARD_LIST:
     {
         pbap_client_parse_pull_vcard_list_resp(pbappcb,data,data_len,status);
+        break;
+    }
+    case PBAP_OPERATE_PULL_VCARD_ENTRY:
+    {
+        pbap_client_parse_pull_vcard_entry_resp(pbappcb,data,data_len,status);
+        break;
+    }
+    case PBAP_OPERATE_SET_PATH:
+        break;
+    default:
+        break;
+
     }
 
 }
@@ -662,7 +679,7 @@ static err_t pbap_client_rf_connect_cfm(void *arg, struct rfcomm_pcb_t *pcb, err
     if(err == BT_ERR_OK)
     {
         BT_PBAP_TRACE_DEBUG("pbap_client_rf_connect_cfm. CN = %d\n", rfcomm_cn(pcb));
-        
+
         pbappcb->rfcommpcb = pcb;
         pbappcb->state = PBAP_W2_OBEX_CONNECTED;
         pbap_client_run(pbappcb);
@@ -680,108 +697,129 @@ static err_t pbap_client_rf_connect_cfm(void *arg, struct rfcomm_pcb_t *pcb, err
 static err_t pbap_client_parse_pull_vcard_list_resp(struct pbap_pcb_t *pcb,uint8_t *data,uint16_t data_len,uint8_t status)
 {
     int16_t vcard_length;
-	uint16_t data_offset;
-	
+    uint16_t data_offset;
+
     if(status == OBEX_RESP_CONTINUE)
     {
-    	if(obex_header_para_get(OBEX_HEADER_BODY,data,data_len,&data_offset,&vcard_length) == BT_ERR_OK)
-    	{
-    		if(pbap_client_cbs && pbap_client_cbs->pbap_download_vcardlist_data)
-				pbap_client_cbs->pbap_download_vcardlist_data(&pcb->remote_addr,pcb->current_repositories,pcb->current_type,data+data_offset+3,vcard_length-3);
-    	}
+        if(obex_header_para_get(OBEX_HEADER_BODY,data,data_len,&data_offset,&vcard_length) == BT_ERR_OK)
+        {
+            if(pbap_client_cbs && pbap_client_cbs->pbap_download_vcardlist_data)
+                pbap_client_cbs->pbap_download_vcardlist_data(&pcb->remote_addr,pcb->current_repositories,pcb->current_type,data+data_offset+3,vcard_length-3);
+        }
         pbap_client_pull_next(pcb);
     }
     else if(status == OBEX_RESP_SUCCESS)
     {
-		
-    	if(obex_header_para_get(OBEX_HEADER_BODY,data,data_len,&data_offset,&vcard_length) == BT_ERR_OK)
-    	{
-    		if(pbap_client_cbs && pbap_client_cbs->pbap_download_vcardlist_data)
-				pbap_client_cbs->pbap_download_vcardlist_data(&pcb->remote_addr,pcb->current_repositories,pcb->current_type,data+data_offset+3,vcard_length-3);
-    	}
-		if(pbap_client_cbs && pbap_client_cbs->pbap_download_vcardlist_status)
-			pbap_client_cbs->pbap_download_vcardlist_status(&pcb->remote_addr,pcb->current_repositories,pcb->current_type,PBAP_DN_VCARD_LIST_END);
+
+        if(obex_header_para_get(OBEX_HEADER_BODY,data,data_len,&data_offset,&vcard_length) == BT_ERR_OK)
+        {
+            if(pbap_client_cbs && pbap_client_cbs->pbap_download_vcardlist_data)
+                pbap_client_cbs->pbap_download_vcardlist_data(&pcb->remote_addr,pcb->current_repositories,pcb->current_type,data+data_offset+3,vcard_length-3);
+        }
+        if(pbap_client_cbs && pbap_client_cbs->pbap_download_vcardlist_status)
+            pbap_client_cbs->pbap_download_vcardlist_status(&pcb->remote_addr,pcb->current_repositories,pcb->current_type,PBAP_DN_VCARD_LIST_END);
     }
     else
     {
         /* TODO: error 处理 */
-        BT_PBAP_TRACE_DEBUG("PBAP_OPERATE_PULL_PHONEBOOK: err++++++++++++++\n");
+        BT_PBAP_TRACE_DEBUG("pbap_client_parse_pull_vcard_list_resp: err++++++++++++++\n");
 
     }
-		return BT_ERR_OK;
+    return BT_ERR_OK;
 }
 
+static err_t pbap_client_parse_pull_vcard_entry_resp(struct pbap_pcb_t *pcb,uint8_t *data,uint16_t data_len,uint8_t status)
+{
+    int16_t vcard_length;
+    uint16_t data_offset;
+
+    if(status == OBEX_RESP_SUCCESS)
+    {
+        if(obex_header_para_get(OBEX_HEADER_END_OF_BODY,data,data_len,&data_offset,&vcard_length) == BT_ERR_OK)
+        {
+            if(pbap_client_cbs && pbap_client_cbs->pbap_download_vcardentry_data)
+                pbap_client_cbs->pbap_download_vcardentry_data(&pcb->remote_addr,pcb->current_repositories,pcb->current_type,pcb->dn_ventry_number,data+data_offset+3,vcard_length-3);
+        }
+    }
+    else
+    {
+        /* TODO: error 处理 */
+        BT_PBAP_TRACE_DEBUG("pbap_client_parse_pull_vcard_list_resp: err++++++++++++++\n");
+
+    }
+    return BT_ERR_OK;
+}
 
 
 static err_t pbap_client_parse_pull_phonebook_resp(struct pbap_pcb_t *pcb,uint8_t *data,uint16_t data_len,uint8_t status)
 {
     uint16_t vcard_length;
-	uint16_t data_offset;
-		
+    uint16_t data_offset;
+
     if(status == OBEX_RESP_CONTINUE)
     {
-    	
-    	if(obex_header_para_get(OBEX_HEADER_BODY,data,data_len,&data_offset,&vcard_length) == BT_ERR_OK)
-    	{
-    		if(pbap_client_cbs && pbap_client_cbs->pbap_download_phonebook_data)
-				pbap_client_cbs->pbap_download_phonebook_data(&pcb->remote_addr,pcb->dn_pb_repositories,pcb->dn_pb_type,data+data_offset+3,vcard_length-3);
-    	}
+
+        if(obex_header_para_get(OBEX_HEADER_BODY,data,data_len,&data_offset,&vcard_length) == BT_ERR_OK)
+        {
+            if(pbap_client_cbs && pbap_client_cbs->pbap_download_phonebook_data)
+                pbap_client_cbs->pbap_download_phonebook_data(&pcb->remote_addr,pcb->dn_pb_repositories,pcb->dn_pb_type,data+data_offset+3,vcard_length-3);
+        }
         pbap_client_pull_next(pcb);
     }
     else if(status == OBEX_RESP_SUCCESS)
     {
-    	if(obex_header_para_get(OBEX_HEADER_END_OF_BODY,data,data_len,&data_offset,&vcard_length) == BT_ERR_OK)
-    	{
-    		if(pbap_client_cbs && pbap_client_cbs->pbap_download_phonebook_data)
-				pbap_client_cbs->pbap_download_phonebook_data(&pcb->remote_addr,pcb->dn_pb_repositories,pcb->dn_pb_type,data+data_offset+3,vcard_length-3);
-    	}
-		BT_PBAP_TRACE_DEBUG("pbap_client_parse_pull_phonebook_resp download complete\n");
-		if(pbap_client_cbs && pbap_client_cbs->pbap_download_phonebook_status)
-			pbap_client_cbs->pbap_download_phonebook_status(&pcb->remote_addr,pcb->dn_pb_repositories,pcb->dn_pb_type,PBAP_DN_PB_END);
+        if(obex_header_para_get(OBEX_HEADER_END_OF_BODY,data,data_len,&data_offset,&vcard_length) == BT_ERR_OK)
+        {
+            if(pbap_client_cbs && pbap_client_cbs->pbap_download_phonebook_data)
+                pbap_client_cbs->pbap_download_phonebook_data(&pcb->remote_addr,pcb->dn_pb_repositories,pcb->dn_pb_type,data+data_offset+3,vcard_length-3);
+        }
+        BT_PBAP_TRACE_DEBUG("pbap_client_parse_pull_phonebook_resp download complete\n");
+        if(pbap_client_cbs && pbap_client_cbs->pbap_download_phonebook_status)
+            pbap_client_cbs->pbap_download_phonebook_status(&pcb->remote_addr,pcb->dn_pb_repositories,pcb->dn_pb_type,PBAP_DN_PB_END);
     }
     else
     {
         /* TODO: error 处理 */
         BT_PBAP_TRACE_DEBUG("PBAP_OPERATE_PULL_PHONEBOOK: err++++++++++++++\n");
     }
-		return BT_ERR_OK;
+    return BT_ERR_OK;
 }
 
 static err_t pbap_client_parse_get_phonebook_size_resp(struct pbap_pcb_t *pcb,uint8_t *data,uint16_t data_len,uint8_t status)
 {
     if(status == OBEX_RESP_SUCCESS)
-    {	
-    	uint16_t data_offset = 0;
-		uint16_t hdr_length = 0;
-    	BT_PBAP_TRACE_DEBUG("pbap_client_parse_get_phonebook_size_resp: data\n");
-		bt_hex_dump(data,data_len);
-		if(obex_header_para_get(OBEX_HEADER_APPLICATION_PARAMETERS,data,data_len,&data_offset,&hdr_length) == BT_ERR_OK)
-		{
-			uint8_t index = 0;
-			uint8_t temp_offset;
-			uint8_t *hdr_data = data+data_offset;
-			BT_PBAP_TRACE_DEBUG("data_offset(%d) hdr_length(%d)\n",data_offset,hdr_length);
-			bt_hex_dump(hdr_data,hdr_length);
-			for(index = 3; index < hdr_length; index+=temp_offset)
-			{
-				temp_offset = hdr_data[index+1]+2;
-				if(hdr_data[index] == PBAP_APP_PARAM_PHONEBOOK_SIZE)
-				{
-					uint16_t phonebook_size = bt_be_read_16(hdr_data+index,2);
-					BT_PBAP_TRACE_DEBUG("repositories(%d)type(%d) size(%d)\n",pcb->query_repositories,pcb->query_type,phonebook_size);
-					if(pbap_client_cbs && pbap_client_cbs->pbap_query_repositories_size)
-            			pbap_client_cbs->pbap_query_repositories_size(&pcb->remote_addr,pcb->query_repositories,pcb->query_type,phonebook_size);
-				}
-			}
-		}
-		
+    {
+        uint16_t data_offset = 0;
+        uint16_t hdr_length = 0;
+        BT_PBAP_TRACE_DEBUG("pbap_client_parse_get_phonebook_size_resp: data\n");
+        bt_hex_dump(data,data_len);
+        if(obex_header_para_get(OBEX_HEADER_APPLICATION_PARAMETERS,data,data_len,&data_offset,&hdr_length) == BT_ERR_OK)
+        {
+            uint8_t index = 0;
+            uint8_t temp_offset;
+            uint8_t *hdr_data = data+data_offset;
+            BT_PBAP_TRACE_DEBUG("data_offset(%d) hdr_length(%d)\n",data_offset,hdr_length);
+            bt_hex_dump(hdr_data,hdr_length);
+            for(index = 3; index < hdr_length; index+=temp_offset)
+            {
+                temp_offset = hdr_data[index+1]+2;
+                if(hdr_data[index] == PBAP_APP_PARAM_PHONEBOOK_SIZE)
+                {
+                    uint16_t phonebook_size = bt_be_read_16(hdr_data+index,2);
+                    BT_PBAP_TRACE_DEBUG("repositories(%d)type(%d) size(%d)\n",pcb->query_repositories,pcb->query_type,phonebook_size);
+                    if(pbap_client_cbs && pbap_client_cbs->pbap_query_repositories_size)
+                        pbap_client_cbs->pbap_query_repositories_size(&pcb->remote_addr,pcb->query_repositories,pcb->query_type,phonebook_size);
+                }
+            }
+        }
+
     }
     else
     {
         /* TODO: error 处理 */
         BT_PBAP_TRACE_DEBUG("PBAP_OPERATE_QUERY_PHONEBOOK_SIZE: err++++++++++++++\n");
     }
-		return BT_ERR_OK;
+    return BT_ERR_OK;
 }
 
 static err_t pbap_client_run(struct pbap_pcb_t *pcb)
@@ -799,13 +837,13 @@ static err_t pbap_client_run(struct pbap_pcb_t *pcb)
         l2cap_connect_req(pcb->l2cappcb, &(pcb->remote_addr), SDP_PSM, HCI_ALLOW_ROLE_SWITCH, l2cap_connect_cfm);
         break;
     case PBAP_W2_SDP_QUERY_RFCOMM_CHANNEL:
-			{
+    {
         uint8_t pbap[] = {0x35, 0x03, 0x19, 0x11, 0x2f}; /* Service search pattern with PBAP UUID is default */
         uint8_t attrids[] = {0x35, 0x03, 0x09, 0x00, 0x04}; /* Attribute IDs to search for in data element sequence form */
         sdp_service_search_attrib_req(pcb->sdppcb, 0xFFFF, pbap, sizeof(pbap),
                                       attrids, sizeof(attrids), pbap_client_sdp_attributes_recv);
         break;
-    	}
+    }
     case PBAP_W2_SDP_DISCONNECTD:
         l2cap_disconnect_req(pcb->sdppcb->l2cappcb, l2cap_disconnect_cfm);
         sdp_free(pcb->sdppcb);
@@ -832,7 +870,7 @@ static err_t pbap_client_run(struct pbap_pcb_t *pcb)
         if(pbap_client_cbs && pbap_client_cbs->pbap_client_connect_set_up)
             pbap_client_cbs->pbap_client_connect_set_up(&pcb->remote_addr,BT_ERR_OK);
         pcb->state = PBAP_OPERATE_IDLE;
-		break;
+        break;
     case PBAP_W2_DISCONNECT_RFCOMM:
         rfcomm_disconnect(pcb->rfcommpcb);
         //l2cap_disconnect_req(pcb->rfcommpcb->l2cappcb, l2cap_disconnect_cfm);
@@ -848,7 +886,7 @@ static err_t pbap_client_run(struct pbap_pcb_t *pcb)
     default:
         break;
     }
-		
-		return BT_ERR_OK;
+
+    return BT_ERR_OK;
 }
 

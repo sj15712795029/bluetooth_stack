@@ -962,9 +962,10 @@ uint8_t shell_parse(uint8_t *shell_string)
 
     if(hw_strncmp("PBAP_DVE",(const char*)shell_string,hw_strlen("PBAP_DVE")) == 0)
     {
+    	static uint16_t dn_entry_number = 1;
         HW_DEBUG("SHELL:operate PBAP PBAP_DVE\n");
 
-        pbap_client_download_vcard_entry(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE,1);
+        bt_pbap_client_download_vcard_entry(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE,dn_entry_number++);
         return HW_ERR_OK;
     }
 #endif

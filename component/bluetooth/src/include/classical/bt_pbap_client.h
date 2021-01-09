@@ -140,6 +140,7 @@ typedef struct
 	void (*pbap_download_phonebook_data)(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint8_t *data,uint16_t data_len);
 	void (*pbap_download_vcardlist_status)(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint8_t status);
 	void (*pbap_download_vcardlist_data)(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint8_t *data,uint16_t data_len);
+	void (*pbap_download_vcardentry_data)(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint16_t entry_number,uint8_t *data,uint16_t data_len);
 } pbap_client_cbs_t;
 
 struct pbap_pcb_t
@@ -163,6 +164,8 @@ struct pbap_pcb_t
 
 	uint8_t dn_pb_repositories;
 	uint8_t dn_pb_type;
+
+	uint16_t dn_ventry_number;
 };
 
 err_t pbap_client_init(pbap_client_cbs_t *cb);
