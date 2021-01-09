@@ -898,6 +898,27 @@ void pbap_download_phonebook_data(struct bd_addr_t *remote_addr,uint8_t reposito
 	//bt_hex_dump(data,data_len);
 }
 
+void pbap_download_vcardlist_status(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint8_t status)
+{
+	printf("WRAPPER << PROFILE:pbap_download_vcardlist_status,address is :\n");
+    bt_addr_dump(remote_addr->addr);
+	printf("repositories(%d) type(%d) status(%d)\n",repositories,type,status);
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_pbap_cb && bt_wrapper_cb->app_pbap_cb->bt_pbap_download_vcardlist_status)
+    {
+        bt_wrapper_cb->app_pbap_cb->bt_pbap_download_vcardlist_status(remote_addr,repositories,type,status);
+    }
+}
+
+void pbap_download_vcardlist_data(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint8_t *data,uint16_t data_len)
+{
+	printf("WRAPPER << PROFILE:pbap_download_vcardlist_data,address is :\n");
+    bt_addr_dump(remote_addr->addr);
+	printf("repositories(%d) type(%d) data_len(%d)\n",repositories,type,data_len);
+
+	bt_hex_dump(data,data_len);
+}
+
 
 static pbap_client_cbs_t pbap_client_wrapper_cb =
 {
@@ -906,6 +927,8 @@ static pbap_client_cbs_t pbap_client_wrapper_cb =
     pbap_query_repositories_size,
     pbap_download_phonebook_status,
     pbap_download_phonebook_data,
+    pbap_download_vcardlist_status,
+    pbap_download_vcardlist_data,
 };
 
 #endif
@@ -1371,6 +1394,13 @@ uint8_t bt_pbap_client_set_path(struct bd_addr_t *addr,uint8_t repositories,uint
 	pbap_client_set_path(addr,repositories,type);
 	return 0;
 }
+
+uint8_t bt_pbap_client_download_vcard_list(struct bd_addr_t *addr,uint8_t repositories,uint8_t type)
+{
+	pbap_client_download_vcard_list(addr,repositories,type);
+	return 0;
+}
+
 
 #endif
 

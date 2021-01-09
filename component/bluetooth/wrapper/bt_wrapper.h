@@ -156,6 +156,7 @@ typedef struct
 	void (*bt_pbap_disconnect)(struct bd_addr_t *remote_addr,uint8_t status);
 	void (*bt_pbap_query_repositories_size)(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint16_t size);
 	void (*bt_pbap_download_pb_status)(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint8_t status);
+	void (*bt_pbap_download_vcardlist_status)(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint8_t status);
 }bt_app_pbap_cb_t;
 
 
@@ -233,7 +234,7 @@ uint8_t bt_avrcp_controller_control(struct bd_addr_t *remote_addr,uint8_t contro
 #endif
 
 #if PROFILE_HID_ENABLE
-/************************* AVRCP API ***********************/
+/************************* HID device API ***********************/
 uint8_t bt_hid_interupt_report(struct bd_addr_t *remote_addr,uint8_t *report,uint8_t report_size);
 uint8_t bt_hid_find_keycode(uint8_t *keycode,uint8_t find_char);
 #endif
@@ -245,6 +246,8 @@ uint8_t bt_pbap_client_disconnect(struct bd_addr_t *remote_addr);
 uint8_t bt_pbap_client_query_phonebook_size(struct bd_addr_t *addr,uint8_t repositories,uint8_t type);
 uint8_t bt_pbap_client_download_phonebook(struct bd_addr_t *addr,uint8_t repositories,uint8_t type);
 uint8_t bt_pbap_client_set_path(struct bd_addr_t *addr,uint8_t repositories,uint8_t type);
+uint8_t bt_pbap_client_download_vcard_list(struct bd_addr_t *addr,uint8_t repositories,uint8_t type);
+
 #endif
 
 

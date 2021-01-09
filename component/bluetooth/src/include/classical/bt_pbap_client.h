@@ -32,6 +32,11 @@
 #define PBAP_DN_PB_START 1
 #define PBAP_DN_PB_CONTINUE 2
 #define PBAP_DN_PB_END 3
+#define PBAP_DN_VCARD_LIST_NONE 0
+#define PBAP_DN_VCARD_LIST_START 1
+#define PBAP_DN_VCARD_LIST_CONTINUE 2
+#define PBAP_DN_VCARD_LIST_END 3
+
 
 #define PBAP_APP_PARAM_ORDER 0x01 /*Order - 0x01 - 1 byte: 0x00 = indexed 0x01 = alphanumeric 0x02 = phonetic */
 #define PBAP_APP_PARAM_SEARCH_VALUE 0x02 /* SearchValue - 0x02 - variable - Text */
@@ -133,6 +138,8 @@ typedef struct
 	void (*pbap_query_repositories_size)(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint16_t size);
 	void (*pbap_download_phonebook_status)(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint8_t status);
 	void (*pbap_download_phonebook_data)(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint8_t *data,uint16_t data_len);
+	void (*pbap_download_vcardlist_status)(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint8_t status);
+	void (*pbap_download_vcardlist_data)(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint8_t *data,uint16_t data_len);
 } pbap_client_cbs_t;
 
 struct pbap_pcb_t

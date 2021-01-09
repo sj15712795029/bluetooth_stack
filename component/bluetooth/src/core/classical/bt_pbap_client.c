@@ -181,6 +181,9 @@ err_t pbap_client_set_path(struct bd_addr_t *addr,uint8_t repositories,uint8_t t
     {
         switch(type)
         {
+        case PBAP_NONE_TYPE:
+			sprintf((char *)name_string_temp, "%s", pbap_telecom_repositories);
+			break;
         case PB_PHONEBOOK_TYPE:
             sprintf((char *)name_string_temp, "%s/%s", pbap_telecom_repositories,pbap_pb_name);
             break;
@@ -204,6 +207,9 @@ err_t pbap_client_set_path(struct bd_addr_t *addr,uint8_t repositories,uint8_t t
     {
         switch(type)
         {
+        case PBAP_NONE_TYPE:
+			sprintf((char *)name_string_temp, "%s", pbap_telecom_repositories);
+			break;
         case PB_PHONEBOOK_TYPE:
             sprintf((char *)name_string_temp, "%s/%s/%s", pbap_sim_repositories,pbap_telecom_repositories,pbap_pb_name);
             break;
@@ -255,6 +261,9 @@ err_t pbap_client_download_vcard_list(struct bd_addr_t *addr,uint8_t repositorie
     obex_header_para_append(OBEX_HEADER_NAME,NULL,0);
 
     obex_client_get(pbappcb->rfcommpcb);
+
+	if(pbap_client_cbs && pbap_client_cbs->pbap_download_vcardlist_status)
+		pbap_client_cbs->pbap_download_vcardlist_status(&pbappcb->remote_addr,pbappcb->current_repositories,pbappcb->current_type,PBAP_DN_VCARD_LIST_START);
 
 	return BT_ERR_OK;
 }
@@ -670,14 +679,28 @@ static err_t pbap_client_rf_connect_cfm(void *arg, struct rfcomm_pcb_t *pcb, err
 
 static err_t pbap_client_parse_pull_vcard_list_resp(struct pbap_pcb_t *pcb,uint8_t *data,uint16_t data_len,uint8_t status)
 {
-    /* TODO:parse */
+    int16_t vcard_length;
+	uint16_t data_offset;
+	
     if(status == OBEX_RESP_CONTINUE)
     {
+    	if(obex_header_para_get(OBEX_HEADER_BODY,data,data_len,&data_offset,&vcard_length) == BT_ERR_OK)
+    	{
+    		if(pbap_client_cbs && pbap_client_cbs->pbap_download_vcardlist_data)
+				pbap_client_cbs->pbap_download_vcardlist_data(&pcb->remote_addr,pcb->current_repositories,pcb->current_type,data+data_offset+3,vcard_length-3);
+    	}
         pbap_client_pull_next(pcb);
     }
     else if(status == OBEX_RESP_SUCCESS)
     {
-
+		
+    	if(obex_header_para_get(OBEX_HEADER_BODY,data,data_len,&data_offset,&vcard_length) == BT_ERR_OK)
+    	{
+    		if(pbap_client_cbs && pbap_client_cbs->pbap_download_vcardlist_data)
+				pbap_client_cbs->pbap_download_vcardlist_data(&pcb->remote_addr,pcb->current_repositories,pcb->current_type,data+data_offset+3,vcard_length-3);
+    	}
+		if(pbap_client_cbs && pbap_client_cbs->pbap_download_vcardlist_status)
+			pbap_client_cbs->pbap_download_vcardlist_status(&pcb->remote_addr,pcb->current_repositories,pcb->current_type,PBAP_DN_VCARD_LIST_END);
     }
     else
     {

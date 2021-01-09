@@ -672,6 +672,13 @@ void bt_app_pbap_download_pb_status(struct bd_addr_t *remote_addr,uint8_t reposi
 	printf("repositories(%d) type(%d) status(%d)\n",repositories,type,status);
 }
 
+void bt_app_pbap_download_vcardlist_status(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint8_t status)
+{
+	printf("bt_app_pbap_download_vcardlist_status,address is :\n");
+    bt_addr_dump(remote_addr->addr);
+	printf("repositories(%d) type(%d) status(%d)\n",repositories,type,status);
+}
+
 
 static bt_app_pbap_cb_t bt_app_pbap_cb =
 {
@@ -679,6 +686,7 @@ static bt_app_pbap_cb_t bt_app_pbap_cb =
     bt_app_pbap_disconnect,
     bt_app_pbap_query_repositories_size,
     bt_app_pbap_download_pb_status,
+    bt_app_pbap_download_vcardlist_status,   
 };
 
 #endif
@@ -920,11 +928,19 @@ uint8_t shell_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-    if(hw_strncmp("PBAP_SP",(const char*)shell_string,hw_strlen("PBAP_SP")) == 0)
+    if(hw_strncmp("PBAP_SPL",(const char*)shell_string,hw_strlen("PBAP_SPL")) == 0)
     {
-        HW_DEBUG("SHELL:operate PBAP PBAP_SP\n");
+        HW_DEBUG("SHELL:operate PBAP PBAP_SPL\n");
 
         bt_pbap_client_set_path(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE);
+        return HW_ERR_OK;
+    }
+
+	if(hw_strncmp("PBAP_SPC",(const char*)shell_string,hw_strlen("PBAP_SPC")) == 0)
+    {
+        HW_DEBUG("SHELL:operate PBAP PBAP_SPC\n");
+
+        bt_pbap_client_set_path(&connect_addr,PB_LOCAL_REPOSITORY,PB_COMBINE_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
@@ -932,7 +948,15 @@ uint8_t shell_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_DVL\n");
 
-        pbap_client_download_vcard_list(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE);
+        bt_pbap_client_download_vcard_list(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE);
+        return HW_ERR_OK;
+    }
+
+	if(hw_strncmp("PBAP_DVC",(const char*)shell_string,hw_strlen("PBAP_DVC")) == 0)
+    {
+        HW_DEBUG("SHELL:operate PBAP PBAP_DVC\n");
+
+        bt_pbap_client_download_vcard_list(&connect_addr,PB_LOCAL_REPOSITORY,PB_COMBINE_BOOK_TYPE);
         return HW_ERR_OK;
     }
 
