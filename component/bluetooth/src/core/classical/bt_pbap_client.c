@@ -356,6 +356,7 @@ static err_t pbap_client_pull_phone_book(struct pbap_pcb_t *pcb,uint8_t reposito
     uint8_t name_string[40] = {0};
     uint8_t max_list_count[2] = {0};
     uint8_t offset_buf[2] = {0};
+	uint8_t property_buf[8] = {0};
     obex_header_para_append(OBEX_HEADER_CONNECTION_ID,(uint8_t *)&(pcb->cid),sizeof(pcb->cid));
     obex_header_para_append(OBEX_HEADER_TYPE,(uint8_t *)pbap_phonebook_type,sizeof(pbap_phonebook_type));
     if(repositories == PB_LOCAL_REPOSITORY)
@@ -421,15 +422,8 @@ static err_t pbap_client_pull_phone_book(struct pbap_pcb_t *pcb,uint8_t reposito
     {
         bt_be_store_16(offset_buf,0,offset);
         pbap_app_para_append(PBAP_APP_PARAM_LIST_START_OFFSET,offset_buf,sizeof(offset_buf));
-        {
-            // test
-            //pbap_app_para_append(PBAP_APP_PARAM_PROPERTY_SELECTOR,&property_mask,sizeof(property_mask));
-            pbap_app_para[pbap_app_para_offset++] = PBAP_APP_PARAM_PROPERTY_SELECTOR;
-            pbap_app_para[pbap_app_para_offset++] = 8;
-            pbap_app_para_offset += 7;
-            pbap_app_para[pbap_app_para_offset++] = property_mask;
-        }
-
+		bt_be_store_64(property_buf,0,property_mask);
+		pbap_app_para_append(PBAP_APP_PARAM_PROPERTY_SELECTOR,property_buf,sizeof(property_buf));
     }
     pbap_app_para_append(PBAP_APP_PARAM_FORMAT,&vcard_format,sizeof(vcard_format));
     obex_header_para_append(OBEX_HEADER_APPLICATION_PARAMETERS,pbap_app_para,pbap_app_para_offset);
