@@ -37,6 +37,13 @@
 #include "bt_hid_device.h"
 #endif
 
+#if BT_BLE_ENABLE > 0
+#include "bt_att.h"
+#endif
+
+
+
+
 
 
 #define LINK_KEY_MAX 10

@@ -80,13 +80,14 @@
 #define BT_A2DP_TRACE_LEVEL 3
 #define BT_AVRCP_TRACE_LEVEL 3
 #define BT_HID_TRACE_LEVEL 3
+#define BT_ATT_TRACE_LEVEL 3
 /******************************************************************************************************************************/
 
 
 
 /***********   memory & memory pool option ************************************************************************************/
 #define BT_MEMORY_C_LIB 1
-#define MEMP_NUM_HCI_PCB 1
+#define MEMP_NUM_HCI_PCB 2
 #define MEMP_NUM_HCI_LINK 7
 #define MEMP_NUM_HCI_INQ 8
 #define MEMP_NUM_L2CAP_PCB 7

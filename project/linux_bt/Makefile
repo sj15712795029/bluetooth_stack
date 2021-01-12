@@ -11,6 +11,7 @@ OBJDUMP			:= $(CROSS_COMPILE)objdump
 INCUDIRS		:= 	./ \
 								${BTSTACK_ROOT}/component/bluetooth/src/include \
 								${BTSTACK_ROOT}/component/bluetooth/src/include/classical \
+								${BTSTACK_ROOT}/component/bluetooth/src/include/ble \
 								${BTSTACK_ROOT}/component/bluetooth/vendor \
 								${BTSTACK_ROOT}/component/bluetooth/wrapper \
 								${BTSTACK_ROOT}/component/ringbuffer \
@@ -21,6 +22,7 @@ INCUDIRS		:= 	./ \
 SRCDIRS			:= 	./ \
 								${BTSTACK_ROOT}/component/bluetooth/src/core \
 								${BTSTACK_ROOT}/component/bluetooth/src/core/classical \
+								${BTSTACK_ROOT}/component/bluetooth/src/core/ble \
 								${BTSTACK_ROOT}/component/bluetooth/vendor \
 								${BTSTACK_ROOT}/component/bluetooth/wrapper \
 								${BTSTACK_ROOT}/component/ringbuffer \

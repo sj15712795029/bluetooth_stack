@@ -293,6 +293,27 @@ err_t l2cap_write(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p, uint16_t len)
     return ret;
 }
 
+void l2cap_process_fixed_channel(uint16_t cid,struct bt_pbuf_t *p)
+{
+	err_t ret = BT_ERR_OK;
+    struct l2cap_pcb_t *l2cap_pcb;
+
+	BT_L2CAP_TRACE_DEBUG("l2cap_process_fixed_channel\n");
+
+	bt_pbuf_header(p, -L2CAP_HDR_LEN);
+    for(l2cap_pcb = l2cap_active_pcbs; l2cap_pcb != NULL; l2cap_pcb = l2cap_pcb->next)
+    {
+        if(l2cap_pcb->fixed_cid == cid)
+        {
+        	
+            L2CA_ACTION_RECV(l2cap_pcb,p,BT_ERR_OK,ret);
+            break;
+        }
+    }
+
+}
+
+
 void l2cap_process_sig(struct bt_pbuf_t *q, struct l2cap_hdr_t *l2caphdr, struct bd_addr_t *bdaddr)
 {
     struct l2cap_sig_hdr_t *sighdr;
@@ -1158,6 +1179,10 @@ void l2cap_acl_input(struct bt_pbuf_t *p, struct bd_addr_t *bdaddr)
         /* Not needed by PAN, LAN access or DUN profiles */
         bt_pbuf_free(inseg->p);
         break;
+    case L2CAP_ATT_CID:
+        l2cap_process_fixed_channel(L2CAP_ATT_CID,p);
+        bt_pbuf_free(p);
+        break;
     default:
         if(inseg->l2caphdr->cid < 0x0040 || inseg->pcb == NULL)
         {
@@ -1810,5 +1835,24 @@ void l2cap_register_recv(struct l2cap_pcb_t *pcb,
 {
     pcb->l2ca_recv = l2ca_recv;
 }
+
+err_t l2cap_fixed_channel_register_recv(uint16_t cid,
+                                        err_t (* l2ca_recv)(void *arg, struct l2cap_pcb_t *pcb, struct bt_pbuf_t *p, err_t err))
+{
+    struct l2cap_pcb_t *l2cappcb;
+
+    if((l2cappcb = l2cap_new()) == NULL)
+    {
+        BT_L2CAP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] l2cap_new fail\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_MEM;
+    }
+
+    l2cappcb->fixed_cid = cid;
+    l2cappcb->l2ca_recv = l2ca_recv;
+    L2CAP_REG(&l2cap_active_pcbs, l2cappcb);
+
+    return BT_ERR_OK;
+}
+
 
 

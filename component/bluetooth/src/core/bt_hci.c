@@ -271,7 +271,7 @@ void hci_wlp_complete(err_t (* wlp_complete)(void *arg, struct bd_addr_t *bdaddr
 
 struct hci_link_t *hci_get_link(struct bd_addr_t *bdaddr)
 {
-    struct hci_link_t *link;
+    struct hci_link_t *link = NULL;
 
     for(link = hci_active_links; link != NULL; link = link->next)
     {
@@ -282,6 +282,21 @@ struct hci_link_t *hci_get_link(struct bd_addr_t *bdaddr)
     }
     return link;
 }
+
+struct hci_link_t *hci_get_link_by_handle(uint16_t handle)
+{
+    struct hci_link_t *link = NULL;
+
+    for(link = hci_active_links; link != NULL; link = link->next)
+    {
+        if(link->conhdl == handle)
+        {
+            break;
+        }
+    }
+    return link;
+}
+
 
 err_t hci_acl_write(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p, uint16_t len, uint8_t pb)
 {
@@ -1245,6 +1260,24 @@ void hci_event_input(struct bt_pbuf_t *p)
 
         switch(sub_event)
         {
+        case HCI_SUBEVENT_LE_CONN_COMPLETE:
+        {
+			uint16_t con_handle = bt_le_read_16((uint8_t *)p->payload,2);
+			link = hci_get_link_by_handle(con_handle);
+        	if(link == NULL)
+            {
+                if((link = hci_new()) == NULL)
+                {
+                    /* Could not allocate memory for link. Disconnect */
+                    BT_HCI_TRACE_DEBUG("hci_event_input: Could not allocate memory for link. Disconnect\n");
+                    break;
+                }
+                link->conhdl = con_handle;
+                HCI_REG(&(hci_active_links), link);
+                link->state = OPEN;
+            }
+			break;
+        }
         case HCI_SUBEVENT_LE_ADV_REPORT:
         {
             struct hci_le_inq_res_t hci_le_inq_res = {0};

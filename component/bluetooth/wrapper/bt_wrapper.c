@@ -1046,6 +1046,10 @@ uint8_t bt_start(bt_app_cb_t *app_cb)
 	bt_profile_mask |= BT_PROFILE_HID_DEVICE_MASK;
 #endif
 
+#if BT_BLE_ENABLE > 0
+	att_init();
+#endif
+
 
     phybusif_reset(&uart_if);
     hci_reset();

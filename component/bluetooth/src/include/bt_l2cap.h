@@ -277,7 +277,8 @@ struct l2cap_pcb_t
     uint16_t dcid; /* Destination CID */
 
     uint16_t psm; /* Protocol/Service Multiplexer */
-
+	uint16_t fixed_cid;
+	
     uint16_t ursp_id; /* Signal id to respond to */
     uint8_t encrypt; /* encryption mode */
 
@@ -345,6 +346,8 @@ void l2cap_register_timeout_ind(struct l2cap_pcb_t *pcb,
 void l2cap_register_recv(struct l2cap_pcb_t *pcb,
                          err_t (* l2ca_recv)(void *arg, struct l2cap_pcb_t *pcb, struct bt_pbuf_t *p, err_t err));
 
+err_t l2cap_fixed_channel_register_recv(uint16_t cid,
+							err_t (* l2ca_recv)(void *arg, struct l2cap_pcb_t *pcb, struct bt_pbuf_t *p, err_t err));
 err_t l2cap_connect_req(struct l2cap_pcb_t *pcb, struct bd_addr_t *bdaddr, uint16_t psm, uint8_t role_switch,
                         err_t (* l2ca_connect_cfm)(void *arg, struct l2cap_pcb_t *lpcb,
                                 uint16_t result, uint16_t status));
