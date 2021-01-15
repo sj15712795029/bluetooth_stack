@@ -1048,6 +1048,11 @@ uint8_t bt_start(bt_app_cb_t *app_cb)
 
 #if BT_BLE_ENABLE > 0
 	att_init();
+	gatt_server_init();
+#if PROFILE_BAS_ENABLE > 0
+	bas_init();
+#endif
+
 #endif
 
 

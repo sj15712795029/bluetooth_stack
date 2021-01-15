@@ -94,6 +94,8 @@ typedef enum {
                                 var = val; \
                               } while(0)
 
+#define BT_LE_U16_TO_ARRAY(u16) (u16&0xff),(u16>>8&0xff)
+
 
 struct bd_addr_t {
   uint8_t addr[6];

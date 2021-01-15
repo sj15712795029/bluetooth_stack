@@ -1722,6 +1722,23 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
     }
 #endif
 
+#if BT_BLE_ENABLE > 0
+	
+#if PROFILE_BAS_ENABLE > 0
+		if(hw_strncmp("BAS_LEVEL_UPDATE",(const char*)shell_string,hw_strlen("BAS_LEVEL_UPDATE")) == 0)
+		{
+			static uint8_t bat_level = 100;
+
+			HW_DEBUG("SHELL:BAS_LEVEL_UPDATE\n");
+			bas_batt_level_notification(bat_level==0?bat_level=100:bat_level--);
+
+			return HW_ERR_OK;
+		}
+#endif
+	
+	
+#endif
+
 
 
     show_usage();

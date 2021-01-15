@@ -47,6 +47,9 @@
 #define BT_CLASS_OF_DEVICE 0x200408
 #endif
 
+#define PROFILE_BAS_ENABLE 1
+
+
 /******************************************************************************************************************************/
 
 
@@ -79,6 +82,9 @@
 #define BT_A2DP_TRACE_LEVEL 3
 #define BT_AVRCP_TRACE_LEVEL 3
 #define BT_HID_TRACE_LEVEL 3
+#define BT_ATT_TRACE_LEVEL 3
+#define BT_GATT_TRACE_LEVEL 3
+#define BT_BAS_TRACE_LEVEL 3
 /******************************************************************************************************************************/
 
 
@@ -198,6 +204,21 @@ typedef uintptr_t mem_ptr_t;
 #define HID_DEVICE_GAMEPAD_ENABLE 0
 #define HID_DEVICE_JOYSTICK_ENABLE 0
 
+/******************************************************************************************************************************/
+
+
+/***********   GATT protocol config ********************************************************************************************/
+#define GATT_PRI_SERVICE_MAX_COUNT 10
+#define GATT_BLE_MTU_SIZE 23
+#define GATT_GAP_SERVICE_HANDLE 0x0001
+#define GATT_GAP_CHARACTERISTIC_HANDLE 0x0002
+#define GATT_GAP_NAME_HANDLE 0x0003
+#define GATT_SERVICE_HANLE 0x0004
+#define GATT_GAP_NAME BT_LOCAL_NAME
+#define GATT_BAS_SERVICE_HANDLE 0x0005
+#define GATT_BAS_CHARACTERISTIC_HANDLE 0x0006
+#define GATT_BAS_LEVEL_HANDLE 0x0007
+#define GATT_BAS_CLIENT_CHARA_CONF_HANDLE 0x0008
 /******************************************************************************************************************************/
 
 

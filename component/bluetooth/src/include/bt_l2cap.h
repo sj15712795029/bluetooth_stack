@@ -358,6 +358,7 @@ err_t l2cap_ertm_connect_req(struct l2cap_pcb_t *pcb, struct bd_addr_t *bdaddr, 
 err_t l2cap_disconnect_req(struct l2cap_pcb_t *pcb,
                            err_t (* l2ca_disconnect_cfm)(void *arg, struct l2cap_pcb_t *pcb));
 err_t l2cap_datawrite(struct l2cap_pcb_t *pcb, struct bt_pbuf_t *p);
+err_t l2cap_fixed_channel_datawrite(struct l2cap_pcb_t *pcb, struct bt_pbuf_t *p,uint16_t cid);
 err_t l2cap_ping(struct bd_addr_t *bdaddr, struct l2cap_pcb_t *tpcb,
                  err_t (* l2ca_pong)(void *arg, struct l2cap_pcb_t *pcb, uint8_t result));
 

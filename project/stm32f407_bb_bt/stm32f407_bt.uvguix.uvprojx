@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F407xx</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\bsp\cortex-m4\core;..\..\bsp\cortex-m4\inc;..\..\bsp\cortex-m4\inc\Legacy;..\..\board;..\..\board\stm32f407;..\..\component\fs;..\..\component\fs\fatfs13\source;..\..\component\bluetooth\src\include;..\..\component\bluetooth\src\include\classical;..\..\component\bluetooth\third_party_lib\sbc\sbc;..\..\component\bluetooth\vendor;..\..\component\bluetooth\wrapper;..\..\component\ringbuffer;..\..\component\cjson;..\stm32f407_bb_bt;..\..\component\memory_manager</IncludePath>
+              <IncludePath>..\..\bsp\cortex-m4\core;..\..\bsp\cortex-m4\inc;..\..\bsp\cortex-m4\inc\Legacy;..\..\board;..\..\board\stm32f407;..\..\component\fs;..\..\component\fs\fatfs13\source;..\..\component\bluetooth\src\include;..\..\component\bluetooth\src\include\classical;..\..\component\bluetooth\third_party_lib\sbc\sbc;..\..\component\bluetooth\vendor;..\..\component\bluetooth\wrapper;..\..\component\ringbuffer;..\..\component\cjson;..\stm32f407_bb_bt;..\..\component\memory_manager;..\..\component\bluetooth\src\include\ble</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -681,6 +681,21 @@
               <FileName>bt_vendor_bcm4345c5.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\component\bluetooth\vendor\bt_vendor_bcm4345c5.c</FilePath>
+            </File>
+            <File>
+              <FileName>bt_att.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\src\core\ble\bt_att.c</FilePath>
+            </File>
+            <File>
+              <FileName>bt_bas.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\src\core\ble\bt_bas.c</FilePath>
+            </File>
+            <File>
+              <FileName>bt_gatt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\src\core\ble\bt_gatt.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -1264,6 +1264,8 @@ void hci_event_input(struct bt_pbuf_t *p)
         {
 			uint16_t con_handle = bt_le_read_16((uint8_t *)p->payload,2);
 			link = hci_get_link_by_handle(con_handle);
+			bdaddr = (void *)((uint8_t *)p->payload)+6;
+
         	if(link == NULL)
             {
                 if((link = hci_new()) == NULL)
@@ -1272,6 +1274,8 @@ void hci_event_input(struct bt_pbuf_t *p)
                     BT_HCI_TRACE_DEBUG("hci_event_input: Could not allocate memory for link. Disconnect\n");
                     break;
                 }
+				bd_addr_set(&(link->bdaddr), bdaddr);
+				bt_hex_dump(&(link->bdaddr),6);
                 link->conhdl = con_handle;
                 HCI_REG(&(hci_active_links), link);
                 link->state = OPEN;

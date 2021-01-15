@@ -293,19 +293,19 @@ err_t l2cap_write(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p, uint16_t len)
     return ret;
 }
 
-void l2cap_process_fixed_channel(uint16_t cid,struct bt_pbuf_t *p)
+void l2cap_process_fixed_channel(uint16_t cid,struct bt_pbuf_t *p,struct bd_addr_t *bdaddr)
 {
-	err_t ret = BT_ERR_OK;
+    err_t ret = BT_ERR_OK;
     struct l2cap_pcb_t *l2cap_pcb;
 
-	BT_L2CAP_TRACE_DEBUG("l2cap_process_fixed_channel\n");
+    BT_L2CAP_TRACE_DEBUG("l2cap_process_fixed_channel\n");
 
-	bt_pbuf_header(p, -L2CAP_HDR_LEN);
+    bt_pbuf_header(p, -L2CAP_HDR_LEN);
     for(l2cap_pcb = l2cap_active_pcbs; l2cap_pcb != NULL; l2cap_pcb = l2cap_pcb->next)
     {
         if(l2cap_pcb->fixed_cid == cid)
         {
-        	
+			bd_addr_set(&(l2cap_pcb->remote_bdaddr),bdaddr);
             L2CA_ACTION_RECV(l2cap_pcb,p,BT_ERR_OK,ret);
             break;
         }
@@ -1180,7 +1180,7 @@ void l2cap_acl_input(struct bt_pbuf_t *p, struct bd_addr_t *bdaddr)
         bt_pbuf_free(inseg->p);
         break;
     case L2CAP_ATT_CID:
-        l2cap_process_fixed_channel(L2CAP_ATT_CID,p);
+        l2cap_process_fixed_channel(L2CAP_ATT_CID,p,bdaddr);
         bt_pbuf_free(p);
         break;
     default:
@@ -1685,6 +1685,37 @@ err_t l2cap_datawrite(struct l2cap_pcb_t *pcb, struct bt_pbuf_t *p)
     return ret;
 }
 
+err_t l2cap_fixed_channel_datawrite(struct l2cap_pcb_t *pcb, struct bt_pbuf_t *p,uint16_t cid)
+{
+    err_t ret;
+    struct l2cap_hdr_t *l2caphdr;
+    struct bt_pbuf_t *q;
+
+
+    /* Build L2CAP header */
+    if((q = bt_pbuf_alloc(BT_PBUF_RAW, L2CAP_HDR_LEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_L2CAP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_MEM;
+    }
+    bt_pbuf_chain(q, p);
+
+    l2caphdr = q->payload;
+    l2caphdr->cid = cid;
+
+
+    l2caphdr->len = p->tot_len;
+    BT_L2CAP_TRACE_DEBUG("l2cap_fixed_channel_datawrite: q->tot_len = %d\n", q->tot_len);
+    ret = l2cap_write(&(pcb->remote_bdaddr), q, q->tot_len);
+
+    /* Free L2CAP header. Higher layers will handle rest of packet */
+    p = bt_pbuf_dechain(q);
+    bt_pbuf_free(q);
+
+    return ret;
+}
+
+
 err_t l2cap_ping(struct bd_addr_t *bdaddr, struct l2cap_pcb_t *tpcb,
                  err_t (* l2ca_pong)(void *arg, struct l2cap_pcb_t *pcb, uint8_t result))
 {
@@ -1849,6 +1880,7 @@ err_t l2cap_fixed_channel_register_recv(uint16_t cid,
 
     l2cappcb->fixed_cid = cid;
     l2cappcb->l2ca_recv = l2ca_recv;
+    l2cappcb->state = L2CAP_OPEN;
     L2CAP_REG(&l2cap_active_pcbs, l2cappcb);
 
     return BT_ERR_OK;

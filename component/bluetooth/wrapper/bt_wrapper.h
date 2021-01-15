@@ -39,6 +39,7 @@
 
 #if BT_BLE_ENABLE > 0
 #include "bt_att.h"
+#include "bt_gatt.h"
 #endif
 
 
