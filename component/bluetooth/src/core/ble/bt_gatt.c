@@ -21,6 +21,7 @@ gatt_server_service_t gatt_service[] =
     {GATT_SERVICE_HANLE,GATT_UUID_PRI_SERVICE,gatt_server_uuid,sizeof(gatt_server_uuid),GATT_PERM_READ},
 };
 
+static err_t gatt_handle_mtu_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
 static err_t gatt_handle_read_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
 static err_t gatt_handle_write_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
 static err_t gatt_handle_find_info_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
@@ -55,6 +56,7 @@ void gatt_data_recv(struct bd_addr_t *remote_addr,struct bt_pbuf_t *p)
     case ATT_REQ_MTU:
     {
         BT_GATT_TRACE_DEBUG("ATT_REQ_MTU\n");
+		gatt_handle_mtu_req(NULL,p);
         break;
     }
     case ATT_RSP_MTU:
@@ -247,8 +249,23 @@ err_t gatt_server_notification(uint16_t handle,uint8_t *value,uint8_t value_leng
 	
     att_send_data(send_pbuf);
     bt_pbuf_free(send_pbuf);
+
+	return BT_ERR_OK;
 }
 
+static err_t gatt_handle_mtu_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+{
+    uint16_t mtu;
+    uint8_t rsp_buf_len = 0;
+    uint8_t rsp_buf[GATT_BLE_MTU_SIZE] = {0};
+
+    att_parse_mtu_req(p,&mtu);
+    BT_GATT_TRACE_DEBUG("gatt_handle_mtu_req handle(%d)\n",mtu);
+
+	att_send_mtu_rsp(GATT_BLE_MTU_SIZE);
+
+	return BT_ERR_OK;
+}
 
 static err_t gatt_handle_read_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
 {
@@ -282,18 +299,7 @@ static err_t gatt_handle_read_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
         }
     }
 
-    if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, 1+rsp_buf_len, BT_PBUF_RAM)) == NULL)
-    {
-        BT_GATT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
-
-        return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
-    }
-
-    ((uint8_t *)send_pbuf->payload)[0] = ATT_RSP_READ;
-    memcpy(((uint8_t *)send_pbuf->payload)+1, rsp_buf, rsp_buf_len);
-
-    att_send_data(send_pbuf);
-    bt_pbuf_free(send_pbuf);
+    att_send_read_rsp(rsp_buf,rsp_buf_len);
 
     return BT_ERR_OK;
 }
@@ -332,36 +338,51 @@ static err_t gatt_handle_find_info_req(struct bd_addr_t *bdaddr, struct bt_pbuf_
 
 	for(index = 0; index < gatt_server_pri_service_count; index++)
 	{
-		if((start_handle >=  gatt_server_pri_service[index].start_handle) && (end_handle <= gatt_server_pri_service[index].end_handle))
+		if((gatt_server_pri_service[index].start_handle <= end_handle) && (gatt_server_pri_service[index].end_handle >= start_handle))
 		{
 			find_index = index;
 			break;
 		}
 	}
+	
 	BT_GATT_TRACE_DEBUG("gatt_handle_find_info_req find_index(%d)\n",find_index);
 
 	for(index = 0; index < gatt_server_pri_service[find_index].serivce_count; index++)
     {
+    	/* TODO1:如果>MTU怎么处理 TODO2:如果是UUID128怎么处理 TODO3:多handle处理 */
     	if(start_handle == gatt_server_pri_service[find_index].gatt_server_service[index].handle)
     	{
 	        bt_le_store_16(rsp_buf,0,start_handle);
 	        bt_le_store_16(rsp_buf,2,gatt_server_pri_service[find_index].gatt_server_service[index].uuid16);
 			rsp_buf_len = 4;
+			break;
     	}
     }
 
-	if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, 4+2, BT_PBUF_RAM)) == NULL)
-    {
-        BT_GATT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+	att_send_find_info_rsp(ATT_UUID16_FORMAT,rsp_buf,rsp_buf_len);
 
-        return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
-    }
-    ((uint8_t *)send_pbuf->payload)[0] = ATT_RSP_FIND_INFO;
-    ((uint8_t *)send_pbuf->payload)[1] = 1;
-    memcpy(((uint8_t *)send_pbuf->payload)+2, rsp_buf, rsp_buf_len);
+    return BT_ERR_OK;
+}
 
-	att_send_data(send_pbuf);
-    bt_pbuf_free(send_pbuf);
+
+static err_t gatt_handle_find_info_value_type_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+{
+	uint8_t index = 0;
+	int8_t find_index = -1;
+    uint16_t start_handle;
+    uint16_t end_handle;
+	uint16_t att_type;
+	uint8_t req_buf_len = 0;
+    uint8_t rsp_buf_len = 0;
+    uint8_t req_buf[GATT_BLE_MTU_SIZE] = {0};
+    uint8_t rsp_buf[GATT_BLE_MTU_SIZE] = {0};
+	
+    struct bt_pbuf_t *send_pbuf;
+
+    att_parse_find_info_type_value_req(p,&start_handle,&end_handle,&att_type,req_buf,&req_buf_len);
+
+	/* TODO:做处理 */
+	//att_send_find_info_value_type_rsp
 
     return BT_ERR_OK;
 }
@@ -377,61 +398,46 @@ static err_t gatt_handle_read_type_req(struct bd_addr_t *bdaddr, struct bt_pbuf_
     uint16_t uuid;
     uint8_t rsp_buf_len = 0;
     uint8_t rsp_buf[GATT_BLE_MTU_SIZE] = {0};
-    struct bt_pbuf_t *send_pbuf;
-
+    
     att_parse_read_type_req(p,&start_handle,&end_handle,&uuid);
 
-    for(index = 0; index < gatt_server_pri_service_count; index++)
-    {
-        if((gatt_server_pri_service[index].start_handle >= start_handle) && (gatt_server_pri_service[index].end_handle <= end_handle))
-        {
-            find_index = index;
-        }
-    }
+
+	for(index = 0; index < gatt_server_pri_service_count; index++)
+	{
+		if((gatt_server_pri_service[index].start_handle <= end_handle) && (gatt_server_pri_service[index].end_handle >= start_handle))
+		{
+			find_index = index;
+			break;
+		}
+	}
+	
 
     BT_GATT_TRACE_DEBUG("gatt_handle_read_type_req find_index(%d)\n",find_index);
     for(index = 0; index < gatt_server_pri_service[find_index].serivce_count; index++)
     {
-        if(gatt_server_pri_service[find_index].gatt_server_service[index].uuid16 == uuid)
-        {
-            find_uuid = 1;
-            bt_le_store_16(rsp_buf+rsp_buf_len,rsp_buf_len,gatt_server_pri_service[find_index].gatt_server_service[index].handle);
-            rsp_buf_len+=2;
-            memcpy(rsp_buf+rsp_buf_len,gatt_server_pri_service[find_index].gatt_server_service[index].value,gatt_server_pri_service[find_index].gatt_server_service[index].value_length);
-            rsp_buf_len += gatt_server_pri_service[find_index].gatt_server_service[index].value_length;
-        }
+    	/* TODO1:uuid128的扩展 */
+		if((gatt_server_pri_service[find_index].gatt_server_service[index].handle >= start_handle) && 
+			(gatt_server_pri_service[find_index].gatt_server_service[index].handle <= end_handle))
+		{
+	        if(gatt_server_pri_service[find_index].gatt_server_service[index].uuid16 == uuid)
+	        {
+	            find_uuid = 1;
+	            bt_le_store_16(rsp_buf+rsp_buf_len,rsp_buf_len,gatt_server_pri_service[find_index].gatt_server_service[index].handle);
+	            rsp_buf_len+=2;
+	            memcpy(rsp_buf+rsp_buf_len,gatt_server_pri_service[find_index].gatt_server_service[index].value,gatt_server_pri_service[find_index].gatt_server_service[index].value_length);
+	            rsp_buf_len += gatt_server_pri_service[find_index].gatt_server_service[index].value_length;
+	        }
+		}
     }
 
     if(find_uuid)
     {
-        if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, 7+2, BT_PBUF_RAM)) == NULL)
-        {
-            BT_GATT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
-
-            return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
-        }
-        ((uint8_t *)send_pbuf->payload)[0] = ATT_RSP_READ_BY_TYPE;
-        ((uint8_t *)send_pbuf->payload)[1] = 7;
-        memcpy(((uint8_t *)send_pbuf->payload)+2, rsp_buf, rsp_buf_len);
+		att_send_read_type_rsp(rsp_buf,rsp_buf_len);
     }
     else
     {
-        if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, 5, BT_PBUF_RAM)) == NULL)
-        {
-            BT_GATT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
-
-            return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
-        }
-
-        ((uint8_t *)send_pbuf->payload)[0] = ATT_RSP_ERROR;
-        ((uint8_t *)send_pbuf->payload)[1] = ATT_REQ_READ_BY_TYPE;
-        bt_le_store_16((uint8_t *)send_pbuf->payload,2,start_handle);
-        ((uint8_t *)send_pbuf->payload)[4] = ATT_NOT_FOUND;
+    	att_send_err_rsp(ATT_REQ_READ_BY_TYPE,start_handle,ATT_NOT_FOUND);
     }
-
-    att_send_data(send_pbuf);
-    bt_pbuf_free(send_pbuf);
-
     return BT_ERR_OK;
 }
 
@@ -443,8 +449,7 @@ static err_t gatt_handle_read_group_type_req(struct bd_addr_t *bdaddr, struct bt
     uint16_t uuid;
     uint8_t rsp_buf_len = 0;
     uint8_t rsp_buf[GATT_BLE_MTU_SIZE] = {0};
-    struct bt_pbuf_t *send_pbuf;
-
+    
     att_parse_read_group_type_req(p,&start_handle,&end_handle,&uuid);
 
     if(GATT_UUID_PRI_SERVICE == uuid)
@@ -465,6 +470,7 @@ static err_t gatt_handle_read_group_type_req(struct bd_addr_t *bdaddr, struct bt
 
         if(rsp_buf_len > 0)
         {
+        	struct bt_pbuf_t *send_pbuf;
             if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, 8, BT_PBUF_RAM)) == NULL)
             {
                 BT_GATT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
@@ -474,26 +480,15 @@ static err_t gatt_handle_read_group_type_req(struct bd_addr_t *bdaddr, struct bt
             ((uint8_t *)send_pbuf->payload)[0] = ATT_RSP_READ_BY_GRP_TYPE;
             ((uint8_t *)send_pbuf->payload)[1] = 6;
             memcpy(((uint8_t *)send_pbuf->payload)+2, rsp_buf, 6);
+			att_send_data(send_pbuf);
+    		bt_pbuf_free(send_pbuf);
 
         }
         else
         {
-            if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, 5, BT_PBUF_RAM)) == NULL)
-            {
-                BT_GATT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
-
-                return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
-            }
-
-            ((uint8_t *)send_pbuf->payload)[0] = ATT_RSP_ERROR;
-            ((uint8_t *)send_pbuf->payload)[1] = ATT_REQ_READ_BY_GRP_TYPE;
-            bt_le_store_16((uint8_t *)send_pbuf->payload,2,start_handle);
-            ((uint8_t *)send_pbuf->payload)[4] = ATT_NOT_FOUND;
+        	att_send_err_rsp(ATT_REQ_READ_BY_GRP_TYPE,start_handle,ATT_NOT_FOUND);
         }
     }
-
-    att_send_data(send_pbuf);
-    bt_pbuf_free(send_pbuf);
 
     return BT_ERR_OK;
 }

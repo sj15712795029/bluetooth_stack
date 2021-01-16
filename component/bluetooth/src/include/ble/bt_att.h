@@ -65,7 +65,15 @@
 #define ATT_UNSUPPORT_GRP_TYPE 0x10
 #define ATT_INSUF_RESOURCE 0x11
 
+#define ATT_UUID16_FORMAT 1
+#define ATT_UUID128_FORMAT 2
 
+#define ATT_ERR_RSP_PACK_LEN 5
+#define ATT_EXCHANGE_MTU_PACK_LEN 3
+#define ATT_FIND_INFO_RSP_HDR_LEN 2
+#define ATT_FIND_INFO_VALUE_TYPE_RSP_PACK_LEN 5
+#define ATT_READ_TYPE_RSP_PACK_LEN 2
+#define ATT_READ_RSP_HDR_LEN 1
 
 typedef struct
 {
@@ -77,9 +85,20 @@ typedef struct
 
 err_t att_init(void);
 err_t att_register_cb(att_cbs_t *cb);
+
+
+/* ATT server API */
+err_t att_send_err_rsp(uint8_t req_op,uint16_t handle,uint8_t err_code);
+err_t att_send_mtu_rsp(uint16_t server_mtu);
+err_t att_send_find_info_rsp(uint8_t uuid_format,uint8_t *info_data,uint8_t info_len);
+err_t att_send_find_info_value_type_rsp(uint8_t uuid_format,uint16_t found_handle,uint16_t end_group_handle);
+err_t att_send_read_type_rsp(uint8_t *data_list,uint8_t data_list_len);
+err_t att_send_read_rsp(uint8_t *att_value,uint8_t att_value_len);
 err_t att_send_data(struct bt_pbuf_t *p);
-err_t att_parse_read_req(struct bt_pbuf_t *p,uint16_t *handle);
+err_t att_parse_mtu_req(struct bt_pbuf_t *p,uint16_t *client_mtu);
 err_t att_parse_find_info_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e_handle);
+err_t att_parse_find_info_type_value_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e_handle,uint16_t *att_type,uint8_t *value,uint8_t *value_len);
+err_t att_parse_read_req(struct bt_pbuf_t *p,uint16_t *handle);
 err_t att_parse_read_type_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e_handle,uint16_t *uuid);
 err_t att_parse_read_group_type_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e_handle,uint16_t *uuid);
 
