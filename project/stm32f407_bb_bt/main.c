@@ -1149,12 +1149,7 @@ uint8_t shell_json_parse(uint8_t *operate_value,
 
 uint8_t shell_at_cmd_parse(uint8_t *shell_string)
 {
-	connect_addr.addr[5] = 0x9c;
-    connect_addr.addr[4] = 0x0c;
-    connect_addr.addr[3] = 0xdf;
-    connect_addr.addr[2] = 0x24;
-    connect_addr.addr[1] = 0x7f;
-    connect_addr.addr[0] = 0x0a;
+
 
     if(hw_strcmp(BT_START_CMD,(const char*)shell_string) == 0)
     {
