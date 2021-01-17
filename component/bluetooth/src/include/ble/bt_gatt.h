@@ -184,6 +184,8 @@ typedef struct
 err_t gatt_server_init(void);
 err_t gatt_server_add_pri_service(gatt_server_service_t *service,uint16_t start_handle,uint16_t end_handle,uint8_t service_count,uint16_t pri_uuid);
 err_t gatt_server_notification(uint16_t handle,uint8_t *value,uint8_t value_length);
+err_t gatt_server_indication(uint16_t handle,uint8_t *value,uint8_t value_length);
+
 
 #endif
 

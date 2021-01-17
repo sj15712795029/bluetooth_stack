@@ -1,5 +1,7 @@
 #include "bt_gatt.h"
 
+
+/* TODO:1. Queued writes 2.Server initiated中的ATT_MULTIPLE_HANDLE_VALUE_NTF  */
 uint8_t gatt_server_pri_service_count = 0;
 gatt_server_pri_service_t gatt_server_pri_service[GATT_PRI_SERVICE_MAX_COUNT] = {0};
 
@@ -22,10 +24,13 @@ gatt_server_service_t gatt_service[] =
 };
 
 static err_t gatt_handle_mtu_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
-static err_t gatt_handle_read_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
 static err_t gatt_handle_write_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+static err_t gatt_handle_write_cmd(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
 static err_t gatt_handle_find_info_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
 static err_t gatt_handle_read_type_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+static err_t gatt_handle_read_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+static err_t gatt_handle_read_blob_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+static err_t gatt_handle_read_multi_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
 static err_t gatt_handle_read_group_type_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
 
 
@@ -111,6 +116,7 @@ void gatt_data_recv(struct bd_addr_t *remote_addr,struct bt_pbuf_t *p)
     case ATT_REQ_READ_BLOB:
     {
         BT_GATT_TRACE_DEBUG("ATT_REQ_READ_BLOB\n");
+		gatt_handle_read_blob_req(NULL,p);
         break;
     }
     case ATT_RSP_READ_BLOB:
@@ -121,6 +127,7 @@ void gatt_data_recv(struct bd_addr_t *remote_addr,struct bt_pbuf_t *p)
     case ATT_REQ_READ_MULTI:
     {
         BT_GATT_TRACE_DEBUG("ATT_REQ_READ_MULTI\n");
+		gatt_handle_read_multi_req(NULL,p);
         break;
     }
     case ATT_RSP_READ_MULTI:
@@ -148,11 +155,18 @@ void gatt_data_recv(struct bd_addr_t *remote_addr,struct bt_pbuf_t *p)
     case ATT_RSP_WRITE:
     {
         BT_GATT_TRACE_DEBUG("ATT_RSP_WRITE\n");
+		
         break;
     }
     case ATT_CMD_WRITE:
     {
         BT_GATT_TRACE_DEBUG("ATT_CMD_WRITE\n");
+		gatt_handle_write_cmd(NULL,p);
+        break;
+    }
+	case ATT_SIGN_CMD_WRITE:
+    {
+        BT_GATT_TRACE_DEBUG("ATT_SIGN_CMD_WRITE\n");
         break;
     }
     case ATT_REQ_PREPARE_WRITE:
@@ -190,11 +204,7 @@ void gatt_data_recv(struct bd_addr_t *remote_addr,struct bt_pbuf_t *p)
         BT_GATT_TRACE_DEBUG("ATT_HANDLE_VALUE_CONF\n");
         break;
     }
-    case ATT_SIGN_CMD_WRITE:
-    {
-        BT_GATT_TRACE_DEBUG("ATT_SIGN_CMD_WRITE\n");
-        break;
-    }
+    
     default:
         BT_GATT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] unknow opcode(0x%x)\n",__FILE__,__FUNCTION__,__LINE__,opcode);
         break;
@@ -235,23 +245,18 @@ err_t gatt_server_add_pri_service(gatt_server_service_t *service,uint16_t start_
 
 err_t gatt_server_notification(uint16_t handle,uint8_t *value,uint8_t value_length)
 {
-	struct bt_pbuf_t *send_pbuf;
-	if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, 3+value_length, BT_PBUF_RAM)) == NULL)
-    {
-        BT_GATT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
-
-        return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
-    }
-
-    ((uint8_t *)send_pbuf->payload)[0] = ATT_HANDLE_VALUE_NOTIF;
-    bt_le_store_16((uint8_t *)send_pbuf->payload,1,handle);
-	memcpy(((uint8_t *)send_pbuf->payload)+3, value, value_length);
-	
-    att_send_data(send_pbuf);
-    bt_pbuf_free(send_pbuf);
+	att_send_notification(handle,value,value_length);
 
 	return BT_ERR_OK;
 }
+
+err_t gatt_server_indication(uint16_t handle,uint8_t *value,uint8_t value_length)
+{
+	att_send_indication(handle,value,value_length);
+
+	return BT_ERR_OK;
+}
+
 
 static err_t gatt_handle_mtu_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
 {
@@ -304,24 +309,54 @@ static err_t gatt_handle_read_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
     return BT_ERR_OK;
 }
 
+static err_t gatt_handle_read_blob_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+{
+	uint16_t offset;
+    uint16_t handle;
+    uint8_t rsp_buf_len = 0;
+    uint8_t rsp_buf[GATT_BLE_MTU_SIZE] = {0};
+    struct bt_pbuf_t *send_pbuf;
+
+    att_parse_read_blob_req(p,&handle,&offset);
+
+	/* TODO:做处理 */
+	//att_send_read_blob_rsp
+
+	return BT_ERR_OK;
+}
+
+static err_t gatt_handle_read_multi_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+{
+	/* TODO */
+	return BT_ERR_OK;
+}
+
+
 
 static err_t gatt_handle_write_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
 {
+	uint16_t handle;
+	uint8_t req_buf_len = 0;
+    uint8_t req_buf[GATT_BLE_MTU_SIZE] = {0};
 	/* TODO:把service后面增加callback */
-    struct bt_pbuf_t *send_pbuf;
-    if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, 1, BT_PBUF_RAM)) == NULL)
-    {
-        BT_GATT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
-
-        return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
-    }
-    ((uint8_t *)send_pbuf->payload)[0] = ATT_RSP_WRITE;
-
-    att_send_data(send_pbuf);
-    bt_pbuf_free(send_pbuf);
+	att_parse_write_req(p,&handle,req_buf,&req_buf_len);
+	
+    att_send_write_rsp();
 
     return BT_ERR_OK;
 }
+
+static err_t gatt_handle_write_cmd(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+{
+	uint16_t handle;
+	uint8_t req_buf_len = 0;
+    uint8_t req_buf[GATT_BLE_MTU_SIZE] = {0};
+	/* TODO:把service后面增加callback */
+	att_parse_write_cmd(p,&handle,req_buf,&req_buf_len);
+
+    return BT_ERR_OK;
+}
+
 
 
 static err_t gatt_handle_find_info_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
@@ -463,25 +498,13 @@ static err_t gatt_handle_read_group_type_req(struct bd_addr_t *bdaddr, struct bt
                 bt_le_store_16(rsp_buf,2,gatt_server_pri_service[index].end_handle);
                 bt_le_store_16(rsp_buf,4,gatt_server_pri_service[index].pri_uuid);
                 rsp_buf_len = 6;
-                bt_hex_dump(rsp_buf,6);
                 break;
             }
         }
 
         if(rsp_buf_len > 0)
         {
-        	struct bt_pbuf_t *send_pbuf;
-            if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, 8, BT_PBUF_RAM)) == NULL)
-            {
-                BT_GATT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
-
-                return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
-            }
-            ((uint8_t *)send_pbuf->payload)[0] = ATT_RSP_READ_BY_GRP_TYPE;
-            ((uint8_t *)send_pbuf->payload)[1] = 6;
-            memcpy(((uint8_t *)send_pbuf->payload)+2, rsp_buf, 6);
-			att_send_data(send_pbuf);
-    		bt_pbuf_free(send_pbuf);
+        	att_send_read_group_type_rsp(rsp_buf,rsp_buf_len);
 
         }
         else

@@ -74,6 +74,12 @@
 #define ATT_FIND_INFO_VALUE_TYPE_RSP_PACK_LEN 5
 #define ATT_READ_TYPE_RSP_PACK_LEN 2
 #define ATT_READ_RSP_HDR_LEN 1
+#define ATT_READ_BLOB_RSP_HDR_LEN 1
+#define ATT_READ_GROUP_TYPE_RSP_HDR_LEN 2
+#define ATT_WRITE_RSP_PACK_LEN 1
+#define ATT_SEND_NOTIFICATION_HDR_LEN 3
+#define ATT_SEND_INDICATION_HDR_LEN 3
+
 
 typedef struct
 {
@@ -93,14 +99,24 @@ err_t att_send_mtu_rsp(uint16_t server_mtu);
 err_t att_send_find_info_rsp(uint8_t uuid_format,uint8_t *info_data,uint8_t info_len);
 err_t att_send_find_info_value_type_rsp(uint8_t uuid_format,uint16_t found_handle,uint16_t end_group_handle);
 err_t att_send_read_type_rsp(uint8_t *data_list,uint8_t data_list_len);
+err_t att_send_read_blob_rsp(uint8_t *att_value,uint8_t att_value_len);
 err_t att_send_read_rsp(uint8_t *att_value,uint8_t att_value_len);
-err_t att_send_data(struct bt_pbuf_t *p);
+err_t att_send_read_group_type_rsp(uint8_t *att_dlist,uint8_t att_dlist_len);
+err_t att_send_write_rsp(void);
+err_t att_send_notification(uint16_t handle,uint8_t *att_value,uint8_t att_value_len);
+err_t att_send_indication(uint16_t handle,uint8_t *att_value,uint8_t att_value_len);
 err_t att_parse_mtu_req(struct bt_pbuf_t *p,uint16_t *client_mtu);
 err_t att_parse_find_info_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e_handle);
 err_t att_parse_find_info_type_value_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e_handle,uint16_t *att_type,uint8_t *value,uint8_t *value_len);
 err_t att_parse_read_req(struct bt_pbuf_t *p,uint16_t *handle);
 err_t att_parse_read_type_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e_handle,uint16_t *uuid);
+err_t att_parse_read_blob_req(struct bt_pbuf_t *p,uint16_t *handle,uint16_t *offset);
+err_t att_parse_read_multi_req(void);
 err_t att_parse_read_group_type_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e_handle,uint16_t *uuid);
+err_t att_parse_write_req(struct bt_pbuf_t *p,uint16_t *handle,uint8_t *att_value,uint8_t *value_len);
+err_t att_parse_write_cmd(struct bt_pbuf_t *p,uint16_t *handle,uint8_t *att_value,uint8_t *value_len);
+
+
 
 
 #endif
