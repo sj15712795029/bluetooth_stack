@@ -12,15 +12,19 @@ uint8_t gatt_server_uuid[] = {BT_LE_U16_TO_ARRAY(BT_UUID_SERVCLASS_GATT_SERVER)}
 
 gatt_server_service_t gap_service[] =
 {
-    {GATT_GAP_SERVICE_HANDLE,GATT_UUID_PRI_SERVICE,gatt_gap_uuid,sizeof(gatt_gap_uuid),GATT_PERM_READ},
-    {GATT_GAP_CHARACTERISTIC_HANDLE,GATT_UUID_CHAR_DECLARE,gatt_gap_characteristic,sizeof(gatt_gap_characteristic),GATT_PERM_READ},
-    {GATT_GAP_NAME_HANDLE,GATT_UUID_GAP_DEVICE_NAME,GATT_GAP_NAME,sizeof(GATT_GAP_NAME),GATT_PERM_READ},
+    {GATT_GAP_SERVICE_HANDLE,GATT_UUID_PRI_SERVICE,
+		gatt_gap_uuid,sizeof(gatt_gap_uuid),GATT_PERM_READ,NULL},
+    {GATT_GAP_CHARACTERISTIC_HANDLE,GATT_UUID_CHAR_DECLARE,
+    	gatt_gap_characteristic,sizeof(gatt_gap_characteristic),GATT_PERM_READ,NULL},
+    {GATT_GAP_NAME_HANDLE,GATT_UUID_GAP_DEVICE_NAME,
+    	GATT_GAP_NAME,sizeof(GATT_GAP_NAME),GATT_PERM_READ,NULL},
 
 };
 
 gatt_server_service_t gatt_service[] =
 {
-    {GATT_SERVICE_HANLE,GATT_UUID_PRI_SERVICE,gatt_server_uuid,sizeof(gatt_server_uuid),GATT_PERM_READ},
+    {GATT_SERVICE_HANLE,GATT_UUID_PRI_SERVICE,
+		gatt_server_uuid,sizeof(gatt_server_uuid),GATT_PERM_READ,NULL},
 };
 
 static err_t gatt_handle_mtu_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
@@ -219,14 +223,16 @@ static att_cbs_t gatt_cb =
     gatt_data_recv,
 };
 
+err_t gatt_init(void)
+{
+	 BT_GATT_TRACE_DEBUG("gatt_init\n");
+
+    att_register_cb(&gatt_cb);
+}
 
 
 err_t gatt_server_init(void)
 {
-    BT_GATT_TRACE_DEBUG("gatt_server_init\n");
-
-    att_register_cb(&gatt_cb);
-
     gatt_server_add_pri_service(&gap_service,GATT_GAP_SERVICE_HANDLE,GATT_GAP_NAME_HANDLE,sizeof(gap_service)/sizeof(gatt_server_service_t),BT_UUID_SERVCLASS_GAP_SERVER);
     gatt_server_add_pri_service(&gatt_service,GATT_SERVICE_HANLE,GATT_SERVICE_HANLE,sizeof(gatt_service)/sizeof(gatt_server_service_t),BT_UUID_SERVCLASS_GATT_SERVER);
 
@@ -515,5 +521,45 @@ static err_t gatt_handle_read_group_type_req(struct bd_addr_t *bdaddr, struct bt
 
     return BT_ERR_OK;
 }
+
+
+/* Gatt client API */
+err_t gatt_client_exchange_mtu(uint16_t mtu)
+{
+	att_send_mtu_req(mtu);
+	return BT_ERR_OK;
+}
+
+err_t gatt_client_discovery_pri_service(uint16_t start_handle,uint16_t end_handle)
+{
+	att_send_read_group_type_req(start_handle,end_handle,GATT_UUID_PRI_SERVICE);
+
+	return BT_ERR_OK;
+}
+
+err_t gatt_client_discovery_pri_service_uuid(uint16_t start_handle,uint16_t end_handle,uint16_t uuid)
+{
+	uint8_t uuid_array[] = {BT_LE_U16_TO_ARRAY(uuid)};
+	att_find_type_value_req(start_handle,end_handle,GATT_UUID_PRI_SERVICE,uuid_array,sizeof(uuid_array));
+	
+	return BT_ERR_OK;
+}
+
+err_t gatt_client_find_include(uint16_t start_handle,uint16_t end_handle)
+{
+	uint8_t uuid_array[] = {BT_LE_U16_TO_ARRAY(GATT_UUID_INCLUDE_SERVICE)};
+	att_read_type_req(start_handle,end_handle,uuid_array,sizeof(uuid_array));
+	
+	return BT_ERR_OK;
+}
+
+err_t gatt_client_find_characteristics(uint16_t start_handle,uint16_t end_handle)
+{
+	uint8_t uuid_array[] = {BT_LE_U16_TO_ARRAY(GATT_UUID_CHAR_DECLARE)};
+	att_read_type_req(start_handle,end_handle,uuid_array,sizeof(uuid_array));
+	
+	return BT_ERR_OK;
+}
+
 
 

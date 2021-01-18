@@ -7,10 +7,14 @@ uint8_t gatt_bas_chara_client_conf[] = {0,0};
 
 gatt_server_service_t bas_service[] = 
 {
-	{GATT_BAS_SERVICE_HANDLE,GATT_UUID_PRI_SERVICE,gatt_bas_uuid,sizeof(gatt_bas_uuid),GATT_PERM_READ},
-	{GATT_BAS_CHARACTERISTIC_HANDLE,GATT_UUID_CHAR_DECLARE,gatt_bas_characteristic,sizeof(gatt_bas_characteristic),GATT_PERM_READ},
-	{GATT_BAS_LEVEL_HANDLE,GATT_UUID_BATTERY_LEVEL,gatt_bas_level,sizeof(gatt_bas_level),GATT_PERM_READ|GATT_PERM_WRITE},
-	{GATT_BAS_CLIENT_CHARA_CONF_HANDLE,GATT_UUID_CHAR_CLIENT_CONFIG,gatt_bas_chara_client_conf,sizeof(gatt_bas_chara_client_conf),GATT_PERM_READ|GATT_PERM_WRITE},
+	{GATT_BAS_SERVICE_HANDLE,GATT_UUID_PRI_SERVICE,
+		gatt_bas_uuid,sizeof(gatt_bas_uuid),GATT_PERM_READ,NULL},
+	{GATT_BAS_CHARACTERISTIC_HANDLE,GATT_UUID_CHAR_DECLARE,
+		gatt_bas_characteristic,sizeof(gatt_bas_characteristic),GATT_PERM_READ,NULL},
+	{GATT_BAS_LEVEL_HANDLE,GATT_UUID_BATTERY_LEVEL,
+		gatt_bas_level,sizeof(gatt_bas_level),GATT_PERM_READ|GATT_PERM_WRITE,NULL},
+	{GATT_BAS_CLIENT_CHARA_CONF_HANDLE,GATT_UUID_CHAR_CLIENT_CONFIG,
+		gatt_bas_chara_client_conf,sizeof(gatt_bas_chara_client_conf),GATT_PERM_READ|GATT_PERM_WRITE,NULL},
 };
 
 

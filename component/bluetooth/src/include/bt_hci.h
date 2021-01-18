@@ -188,6 +188,7 @@
 #define HCI_LE_SET_ADV_ENABLE 0x0a
 #define HCI_LE_SET_SCAN_PARAM 0x0b
 #define HCI_LE_SET_SCAN 0x0c
+#define HCI_LE_CREATE_CON 0x0d
 
 
 /* Possible event codes */
@@ -680,6 +681,7 @@ err_t hci_le_set_adv_param(uint16_t adv_int_min, uint16_t adv_int_max, uint8_t a
     uint8_t own_address_typ, uint8_t peer_address_type,struct bd_addr_t *peer_address, uint8_t channel_map, uint8_t filter_policy);
 err_t hci_le_set_adv_data(uint8_t adv_len,uint8_t *adv_data);
 err_t hci_le_set_adv_enable(uint8_t enable);
+err_t hci_le_create_connection();
 #endif
 
 

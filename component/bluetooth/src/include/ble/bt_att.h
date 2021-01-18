@@ -79,6 +79,10 @@
 #define ATT_WRITE_RSP_PACK_LEN 1
 #define ATT_SEND_NOTIFICATION_HDR_LEN 3
 #define ATT_SEND_INDICATION_HDR_LEN 3
+#define ATT_READ_GROUP_TYPE_REQ_HDR_LEN 7
+#define ATT_FIND_TYPE_VALUE_REQ_HDR_LEN 7
+#define ATT_READ_TYPE_REQ_HDR_LEN 5
+#define ATT_READ_REQ_PACK_LEN 3
 
 
 typedef struct
@@ -88,7 +92,7 @@ typedef struct
     void (*att_data_recv)(struct bd_addr_t *remote_addr,struct bt_pbuf_t *p);
 } att_cbs_t;
 
-
+/* ATT common API */
 err_t att_init(void);
 err_t att_register_cb(att_cbs_t *cb);
 
@@ -117,6 +121,13 @@ err_t att_parse_write_req(struct bt_pbuf_t *p,uint16_t *handle,uint8_t *att_valu
 err_t att_parse_write_cmd(struct bt_pbuf_t *p,uint16_t *handle,uint8_t *att_value,uint8_t *value_len);
 
 
+/* ATT client API */
+err_t att_send_mtu_req(uint16_t client_mtu);
+err_t att_send_read_group_type_req(uint16_t start_handle,uint16_t end_handle,uint16_t uuid);
+err_t att_find_type_value_req(uint16_t start_handle,uint16_t end_handle,uint16_t uuid,uint8_t *value,uint8_t value_len);
+err_t att_find_type_value_req(uint16_t start_handle,uint16_t end_handle,uint16_t uuid,uint8_t *value,uint8_t value_len);
+err_t att_read_type_req(uint16_t start_handle,uint16_t end_handle,uint8_t *value,uint8_t value_len);
+err_t att_read_req(uint16_t handle);
 
 
 #endif

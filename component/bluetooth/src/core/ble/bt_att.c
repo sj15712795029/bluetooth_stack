@@ -403,3 +403,112 @@ static err_t att_send_data(struct bt_pbuf_t *p)
 
 
 
+
+err_t att_send_mtu_req(uint16_t client_mtu)
+{
+	struct bt_pbuf_t *send_pbuf;
+    if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_EXCHANGE_MTU_PACK_LEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_ATT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+
+        return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
+    }
+
+    ((uint8_t *)send_pbuf->payload)[0] = ATT_REQ_MTU;
+    bt_le_store_16((uint8_t *)send_pbuf->payload,1,client_mtu);
+
+    att_send_data(send_pbuf);
+    bt_pbuf_free(send_pbuf);
+
+	return BT_ERR_OK;
+}
+
+err_t att_send_read_group_type_req(uint16_t start_handle,uint16_t end_handle,uint16_t uuid)
+{
+	/* TODO:UUIN128的支持 */
+	struct bt_pbuf_t *send_pbuf;
+    if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_READ_GROUP_TYPE_REQ_HDR_LEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_ATT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+
+        return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
+    }
+
+    ((uint8_t *)send_pbuf->payload)[0] = ATT_REQ_READ_BY_GRP_TYPE;
+    bt_le_store_16((uint8_t *)send_pbuf->payload,1,start_handle);
+	bt_le_store_16((uint8_t *)send_pbuf->payload,3,end_handle);
+	bt_le_store_16((uint8_t *)send_pbuf->payload,5,uuid);
+
+    att_send_data(send_pbuf);
+    bt_pbuf_free(send_pbuf);
+
+	return BT_ERR_OK;
+}
+
+err_t att_find_type_value_req(uint16_t start_handle,uint16_t end_handle,uint16_t uuid,uint8_t *value,uint8_t value_len)
+{
+	/* TODO:UUIN128的支持 */
+	struct bt_pbuf_t *send_pbuf;
+    if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_FIND_TYPE_VALUE_REQ_HDR_LEN+value_len, BT_PBUF_RAM)) == NULL)
+    {
+        BT_ATT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+
+        return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
+    }
+
+    ((uint8_t *)send_pbuf->payload)[0] = ATT_REQ_FIND_TYPE_VALUE;
+    bt_le_store_16((uint8_t *)send_pbuf->payload,1,start_handle);
+	bt_le_store_16((uint8_t *)send_pbuf->payload,3,end_handle);
+	bt_le_store_16((uint8_t *)send_pbuf->payload,5,uuid);
+	memcpy((uint8_t *)send_pbuf->payload+7,value,value_len);
+
+    att_send_data(send_pbuf);
+    bt_pbuf_free(send_pbuf);
+
+	return BT_ERR_OK;
+}
+
+err_t att_read_type_req(uint16_t start_handle,uint16_t end_handle,uint8_t *value,uint8_t value_len)
+{
+	/* TODO:UUIN128的支持 */
+	struct bt_pbuf_t *send_pbuf;
+    if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_READ_TYPE_REQ_HDR_LEN+value_len, BT_PBUF_RAM)) == NULL)
+    {
+        BT_ATT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+
+        return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
+    }
+
+    ((uint8_t *)send_pbuf->payload)[0] = ATT_REQ_READ_BY_TYPE;
+    bt_le_store_16((uint8_t *)send_pbuf->payload,1,start_handle);
+	bt_le_store_16((uint8_t *)send_pbuf->payload,3,end_handle);
+	memcpy((uint8_t *)send_pbuf->payload+5,value,value_len);
+
+    att_send_data(send_pbuf);
+    bt_pbuf_free(send_pbuf);
+
+	return BT_ERR_OK;
+}
+
+err_t att_read_req(uint16_t handle)
+{
+	struct bt_pbuf_t *send_pbuf;
+    if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_READ_REQ_PACK_LEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_ATT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+
+        return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
+    }
+
+    ((uint8_t *)send_pbuf->payload)[0] = ATT_REQ_READ;
+    bt_le_store_16((uint8_t *)send_pbuf->payload,1,handle);
+
+    att_send_data(send_pbuf);
+    bt_pbuf_free(send_pbuf);
+
+	return BT_ERR_OK;
+	
+}
+
+
+
