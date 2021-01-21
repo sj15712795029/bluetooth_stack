@@ -34,7 +34,7 @@ err_t att_register_cb(att_cbs_t *cb)
     return BT_ERR_OK;
 }
 
-err_t att_send_err_rsp(uint8_t req_op,uint16_t handle,uint8_t err_code)
+err_t att_err_rsp(uint8_t req_op,uint16_t handle,uint8_t err_code)
 {
     struct bt_pbuf_t *send_pbuf;
     if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_ERR_RSP_PACK_LEN, BT_PBUF_RAM)) == NULL)
@@ -55,7 +55,21 @@ err_t att_send_err_rsp(uint8_t req_op,uint16_t handle,uint8_t err_code)
 	return BT_ERR_OK;
 }
 
-err_t att_send_mtu_rsp(uint16_t server_mtu)
+
+
+err_t att_parse_mtu_req(struct bt_pbuf_t *p,uint16_t *client_mtu)
+{
+    uint8_t *data = p->payload;
+    uint8_t data_len = p->len;
+
+    BT_ATT_TRACE_DEBUG("att_parse_mtu_req data_len(%d)\n",data_len);
+    *client_mtu = bt_le_read_16(data,1);
+
+    return BT_ERR_OK;
+}
+
+
+err_t att_mtu_rsp(uint16_t server_mtu)
 {
 	struct bt_pbuf_t *send_pbuf;
     if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_EXCHANGE_MTU_PACK_LEN, BT_PBUF_RAM)) == NULL)
@@ -74,7 +88,22 @@ err_t att_send_mtu_rsp(uint16_t server_mtu)
 	return BT_ERR_OK;
 }
 
-err_t att_send_find_info_rsp(uint8_t uuid_format,uint8_t *info_data,uint8_t info_len)
+
+err_t att_parse_find_info_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e_handle)
+{
+    uint8_t *data = p->payload;
+    uint8_t data_len = p->len;
+
+    BT_ATT_TRACE_DEBUG("att_parse_find_info_req data_len(%d)\n",data_len);
+    *s_handle = bt_le_read_16(data,1);
+    *e_handle = bt_le_read_16(data,3);
+
+    return BT_ERR_OK;
+}
+
+
+
+err_t att_find_info_rsp(uint8_t uuid_format,uint8_t *info_data,uint8_t info_len)
 {
 	struct bt_pbuf_t *send_pbuf;
     if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_FIND_INFO_RSP_HDR_LEN+info_len, BT_PBUF_RAM)) == NULL)
@@ -94,7 +123,7 @@ err_t att_send_find_info_rsp(uint8_t uuid_format,uint8_t *info_data,uint8_t info
 	return BT_ERR_OK;
 }
 
-err_t att_send_find_info_value_type_rsp(uint8_t uuid_format,uint16_t found_handle,uint16_t end_group_handle)
+err_t att_find_info_value_type_rsp(uint8_t uuid_format,uint16_t found_handle,uint16_t end_group_handle)
 {
 	struct bt_pbuf_t *send_pbuf;
     if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_FIND_INFO_VALUE_TYPE_RSP_PACK_LEN, BT_PBUF_RAM)) == NULL)
@@ -114,7 +143,7 @@ err_t att_send_find_info_value_type_rsp(uint8_t uuid_format,uint16_t found_handl
 	return BT_ERR_OK;
 }
 
-err_t att_send_read_type_rsp(uint8_t *data_list,uint8_t data_list_len)
+err_t att_read_type_rsp(uint8_t *data_list,uint8_t data_list_len)
 {
 	struct bt_pbuf_t *send_pbuf;
     if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_READ_TYPE_RSP_PACK_LEN+data_list_len, BT_PBUF_RAM)) == NULL)
@@ -134,7 +163,7 @@ err_t att_send_read_type_rsp(uint8_t *data_list,uint8_t data_list_len)
 	return BT_ERR_OK;
 }
 
-err_t att_send_read_blob_rsp(uint8_t *att_value,uint8_t att_value_len)
+err_t att_read_blob_rsp(uint8_t *att_value,uint8_t att_value_len)
 {
 	struct bt_pbuf_t *send_pbuf;
     if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_READ_BLOB_RSP_HDR_LEN+att_value_len, BT_PBUF_RAM)) == NULL)
@@ -154,7 +183,13 @@ err_t att_send_read_blob_rsp(uint8_t *att_value,uint8_t att_value_len)
 }
 
 
-err_t att_send_read_rsp(uint8_t *att_value,uint8_t att_value_len)
+err_t att_read_multi_rsp(void)
+{
+	return BT_ERR_OK;
+}
+
+
+err_t att_read_rsp(uint8_t *att_value,uint8_t att_value_len)
 {
 	struct bt_pbuf_t *send_pbuf;
     if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_READ_RSP_HDR_LEN+att_value_len, BT_PBUF_RAM)) == NULL)
@@ -173,7 +208,7 @@ err_t att_send_read_rsp(uint8_t *att_value,uint8_t att_value_len)
 	return BT_ERR_OK;
 }
 
-err_t att_send_read_group_type_rsp(uint8_t *att_dlist,uint8_t att_dlist_len)
+err_t att_read_group_type_rsp(uint8_t *att_dlist,uint8_t att_dlist_len)
 {
 	struct bt_pbuf_t *send_pbuf;
     if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_READ_GROUP_TYPE_RSP_HDR_LEN+att_dlist_len, BT_PBUF_RAM)) == NULL)
@@ -194,7 +229,19 @@ err_t att_send_read_group_type_rsp(uint8_t *att_dlist,uint8_t att_dlist_len)
 	
 }
 
-err_t att_send_write_rsp(void)
+
+err_t att_parse_multi_var_req(void)
+{
+	return BT_ERR_OK;
+}
+
+err_t att_multi_var_rsp(void)
+{
+	return BT_ERR_OK;
+}
+
+
+err_t att_write_rsp(void)
 {
 	struct bt_pbuf_t *send_pbuf;
     if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_WRITE_RSP_PACK_LEN, BT_PBUF_RAM)) == NULL)
@@ -211,7 +258,7 @@ err_t att_send_write_rsp(void)
 	return BT_ERR_OK;
 }
 
-err_t att_send_notification(uint16_t handle,uint8_t *att_value,uint8_t att_value_len)
+err_t att_notification(uint16_t handle,uint8_t *att_value,uint8_t att_value_len)
 {
 	struct bt_pbuf_t *send_pbuf;
 	if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_SEND_NOTIFICATION_HDR_LEN+att_value_len, BT_PBUF_RAM)) == NULL)
@@ -227,9 +274,11 @@ err_t att_send_notification(uint16_t handle,uint8_t *att_value,uint8_t att_value
 	
     att_send_data(send_pbuf);
     bt_pbuf_free(send_pbuf);
+		
+		return BT_ERR_OK;
 }
 
-err_t att_send_indication(uint16_t handle,uint8_t *att_value,uint8_t att_value_len)
+err_t att_indication(uint16_t handle,uint8_t *att_value,uint8_t att_value_len)
 {
 	struct bt_pbuf_t *send_pbuf;
 	if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_SEND_INDICATION_HDR_LEN+att_value_len, BT_PBUF_RAM)) == NULL)
@@ -245,6 +294,8 @@ err_t att_send_indication(uint16_t handle,uint8_t *att_value,uint8_t att_value_l
 	
     att_send_data(send_pbuf);
     bt_pbuf_free(send_pbuf);
+		
+		return BT_ERR_OK;
 }
 
 
@@ -261,17 +312,7 @@ err_t att_parse_read_req(struct bt_pbuf_t *p,uint16_t *handle)
 }
 
 
-err_t att_parse_find_info_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e_handle)
-{
-    uint8_t *data = p->payload;
-    uint8_t data_len = p->len;
 
-    BT_ATT_TRACE_DEBUG("att_parse_find_info_req data_len(%d)\n",data_len);
-    *s_handle = bt_le_read_16(data,1);
-    *e_handle = bt_le_read_16(data,3);
-
-    return BT_ERR_OK;
-}
 
 err_t att_parse_find_info_type_value_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e_handle,uint16_t *att_type,uint8_t *value,uint8_t *value_len)
 {
@@ -338,9 +379,32 @@ err_t att_parse_write_cmd(struct bt_pbuf_t *p,uint16_t *handle,uint8_t *att_valu
     return BT_ERR_OK;
 }
 
+err_t att_parse_sig_write_cmd(void)
+{
+	return BT_ERR_OK;
+}
+
+err_t att_parse_pre_write_req(void)
+{
+	return BT_ERR_OK;
+}
+err_t att_pre_write_rsp(void)
+{
+	return BT_ERR_OK;
+}
+
+err_t att_parse_exc_write_req(void)
+{
+	return BT_ERR_OK;
+}
+err_t att_exc_write_rsp(void)
+{
+	return BT_ERR_OK;
+}
 
 
-err_t att_parse_read_type_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e_handle,uint16_t *uuid)
+err_t att_parse_read_type_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e_handle,
+	uint8_t *uuid_format,uint16_t *uuid,uint8_t **uuid128)
 {
     uint8_t *data = p->payload;
     uint8_t data_len = p->len;
@@ -350,10 +414,14 @@ err_t att_parse_read_type_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e
     *e_handle = bt_le_read_16(data,3);
 
     if(data_len ==  7)
+    {
+    	*uuid_format = ATT_UUID16_FORMAT;
         *uuid = bt_le_read_16(data,5);
+    }
     else
     {
-        /* TODO:UUID128->UUID16 */
+    	*uuid_format = ATT_UUID128_FORMAT;
+		memcpy(*uuid128,data+5,16);
     }
 
 
@@ -379,19 +447,6 @@ err_t att_parse_read_multi_req(void)
 }
 
 
-
-err_t att_parse_mtu_req(struct bt_pbuf_t *p,uint16_t *client_mtu)
-{
-    uint8_t *data = p->payload;
-    uint8_t data_len = p->len;
-
-    BT_ATT_TRACE_DEBUG("att_parse_read_type_req data_len(%d)\n",data_len);
-    *client_mtu = bt_le_read_16(data,1);
-
-    return BT_ERR_OK;
-}
-
-
 static err_t att_send_data(struct bt_pbuf_t *p)
 {
     BT_ATT_TRACE_DEBUG("att_send_data\n");
@@ -399,12 +454,14 @@ static err_t att_send_data(struct bt_pbuf_t *p)
     bt_hex_dump(p->payload,p->tot_len);
 
     l2cap_fixed_channel_datawrite(att_l2cap,p,L2CAP_ATT_CID);
+	
+	return BT_ERR_OK;
 }
 
 
 
 
-err_t att_send_mtu_req(uint16_t client_mtu)
+err_t att_mtu_req(uint16_t client_mtu)
 {
 	struct bt_pbuf_t *send_pbuf;
     if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_EXCHANGE_MTU_PACK_LEN, BT_PBUF_RAM)) == NULL)
@@ -423,7 +480,65 @@ err_t att_send_mtu_req(uint16_t client_mtu)
 	return BT_ERR_OK;
 }
 
-err_t att_send_read_group_type_req(uint16_t start_handle,uint16_t end_handle,uint16_t uuid)
+err_t att_parse_mtu_rsp(struct bt_pbuf_t *p,uint16_t *server_mtu)
+{
+	uint8_t *data = p->payload;
+    uint8_t data_len = p->len;
+
+    BT_ATT_TRACE_DEBUG("att_parse_mtu_rsp data_len(%d)\n",data_len);
+    *server_mtu = bt_le_read_16(data,1);
+
+    return BT_ERR_OK;
+}
+
+
+err_t att_parse_read_type_rsp(struct bt_pbuf_t *p,uint8_t *each_len,uint8_t *data_num,uint8_t **data_list)
+{
+	uint8_t *data = p->payload;
+    uint8_t data_len = p->len;
+
+	*each_len = data[1];
+
+    BT_ATT_TRACE_DEBUG("att_parse_read_type_rsp data_len(%d)\n",data_len);
+	*data_num = (data_len-2)/(*each_len);
+    *data_list = data+2;
+
+    return BT_ERR_OK;
+}
+
+
+
+err_t att_parse_read_group_type_rsp(struct bt_pbuf_t *p,uint8_t *each_len,uint8_t *data_num,uint8_t **data_list,uint8_t *uuid_type)
+{
+	uint8_t *data = p->payload;
+    uint8_t data_len = p->len;
+	*each_len = data[1];
+
+    BT_ATT_TRACE_DEBUG("att_parse_read_group_type_rsp data_len(%d)\n",data_len);
+	
+    *data_num = (data_len-2)/(*each_len);
+	if(*each_len == 6)
+		*uuid_type = ATT_UUID16_FORMAT;
+
+	*data_list = data+2;
+
+	return BT_ERR_OK;
+}
+
+err_t att_parse_find_type_value_rsp(struct bt_pbuf_t *p,uint8_t *info_num,uint8_t **info_list)
+{
+	uint8_t *data = p->payload;
+    uint8_t data_len = p->len;
+
+	*info_num = (data_len-1)/4;
+	*info_list = data+1;
+
+	return BT_ERR_OK;
+}
+
+
+
+err_t att_read_group_type_req(uint16_t start_handle,uint16_t end_handle,uint16_t uuid)
 {
 	/* TODO:UUIN128µÄÖ§³Ö */
 	struct bt_pbuf_t *send_pbuf;

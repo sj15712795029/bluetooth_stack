@@ -98,33 +98,48 @@ err_t att_register_cb(att_cbs_t *cb);
 
 
 /* ATT server API */
-err_t att_send_err_rsp(uint8_t req_op,uint16_t handle,uint8_t err_code);
-err_t att_send_mtu_rsp(uint16_t server_mtu);
-err_t att_send_find_info_rsp(uint8_t uuid_format,uint8_t *info_data,uint8_t info_len);
-err_t att_send_find_info_value_type_rsp(uint8_t uuid_format,uint16_t found_handle,uint16_t end_group_handle);
-err_t att_send_read_type_rsp(uint8_t *data_list,uint8_t data_list_len);
-err_t att_send_read_blob_rsp(uint8_t *att_value,uint8_t att_value_len);
-err_t att_send_read_rsp(uint8_t *att_value,uint8_t att_value_len);
-err_t att_send_read_group_type_rsp(uint8_t *att_dlist,uint8_t att_dlist_len);
-err_t att_send_write_rsp(void);
-err_t att_send_notification(uint16_t handle,uint8_t *att_value,uint8_t att_value_len);
-err_t att_send_indication(uint16_t handle,uint8_t *att_value,uint8_t att_value_len);
+err_t att_err_rsp(uint8_t req_op,uint16_t handle,uint8_t err_code);
 err_t att_parse_mtu_req(struct bt_pbuf_t *p,uint16_t *client_mtu);
+err_t att_mtu_rsp(uint16_t server_mtu);
 err_t att_parse_find_info_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e_handle);
-err_t att_parse_find_info_type_value_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e_handle,uint16_t *att_type,uint8_t *value,uint8_t *value_len);
+err_t att_find_info_rsp(uint8_t uuid_format,uint8_t *info_data,uint8_t info_len);
+err_t att_parse_find_info_type_value_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e_handle,
+	uint16_t *att_type,uint8_t *value,uint8_t *value_len);
+err_t att_find_info_value_type_rsp(uint8_t uuid_format,uint16_t found_handle,uint16_t end_group_handle);
+err_t att_parse_read_type_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e_handle,
+	uint8_t *uuid_format,uint16_t *uuid,uint8_t **uuid128);
+err_t att_read_type_rsp(uint8_t *data_list,uint8_t data_list_len);
 err_t att_parse_read_req(struct bt_pbuf_t *p,uint16_t *handle);
-err_t att_parse_read_type_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e_handle,uint16_t *uuid);
+err_t att_read_rsp(uint8_t *att_value,uint8_t att_value_len);
 err_t att_parse_read_blob_req(struct bt_pbuf_t *p,uint16_t *handle,uint16_t *offset);
+err_t att_read_blob_rsp(uint8_t *att_value,uint8_t att_value_len);
 err_t att_parse_read_multi_req(void);
-err_t att_parse_read_group_type_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e_handle,uint16_t *uuid);
+err_t att_read_multi_rsp(void);
+err_t att_parse_read_group_type_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e_handle,uint16_t *uuid);;
+err_t att_read_group_type_rsp(uint8_t *att_dlist,uint8_t att_dlist_len);
+err_t att_parse_multi_var_req(void);
+err_t att_multi_var_rsp(void);
 err_t att_parse_write_req(struct bt_pbuf_t *p,uint16_t *handle,uint8_t *att_value,uint8_t *value_len);
+err_t att_write_rsp(void);
 err_t att_parse_write_cmd(struct bt_pbuf_t *p,uint16_t *handle,uint8_t *att_value,uint8_t *value_len);
+err_t att_parse_sig_write_cmd(void);
+err_t att_parse_pre_write_req(void);
+err_t att_pre_write_rsp(void);
+err_t att_parse_exc_write_req(void);
+err_t att_exc_write_rsp(void);
+err_t att_notification(uint16_t handle,uint8_t *att_value,uint8_t att_value_len);
+err_t att_indication(uint16_t handle,uint8_t *att_value,uint8_t att_value_len);
+
+
 
 
 /* ATT client API */
-err_t att_send_mtu_req(uint16_t client_mtu);
-err_t att_send_read_group_type_req(uint16_t start_handle,uint16_t end_handle,uint16_t uuid);
-err_t att_find_type_value_req(uint16_t start_handle,uint16_t end_handle,uint16_t uuid,uint8_t *value,uint8_t value_len);
+err_t att_mtu_req(uint16_t client_mtu);
+err_t att_parse_mtu_rsp(struct bt_pbuf_t *p,uint16_t *server_mtu);
+err_t att_parse_mtu_rsp(struct bt_pbuf_t *p,uint16_t *server_mtu);
+err_t att_parse_read_type_rsp(struct bt_pbuf_t *p,uint8_t *each_len,uint8_t *data_num,uint8_t **data_list);
+err_t att_parse_read_group_type_rsp(struct bt_pbuf_t *p,uint8_t *each_len,uint8_t *data_num,uint8_t **data_list,uint8_t *uuid_type);
+err_t att_parse_find_type_value_rsp(struct bt_pbuf_t *p,uint8_t *info_num,uint8_t **info_list);
 err_t att_find_type_value_req(uint16_t start_handle,uint16_t end_handle,uint16_t uuid,uint8_t *value,uint8_t value_len);
 err_t att_read_type_req(uint16_t start_handle,uint16_t end_handle,uint8_t *value,uint8_t value_len);
 err_t att_read_req(uint16_t handle);

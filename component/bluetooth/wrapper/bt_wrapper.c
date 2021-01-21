@@ -1051,7 +1051,7 @@ uint8_t bt_start(bt_app_cb_t *app_cb)
 	gatt_init();
 	gatt_server_init();
 #if PROFILE_BAS_ENABLE > 0
-	bas_init();
+	bas_init(100);
 #endif
 
 #endif

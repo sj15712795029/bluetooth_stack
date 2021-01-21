@@ -13,8 +13,12 @@
 #include "bt_common.h"
 #include "bt_gatt.h"
 
-
-err_t bas_init(void);
+typedef struct
+{
+	uint8_t bat_level;
+	uint8_t client_conf; /*  */
+}bas_manager_t;
+err_t bas_init(uint8_t bat_level);
 err_t bas_batt_level_notification(uint8_t level);
 
 

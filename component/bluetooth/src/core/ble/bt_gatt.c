@@ -2,8 +2,12 @@
 
 
 /* TODO:1. Queued writes 2.Server initiated中的ATT_MULTIPLE_HANDLE_VALUE_NTF  */
-uint8_t gatt_server_pri_service_count = 0;
 gatt_server_pri_service_t gatt_server_pri_service[GATT_PRI_SERVICE_MAX_COUNT] = {0};
+
+gatt_client_manager_t gatt_client_manager = {0};
+gatt_server_manager_t gatt_server_manager = {0};
+
+
 
 
 uint8_t gatt_gap_uuid[] = {BT_LE_U16_TO_ARRAY(BT_UUID_SERVCLASS_GAP_SERVER)};
@@ -12,30 +16,46 @@ uint8_t gatt_server_uuid[] = {BT_LE_U16_TO_ARRAY(BT_UUID_SERVCLASS_GATT_SERVER)}
 
 gatt_server_service_t gap_service[] =
 {
-    {GATT_GAP_SERVICE_HANDLE,GATT_UUID_PRI_SERVICE,
-		gatt_gap_uuid,sizeof(gatt_gap_uuid),GATT_PERM_READ,NULL},
-    {GATT_GAP_CHARACTERISTIC_HANDLE,GATT_UUID_CHAR_DECLARE,
-    	gatt_gap_characteristic,sizeof(gatt_gap_characteristic),GATT_PERM_READ,NULL},
-    {GATT_GAP_NAME_HANDLE,GATT_UUID_GAP_DEVICE_NAME,
-    	GATT_GAP_NAME,sizeof(GATT_GAP_NAME),GATT_PERM_READ,NULL},
+    {GATT_GAP_SERVICE_HANDLE,GATT_UUID_PRI_SERVICE,NULL,
+		gatt_gap_uuid,sizeof(gatt_gap_uuid),GATT_PERM_READ},
+    {GATT_GAP_CHARACTERISTIC_HANDLE,GATT_UUID_CHAR_DECLARE,NULL,
+    	gatt_gap_characteristic,sizeof(gatt_gap_characteristic),GATT_PERM_READ},
+    {GATT_GAP_NAME_HANDLE,GATT_UUID_GAP_DEVICE_NAME,NULL,
+    	GATT_GAP_NAME,sizeof(GATT_GAP_NAME),GATT_PERM_READ},
 
 };
 
 gatt_server_service_t gatt_service[] =
 {
-    {GATT_SERVICE_HANLE,GATT_UUID_PRI_SERVICE,
-		gatt_server_uuid,sizeof(gatt_server_uuid),GATT_PERM_READ,NULL},
+    {GATT_SERVICE_HANLE,GATT_UUID_PRI_SERVICE,NULL,
+		gatt_server_uuid,sizeof(gatt_server_uuid),GATT_PERM_READ},
 };
 
-static err_t gatt_handle_mtu_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
-static err_t gatt_handle_write_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
-static err_t gatt_handle_write_cmd(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
-static err_t gatt_handle_find_info_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
-static err_t gatt_handle_read_type_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
-static err_t gatt_handle_read_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
-static err_t gatt_handle_read_blob_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
-static err_t gatt_handle_read_multi_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
-static err_t gatt_handle_read_group_type_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+
+static err_t gatts_handle_mtu_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+static err_t gatts_handle_find_info_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+static err_t gatts_handle_find_info_value_type_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+static err_t gatts_handle_read_type_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+static err_t gatts_handle_read_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+static err_t gatts_handle_read_blob_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+static err_t gatts_handle_read_multi_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+static err_t gatts_handle_read_group_type_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+static err_t gatts_handle_write_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+static err_t gatts_handle_write_cmd(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+static err_t gatts_handle_sig_write_cmd(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+static err_t gatts_handle_pre_write_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+static err_t gatts_handle_exc_write_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+static err_t gatts_handle_value_cfm(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+
+
+
+
+
+static err_t gatt_handle_mtu_rsp(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+static err_t gatt_handle_read_type_rsp(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+static err_t gatt_handle_read_group_type_rsp(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+static err_t gatt_handle_find_type_value_rsp(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+
 
 
 
@@ -65,18 +85,19 @@ void gatt_data_recv(struct bd_addr_t *remote_addr,struct bt_pbuf_t *p)
     case ATT_REQ_MTU:
     {
         BT_GATT_TRACE_DEBUG("ATT_REQ_MTU\n");
-		gatt_handle_mtu_req(NULL,p);
+		gatts_handle_mtu_req(NULL,p);
         break;
     }
     case ATT_RSP_MTU:
     {
         BT_GATT_TRACE_DEBUG("ATT_RSP_MTU\n");
+		gatt_handle_mtu_rsp(NULL,p);
         break;
     }
     case ATT_REQ_FIND_INFO:
     {
         BT_GATT_TRACE_DEBUG("ATT_REQ_FIND_INFO\n");
-		gatt_handle_find_info_req(NULL,p);
+		gatts_handle_find_info_req(NULL,p);
         break;
     }
     case ATT_RSP_FIND_INFO:
@@ -87,28 +108,31 @@ void gatt_data_recv(struct bd_addr_t *remote_addr,struct bt_pbuf_t *p)
     case ATT_REQ_FIND_TYPE_VALUE:
     {
         BT_GATT_TRACE_DEBUG("ATT_REQ_FIND_TYPE_VALUE\n");
+		gatts_handle_find_info_value_type_req(NULL,p);
         break;
     }
     case ATT_RSP_FIND_TYPE_VALUE:
     {
         BT_GATT_TRACE_DEBUG("ATT_RSP_FIND_TYPE_VALUE\n");
+		gatt_handle_find_type_value_rsp(NULL,p);
         break;
     }
     case ATT_REQ_READ_BY_TYPE:
     {
         BT_GATT_TRACE_DEBUG("ATT_REQ_READ_BY_TYPE\n");
-        gatt_handle_read_type_req(NULL,p);
+        gatts_handle_read_type_req(NULL,p);
         break;
     }
     case ATT_RSP_READ_BY_TYPE:
     {
         BT_GATT_TRACE_DEBUG("ATT_RSP_READ_BY_TYPE\n");
+		gatt_handle_read_type_rsp(NULL,p);
         break;
     }
     case ATT_REQ_READ:
     {
         BT_GATT_TRACE_DEBUG("ATT_REQ_READ\n");
-        gatt_handle_read_req(NULL,p);
+        gatts_handle_read_req(NULL,p);
         break;
     }
     case ATT_RSP_READ:
@@ -120,7 +144,7 @@ void gatt_data_recv(struct bd_addr_t *remote_addr,struct bt_pbuf_t *p)
     case ATT_REQ_READ_BLOB:
     {
         BT_GATT_TRACE_DEBUG("ATT_REQ_READ_BLOB\n");
-		gatt_handle_read_blob_req(NULL,p);
+		gatts_handle_read_blob_req(NULL,p);
         break;
     }
     case ATT_RSP_READ_BLOB:
@@ -131,7 +155,7 @@ void gatt_data_recv(struct bd_addr_t *remote_addr,struct bt_pbuf_t *p)
     case ATT_REQ_READ_MULTI:
     {
         BT_GATT_TRACE_DEBUG("ATT_REQ_READ_MULTI\n");
-		gatt_handle_read_multi_req(NULL,p);
+		gatts_handle_read_multi_req(NULL,p);
         break;
     }
     case ATT_RSP_READ_MULTI:
@@ -142,18 +166,19 @@ void gatt_data_recv(struct bd_addr_t *remote_addr,struct bt_pbuf_t *p)
     case ATT_REQ_READ_BY_GRP_TYPE:
     {
         BT_GATT_TRACE_DEBUG("ATT_REQ_READ_BY_GRP_TYPE\n");
-        gatt_handle_read_group_type_req(NULL,p);
+        gatts_handle_read_group_type_req(NULL,p);
         break;
     }
     case ATT_RSP_READ_BY_GRP_TYPE:
     {
         BT_GATT_TRACE_DEBUG("ATT_RSP_READ_BY_GRP_TYPE\n");
+		gatt_handle_read_group_type_rsp(NULL,p);
         break;
     }
     case ATT_REQ_WRITE:
     {
         BT_GATT_TRACE_DEBUG("ATT_REQ_WRITE\n");
-        gatt_handle_write_req(NULL,p);
+        gatts_handle_write_req(NULL,p);
         break;
     }
     case ATT_RSP_WRITE:
@@ -165,17 +190,19 @@ void gatt_data_recv(struct bd_addr_t *remote_addr,struct bt_pbuf_t *p)
     case ATT_CMD_WRITE:
     {
         BT_GATT_TRACE_DEBUG("ATT_CMD_WRITE\n");
-		gatt_handle_write_cmd(NULL,p);
+		gatts_handle_write_cmd(NULL,p);
         break;
     }
 	case ATT_SIGN_CMD_WRITE:
     {
         BT_GATT_TRACE_DEBUG("ATT_SIGN_CMD_WRITE\n");
+		gatts_handle_sig_write_cmd(NULL,p);
         break;
     }
     case ATT_REQ_PREPARE_WRITE:
     {
         BT_GATT_TRACE_DEBUG("ATT_REQ_PREPARE_WRITE\n");
+		gatts_handle_pre_write_req(NULL,p);
         break;
     }
     case ATT_RSP_PREPARE_WRITE:
@@ -186,6 +213,7 @@ void gatt_data_recv(struct bd_addr_t *remote_addr,struct bt_pbuf_t *p)
     case ATT_REQ_EXEC_WRITE:
     {
         BT_GATT_TRACE_DEBUG("ATT_REQ_EXEC_WRITE\n");
+		gatts_handle_exc_write_req(NULL,p);;
         break;
     }
     case ATT_RSP_EXEC_WRITE:
@@ -206,6 +234,7 @@ void gatt_data_recv(struct bd_addr_t *remote_addr,struct bt_pbuf_t *p)
     case ATT_HANDLE_VALUE_CONF:
     {
         BT_GATT_TRACE_DEBUG("ATT_HANDLE_VALUE_CONF\n");
+		gatts_handle_value_cfm(NULL,p);
         break;
     }
     
@@ -228,69 +257,92 @@ err_t gatt_init(void)
 	 BT_GATT_TRACE_DEBUG("gatt_init\n");
 
     att_register_cb(&gatt_cb);
+	
+	return BT_ERR_OK;
 }
 
 
 err_t gatt_server_init(void)
 {
-    gatt_server_add_pri_service(&gap_service,GATT_GAP_SERVICE_HANDLE,GATT_GAP_NAME_HANDLE,sizeof(gap_service)/sizeof(gatt_server_service_t),BT_UUID_SERVCLASS_GAP_SERVER);
-    gatt_server_add_pri_service(&gatt_service,GATT_SERVICE_HANLE,GATT_SERVICE_HANLE,sizeof(gatt_service)/sizeof(gatt_server_service_t),BT_UUID_SERVCLASS_GATT_SERVER);
+	gatt_server_manager.server_mtu = GATT_BLE_MTU_SIZE;
+	gatt_server_manager.gatt_server_pri_service_count = 0;
+	
+    gatt_server_add_pri_service(&gap_service,GATT_GAP_SERVICE_HANDLE,GATT_GAP_NAME_HANDLE,
+			sizeof(gap_service)/sizeof(gatt_server_service_t),BT_UUID_SERVCLASS_GAP_SERVER,NULL,NULL);
+    gatt_server_add_pri_service(&gatt_service,GATT_SERVICE_HANLE,GATT_SERVICE_HANLE,
+			sizeof(gatt_service)/sizeof(gatt_server_service_t),BT_UUID_SERVCLASS_GATT_SERVER,NULL,NULL);
 
     return BT_ERR_OK;
 }
 
-err_t gatt_server_add_pri_service(gatt_server_service_t *service,uint16_t start_handle,uint16_t end_handle,uint8_t service_count,uint16_t pri_uuid)
+err_t gatt_server_add_pri_service(gatt_server_service_t *service,uint16_t start_handle,uint16_t end_handle,
+	uint8_t service_count,uint16_t pri_uuid,uint8_t *pri_uuid128,gatt_pri_service_cbs_t *cb)
 {
-    gatt_server_pri_service[gatt_server_pri_service_count].serivce_count = service_count;
-    gatt_server_pri_service[gatt_server_pri_service_count].start_handle = start_handle;
-    gatt_server_pri_service[gatt_server_pri_service_count].end_handle = end_handle;
-    gatt_server_pri_service[gatt_server_pri_service_count].pri_uuid = pri_uuid;
-    gatt_server_pri_service[gatt_server_pri_service_count].gatt_server_service = service;
-    gatt_server_pri_service_count++;
+	uint8_t server_pri_service_cnt = gatt_server_manager.gatt_server_pri_service_count;
+    gatt_server_pri_service[server_pri_service_cnt].serivce_count = service_count;
+    gatt_server_pri_service[server_pri_service_cnt].start_handle = start_handle;
+    gatt_server_pri_service[server_pri_service_cnt].end_handle = end_handle;
+    gatt_server_pri_service[server_pri_service_cnt].pri_uuid = pri_uuid;
+    gatt_server_pri_service[server_pri_service_cnt].gatt_server_service = service;
+	gatt_server_pri_service[server_pri_service_cnt].cb = cb;
+	if(pri_uuid128)
+		memcpy(gatt_server_pri_service[server_pri_service_cnt].pri_uuid128,pri_uuid128,16);
+    gatt_server_manager.gatt_server_pri_service_count++;
 }
 
 err_t gatt_server_notification(uint16_t handle,uint8_t *value,uint8_t value_length)
 {
-	att_send_notification(handle,value,value_length);
+	att_notification(handle,value,value_length);
 
 	return BT_ERR_OK;
 }
 
 err_t gatt_server_indication(uint16_t handle,uint8_t *value,uint8_t value_length)
 {
-	att_send_indication(handle,value,value_length);
+	att_indication(handle,value,value_length);
 
 	return BT_ERR_OK;
 }
 
 
-static err_t gatt_handle_mtu_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+static err_t gatts_handle_mtu_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
 {
     uint16_t mtu;
-    uint8_t rsp_buf_len = 0;
-    uint8_t rsp_buf[GATT_BLE_MTU_SIZE] = {0};
 
     att_parse_mtu_req(p,&mtu);
-    BT_GATT_TRACE_DEBUG("gatt_handle_mtu_req handle(%d)\n",mtu);
+    BT_GATT_TRACE_DEBUG("gatts_handle_mtu_req handle(%d)\n",mtu);
 
-	att_send_mtu_rsp(GATT_BLE_MTU_SIZE);
+	gatt_server_manager.client_mtu = mtu;
+	att_mtu_rsp(gatt_server_manager.server_mtu);
 
 	return BT_ERR_OK;
 }
 
-static err_t gatt_handle_read_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+static err_t gatt_handle_mtu_rsp(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+{
+	uint16_t mtu;
+    att_parse_mtu_rsp(p,&mtu);
+    BT_GATT_TRACE_DEBUG("gatt_handle_mtu_rsp handle(%d)\n",mtu);
+
+	return BT_ERR_OK;	
+}
+
+
+static err_t gatts_handle_read_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
 {
     uint8_t index;
     int8_t find_index = -1;
     uint16_t handle;
+	uint8_t err_code;
     uint8_t rsp_buf_len = 0;
     uint8_t rsp_buf[GATT_BLE_MTU_SIZE] = {0};
-    struct bt_pbuf_t *send_pbuf;
+
 
     att_parse_read_req(p,&handle);
-    BT_GATT_TRACE_DEBUG("gatt_handle_read_req handle(%d)\n",handle);
+    BT_GATT_TRACE_DEBUG("gatts_handle_read_req handle(%d)\n",handle);
 
-    for(index = 0; index < gatt_server_pri_service_count; index++)
+	
+    for(index = 0; index < gatt_server_manager.gatt_server_pri_service_count; index++)
     {
         if((handle >= gatt_server_pri_service[index].start_handle) && (handle <= gatt_server_pri_service[index].end_handle))
         {
@@ -301,71 +353,141 @@ static err_t gatt_handle_read_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
 
     BT_GATT_TRACE_DEBUG("find_index(%d)\n",find_index);
 
-    for(index = 0; index < gatt_server_pri_service[find_index].serivce_count; index++)
-    {
-        if(gatt_server_pri_service[find_index].gatt_server_service[index].handle == handle)
-        {
-            memcpy(rsp_buf+rsp_buf_len,gatt_server_pri_service[find_index].gatt_server_service[index].value,gatt_server_pri_service[find_index].gatt_server_service[index].value_length);
-            rsp_buf_len += gatt_server_pri_service[find_index].gatt_server_service[index].value_length;
-        }
-    }
+	if(gatt_server_pri_service[find_index].cb && gatt_server_pri_service[find_index].cb->gatt_db_read)
+	{
+		gatt_server_pri_service[find_index].cb->gatt_db_read(bdaddr,handle,rsp_buf,&rsp_buf_len,&err_code);
+		BT_GATT_TRACE_DEBUG("db has callback,rsp_buf_len(%d)\n",rsp_buf_len);	
+		bt_hex_dump(rsp_buf,rsp_buf_len);
+	}
+	else
+	{
+		BT_GATT_TRACE_DEBUG("db has not callback\n");	
+    	for(index = 0; index < gatt_server_pri_service[find_index].serivce_count; index++)
+	    {
+	        if(gatt_server_pri_service[find_index].gatt_server_service[index].handle == handle)
+	        {
+	            memcpy(rsp_buf+rsp_buf_len,gatt_server_pri_service[find_index].gatt_server_service[index].value,gatt_server_pri_service[find_index].gatt_server_service[index].value_length);
+	            rsp_buf_len += gatt_server_pri_service[find_index].gatt_server_service[index].value_length;
+	        }
+	    }
+	}
 
-    att_send_read_rsp(rsp_buf,rsp_buf_len);
+    att_read_rsp(rsp_buf,rsp_buf_len);
 
     return BT_ERR_OK;
 }
 
-static err_t gatt_handle_read_blob_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+static err_t gatts_handle_read_blob_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
 {
 	uint16_t offset;
     uint16_t handle;
-    uint8_t rsp_buf_len = 0;
-    uint8_t rsp_buf[GATT_BLE_MTU_SIZE] = {0};
-    struct bt_pbuf_t *send_pbuf;
+
 
     att_parse_read_blob_req(p,&handle,&offset);
 
 	/* TODO:做处理 */
-	//att_send_read_blob_rsp
+	//att_read_blob_rsp
 
 	return BT_ERR_OK;
 }
 
-static err_t gatt_handle_read_multi_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+static err_t gatts_handle_read_multi_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
 {
 	/* TODO */
+	att_parse_read_multi_req();
 	return BT_ERR_OK;
 }
 
 
 
-static err_t gatt_handle_write_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+static err_t gatts_handle_write_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
 {
+	uint8_t index;
+	int8_t find_index = -1;
 	uint16_t handle;
 	uint8_t req_buf_len = 0;
     uint8_t req_buf[GATT_BLE_MTU_SIZE] = {0};
-	/* TODO:把service后面增加callback */
+	uint8_t err_code;
 	att_parse_write_req(p,&handle,req_buf,&req_buf_len);
+
+	for(index = 0; index < gatt_server_manager.gatt_server_pri_service_count; index++)
+    {
+        if((handle >= gatt_server_pri_service[index].start_handle) && (handle <= gatt_server_pri_service[index].end_handle))
+        {
+            find_index = index;
+            break;
+        }
+    }
+
+	BT_GATT_TRACE_DEBUG("find_index(%d)\n",find_index);
+
+	if(gatt_server_pri_service[find_index].cb && gatt_server_pri_service[find_index].cb->gatt_db_write)
+	{
+		gatt_server_pri_service[find_index].cb->gatt_db_write(bdaddr,handle,req_buf,req_buf_len,&err_code);
+	}
 	
-    att_send_write_rsp();
+    att_write_rsp();
 
     return BT_ERR_OK;
 }
 
-static err_t gatt_handle_write_cmd(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+static err_t gatts_handle_write_cmd(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
 {
+	uint8_t index;
+	int8_t find_index = -1;
 	uint16_t handle;
+	uint8_t err_code;
 	uint8_t req_buf_len = 0;
     uint8_t req_buf[GATT_BLE_MTU_SIZE] = {0};
-	/* TODO:把service后面增加callback */
+	
 	att_parse_write_cmd(p,&handle,req_buf,&req_buf_len);
 
+	for(index = 0; index < gatt_server_manager.gatt_server_pri_service_count; index++)
+    {
+        if((handle >= gatt_server_pri_service[index].start_handle) && (handle <= gatt_server_pri_service[index].end_handle))
+        {
+            find_index = index;
+            break;
+        }
+    }
+
+	BT_GATT_TRACE_DEBUG("find_index(%d)\n",find_index);
+
+	if(gatt_server_pri_service[index].cb && gatt_server_pri_service[index].cb->gatt_db_write)
+	{
+		gatt_server_pri_service[index].cb->gatt_db_write(bdaddr,handle,req_buf,req_buf_len,&err_code);
+	}
+
     return BT_ERR_OK;
+}
+
+static err_t gatts_handle_sig_write_cmd(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+{
+	att_parse_sig_write_cmd();
+	return BT_ERR_OK;
+}
+
+static err_t gatts_handle_pre_write_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+{
+	att_parse_pre_write_req();
+	att_pre_write_rsp();
+	return BT_ERR_OK;
+}
+static err_t gatts_handle_exc_write_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+{
+	att_parse_exc_write_req();
+	att_exc_write_rsp();
+	return BT_ERR_OK;
+}
+
+static err_t gatts_handle_value_cfm(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+{
+	return BT_ERR_OK;
 }
 
 
 
-static err_t gatt_handle_find_info_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+static err_t gatts_handle_find_info_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
 {
 	uint8_t index = 0;
 	int8_t find_index = -1;
@@ -373,11 +495,14 @@ static err_t gatt_handle_find_info_req(struct bd_addr_t *bdaddr, struct bt_pbuf_
     uint16_t end_handle;
     uint8_t rsp_buf_len = 0;
     uint8_t rsp_buf[GATT_BLE_MTU_SIZE] = {0};
-    struct bt_pbuf_t *send_pbuf;
+	uint8_t uuid_format;
+
 
     att_parse_find_info_req(p,&start_handle,&end_handle);
 
-	for(index = 0; index < gatt_server_pri_service_count; index++)
+
+	BT_GATT_TRACE_DEBUG("gatts_handle_find_info_req start handle(%d) end handle\n",end_handle);
+	for(index = 0; index < gatt_server_manager.gatt_server_pri_service_count; index++)
 	{
 		if((gatt_server_pri_service[index].start_handle <= end_handle) && (gatt_server_pri_service[index].end_handle >= start_handle))
 		{
@@ -386,52 +511,59 @@ static err_t gatt_handle_find_info_req(struct bd_addr_t *bdaddr, struct bt_pbuf_
 		}
 	}
 	
-	BT_GATT_TRACE_DEBUG("gatt_handle_find_info_req find_index(%d)\n",find_index);
+	BT_GATT_TRACE_DEBUG("gatts_handle_find_info_req find_index(%d)\n",find_index);
 
 	for(index = 0; index < gatt_server_pri_service[find_index].serivce_count; index++)
     {
-    	/* TODO1:如果>MTU怎么处理 TODO2:如果是UUID128怎么处理 TODO3:多handle处理 */
     	if(start_handle == gatt_server_pri_service[find_index].gatt_server_service[index].handle)
     	{
 	        bt_le_store_16(rsp_buf,0,start_handle);
-	        bt_le_store_16(rsp_buf,2,gatt_server_pri_service[find_index].gatt_server_service[index].uuid16);
-			rsp_buf_len = 4;
+			if(gatt_server_pri_service[find_index].gatt_server_service[index].uuid16 == 0)
+			{
+				uuid_format = ATT_UUID128_FORMAT;
+				memcpy(rsp_buf+2,gatt_server_pri_service[find_index].gatt_server_service[index].uuid128,16);
+				rsp_buf_len = 18;
+			}
+			else
+			{
+				uuid_format = ATT_UUID16_FORMAT;
+		        bt_le_store_16(rsp_buf,2,gatt_server_pri_service[find_index].gatt_server_service[index].uuid16);
+				rsp_buf_len = 4;
+			}
 			break;
     	}
     }
 
-	att_send_find_info_rsp(ATT_UUID16_FORMAT,rsp_buf,rsp_buf_len);
+	att_find_info_rsp(uuid_format,rsp_buf,rsp_buf_len);
 
     return BT_ERR_OK;
 }
 
 
-static err_t gatt_handle_find_info_value_type_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+static err_t gatts_handle_find_info_value_type_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
 {
-	uint8_t index = 0;
-	int8_t find_index = -1;
+
     uint16_t start_handle;
     uint16_t end_handle;
 	uint16_t att_type;
 	uint8_t req_buf_len = 0;
-    uint8_t rsp_buf_len = 0;
     uint8_t req_buf[GATT_BLE_MTU_SIZE] = {0};
-    uint8_t rsp_buf[GATT_BLE_MTU_SIZE] = {0};
-	
-    struct bt_pbuf_t *send_pbuf;
+
 
     att_parse_find_info_type_value_req(p,&start_handle,&end_handle,&att_type,req_buf,&req_buf_len);
 
 	/* TODO:做处理 */
-	//att_send_find_info_value_type_rsp
+	//att_find_info_value_type_rsp
 
     return BT_ERR_OK;
 }
 
 
-static err_t gatt_handle_read_type_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+static err_t gatts_handle_read_type_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
 {
     uint8_t index = 0;
+	uint8_t uuid_format;
+	uint8_t uuid128[16];
     int8_t find_index = -1;
     uint8_t find_uuid = 0;
     uint16_t start_handle;
@@ -440,10 +572,10 @@ static err_t gatt_handle_read_type_req(struct bd_addr_t *bdaddr, struct bt_pbuf_
     uint8_t rsp_buf_len = 0;
     uint8_t rsp_buf[GATT_BLE_MTU_SIZE] = {0};
     
-    att_parse_read_type_req(p,&start_handle,&end_handle,&uuid);
+    att_parse_read_type_req(p,&start_handle,&end_handle,&uuid_format,&uuid,&uuid128);
 
 
-	for(index = 0; index < gatt_server_pri_service_count; index++)
+	for(index = 0; index < gatt_server_manager.gatt_server_pri_service_count; index++)
 	{
 		if((gatt_server_pri_service[index].start_handle <= end_handle) && (gatt_server_pri_service[index].end_handle >= start_handle))
 		{
@@ -453,36 +585,42 @@ static err_t gatt_handle_read_type_req(struct bd_addr_t *bdaddr, struct bt_pbuf_
 	}
 	
 
-    BT_GATT_TRACE_DEBUG("gatt_handle_read_type_req find_index(%d)\n",find_index);
+    BT_GATT_TRACE_DEBUG("gatts_handle_read_type_req find_index(%d)\n",find_index);
     for(index = 0; index < gatt_server_pri_service[find_index].serivce_count; index++)
     {
-    	/* TODO1:uuid128的扩展 */
 		if((gatt_server_pri_service[find_index].gatt_server_service[index].handle >= start_handle) && 
 			(gatt_server_pri_service[find_index].gatt_server_service[index].handle <= end_handle))
 		{
-	        if(gatt_server_pri_service[find_index].gatt_server_service[index].uuid16 == uuid)
-	        {
-	            find_uuid = 1;
-	            bt_le_store_16(rsp_buf+rsp_buf_len,rsp_buf_len,gatt_server_pri_service[find_index].gatt_server_service[index].handle);
-	            rsp_buf_len+=2;
-	            memcpy(rsp_buf+rsp_buf_len,gatt_server_pri_service[find_index].gatt_server_service[index].value,gatt_server_pri_service[find_index].gatt_server_service[index].value_length);
-	            rsp_buf_len += gatt_server_pri_service[find_index].gatt_server_service[index].value_length;
-	        }
+			if(uuid_format == ATT_UUID16_FORMAT)
+			{
+		        if(gatt_server_pri_service[find_index].gatt_server_service[index].uuid16 == uuid)
+		        {
+		            find_uuid = 1;
+		            bt_le_store_16(rsp_buf+rsp_buf_len,rsp_buf_len,gatt_server_pri_service[find_index].gatt_server_service[index].handle);
+		            rsp_buf_len+=2;
+		            memcpy(rsp_buf+rsp_buf_len,gatt_server_pri_service[find_index].gatt_server_service[index].value,gatt_server_pri_service[find_index].gatt_server_service[index].value_length);
+		            rsp_buf_len += gatt_server_pri_service[find_index].gatt_server_service[index].value_length;
+		        }
+			}
+			else
+			{
+				/* UUID128扩展 */
+			}
 		}
     }
 
     if(find_uuid)
     {
-		att_send_read_type_rsp(rsp_buf,rsp_buf_len);
+		att_read_type_rsp(rsp_buf,rsp_buf_len);
     }
     else
     {
-    	att_send_err_rsp(ATT_REQ_READ_BY_TYPE,start_handle,ATT_NOT_FOUND);
+    	att_err_rsp(ATT_REQ_READ_BY_TYPE,start_handle,ATT_NOT_FOUND);
     }
     return BT_ERR_OK;
 }
 
-static err_t gatt_handle_read_group_type_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+static err_t gatts_handle_read_group_type_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
 {
     uint8_t index = 0;
     uint16_t start_handle;
@@ -495,27 +633,35 @@ static err_t gatt_handle_read_group_type_req(struct bd_addr_t *bdaddr, struct bt
 
     if(GATT_UUID_PRI_SERVICE == uuid)
     {
-        for(index = 0; index < gatt_server_pri_service_count; index++)
+        for(index = 0; index < gatt_server_manager.gatt_server_pri_service_count; index++)
         {
             if(gatt_server_pri_service[index].start_handle >= start_handle)
             {
-                printf("start(%d) end(%d) uuid(0x%x)\r\n",gatt_server_pri_service[index].start_handle,gatt_server_pri_service[index].end_handle,gatt_server_pri_service[index].pri_uuid);
                 bt_le_store_16(rsp_buf,0,gatt_server_pri_service[index].start_handle);
                 bt_le_store_16(rsp_buf,2,gatt_server_pri_service[index].end_handle);
-                bt_le_store_16(rsp_buf,4,gatt_server_pri_service[index].pri_uuid);
-                rsp_buf_len = 6;
+
+				if(gatt_server_pri_service[index].pri_uuid == 0)
+				{
+					memcpy(rsp_buf+4,gatt_server_pri_service[index].pri_uuid128,16);
+					rsp_buf_len = 20;
+				}
+				else
+				{
+	                bt_le_store_16(rsp_buf,4,gatt_server_pri_service[index].pri_uuid);
+	                rsp_buf_len = 6;
+				}
                 break;
             }
         }
 
         if(rsp_buf_len > 0)
         {
-        	att_send_read_group_type_rsp(rsp_buf,rsp_buf_len);
+        	att_read_group_type_rsp(rsp_buf,rsp_buf_len);
 
         }
         else
         {
-        	att_send_err_rsp(ATT_REQ_READ_BY_GRP_TYPE,start_handle,ATT_NOT_FOUND);
+        	att_err_rsp(ATT_REQ_READ_BY_GRP_TYPE,start_handle,ATT_NOT_FOUND);
         }
     }
 
@@ -523,16 +669,90 @@ static err_t gatt_handle_read_group_type_req(struct bd_addr_t *bdaddr, struct bt
 }
 
 
+static err_t gatt_handle_read_type_rsp(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+{
+	uint8_t each_len;
+	uint8_t data_num;
+	uint8_t *data_list;
+	att_parse_read_type_rsp(p,&each_len,&data_num,&data_list);
+
+	BT_GATT_TRACE_DEBUG("gatt_handle_read_type_rsp each_len(%d) data_num(%d)\n",each_len,data_num);
+
+	return BT_ERR_OK;
+}
+
+
+static err_t gatt_handle_read_group_type_rsp(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+{
+	uint8_t index;
+	uint8_t each_len;
+	uint8_t data_num;
+	uint8_t *data_list;
+	uint8_t uuid_type;
+	uint16_t start_handle;
+	uint16_t end_handle;
+	uint16_t uuid;
+	att_parse_read_group_type_rsp(p,&each_len,&data_num,&data_list,&uuid_type);
+
+	BT_GATT_TRACE_DEBUG("gatt_handle_read_group_type_rsp each_len(%d) data_num(%d) uuid_type(%d)\n",each_len,data_num,uuid_type);
+
+	for(index = 0; index < data_num; index++)
+	{
+		start_handle = bt_le_read_16(data_list,index*each_len);
+		end_handle = bt_le_read_16(data_list,index*each_len+2);
+		uuid = bt_le_read_16(data_list,index*each_len+4);
+		BT_GATT_TRACE_DEBUG("s_handle(0x%x) e_handle(0x%x) uuid(0x%x)\n",start_handle,end_handle,uuid);
+		/* TODO */
+	}
+
+	return BT_ERR_OK;
+}
+
+
+static err_t gatt_handle_find_type_value_rsp(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+{
+	uint8_t index = 0;
+	uint8_t info_num;
+	uint8_t *info_list;
+	uint16_t start_handle;
+	uint16_t end_handle;
+	att_parse_find_type_value_rsp(p,&info_num,&info_list);
+
+	BT_GATT_TRACE_DEBUG("gatt_handle_find_type_value_rsp info_num(%d)\n",info_num);
+
+	for(index = 0; index < info_num; index++)
+	{
+		start_handle = bt_le_read_16(info_list,index*4);
+		end_handle = bt_le_read_16(info_list,index*4+2);
+		BT_GATT_TRACE_DEBUG("s_handle(0x%x) e_handle(0x%x)\n",start_handle,end_handle);
+		/* TODO */
+	}
+
+	return BT_ERR_OK;
+}
+
+
+
 /* Gatt client API */
+
+err_t gatt_client_init(void)
+{
+	gatt_client_manager.client_mtu= GATT_BLE_MTU_SIZE;
+	
+	return BT_ERR_OK;
+}
+
+
 err_t gatt_client_exchange_mtu(uint16_t mtu)
 {
-	att_send_mtu_req(mtu);
+	att_mtu_req(mtu);
 	return BT_ERR_OK;
 }
 
 err_t gatt_client_discovery_pri_service(uint16_t start_handle,uint16_t end_handle)
 {
-	att_send_read_group_type_req(start_handle,end_handle,GATT_UUID_PRI_SERVICE);
+	gatt_client_manager.last_opcode = GATT_CLIENT_OP_DISCOVERY;
+	att_read_group_type_req(start_handle,end_handle,GATT_UUID_PRI_SERVICE);
 
 	return BT_ERR_OK;
 }
@@ -540,6 +760,7 @@ err_t gatt_client_discovery_pri_service(uint16_t start_handle,uint16_t end_handl
 err_t gatt_client_discovery_pri_service_uuid(uint16_t start_handle,uint16_t end_handle,uint16_t uuid)
 {
 	uint8_t uuid_array[] = {BT_LE_U16_TO_ARRAY(uuid)};
+	gatt_client_manager.last_opcode = GATT_CLIENT_OP_DISCOVERY;
 	att_find_type_value_req(start_handle,end_handle,GATT_UUID_PRI_SERVICE,uuid_array,sizeof(uuid_array));
 	
 	return BT_ERR_OK;
@@ -560,6 +781,12 @@ err_t gatt_client_find_characteristics(uint16_t start_handle,uint16_t end_handle
 	
 	return BT_ERR_OK;
 }
+
+err_t gatt_client_find_characteristics_uuid(uint16_t start_handle,uint16_t end_handle,uint16_t uuid)
+{
+	return BT_ERR_OK;
+}
+
 
 
 

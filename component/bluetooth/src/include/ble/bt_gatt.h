@@ -160,17 +160,26 @@
 #define GATT_CHAR_PROP_BIT_AUTH (1 << 6)
 #define GATT_CHAR_PROP_BIT_EXT_PROP (1 << 7)
 
-typedef void(*gatt_db_access_cb)(uint8_t opcode,uint16_t handle,uint8_t *value,uint8_t value_len);
+
+#define GATT_CLIENT_OP_NONE 0
+#define GATT_CLIENT_OP_EX_MTU 1
+#define GATT_CLIENT_OP_DISCOVERY 2
+
+typedef struct
+{
+    void (*gatt_db_read)(struct bd_addr_t *remote_addr,uint16_t handle,uint8_t *value,uint8_t *value_len,uint8_t *err_code);
+    void (*gatt_db_write)(struct bd_addr_t *remote_addr,uint16_t handle,uint8_t *value,uint8_t value_len,uint8_t *err_code);
+} gatt_pri_service_cbs_t;
 
 
 typedef struct
 {
 	uint16_t handle;
 	uint16_t uuid16;
+	uint8_t *uuid128;
 	uint8_t *value;
 	uint8_t value_length;
 	uint16_t permission;
-	gatt_db_access_cb cb;
 }gatt_server_service_t;
 
 typedef struct
@@ -179,26 +188,45 @@ typedef struct
 	uint16_t start_handle;
 	uint16_t end_handle;
 	uint16_t pri_uuid;
+	uint8_t pri_uuid128[16];
 	gatt_server_service_t *gatt_server_service;
-	
+	gatt_pri_service_cbs_t *cb;
 }gatt_server_pri_service_t;
+
+typedef struct
+{
+	uint16_t client_mtu;
+	uint16_t server_mtu;
+	uint8_t gatt_server_pri_service_count;
+}gatt_server_manager_t;
+
+typedef struct
+{
+	uint16_t client_mtu;
+	uint16_t server_mtu;
+	uint8_t last_opcode;
+}gatt_client_manager_t;
+
 
 /* Gatt commmon API */
 err_t gatt_init(void);
 
 /* Gatt server API */
 err_t gatt_server_init(void);
-err_t gatt_server_add_pri_service(gatt_server_service_t *service,uint16_t start_handle,uint16_t end_handle,uint8_t service_count,uint16_t pri_uuid);
+err_t gatt_server_add_pri_service(gatt_server_service_t *service,uint16_t start_handle,uint16_t end_handle,
+	uint8_t service_count,uint16_t pri_uuid,uint8_t *pri_uuid128,gatt_pri_service_cbs_t *cb);
 err_t gatt_server_notification(uint16_t handle,uint8_t *value,uint8_t value_length);
 err_t gatt_server_indication(uint16_t handle,uint8_t *value,uint8_t value_length);
 
 
 /* Gatt client API */
+err_t gatt_client_init(void);
 err_t gatt_client_exchange_mtu(uint16_t mtu);
 err_t gatt_client_discovery_pri_service(uint16_t start_handle,uint16_t end_handle);
 err_t gatt_client_discovery_pri_service_uuid(uint16_t start_handle,uint16_t end_handle,uint16_t uuid);
 err_t gatt_client_find_include(uint16_t start_handle,uint16_t end_handle);
 err_t gatt_client_find_characteristics(uint16_t start_handle,uint16_t end_handle);
+err_t gatt_client_find_characteristics_uuid(uint16_t start_handle,uint16_t end_handle,uint16_t uuid);
 
 
 
