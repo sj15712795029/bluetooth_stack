@@ -347,6 +347,8 @@ void l2cap_register_recv(struct l2cap_pcb_t *pcb,
                          err_t (* l2ca_recv)(void *arg, struct l2cap_pcb_t *pcb, struct bt_pbuf_t *p, err_t err));
 
 err_t l2cap_fixed_channel_register_recv(uint16_t cid,
+							err_t (* l2ca_connect_ind)(void *arg, struct l2cap_pcb_t *pcb, err_t err),
+							err_t (* l2ca_disconnect_ind)(void *arg, struct l2cap_pcb_t *pcb, err_t err),
 							err_t (* l2ca_recv)(void *arg, struct l2cap_pcb_t *pcb, struct bt_pbuf_t *p, err_t err));
 err_t l2cap_connect_req(struct l2cap_pcb_t *pcb, struct bd_addr_t *bdaddr, uint16_t psm, uint8_t role_switch,
                         err_t (* l2ca_connect_cfm)(void *arg, struct l2cap_pcb_t *lpcb,

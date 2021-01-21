@@ -5,7 +5,25 @@ att_cbs_t *att_cbs;
 struct l2cap_pcb_t *att_l2cap;
 
 static err_t att_send_data(struct bt_pbuf_t *p);
+err_t att_connect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err);
+err_t att_disconnect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err);
+err_t att_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err);
 
+
+
+
+err_t att_connect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err)
+{
+	BT_ATT_TRACE_DEBUG("att_connect_ind\n");
+	return BT_ERR_OK;
+}
+
+err_t att_disconnect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err)
+{
+	BT_ATT_TRACE_DEBUG("att_disconnect_ind\n");
+	l2cap_fixed_channel_register_recv(L2CAP_ATT_CID,att_connect_ind,att_disconnect_ind,att_input);
+	return BT_ERR_OK;
+}
 
 err_t att_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err)
 {
@@ -22,7 +40,7 @@ err_t att_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, er
 
 err_t att_init(void)
 {
-    l2cap_fixed_channel_register_recv(L2CAP_ATT_CID,att_input);
+    l2cap_fixed_channel_register_recv(L2CAP_ATT_CID,att_connect_ind,att_disconnect_ind,att_input);
 
     return BT_ERR_OK;
 }

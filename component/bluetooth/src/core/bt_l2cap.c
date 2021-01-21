@@ -1868,7 +1868,9 @@ void l2cap_register_recv(struct l2cap_pcb_t *pcb,
 }
 
 err_t l2cap_fixed_channel_register_recv(uint16_t cid,
-                                        err_t (* l2ca_recv)(void *arg, struct l2cap_pcb_t *pcb, struct bt_pbuf_t *p, err_t err))
+							err_t (* l2ca_connect_ind)(void *arg, struct l2cap_pcb_t *pcb, err_t err),
+							err_t (* l2ca_disconnect_ind)(void *arg, struct l2cap_pcb_t *pcb, err_t err),
+							err_t (* l2ca_recv)(void *arg, struct l2cap_pcb_t *pcb, struct bt_pbuf_t *p, err_t err))
 {
     struct l2cap_pcb_t *l2cappcb;
 
@@ -1879,6 +1881,8 @@ err_t l2cap_fixed_channel_register_recv(uint16_t cid,
     }
 
     l2cappcb->fixed_cid = cid;
+	l2cappcb->l2ca_connect_ind = l2ca_connect_ind;
+	l2cappcb->l2ca_disconnect_ind = l2ca_disconnect_ind;
     l2cappcb->l2ca_recv = l2ca_recv;
     l2cappcb->state = L2CAP_OPEN;
     L2CAP_REG(&l2cap_active_pcbs, l2cappcb);
