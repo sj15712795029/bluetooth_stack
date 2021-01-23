@@ -373,9 +373,9 @@ err_t hfp_hf_init(uint16_t hf_support_feature,uint8_t support_wbs,hfp_hf_cbs_t *
     rfcomm_listen(rfcommpcb, RFCOMM_HFP_HF_CHNL, hfp_connect_ind);
 
     hfp_hf_cbs = cb;
-    hci_sco_req(hfp_hf_sco_connect_ind);
-    hci_sco_conn_complete(hfp_hf_sco_conn_complete);
-    hci_sco_disconn_complete(sco_hfp_disconn_complete);
+    hci_register_sco_req(hfp_hf_sco_connect_ind);
+    hci_register_sco_conn_complete(hfp_hf_sco_conn_complete);
+    hci_register_sco_disconn_complete(sco_hfp_disconn_complete);
 
     return BT_ERR_OK;
 }

@@ -3305,7 +3305,7 @@ static uint8_t bcm4345c5_dn_fw(void)
 {
 	uint8_t download_done = 0;
 	struct bt_pbuf_t *p;
-	pbcm4345c5_initscript = bcm4345c5_initscript + bcm4345c5_prepare_pos;
+	pbcm4345c5_initscript = (uint8_t *)bcm4345c5_initscript + bcm4345c5_prepare_pos;
 	if(bcm4345c5_prepare_pos < sizeof(bcm4345c5_initscript))
     {
     	uint16_t write_len = 0;
@@ -3315,7 +3315,7 @@ static uint8_t bcm4345c5_dn_fw(void)
         if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, 3 + write_len, BT_PBUF_RAM)) == NULL)
         {
             BT_VENDOR_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
-            return;
+            return 0;
         }
         memcpy(((uint8_t *)p->payload), pbcm4345c5_initscript, 3 + write_len);
         /* Assembling cmd prameters */

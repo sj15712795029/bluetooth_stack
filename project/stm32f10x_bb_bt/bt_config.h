@@ -22,6 +22,7 @@
 #define BT_ENABLE_SNOOP 0
 #define BT_TRANSPORT_TYPE 0x02
 #define BT_ENABLE_SSP 0
+#define BT_PAGE_TIMEOUT 0x4000 /* value*0.625ms */
 /* IO_CAP_DISPLAY_ONLY->0x00 IO_CAP_DISPLAY_YES_NO->0x01 IO_CAP_KEYBOARD_ONLY->0x02 IO_CAP_NOINPUT_OUTPUT->0x03 */
 #define BT_SSP_IOCAP_CONF 1
 #define BT_LOCAL_NAME "ANW_TEST"
@@ -127,6 +128,10 @@ typedef uintptr_t mem_ptr_t;
 #define HCI_PACKET_TYPE 0xCC18 /* Default DM1, DH1, DM3, DH3, DM5, DH5 */
 #define HCI_ALLOW_ROLE_SWITCH 1 /* Default 1 */
 #define HCI_FLOW_QUEUEING 0 /* Default: 0 */
+#define HCI_RESET_TIMEOUT	10
+#define HCI_REMOTE_NAME_LEN 32
+#define HCI_LE_ADV_MAX_SIZE 32
+#define HCI_INQUIRY_MAX_DEV MEMP_NUM_HCI_INQ
 /******************************************************************************************************************************/
 
 

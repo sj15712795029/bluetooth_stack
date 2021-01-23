@@ -277,12 +277,12 @@ err_t phybusif_input(struct phybusif_cb *cb)
         }
         case W4_EVENT_HDR:
         {
-            if(ringbuffer_len(&bt_ring_buf) < HCI_EVENT_HDR_LEN)
+            if(ringbuffer_len(&bt_ring_buf) < HCI_EVT_HDR_LEN)
             {
                 return BT_ERR_BUF;
             }
 
-            ringbuffer_get(&bt_ring_buf,(uint8_t *)cb->p->payload,HCI_EVENT_HDR_LEN);
+            ringbuffer_get(&bt_ring_buf,(uint8_t *)cb->p->payload,HCI_EVT_HDR_LEN);
             cb->evhdr = cb->p->payload;
             if(cb->evhdr->len > PBUF_POOL_BUFSIZE)
             {
@@ -321,7 +321,7 @@ err_t phybusif_input(struct phybusif_cb *cb)
                 printf("+++++++W4_EVENT_PARAM left %d,event size %d\n",ringbuffer_space_left(&bt_ring_buf),cb->evhdr->len);
                 return BT_ERR_BUF;
             }
-            ringbuffer_get(&bt_ring_buf,(uint8_t *)cb->p->payload+HCI_EVENT_HDR_LEN,cb->evhdr->len);
+            ringbuffer_get(&bt_ring_buf,(uint8_t *)cb->p->payload+HCI_EVT_HDR_LEN,cb->evhdr->len);
             hci_event_input(cb->p);
             bt_pbuf_free(cb->p);
             phybusif_reset(cb);

@@ -2193,6 +2193,7 @@ chip_mgr_t bcm43430a1_mgr =
     /* void  (*vendor_init)(init_done_cb cb,uint8_t ogf,uint8_t ocf) */&bcm43430a1_vendor_init,
     /* void (*vendor_deinit)(void) */&bcm43430a1_vendor_deinit,
     /* void (*vendor_set_baud_rate)(uint32_t baud_rate);*/&bcm43430a1_vendor_set_baud_rate,
+    /* void (*vendor_cmd_handle)(uint8_t ogf,uint8_t ocf,uint8_t *payload); */NULL,
 };
 #endif
 

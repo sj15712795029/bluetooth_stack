@@ -353,6 +353,8 @@ err_t obex_client_abort(struct rfcomm_pcb_t *rfcommpcb)
     obex_reset_header_para();
 
     bt_pbuf_free(p);
+		
+		return BT_ERR_OK;
 }
 
 

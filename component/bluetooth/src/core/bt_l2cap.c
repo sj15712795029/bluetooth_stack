@@ -1067,7 +1067,7 @@ void l2cap_process_sig(struct bt_pbuf_t *q, struct l2cap_hdr_t *l2caphdr, struct
 void l2cap_acl_input(struct bt_pbuf_t *p, struct bd_addr_t *bdaddr)
 {
     struct l2cap_seg_t *inseg;
-    struct hci_acl_hdr_t *aclhdr;
+    hci_acl_hdr_t *aclhdr;
     struct bt_pbuf_t *data;
     err_t ret = BT_ERR_OK;
     BT_UNUSED_ARG(ret);

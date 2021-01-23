@@ -10,11 +10,11 @@ uint16_t bt_profile_mask = 0;
 uint8_t bt_sco_connected = 0;
 uint8_t bt_call_active = 0;
 
-static err_t bt_inquiry_complete(struct hci_pcb_t *pcb,uint16_t result);
-static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres);
+static err_t bt_inquiry_complete(uint16_t result);
+static err_t bt_inquiry_result(hci_inq_res_t *inqres);
 #if BT_BLE_ENABLE > 0
-static err_t bt_le_inquiry_complete(struct hci_pcb_t *pcb,uint16_t result);
-static err_t bt_le_inquiry_result(struct hci_pcb_t *pcb,struct hci_le_inq_res_t *le_inqres);
+static err_t bt_le_inquiry_complete(uint16_t result);
+static err_t bt_le_inquiry_result(hci_le_inq_res_t *le_inqres);
 static uint8_t bt_le_adv_get_type(bt_le_adv_parse_t *bt_adv_le_parse);
 static uint8_t bt_le_adv_get_size(bt_le_adv_parse_t *bt_adv_le_parse);
 static uint8_t *bt_le_adv_get_data(bt_le_adv_parse_t *bt_adv_le_parse);
@@ -211,9 +211,9 @@ static err_t bt_ass_eir_data()
     return 0;
 }
 
-static err_t bt_inquiry_complete(struct hci_pcb_t *pcb,uint16_t result);
-static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres);
-static err_t bt_get_remote_name_complete(struct hci_pcb_t *pcb,struct bd_addr_t *bdaddr,uint8_t * name);
+static err_t bt_inquiry_complete(uint16_t result);
+static err_t bt_inquiry_result(hci_inq_res_t *inqres);
+static err_t bt_get_remote_name_complete(struct bd_addr_t *bdaddr,uint8_t * name);
 
 
 static err_t  link_key_req(void *arg,struct bd_addr_t *bdaddr)
@@ -1006,9 +1006,9 @@ uint8_t bt_start(bt_app_cb_t *app_cb)
 #endif
     /* blueooth stack init */
     hci_init();
-    hci_link_key_req(link_key_req);
-    hci_link_key_not(link_key_not);
-    hci_bt_working(bt_stack_worked);
+    hci_register_link_key_req(link_key_req);
+    hci_register_link_key_not(link_key_not);
+    hci_register_bt_working(bt_stack_worked);
 
     l2cap_init();
     sdp_init();
@@ -1436,7 +1436,7 @@ uint8_t bt_pbap_client_download_abort(struct bd_addr_t *addr)
 
 
 
-static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres)
+static err_t bt_inquiry_result(hci_inq_res_t *inqres)
 {
     if(inqres != NULL)
     {
@@ -1465,7 +1465,7 @@ static err_t bt_inquiry_result(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqre
     return BT_ERR_OK;
 }
 
-static err_t bt_inquiry_complete(struct hci_pcb_t *pcb,uint16_t result)
+static err_t bt_inquiry_complete(uint16_t result)
 {
     if(bt_wrapper_cb && bt_wrapper_cb->app_common_cb && bt_wrapper_cb->app_common_cb->bt_inquiry_status)
     {
@@ -1475,7 +1475,7 @@ static err_t bt_inquiry_complete(struct hci_pcb_t *pcb,uint16_t result)
 }
 
 #if BT_BLE_ENABLE > 0
-static err_t bt_le_inquiry_result(struct hci_pcb_t *pcb,struct hci_le_inq_res_t *le_inqres)
+static err_t bt_le_inquiry_result(hci_le_inq_res_t *le_inqres)
 {
     if(le_inqres != NULL)
     {
@@ -1492,7 +1492,7 @@ static err_t bt_le_inquiry_result(struct hci_pcb_t *pcb,struct hci_le_inq_res_t 
 }
 
 
-static err_t bt_le_inquiry_complete(struct hci_pcb_t *pcb,uint16_t result)
+static err_t bt_le_inquiry_complete(uint16_t result)
 {
     if(bt_wrapper_cb && bt_wrapper_cb->app_common_cb && bt_wrapper_cb->app_common_cb->bt_le_inquiry_status)
     {
@@ -1521,7 +1521,7 @@ static uint8_t *bt_le_adv_get_data(bt_le_adv_parse_t *bt_adv_le_parse)
 
 #endif
 
-static err_t bt_get_remote_name_complete(struct hci_pcb_t *pcb,struct bd_addr_t *bdaddr,uint8_t * name)
+static err_t bt_get_remote_name_complete(struct bd_addr_t *bdaddr,uint8_t * name)
 {
     printf("---------bt_address:\n");
 	bt_addr_dump(bdaddr->addr);

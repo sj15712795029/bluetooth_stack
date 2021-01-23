@@ -12,6 +12,7 @@
 
 #include "bt_pbuf.h"
 #include "bt_common.h"
+#include "bt_hci.h"
 
 
 #define PHYBUSIF_PACKET_TYPE_CMD  0x01
@@ -52,8 +53,8 @@ struct phybusif_cb
     struct bt_pbuf_t *p;
     struct bt_pbuf_t *q;
 
-    struct hci_event_hdr_t *evhdr;
-    struct hci_acl_hdr_t *aclhdr;
+    hci_evt_hdr_t *evhdr;
+    hci_acl_hdr_t *aclhdr;
 
 };
 

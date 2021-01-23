@@ -1249,7 +1249,61 @@ uint8_t shell_parse(uint8_t *shell_string)
 #endif
 
 #if BT_BLE_ENABLE > 0
+		if(hw_strncmp("GATTC_MTU_REQ",(const char*)shell_string,hw_strlen("GATTC_MTU_REQ")) == 0)
+		{
 
+			HW_DEBUG("SHELL:GATTC_MTU_REQ\n");
+			gatt_client_exchange_mtu(GATT_BLE_MTU_SIZE);
+
+			return HW_ERR_OK;
+		}
+
+		if(hw_strncmp("GATTC_DIS_P",(const char*)shell_string,hw_strlen("GATTC_DIS_P")) == 0)
+		{
+
+			HW_DEBUG("SHELL:GATTC_DIS_P\n");
+			gatt_client_discovery_pri_service(1,0xffff);
+
+			return HW_ERR_OK;
+		}
+
+		if(hw_strncmp("GATTC_DIS_FTV",(const char*)shell_string,hw_strlen("GATTC_DIS_FTV")) == 0)
+		{
+
+			HW_DEBUG("SHELL:GATTC_DIS_FTV\n");
+			gatt_client_discovery_pri_service_uuid(1,0xffff,BT_UUID_SERVCLASS_HEART_RATE);
+
+			return HW_ERR_OK;
+		}
+
+		if(hw_strncmp("GATTC_DIS_FINCLUDE",(const char*)shell_string,hw_strlen("GATTC_DIS_FINCLUDE")) == 0)
+		{
+
+			HW_DEBUG("SHELL:GATTC_DIS_FINCLUDE\n");
+			gatt_client_find_include(1,0xffff);
+
+			return HW_ERR_OK;
+		}
+
+		if(hw_strncmp("GATTC_DIS_FCHARA",(const char*)shell_string,hw_strlen("GATTC_DIS_FCHARA")) == 0)
+		{
+
+			HW_DEBUG("SHELL:GATTC_DIS_FCHARA\n");
+			gatt_client_find_characteristics(1,0xffff);
+
+			return HW_ERR_OK;
+		}
+
+		if(hw_strncmp("GATTC_READ2",(const char*)shell_string,hw_strlen("GATTC_READ2")) == 0)
+		{
+
+			HW_DEBUG("SHELL:GATTC_READ2\n");
+			att_read_req(2);
+
+			return HW_ERR_OK;
+		}
+			
+		
 #if PROFILE_BAS_ENABLE > 0
 		if(hw_strncmp("BAS_LEVEL_UPDATE",(const char*)shell_string,hw_strlen("BAS_LEVEL_UPDATE")) == 0)
 		{

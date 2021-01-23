@@ -32,9 +32,9 @@ static struct bt_memp_t *memp_tab[MEMP_BT_MAX];
 
 static const uint16_t memp_sizes[MEMP_BT_MAX] =
 {
-    sizeof(struct hci_pcb_t),
-    sizeof(struct hci_link_t),
-    sizeof(struct hci_inq_res_t),
+    sizeof(hci_pcb_t),
+    sizeof(hci_link_t),
+    sizeof(hci_inq_res_t),
     sizeof(struct l2cap_pcb_t),
     sizeof(struct l2cap_pcb_listen_t),
     sizeof(struct l2cap_sig_t),
@@ -83,13 +83,13 @@ static const uint16_t memp_num[MEMP_BT_MAX] =
 };
 
 static uint8_t memp_memory[(MEMP_NUM_HCI_PCB *
-                         MEM_ALIGN_SIZE(sizeof(struct hci_pcb_t) +
+                         MEM_ALIGN_SIZE(sizeof(hci_pcb_t) +
                                         sizeof(struct bt_memp_t)) +
                          MEMP_NUM_HCI_LINK *
-                         MEM_ALIGN_SIZE(sizeof(struct hci_link_t) +
+                         MEM_ALIGN_SIZE(sizeof(hci_link_t) +
                                         sizeof(struct bt_memp_t)) +
                          MEMP_NUM_HCI_INQ *
-                         MEM_ALIGN_SIZE(sizeof(struct hci_inq_res_t) +
+                         MEM_ALIGN_SIZE(sizeof(hci_inq_res_t) +
                                         sizeof(struct bt_memp_t)) +
                          MEMP_NUM_L2CAP_PCB *
                          MEM_ALIGN_SIZE(sizeof(struct l2cap_pcb_t) +

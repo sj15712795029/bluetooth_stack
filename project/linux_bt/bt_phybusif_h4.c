@@ -317,13 +317,13 @@ err_t phybusif_input(struct phybusif_cb *cb)
         }
         case W4_EVENT_HDR:
         {
-            if(ringbuffer_len(&bt_ring_buf) < HCI_EVENT_HDR_LEN)
+            if(ringbuffer_len(&bt_ring_buf) < HCI_EVT_HDR_LEN)
             {
                 BT_TRANSPORT_TRACE_WARNING("+++++++W4_EVENT_HDR left %d<HCI_EVENT_HDR_LEN\n",ringbuffer_len(&bt_ring_buf));
                 return BT_ERR_BUF;
             }
 
-            ringbuffer_get(&bt_ring_buf,(uint8_t *)cb->p->payload,HCI_EVENT_HDR_LEN);
+            ringbuffer_get(&bt_ring_buf,(uint8_t *)cb->p->payload,HCI_EVT_HDR_LEN);
             cb->evhdr = cb->p->payload;
             if(cb->evhdr->len > PBUF_POOL_BUFSIZE)
             {
@@ -361,10 +361,10 @@ err_t phybusif_input(struct phybusif_cb *cb)
 
                 return BT_ERR_BUF;
             }
-            ringbuffer_get(&bt_ring_buf,(uint8_t *)cb->p->payload+HCI_EVENT_HDR_LEN,cb->evhdr->len);
+            ringbuffer_get(&bt_ring_buf,(uint8_t *)cb->p->payload+HCI_EVT_HDR_LEN,cb->evhdr->len);
 
 #if BT_ENABLE_SNOOP > 0
-            bt_snoop_write(BT_SNOOP_PACKET_TYPE_EVT,1,cb->p->payload,cb->evhdr->len+HCI_EVENT_HDR_LEN);
+            bt_snoop_write(BT_SNOOP_PACKET_TYPE_EVT,1,cb->p->payload,cb->evhdr->len+HCI_EVT_HDR_LEN);
 #endif
 
             hci_event_input(cb->p);

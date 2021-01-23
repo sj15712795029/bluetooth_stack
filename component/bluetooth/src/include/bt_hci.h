@@ -15,15 +15,263 @@
 #include "bt_vendor_manager.h"
 
 
-#define HCI_RESET_TIMEOUT	10
-#define HCI_REMOTE_NAME_LEN 32
-#define HCI_LE_ADV_MAX_SIZE 32
-#define HCI_INQUIRY_MAX_DEV MEMP_NUM_HCI_INQ
-
-#define HCI_EVENT_HDR_LEN 2
+#define HCI_EVT_HDR_LEN 2
 #define HCI_ACL_HDR_LEN 4
 #define HCI_SCO_HDR_LEN 3
 #define HCI_CMD_HDR_LEN 3
+
+
+/* Group occupies high 6 bits of the HCI command rest is opcode itself */
+#define HCI_OGF(p)  (uint8_t)((0xFC00 & (p)) >> 10)
+#define HCI_OCF(p)  ( 0x3FF & (p))
+
+/*
+**  Definitions for HCI groups
+*/
+#define HCI_GRP_LINK_CTL_CMDS       (0x01 << 10)            /* 0x0400 */
+#define HCI_GRP_LINK_PLY_CMDS        (0x02 << 10)            /* 0x0800 */
+#define HCI_GRP_HOST_CONT_BB_CMDS (0x03 << 10)            /* 0x0C00 */
+#define HCI_GRP_INFO_PARA    (0x04 << 10)            /* 0x1000 */
+#define HCI_GRP_STATUS_PARA           (0x05 << 10)            /* 0x1400 */
+#define HCI_GRP_TEST_CMDS            (0x06 << 10)            /* 0x1800 */
+#define HCI_GRP_BLE_CMDS                (0x08 << 10)
+#define HCI_GRP_VENDOR_SPECIFIC         (0x3F << 10)            /* 0xFC00 */
+
+
+/* Following opcode is used only in command complete event for flow control */
+#define HCI_OP_NONE                0x0000
+
+/* Commands of HCI_GRP_LINK_CTL_CMDS group */
+#define HCI_OP_INQUIRY                     (0x0001 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_INQUIRY_CANCEL              (0x0002 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_PERIODIC_INQUIRY_MODE       (0x0003 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_EXIT_PERIODIC_INQUIRY_MODE  (0x0004 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_CREATE_CONNECTION           (0x0005 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_DISCONNECT                  (0x0006 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_ADD_SCO_CONNECTION          (0x0007 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_CREATE_CONNECTION_CANCEL    (0x0008 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_ACCEPT_CONNECTION_REQUEST   (0x0009 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_REJECT_CONNECTION_REQUEST   (0x000A | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_LINK_KEY_REQUEST_REPLY      (0x000B | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_LINK_KEY_REQUEST_NEG_REPLY  (0x000C | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_PIN_CODE_REQUEST_REPLY      (0x000D | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_PIN_CODE_REQUEST_NEG_REPLY  (0x000E | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_CHANGE_CONN_PACKET_TYPE     (0x000F | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_AUTHENTICATION_REQUESTED    (0x0011 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_SET_CONN_ENCRYPTION         (0x0013 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_CHANGE_CONN_LINK_KEY        (0x0015 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_MASTER_LINK_KEY             (0x0017 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_RMT_NAME_REQUEST            (0x0019 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_RMT_NAME_REQUEST_CANCEL     (0x001A | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_READ_RMT_FEATURES           (0x001B | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_READ_RMT_EXT_FEATURES       (0x001C | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_READ_RMT_VERSION_INFO       (0x001D | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_READ_RMT_CLOCK_OFFSET       (0x001F | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_READ_LMP_HANDLE             (0x0020 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_SETUP_ESCO_CONNECTION       (0x0028 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_ACCEPT_ESCO_CONNECTION      (0x0029 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_REJECT_ESCO_CONNECTION      (0x002A | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_IO_CAPABILITY_RESPONSE      (0x002B | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_USER_CONF_REQUEST_REPLY     (0x002C | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_USER_CONF_VALUE_NEG_REPLY   (0x002D | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_USER_PASSKEY_REQ_REPLY      (0x002E | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_USER_PASSKEY_REQ_NEG_REPLY  (0x002F | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_REM_OOB_DATA_REQ_REPLY      (0x0030 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_REM_OOB_DATA_REQ_NEG_REPLY  (0x0033 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_IO_CAP_REQ_NEG_REPLY        (0x0034 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_CREATE_PHYSICAL_LINK        (0x0035 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_ACCEPT_PHYSICAL_LINK        (0x0036 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_DISCONNECT_PHYSICAL_LINK    (0x0037 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_CREATE_LOGICAL_LINK         (0x0038 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_ACCEPT_LOGICAL_LINK         (0x0039 | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_DISCONNECT_LOGICAL_LINK     (0x003A | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_LOGICAL_LINK_CANCEL         (0x003B | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_FLOW_SPEC_MODIFY            (0x003C | HCI_GRP_LINK_CTL_CMDS)
+#define HCI_OP_LINK_CTRL_CMDS_FIRST        HCI_OP_INQUIRY
+#define HCI_OP_LINK_CTRL_CMDS_LAST         HCI_OP_FLOW_SPEC_MODIFY
+
+
+/* Commands of HCI_GRP_LINK_PLY_CMDS */
+#define HCI_OP_HOLD_MODE                   (0x0001 | HCI_GRP_LINK_PLY_CMDS)
+#define HCI_OP_SNIFF_MODE                  (0x0003 | HCI_GRP_LINK_PLY_CMDS)
+#define HCI_OP_EXIT_SNIFF_MODE             (0x0004 | HCI_GRP_LINK_PLY_CMDS)
+#define HCI_OP_PARK_MODE                   (0x0005 | HCI_GRP_LINK_PLY_CMDS)
+#define HCI_OP_EXIT_PARK_MODE              (0x0006 | HCI_GRP_LINK_PLY_CMDS)
+#define HCI_OP_QOS_SETUP                   (0x0007 | HCI_GRP_LINK_PLY_CMDS)
+#define HCI_OP_ROLE_DISCOVERY              (0x0009 | HCI_GRP_LINK_PLY_CMDS)
+#define HCI_OP_SWITCH_ROLE                 (0x000B | HCI_GRP_LINK_PLY_CMDS)
+#define HCI_OP_READ_POLICY_SETTINGS        (0x000C | HCI_GRP_LINK_PLY_CMDS)
+#define HCI_OP_WRITE_POLICY_SETTINGS       (0x000D | HCI_GRP_LINK_PLY_CMDS)
+#define HCI_OP_READ_DEF_POLICY_SETTINGS    (0x000E | HCI_GRP_LINK_PLY_CMDS)
+#define HCI_OP_WRITE_DEF_POLICY_SETTINGS   (0x000F | HCI_GRP_LINK_PLY_CMDS)
+#define HCI_OP_FLOW_SPECIFICATION          (0x0010 | HCI_GRP_LINK_PLY_CMDS)
+#define HCI_OP_SNIFF_SUB_RATE              (0x0011 | HCI_GRP_LINK_PLY_CMDS)
+#define HCI_OP_LINK_POLICY_CMDS_FIRST      HCI_OP_HOLD_MODE
+#define HCI_OP_LINK_POLICY_CMDS_LAST       HCI_OP_SNIFF_SUB_RATE
+
+
+
+/* Commands of HCI_GRP_HOST_CONT_BB_CMDS */
+#define HCI_OP_SET_EVENT_MASK              (0x0001 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_RESET                       (0x0003 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_SET_EVENT_FILTER            (0x0005 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_FLUSH                       (0x0008 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_PIN_TYPE               (0x0009 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_PIN_TYPE              (0x000A | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_CREATE_NEW_UNIT_KEY         (0x000B | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_STORED_LINK_KEY        (0x000D | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_STORED_LINK_KEY       (0x0011 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_DELETE_STORED_LINK_KEY      (0x0012 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_CHANGE_LOCAL_NAME           (0x0013 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_LOCAL_NAME             (0x0014 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_CONN_ACCEPT_TOUT       (0x0015 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_CONN_ACCEPT_TOUT      (0x0016 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_PAGE_TOUT              (0x0017 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_PAGE_TOUT             (0x0018 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_SCAN_ENABLE            (0x0019 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_SCAN_ENABLE           (0x001A | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_PAGESCAN_CFG           (0x001B | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_PAGESCAN_CFG          (0x001C | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_INQUIRYSCAN_CFG        (0x001D | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_INQUIRYSCAN_CFG       (0x001E | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_AUTHENTICATION_ENABLE  (0x001F | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_AUTHENTICATION_ENABLE (0x0020 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_ENCRYPTION_MODE        (0x0021 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_ENCRYPTION_MODE       (0x0022 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_CLASS_OF_DEVICE        (0x0023 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_CLASS_OF_DEVICE       (0x0024 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_VOICE_SETTINGS         (0x0025 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_VOICE_SETTINGS        (0x0026 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_AUTO_FLUSH_TOUT        (0x0027 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_AUTO_FLUSH_TOUT       (0x0028 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_NUM_BCAST_REXMITS      (0x0029 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_NUM_BCAST_REXMITS     (0x002A | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_HOLD_MODE_ACTIVITY     (0x002B | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_HOLD_MODE_ACTIVITY    (0x002C | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_TRANSMIT_POWER_LEVEL   (0x002D | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_SCO_FLOW_CTRL_ENABLE   (0x002E | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_SCO_FLOW_CTRL_ENABLE  (0x002F | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_SET_HC_TO_HOST_FLOW_CTRL    (0x0031 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_HOST_BUFFER_SIZE            (0x0033 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_HOST_NUM_PACKETS_DONE       (0x0035 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_LINK_SUPER_TOUT        (0x0036 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_LINK_SUPER_TOUT       (0x0037 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_NUM_SUPPORTED_IAC      (0x0038 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_CURRENT_IAC_LAP        (0x0039 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_CURRENT_IAC_LAP       (0x003A | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_PAGESCAN_PERIOD_MODE   (0x003B | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_PAGESCAN_PERIOD_MODE  (0x003C | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_PAGESCAN_MODE          (0x003D | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_PAGESCAN_MODE         (0x003E | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_SET_AFH_CHANNELS            (0x003F | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_INQSCAN_TYPE           (0x0042 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_INQSCAN_TYPE          (0x0043 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_INQUIRY_MODE           (0x0044 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_INQUIRY_MODE          (0x0045 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_PAGESCAN_TYPE          (0x0046 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_PAGESCAN_TYPE         (0x0047 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_AFH_ASSESSMENT_MODE    (0x0048 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_AFH_ASSESSMENT_MODE   (0x0049 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_EXT_INQ_RESPONSE       (0x0051 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_EXT_INQ_RESPONSE      (0x0052 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_REFRESH_ENCRYPTION_KEY      (0x0053 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_SIMPLE_PAIRING_MODE    (0x0055 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_SIMPLE_PAIRING_MODE   (0x0056 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_LOCAL_OOB_DATA         (0x0057 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_INQ_TX_POWER_LEVEL     (0x0058 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_INQ_TX_POWER_LEVEL    (0x0059 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_ERRONEOUS_DATA_RPT     (0x005A | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_ERRONEOUS_DATA_RPT    (0x005B | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_ENHANCED_FLUSH              (0x005F | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_SEND_KEYPRESS_NOTIF         (0x0060 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_LOGICAL_LINK_ACCEPT_TIMEOUT  (0x0061 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_LOGICAL_LINK_ACCEPT_TIMEOUT (0x0062 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_SET_EVENT_MASK_PAGE_2             (0x0063 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_LOCATION_DATA                (0x0064 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_LOCATION_DATA               (0x0065 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_FLOW_CONTROL_MODE            (0x0066 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_FLOW_CONTROL_MODE           (0x0067 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_READ_BE_FLUSH_TOUT                (0x0069 | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_BE_FLUSH_TOUT               (0x006A | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_SHORT_RANGE_MODE                  (0x006B | HCI_GRP_HOST_CONT_BB_CMDS) /* 802.11 only */
+#define HCI_OP_READ_LE_SUPPORT 						(0x006C | HCI_GRP_HOST_CONT_BB_CMDS)
+#define HCI_OP_WRITE_LE_SUPPORT 						(0x006D | HCI_GRP_HOST_CONT_BB_CMDS)
+
+#define HCI_OP_CONT_BASEBAND_CMDS_FIRST    HCI_OP_SET_EVENT_MASK
+#define HCI_OP_CONT_BASEBAND_CMDS_LAST     HCI_OP_WRITE_LE_SUPPORT
+
+
+/* Commands of HCI_GRP_INFO_PARA group */
+#define HCI_OP_READ_LOCAL_VERSION_INFO     (0x0001 | HCI_GRP_INFO_PARA)
+#define HCI_OP_READ_LOCAL_SUPPORTED_CMDS   (0x0002 | HCI_GRP_INFO_PARA)
+#define HCI_OP_READ_LOCAL_FEATURES         (0x0003 | HCI_GRP_INFO_PARA)
+#define HCI_OP_READ_LOCAL_EXT_FEATURES     (0x0004 | HCI_GRP_INFO_PARA)
+#define HCI_OP_READ_BUFFER_SIZE            (0x0005 | HCI_GRP_INFO_PARA)
+#define HCI_OP_READ_COUNTRY_CODE           (0x0007 | HCI_GRP_INFO_PARA)
+#define HCI_OP_READ_BD_ADDR                (0x0009 | HCI_GRP_INFO_PARA)
+#define HCI_OP_READ_DATA_BLOCK_SIZE        (0x000A | HCI_GRP_INFO_PARA)
+#define HCI_OP_INFORMATIONAL_CMDS_FIRST    HCI_OP_READ_LOCAL_VERSION_INFO
+#define HCI_OP_INFORMATIONAL_CMDS_LAST     HCI_OP_READ_BD_ADDR
+
+
+/* Commands of HCI_GRP_STATUS_PARA group */
+#define HCI_OP_READ_FAILED_CONTACT_COUNT   (0x0001 | HCI_GRP_STATUS_PARA)
+#define HCI_OP_RESET_FAILED_CONTACT_COUNT  (0x0002 | HCI_GRP_STATUS_PARA)
+#define HCI_OP_GET_LINK_QUALITY            (0x0003 | HCI_GRP_STATUS_PARA)
+#define HCI_OP_READ_RSSI                   (0x0005 | HCI_GRP_STATUS_PARA)
+#define HCI_OP_READ_AFH_CH_MAP             (0x0006 | HCI_GRP_STATUS_PARA)
+#define HCI_OP_READ_CLOCK                  (0x0007 | HCI_GRP_STATUS_PARA)
+#define HCI_OP_READ_ENCR_KEY_SIZE          (0x0008 | HCI_GRP_STATUS_PARA)
+#define HCI_OP_READ_LOCAL_AMP_INFO         (0x0009 | HCI_GRP_STATUS_PARA)
+#define HCI_OP_READ_LOCAL_AMP_ASSOC        (0x000A | HCI_GRP_STATUS_PARA)
+#define HCI_OP_WRITE_REMOTE_AMP_ASSOC      (0x000B | HCI_GRP_STATUS_PARA)
+#define HCI_OP_STATUS_PARAMS_CMDS_FIRST    HCI_OP_READ_FAILED_CONTACT_COUNT
+#define HCI_OP_STATUS_PARAMS_CMDS_LAST     HCI_OP_WRITE_REMOTE_AMP_ASSOC
+
+
+/* Commands of HCI_GRP_TEST_CMDS group */
+#define HCI_OP_READ_LOOPBACK_MODE          (0x0001 | HCI_GRP_TEST_CMDS)
+#define HCI_OP_WRITE_LOOPBACK_MODE         (0x0002 | HCI_GRP_TEST_CMDS)
+#define HCI_OP_ENABLE_DEV_UNDER_TEST_MODE  (0x0003 | HCI_GRP_TEST_CMDS)
+#define HCI_OP_WRITE_SIMP_PAIR_DEBUG_MODE  (0x0004 | HCI_GRP_TEST_CMDS)
+#define HCI_OP_ENABLE_AMP_RCVR_REPORTS     (0x0007 | HCI_GRP_TEST_CMDS)
+#define HCI_OP_AMP_TEST_END                (0x0008 | HCI_GRP_TEST_CMDS)
+#define HCI_OP_AMP_TEST                    (0x0009 | HCI_GRP_TEST_CMDS)
+#define HCI_OP_TESTING_CMDS_FIRST          HCI_OP_READ_LOOPBACK_MODE
+#define HCI_OP_TESTING_CMDS_LAST           HCI_OP_AMP_TEST
+
+/* Commands of BLE Controller setup and configuration */
+#define HCI_OP_BLE_SET_EVENT_MASK          (0x0001 | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_READ_BUFFER_SIZE        (0x0002 | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_READ_LOCAL_SPT_FEAT     (0x0003 | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_WRITE_LOCAL_SPT_FEAT    (0x0004 | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_WRITE_RANDOM_ADDR       (0x0005 | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_WRITE_ADV_PARAMS        (0x0006 | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_READ_ADV_CHNL_TX_POWER  (0x0007 | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_WRITE_ADV_DATA          (0x0008 | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_WRITE_SCAN_RSP_DATA     (0x0009 | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_WRITE_ADV_ENABLE        (0x000A | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_WRITE_SCAN_PARAMS       (0x000B | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_WRITE_SCAN_ENABLE       (0x000C | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_CREATE_LL_CONN          (0x000D | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_CREATE_CONN_CANCEL      (0x000E | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_READ_WHITE_LIST_SIZE    (0x000F | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_CLEAR_WHITE_LIST        (0x0010 | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_ADD_WHITE_LIST          (0x0011 | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_REMOVE_WHITE_LIST       (0x0012 | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_UPD_LL_CONN_PARAMS      (0x0013 | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_SET_HOST_CHNL_CLASS     (0x0014 | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_READ_CHNL_MAP           (0x0015 | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_READ_REMOTE_FEAT        (0x0016 | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_ENCRYPT                 (0x0017 | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_RAND                    (0x0018 | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_START_ENC               (0x0019 | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_LTK_REQ_REPLY           (0x001A | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_LTK_REQ_NEG_REPLY       (0x001B | HCI_GRP_BLE_CMDS)
+#define HCI_OP_BLE_READ_SUPPORTED_STATES   (0x001C | HCI_GRP_BLE_CMDS)
+
+
+
 
 /* Opcode Group Field (OGF) values */
 #define HCI_NOP_OGF 0x00
@@ -385,7 +633,7 @@
 
 #define hci_num_cmd(pcb) ((pcb)->numcmd)
 #define hci_num_acl(pcb) ((pcb)->hc_num_acl)
-#define hci_maxsize(pcb) ((pcb)->maxsize)
+#define hci_maxsize(pcb) ((pcb)->acl_maxsize)
 
 
 #define IO_CAP_DISPLAY_ONLY 0x00
@@ -397,9 +645,6 @@
 #define INQUIRY_MODE_RSSI 1
 #define INQUIRY_MODE_EIR 2
 
-/**
- * SSP Authentication Requirements, see IO Capability Request Reply Commmand
- */
 
 // Numeric comparison with automatic accept allowed.
 #define SSP_IO_AUTHREQ_MITM_PROTECTION_NOT_REQUIRED_NO_BONDING 0x00
@@ -436,22 +681,22 @@
 
 
 
-struct hci_event_hdr_t
+typedef struct 
 {
     uint8_t code; /* Event code */
     uint8_t len;  /* Parameter total length */
-} BT_PACK_END;
+}BT_PACK_END hci_evt_hdr_t;
 
-struct hci_acl_hdr_t
+typedef struct 
 {
     uint16_t conhdl_pb_bc; /* Connection handle, packet boundary and broadcast flag
 			 flag */
     uint16_t len; /* length of data */
-} BT_PACK_END;
+} BT_PACK_END hci_acl_hdr_t;
 
-struct hci_inq_res_t
+typedef struct _hci_inq_res_t
 {
-    struct hci_inq_res_t *next; /* For the linked list */
+    struct _hci_inq_res_t *next; /* For the linked list */
 
     struct bd_addr_t bdaddr; /* Bluetooth address of a device found in an inquiry */
     uint8_t cod[3]; /* Class of the remote device */
@@ -461,10 +706,10 @@ struct hci_inq_res_t
     int8_t rssi;
     uint8_t support_carplay;
     uint8_t remote_name[HCI_REMOTE_NAME_LEN];
-};
+}hci_inq_res_t;
 
 
-struct hci_le_inq_res_t
+typedef struct 
 {
     uint8_t addr_type;
     struct bd_addr_t bdaddr; /* Bluetooth address of a device found in an inquiry */
@@ -472,7 +717,7 @@ struct hci_le_inq_res_t
     uint8_t adv_type;
     uint8_t adv_size;
     uint8_t adv_data[HCI_LE_ADV_MAX_SIZE];
-};
+}hci_le_inq_res_t;
 /**
  * Connection State
  */
@@ -496,9 +741,9 @@ typedef enum
 #define HCI_LINK_TYPE_ACL 1
 #define HCI_LINK_TYPE_ESCO 2
 
-struct hci_link_t
+typedef struct _hci_link_t
 {
-    struct hci_link_t *next; /* For the linked list */
+    struct _hci_link_t *next; /* For the linked list */
 
     struct bd_addr_t bdaddr; /* The remote peers Bluetooth address for this connection */
     uint32_t cod;
@@ -512,7 +757,7 @@ struct hci_link_t
     uint16_t len;
     uint8_t pb;
 #endif
-};
+}hci_link_t;
 
 typedef enum hci_init_status
 {
@@ -527,7 +772,7 @@ typedef enum hci_vendor_init_status
 } hci_vendor_init_status_e;
 
 
-struct hci_pcb_t
+typedef struct
 {
     void *callback_arg;
 
@@ -546,7 +791,7 @@ struct hci_pcb_t
     /* Host to host controller flow control */
     uint8_t numcmd; /* Number of command packets that the host controller (Bluetooth module)
 		  can buffer */
-    uint16_t maxsize; /* Maximum length of the data portion of each HCI ACL data packet that the
+    uint16_t acl_maxsize; /* Maximum length of the data portion of each HCI ACL data packet that the
 		   Host Controller is able to accept */
     uint16_t hc_num_acl; /* Number of ACL packets that the Bluetooth module can buffer */
 
@@ -554,45 +799,42 @@ struct hci_pcb_t
     uint8_t flow; /* Indicates if host controller to host flow control is on */
     uint16_t host_num_acl; /* Number of ACL packets that we (the host) can buffer */
 
-    struct hci_inq_res_t *ires; /* Results of an inquiry */
+    hci_inq_res_t *ires; /* Results of an inquiry */
 
     uint8_t le_inq_w2_stop;
     err_t (* pin_req)(void *arg, struct bd_addr_t *bdaddr);
     err_t (* bt_working)(void *arg);
-    err_t (* sco_req)(void *arg, struct bd_addr_t *bdaddr);
+    err_t (* sco_conn_req)(void *arg, struct bd_addr_t *bdaddr);
     err_t (*sco_conn_complete)(void *arg, uint8_t status,struct bd_addr_t *bdaddr);
     err_t (*sco_disconn_complete)(void *arg, uint8_t status,struct bd_addr_t *bdaddr);
-    err_t (*inq_result)(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres);
-    err_t (* inq_complete)(struct hci_pcb_t *pcb,uint16_t result);
-    err_t (*le_inq_result)(struct hci_pcb_t *pcb,struct hci_le_inq_res_t *le_inqres);
-    err_t (*le_inq_complete)(struct hci_pcb_t *pcb,uint16_t result);
-    err_t (*name_req_complete)(struct hci_pcb_t *pcb,struct bd_addr_t *bdaddr,uint8_t * name);
+    err_t (*inq_result)(hci_inq_res_t *inqres);
+    err_t (* inq_complete)(uint16_t result);
+    err_t (*le_inq_result)(hci_le_inq_res_t *le_inqres);
+    err_t (*le_inq_complete)(uint16_t result);
+    err_t (*name_req_complete)(struct bd_addr_t *bdaddr,uint8_t * name);
     err_t (* rbd_complete)(void *arg, struct bd_addr_t *bdaddr);
     err_t (* link_key_not)(void *arg, struct bd_addr_t *bdaddr, uint8_t *key,uint8_t key_type);
     err_t (*link_key_req)(void *arg,struct bd_addr_t *bdaddr );
     err_t (* wlp_complete)(void *arg, struct bd_addr_t *bdaddr);
     err_t (* conn_complete)(void *arg, struct bd_addr_t *bdaddr);
-    err_t (* cmd_complete)(void *arg, struct hci_pcb_t *pcb, uint8_t ogf, uint8_t ocf, uint8_t result);
-};
+    err_t (* cmd_complete)(void *arg,uint16_t opcode, uint8_t result);
+}hci_pcb_t;
 
 
 /*-------------------- common api ----------------------------------------*/
 /*  Functions for interfacing with HCI */
 err_t hci_init(void);
-err_t hci_set_chip_name(uint8_t *name);
-err_t hci_close(struct hci_link_t *link);
 void hci_reset_all(void);
-void hci_arg(void *arg);
-void hci_cmd_complete(err_t (* cmd_complete)(void *arg, struct hci_pcb_t *pcb,uint8_t ogf, uint8_t ocf, uint8_t result));
-void hci_pin_req(err_t (* pin_req)(void *arg, struct bd_addr_t *bdaddr));
-void hci_bt_working(err_t (* bt_working)(void *arg));
-void hci_sco_req(err_t (* sco_req)(void *arg, struct bd_addr_t *bdaddr));
-void hci_sco_conn_complete(err_t (* sco_conn_complete)(void *arg, uint8_t status,struct bd_addr_t *bdaddr));
-void hci_sco_disconn_complete(err_t (* sco_disconn_complete)(void *arg, uint8_t status,struct bd_addr_t *bdaddr));
-void hci_link_key_req(err_t (* link_key_req)(void *arg,struct bd_addr_t *bdaddr));
-void hci_link_key_not(err_t (* link_key_not)(void *arg, struct bd_addr_t *bdaddr, uint8_t *key,uint8_t key_type));
-void  hci_wlp_complete(err_t (* wlp_complete)(void *arg, struct bd_addr_t *bdaddr));
-void hci_connection_complete(err_t (* conn_complete)(void *arg, struct bd_addr_t *bdaddr));
+void hci_register_cmd_complete(err_t (* cmd_complete)(void *arg, uint16_t opcode, uint8_t result));
+void hci_register_pin_req(err_t (* pin_req)(void *arg, struct bd_addr_t *bdaddr));
+void hci_register_bt_working(err_t (* bt_working)(void *arg));
+void hci_register_sco_req(err_t (* sco_conn_req)(void *arg, struct bd_addr_t *bdaddr));
+void hci_register_sco_conn_complete(err_t (* sco_conn_complete)(void *arg, uint8_t status,struct bd_addr_t *bdaddr));
+void hci_register_sco_disconn_complete(err_t (* sco_disconn_complete)(void *arg, uint8_t status,struct bd_addr_t *bdaddr));
+void hci_register_link_key_req(err_t (* link_key_req)(void *arg,struct bd_addr_t *bdaddr));
+void hci_register_link_key_not(err_t (* link_key_not)(void *arg, struct bd_addr_t *bdaddr, uint8_t *key,uint8_t key_type));
+void hci_register_write_policy_complete(err_t (* wlp_complete)(void *arg, struct bd_addr_t *bdaddr));
+void hci_register_connection_complete(err_t (* conn_complete)(void *arg, struct bd_addr_t *bdaddr));
 err_t hci_acl_write(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p, uint16_t len, uint8_t pb);
 uint8_t hci_is_connected(struct bd_addr_t *bdaddr);
 uint16_t hci_pdu_maxsize(void);
@@ -602,12 +844,12 @@ void hci_event_input(struct bt_pbuf_t *p);
 /*-------------------- hci command ----------------------------------------*/
 /* OGF = 0x01 LINK CONTROL COMMANDS */
 err_t hci_inquiry(uint32_t lap, uint8_t inq_len, uint8_t num_resp,
-                  err_t (*inq_result)(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres),
-                  err_t (* inq_complete)(struct hci_pcb_t *pcb,uint16_t result));
+                  err_t (*inq_result)(hci_inq_res_t *inqres),
+                  err_t (* inq_complete)(uint16_t result));
 err_t hci_cancel_inquiry(void);
 err_t hci_periodic_inquiry(uint16_t min_periodic,uint16_t max_periodic,uint32_t lap, uint8_t inq_len, uint8_t num_resp,
-                           err_t (*inq_result)(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres),
-                           err_t (* inq_complete)(struct hci_pcb_t *pcb,uint16_t result));
+                           err_t (*inq_result)(hci_inq_res_t *inqres),
+                           err_t (* inq_complete)(uint16_t result));
 err_t hci_cancel_periodic_inquiry(void);
 err_t hci_connect_req(struct bd_addr_t *bdaddr, uint8_t allow_role_switch);
 err_t hci_disconnect_acl(struct bd_addr_t *bdaddr, uint8_t reason);
@@ -618,7 +860,7 @@ err_t hci_link_key_request_reply(struct bd_addr_t *bdaddr, uint8_t *link_key);
 err_t hci_link_key_request_negative_reply(struct bd_addr_t *bdaddr);
 err_t hci_pin_code_request_reply(struct bd_addr_t *bdaddr, uint8_t pinlen, uint8_t *pincode);
 err_t hci_pin_code_request_neg_reply(struct bd_addr_t *bdaddr);
-err_t hci_get_remote_name(struct bd_addr_t *bdaddr,err_t (*name_req_complete)(struct hci_pcb_t *pcb,struct bd_addr_t *bdaddr,uint8_t * name));
+err_t hci_get_remote_name(struct bd_addr_t *bdaddr,err_t (*name_req_complete)(struct bd_addr_t *bdaddr,uint8_t * name));
 err_t hci_cancel_get_remote_name(struct bd_addr_t *bdaddr);
 err_t hci_get_remote_feature(struct bd_addr_t *bdaddr);
 err_t hci_connect_sco(struct bd_addr_t *bdaddr,uint32_t transmit_bandwidth,uint32_t receive_bandwidth,
@@ -674,8 +916,8 @@ err_t hci_enable_dut_mode(void);
 #if BT_BLE_ENABLE > 0
 err_t hci_set_le_scan_param(uint8_t scan_type,uint16_t scan_interval,uint16_t scan_window,uint8_t own_type,uint8_t scan_filter);
 err_t hci_le_inquiry(uint8_t filter_duplicates,
-					err_t (*le_inq_result)(struct hci_pcb_t *pcb,struct hci_le_inq_res_t *le_inqres),
-                     err_t (* le_inq_complete)(struct hci_pcb_t *pcb,uint16_t result));
+					err_t (*le_inq_result)(hci_le_inq_res_t *le_inqres),
+                     err_t (* le_inq_complete)(uint16_t result));
 err_t hci_le_cancel_inquiry(void);
 err_t hci_le_set_adv_param(uint16_t adv_int_min, uint16_t adv_int_max, uint8_t adv_type,
     uint8_t own_address_typ, uint8_t peer_address_type,struct bd_addr_t *peer_address, uint8_t channel_map, uint8_t filter_policy);

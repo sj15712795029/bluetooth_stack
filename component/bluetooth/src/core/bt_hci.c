@@ -11,67 +11,74 @@
 #include "bt_hci.h"
 #include "bt_l2cap.h"
 #include "bt_timer.h"
+#if BT_VENDOR_CSR8X11_SUPPORT
 #include "bt_vendor_csr8x11.h"
+#endif
+#if BT_VENDOR_BCM43430A1_SUPPORT
 #include "bt_vendor_bcm43430a1.h"
+#endif
+#if BT_VENDOR_BCM4345C5_SUPPORT
+#include "bt_vendor_bcm4345c5.h"
+#endif
 
 /* The HCI LINK lists. */
-struct hci_link_t *hci_active_links;  /* List of all active HCI LINKs */
-struct hci_link_t *hci_tmp_link;
-struct hci_pcb_t *pcb = NULL;
+static hci_link_t *hci_active_links;  /* List of all active HCI LINKs */
+static hci_link_t *hci_tmp_link;
+static hci_pcb_t *hci_pcb = NULL;
 
-#define HCI_EVENT_PIN_REQ(pcb,bdaddr,ret) \
+#define HCI_EVENT_PIN_REQ(pcb,bdaddr) \
                          if((pcb)->pin_req != NULL) { \
-                           (ret = (pcb)->pin_req((pcb)->callback_arg,(bdaddr))); \
+                           ((pcb)->pin_req((pcb)->callback_arg,(bdaddr))); \
                          } else { \
-                           ret = hci_pin_code_request_neg_reply(bdaddr); \
+                           hci_pin_code_request_neg_reply(bdaddr); \
 			 }
 #define HCI_BT_WORKING(pcb) \
                               if((pcb)->bt_working != NULL) \
                               ((pcb)->bt_working((pcb)->callback_arg))
-#define HCI_EVENT_SCO_REQ(pcb,bdaddr,ret) \
-                              if((pcb)->sco_req != NULL) \
-                              (ret = (pcb)->sco_req((pcb)->callback_arg,(bdaddr)))
-#define HCI_EVENT_SCO_CONN_COMPLETE(pcb,status,bdaddr,ret) \
+#define HCI_EVENT_SCO_REQ(pcb,bdaddr) \
+                              if((pcb)->sco_conn_req != NULL) \
+                              ((pcb)->sco_conn_req((pcb)->callback_arg,(bdaddr)))
+#define HCI_EVENT_SCO_CONN_COMPLETE(pcb,status,bdaddr) \
                               if((pcb)->sco_conn_complete != NULL) \
-                              (ret = (pcb)->sco_conn_complete((pcb)->callback_arg,status,(bdaddr)))
-#define HCI_EVENT_SCO_DISCONN_COMPLETE(pcb,status,bdaddr,ret) \
+                              ((pcb)->sco_conn_complete((pcb)->callback_arg,status,(bdaddr)))
+#define HCI_EVENT_SCO_DISCONN_COMPLETE(pcb,status,bdaddr) \
                               if((pcb)->sco_disconn_complete != NULL) \
-                              (ret = (pcb)->sco_disconn_complete((pcb)->callback_arg,status,(bdaddr)))
-#define HCI_EVENT_LINK_REQ(pcb,bdaddr,ret) \
+                              ((pcb)->sco_disconn_complete((pcb)->callback_arg,status,(bdaddr)))
+#define HCI_EVENT_LINK_REQ(pcb,bdaddr) \
                               if((pcb)->link_key_req != NULL) { \
-                                (ret = (pcb)->link_key_req((pcb)->callback_arg,(bdaddr))); \
+                                ((pcb)->link_key_req((pcb)->callback_arg,(bdaddr))); \
                               	}
-#define HCI_EVENT_LINK_KEY_NOT(pcb,bdaddr,key,key_type,ret) \
+#define HCI_EVENT_LINK_KEY_NOT(pcb,bdaddr,key,key_type) \
                               if((pcb)->link_key_not != NULL) { \
-                                (ret = (pcb)->link_key_not((pcb)->callback_arg,(bdaddr),(key),(key_type))); \
+                                ((pcb)->link_key_not((pcb)->callback_arg,(bdaddr),(key),(key_type))); \
                               }
-#define HCI_EVENT_INQ_RESULT(pcb,result,ret)\
+#define HCI_EVENT_INQ_RESULT(pcb,result)\
 					if((pcb)->inq_result != NULL) \
-                              (ret = (pcb)->inq_result((pcb),(result)))
-#define HCI_EVENT_INQ_COMPLETE(pcb,result,ret) \
+                              ((pcb)->inq_result((result)))
+#define HCI_EVENT_INQ_COMPLETE(pcb,result) \
                               if((pcb)->inq_complete != NULL) \
-                              (ret = (pcb)->inq_complete((pcb),(result)))
-#define HCI_EVENT_LE_INQ_RESULT(pcb,result,ret)\
+                              ((pcb)->inq_complete((result)))
+#define HCI_EVENT_LE_INQ_RESULT(pcb,result)\
 							  if((pcb)->le_inq_result != NULL) \
-							 (ret = (pcb)->le_inq_result((pcb),(result)))
-#define HCI_EVENT_LE_INQ_COMPLETE(pcb,result,ret) \
+							 ((pcb)->le_inq_result((result)))
+#define HCI_EVENT_LE_INQ_COMPLETE(pcb,result) \
                               if((pcb)->le_inq_complete != NULL) \
-                              (ret = (pcb)->le_inq_complete((pcb),(result)))
-#define HCI_EVENT_REMOTE_NAME_REQ_COMPLETE(pcb,bdaddr,name,ret) \
+                              ((pcb)->le_inq_complete((result)))
+#define HCI_EVENT_REMOTE_NAME_REQ_COMPLETE(pcb,bdaddr,name) \
                               if((pcb)->name_req_complete != NULL) \
-                              (ret = (pcb)->name_req_complete((pcb),(bdaddr),(name)))
-#define HCI_EVENT_RBD_COMPLETE(pcb,bdaddr,ret) \
+                              ((pcb)->name_req_complete((bdaddr),(name)))
+#define HCI_EVENT_RBD_COMPLETE(pcb,bdaddr) \
                               if((pcb)->rbd_complete != NULL) \
-                              (ret = (pcb)->rbd_complete((pcb)->callback_arg,(bdaddr)));
-#define HCI_EVENT_WLP_COMPLETE(pcb,bdaddr,ret) \
+                              ((pcb)->rbd_complete((pcb)->callback_arg,(bdaddr)));
+#define HCI_EVENT_WLP_COMPLETE(pcb,bdaddr) \
                                if((pcb)->wlp_complete != NULL) \
-                               (ret = (pcb)->wlp_complete((pcb)->callback_arg,(bdaddr)));
-#define HCI_EVENT_CONN_COMPLETE(pcb,bdaddr,ret) \
+                               ((pcb)->wlp_complete((pcb)->callback_arg,(bdaddr)));
+#define HCI_EVENT_CONN_COMPLETE(pcb,bdaddr) \
                                if((pcb)->conn_complete != NULL) \
-                               (ret = (pcb)->conn_complete((pcb)->callback_arg,(bdaddr)));
-#define HCI_EVENT_CMD_COMPLETE(pcb,ogf,ocf,result,ret) \
+                               ((pcb)->conn_complete((pcb)->callback_arg,(bdaddr)));
+#define HCI_EVENT_CMD_COMPLETE(pcb,opcode,result) \
                               if((pcb)->cmd_complete != NULL) \
-                              (ret = (pcb)->cmd_complete((pcb)->callback_arg,(pcb),(ogf),(ocf),(result)))
+                              ((pcb)->cmd_complete((pcb)->callback_arg,(opcode),(result)))
 
 
 #define HCI_REG(links, nlink) do { \
@@ -90,120 +97,104 @@ struct hci_pcb_t *pcb = NULL;
                             nlink->next = NULL; \
                             } while(0)
 
+static hci_link_t *_hci_new_link(void);
+static err_t _hci_delete_link(hci_link_t *link);
+static hci_link_t *_hci_get_link_by_addr(struct bd_addr_t *bdaddr);
+static hci_link_t *_hci_get_link_by_handle(uint16_t handle);
+static uint8_t *_hci_get_error_code(uint8_t code);
+static err_t _hci_reset_cmd_timeout(void *para);
+static err_t _hci_pin_req_handle(void *arg, struct bd_addr_t *bdaddr);
+static err_t _hci_set_chip_name(uint8_t *name);
+static err_t _hci_init_process(struct bt_pbuf_t *p);
+static err_t _hci_init_cmd_compl_process(uint8_t *payload,uint16_t payload_len);
+static err_t _hci_inq_comp_evt_process(uint8_t *payload,uint16_t payload_len);
+static err_t _hci_inq_result_evt_process(uint8_t evt_code,uint8_t *payload,uint16_t payload_len);
+static err_t _hci_conn_comp_evt_process(uint8_t *payload,uint16_t payload_len);
+static err_t _hci_conn_req_evt_process(uint8_t *payload,uint16_t payload_len);
+static err_t _hci_sco_conn_comp_evt_process(uint8_t *payload,uint16_t payload_len);
+static err_t _hci_disconn_comp_evt_process(uint8_t *payload,uint16_t payload_len);
+static err_t _hci_remote_name_req_evt_process(uint8_t *payload,uint16_t payload_len);
+static err_t _hci_encryption_change_evt_process(uint8_t *payload,uint16_t payload_len);
+static err_t _hci_qos_setup_evt_process(uint8_t *payload,uint16_t payload_len);
+static err_t _hci_cmd_comp_evt_process(uint8_t *payload,uint16_t payload_len);
+static err_t _hci_cmd_status_evt_process(uint8_t *payload,uint16_t payload_len);
+static err_t _hci_hw_err_evt_process(uint8_t *payload,uint16_t payload_len);
+static err_t _hci_role_change_evt_process(uint8_t *payload,uint16_t payload_len);
+static err_t _hci_number_comp_evt_process(uint8_t *payload,uint16_t payload_len);
+static err_t _hci_mode_change_evt_process(uint8_t *payload,uint16_t payload_len);
+static err_t _hci_data_buf_overflow_evt_process(uint8_t *payload,uint16_t payload_len);
+static err_t _hci_max_slot_change_evt_process(uint8_t *payload,uint16_t payload_len);
+static err_t _hci_pincode_req_evt_process(uint8_t *payload,uint16_t payload_len);
+static err_t _hci_linkkey_req_evt_process(uint8_t *payload,uint16_t payload_len);
+static err_t _hci_linkkey_notify_evt_process(uint8_t *payload,uint16_t payload_len);
+static err_t _hci_io_cap_req_evt_process(uint8_t *payload,uint16_t payload_len);
+static err_t _hci_usr_confim_req_evt_process(uint8_t *payload,uint16_t payload_len);
+static err_t _hci_vendor_evt_process(uint8_t *payload,uint16_t payload_len);
+#if BT_BLE_ENABLE > 0
+static err_t _hci_le_meta_evt_process(uint8_t *payload,uint16_t payload_len);
+#endif
 
 
-void hci_reset_timeout(void *para)
-{
-    BT_HCI_TRACE_DEBUG("hci_reset_timeout handle\n");
-    hci_reset();
-}
-
-static err_t pin_req_handle(void *arg, struct bd_addr_t *bdaddr)
-{
-    return hci_pin_code_request_reply(bdaddr, strlen((const char*)pcb->pincode), pcb->pincode);
-}
 
 err_t hci_init(void)
 {
-    if((pcb = bt_memp_malloc(MEMP_HCI_PCB)) == NULL)
+    if((hci_pcb = bt_memp_malloc(MEMP_HCI_PCB)) == NULL)
     {
         BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_memp_malloc fail\n",__FILE__,__FUNCTION__,__LINE__);
         return BT_ERR_MEM;
     }
-    memset(pcb, 0, sizeof(struct hci_pcb_t));
+    memset(hci_pcb, 0, sizeof(hci_pcb_t));
 
-    pcb->ssp_enable = BT_ENABLE_SSP;
-    pcb->ssp_io_cap = BT_SSP_IOCAP_CONF;
-    pcb->class_of_device = BT_CLASS_OF_DEVICE;
-    pcb->local_name = (const uint8_t *)BT_LOCAL_NAME;
-    pcb->pincode = (uint8_t *)BT_PIN_CODE;
+    hci_pcb->ssp_enable = BT_ENABLE_SSP;
+    hci_pcb->ssp_io_cap = BT_SSP_IOCAP_CONF;
+    hci_pcb->class_of_device = BT_CLASS_OF_DEVICE;
+    hci_pcb->local_name = (const uint8_t *)BT_LOCAL_NAME;
+    hci_pcb->pincode = (uint8_t *)BT_PIN_CODE;
 
-    hci_pin_req(pin_req_handle);
+    hci_register_pin_req(_hci_pin_req_handle);
     /* Clear globals */
     hci_active_links = NULL;
     hci_tmp_link = NULL;
 
 #if BT_VENDOR_CSR8X11_SUPPORT > 0
-	hci_set_chip_name(VENDOR_CSR8X11_NAME);
+    _hci_set_chip_name((uint8_t *)VENDOR_CSR8X11_NAME);
 #endif
 
 #if BT_VENDOR_BCM43430A1_SUPPORT > 0
-		hci_set_chip_name(VENDOR_BCM43430A1_NAME);
+    _hci_set_chip_name((uint8_t *)VENDOR_BCM43430A1_NAME);
 #endif
 
 #if BT_VENDOR_BCM4345C5_SUPPORT > 0
-	hci_set_chip_name(VENDOR_BCM4345C5_NAME);
+    _hci_set_chip_name((uint8_t *)VENDOR_BCM4345C5_NAME);
 #endif
 
 
-	
+
     return BT_ERR_OK;
 }
 
-err_t hci_set_chip_name(uint8_t *name)
-{
-	if(pcb != NULL)
-	{
-		pcb->chip_mgr = bt_vendor_get_chip_mrg(name);
-
-		if(pcb->chip_mgr != NULL)
-			return BT_ERR_ARG;
-	}
-
-		return BT_ERR_MEM;
-}
-
-
-struct hci_link_t *hci_new(void)
-{
-    struct hci_link_t *link;
-
-    link = bt_memp_malloc(MEMP_HCI_LINK);
-    if(link != NULL)
-    {
-        memset(link, 0, sizeof(struct hci_link_t));
-        return link;
-    }
-
-    BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_memp_malloc fail\n",__FILE__,__FUNCTION__,__LINE__);
-    return NULL;
-}
-
-err_t hci_close(struct hci_link_t *link)
-{
-#if HCI_FLOW_QUEUEING
-    if(link->p != NULL)
-    {
-        bt_pbuf_free(link->p);
-    }
-#endif
-    HCI_RMV(&(hci_active_links), link);
-    bt_memp_free(MEMP_HCI_LINK, link);
-    link = NULL;
-    return BT_ERR_OK;
-}
 
 void hci_reset_all(void)
 {
-    struct hci_link_t *link, *tlink;
-    struct hci_inq_res_t *ires, *tires;
+    hci_link_t *link, *tlink;
+    hci_inq_res_t *ires, *tires;
 
-    pcb->chip_mgr->vendor_deinit();
+    hci_pcb->chip_mgr->vendor_deinit();
 
     for(link = hci_active_links; link != NULL;)
     {
         tlink = link->next;
-        hci_close(link);
+        _hci_delete_link(link);
         link = tlink;
     }
 
-    for(ires = pcb->ires; ires != NULL;)
+    for(ires = hci_pcb->ires; ires != NULL;)
     {
         tires = ires->next;
         bt_memp_free(MEMP_HCI_INQ, ires);
         ires = tires;
     }
-    bt_memp_free(MEMP_HCI_PCB, pcb);
+    bt_memp_free(MEMP_HCI_PCB, hci_pcb);
 
     hci_active_links = NULL;
     hci_tmp_link = NULL;
@@ -211,101 +202,68 @@ void hci_reset_all(void)
 
 }
 
-void hci_arg(void *arg)
+
+void hci_register_cmd_complete(err_t (* cmd_complete)(void *arg,uint16_t opcode, uint8_t result))
 {
-    pcb->callback_arg = arg;
+    hci_pcb->cmd_complete = cmd_complete;
 }
 
-void hci_cmd_complete(err_t (* cmd_complete)(void *arg, struct hci_pcb_t *pcb, uint8_t ogf,
-                      uint8_t ocf, uint8_t result))
+void hci_register_pin_req(err_t (* pin_req)(void *arg, struct bd_addr_t *bdaddr))
 {
-    pcb->cmd_complete = cmd_complete;
-}
-
-void hci_pin_req(err_t (* pin_req)(void *arg, struct bd_addr_t *bdaddr))
-{
-    pcb->pin_req = pin_req;
+    hci_pcb->pin_req = pin_req;
 }
 
 
-void hci_bt_working(err_t (* bt_working)(void *arg))
+void hci_register_bt_working(err_t (* bt_working)(void *arg))
 {
-    pcb->bt_working = bt_working;
+    hci_pcb->bt_working = bt_working;
 }
 
-void hci_sco_req(err_t (* sco_req)(void *arg, struct bd_addr_t *bdaddr))
+void hci_register_sco_req(err_t (* sco_conn_req)(void *arg, struct bd_addr_t *bdaddr))
 {
-    pcb->sco_req = sco_req;
+    hci_pcb->sco_conn_req = sco_conn_req;
 }
 
-void hci_sco_conn_complete(err_t (* sco_conn_complete)(void *arg, uint8_t status,struct bd_addr_t *bdaddr))
+void hci_register_sco_conn_complete(err_t (* sco_conn_complete)(void *arg, uint8_t status,struct bd_addr_t *bdaddr))
 {
-    pcb->sco_conn_complete = sco_conn_complete;
+    hci_pcb->sco_conn_complete = sco_conn_complete;
 }
 
-void hci_sco_disconn_complete(err_t (* sco_disconn_complete)(void *arg, uint8_t status,struct bd_addr_t *bdaddr))
+void hci_register_sco_disconn_complete(err_t (* sco_disconn_complete)(void *arg, uint8_t status,struct bd_addr_t *bdaddr))
 {
-    pcb->sco_disconn_complete = sco_disconn_complete;
+    hci_pcb->sco_disconn_complete = sco_disconn_complete;
 }
 
-void hci_link_key_req(err_t (* link_key_req)(void *arg,struct bd_addr_t *bdaddr))
+void hci_register_link_key_req(err_t (* link_key_req)(void *arg,struct bd_addr_t *bdaddr))
 {
-    pcb->link_key_req= link_key_req;
+    hci_pcb->link_key_req= link_key_req;
 }
 
 
-void hci_link_key_not(err_t (* link_key_not)(void *arg, struct bd_addr_t *bdaddr, uint8_t *key,uint8_t key_type))
+void hci_register_link_key_not(err_t (* link_key_not)(void *arg, struct bd_addr_t *bdaddr, uint8_t *key,uint8_t key_type))
 {
-    pcb->link_key_not = link_key_not;
+    hci_pcb->link_key_not = link_key_not;
 }
 
-void hci_connection_complete(err_t (* conn_complete)(void *arg, struct bd_addr_t *bdaddr))
+void hci_register_connection_complete(err_t (* conn_complete)(void *arg, struct bd_addr_t *bdaddr))
 {
-    pcb->conn_complete = conn_complete;
+    hci_pcb->conn_complete = conn_complete;
 }
 
-void hci_wlp_complete(err_t (* wlp_complete)(void *arg, struct bd_addr_t *bdaddr))
+void hci_register_write_policy_complete(err_t (* wlp_complete)(void *arg, struct bd_addr_t *bdaddr))
 {
-    pcb->wlp_complete = wlp_complete;
-}
-
-struct hci_link_t *hci_get_link(struct bd_addr_t *bdaddr)
-{
-    struct hci_link_t *link = NULL;
-
-    for(link = hci_active_links; link != NULL; link = link->next)
-    {
-        if(bd_addr_cmp(&(link->bdaddr), bdaddr))
-        {
-            break;
-        }
-    }
-    return link;
-}
-
-struct hci_link_t *hci_get_link_by_handle(uint16_t handle)
-{
-    struct hci_link_t *link = NULL;
-
-    for(link = hci_active_links; link != NULL; link = link->next)
-    {
-        if(link->conhdl == handle)
-        {
-            break;
-        }
-    }
-    return link;
+    hci_pcb->wlp_complete = wlp_complete;
 }
 
 
 err_t hci_acl_write(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p, uint16_t len, uint8_t pb)
 {
-    struct hci_link_t *link;
-    static struct hci_acl_hdr_t *aclhdr;
+    hci_link_t *link;
+    static hci_acl_hdr_t *aclhdr;
     struct bt_pbuf_t *q;
 
     /* Check if an ACL connection exists */
-    link = hci_get_link(bdaddr);
+    link = _hci_get_link_by_addr(bdaddr);
 
     if(link == NULL)
     {
@@ -313,9 +271,9 @@ err_t hci_acl_write(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p, uint16_t len,
 
         return BT_ERR_CONN;
     }
-    BT_HCI_TRACE_DEBUG("hci_acl_write: HC num ACL %d\n", pcb->hc_num_acl);
+    BT_HCI_TRACE_DEBUG("hci_acl_write: HC num ACL %d\n", hci_pcb->hc_num_acl);
 
-    if(pcb->hc_num_acl == 0)
+    if(hci_pcb->hc_num_acl == 0)
     {
         BT_HCI_TRACE_DEBUG("hci_acl_write: HC out of buffer space\n");
 
@@ -365,7 +323,7 @@ err_t hci_acl_write(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p, uint16_t len,
 
     phybusif_output(q, aclhdr->len + q->len,PHYBUSIF_PACKET_TYPE_ACL_DATA);
 
-    --pcb->hc_num_acl;
+    --hci_pcb->hc_num_acl;
 
     /* Free ACL header. Upper layers will handle rest of packet */
     p = bt_pbuf_dechain(q);
@@ -375,9 +333,9 @@ err_t hci_acl_write(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p, uint16_t len,
 
 uint8_t hci_is_connected(struct bd_addr_t *bdaddr)
 {
-    struct hci_link_t *link;
+    hci_link_t *link;
 
-    link = hci_get_link(bdaddr);
+    link = _hci_get_link_by_addr(bdaddr);
 
     if(link == NULL)
     {
@@ -389,35 +347,34 @@ uint8_t hci_is_connected(struct bd_addr_t *bdaddr)
 
 uint16_t hci_pdu_maxsize(void)
 {
-    return pcb->maxsize;
+    return hci_pcb->acl_maxsize;
 }
 
 void hci_acl_input(struct bt_pbuf_t *p)
 {
-    struct hci_acl_hdr_t *aclhdr;
-    struct hci_link_t *link;
+    hci_acl_hdr_t *aclhdr;
+    hci_link_t *link;
     uint16_t conhdl;
 
-    //bt_pbuf_header(p, HCI_ACL_HDR_LEN);
     aclhdr = p->payload;
 
-    //BT_HCI_TRACE_DEBUG("DEBUG:BT RX ACL LEN:%d\n",aclhdr->len);
-    //bt_hex_dump(p->payload,aclhdr->len + HCI_ACL_HDR_LEN);
+    BT_HCI_TRACE_DEBUG("DEBUG:BT RX ACL LEN:%d\n",aclhdr->len);
+    bt_hex_dump(p->payload,aclhdr->len + HCI_ACL_HDR_LEN);
 
     //bt_pbuf_header(p, -HCI_ACL_HDR_LEN);
 
     conhdl = aclhdr->conhdl_pb_bc & 0x0FFF; /* Get the connection handle from the first
 						   12 bits */
-    if(pcb->flow)
+    if(hci_pcb->flow)
     {
         //TODO: XXX??? DO WE SAVE NUMACL PACKETS COMPLETED IN LINKS LIST?? SHOULD WE CALL
         //hci_host_num_comp_packets from the main loop when no data has been received from the
         //serial port???
-        --pcb->host_num_acl;
-        if(pcb->host_num_acl == 0)
+        --hci_pcb->host_num_acl;
+        if(hci_pcb->host_num_acl == 0)
         {
             hci_host_num_comp_packets(conhdl, HCI_HOST_MAX_NUM_ACL);
-            pcb->host_num_acl = HCI_HOST_MAX_NUM_ACL;
+            hci_pcb->host_num_acl = HCI_HOST_MAX_NUM_ACL;
         }
     }
 
@@ -448,7 +405,846 @@ void hci_acl_input(struct bt_pbuf_t *p)
 }
 
 
-uint8_t *hci_get_error_code(uint8_t code)
+
+static void vendor_init_done(uint8_t vendor_status)
+{
+    BT_HCI_TRACE_DEBUG("vendor_init_done %d\n",vendor_status);
+
+    if(vendor_status == VENDOR_STATUS_INITED)
+    {
+        hci_pcb->vendor_init_status = VENDOR_INITED;
+#if BT_VENDOR_BCM4345C5_SUPPORT > 0
+        hci_read_local_version_info();
+#else
+        hci_reset();
+#endif
+    }
+}
+
+static void vendor_init(uint8_t ogf,uint8_t ocf)
+{
+    hci_pcb->chip_mgr->vendor_init(vendor_init_done,ogf,ocf);
+}
+
+
+err_t read_bdaddr_complete(void *arg, struct bd_addr_t *bdaddr)
+{
+
+    BT_HCI_TRACE_DEBUG("DEBUG:read_bdaddr_complete: %02x:%02x:%02x:%02x:%02x:%02x\n",
+                       bdaddr->addr[5], bdaddr->addr[4], bdaddr->addr[3],
+                       bdaddr->addr[2], bdaddr->addr[1], bdaddr->addr[0]);
+
+    return BT_ERR_OK;
+}
+
+static err_t _hci_inq_comp_evt_process(uint8_t *payload,uint16_t payload_len)
+{
+    BT_HCI_TRACE_DEBUG("_hci_inq_comp_evt_process 0x%x %s\n",payload[0], _hci_get_error_code(payload[0]));
+    HCI_EVENT_INQ_COMPLETE(hci_pcb,payload[0]);
+
+    return BT_ERR_OK;
+}
+
+static err_t _hci_inq_result_evt_process(uint8_t evt_code,uint8_t *payload,uint16_t payload_len)
+{
+    uint8_t index = 0;
+    hci_inq_res_t *inqres;
+    struct bd_addr_t *bdaddr;
+    uint8_t resp_offset;
+
+    for(index=0; index<payload[0]; index++)
+    {
+        resp_offset = index*14;
+        BT_HCI_TRACE_DEBUG("hci_event_input: Inquiry result %d\nBD_ADDR: 0x",index);
+        for(index = 0; index < BD_ADDR_LEN; index++)
+        {
+            BT_HCI_TRACE_DEBUG("%x",payload[1+resp_offset+index]);
+        }
+        BT_HCI_TRACE_DEBUG("\n");
+
+        BT_HCI_TRACE_DEBUG("Page_Scan_Rep_Mode: 0x%x\n",payload[7+resp_offset]);
+
+        BT_HCI_TRACE_DEBUG("Class_of_Dev: 0x%x 0x%x 0x%x\n",payload[10+resp_offset],
+                           payload[11+resp_offset], payload[12+resp_offset]);
+        BT_HCI_TRACE_DEBUG("Clock_Offset: 0x%x%x\n",payload[13+resp_offset],
+                           payload[14+resp_offset]);
+        bdaddr = (void *)(payload+(1+resp_offset));
+        if((inqres = bt_memp_malloc(MEMP_HCI_INQ)) != NULL)
+        {
+            bd_addr_set(&(inqres->bdaddr), bdaddr);
+            inqres->psrm = payload[7+resp_offset];
+            inqres->psm = payload[9+resp_offset];
+
+            if(evt_code == HCI_EXT_INQ_RESULT)
+            {
+                uint8_t temp_rssi = payload[14+resp_offset];
+                uint8_t *eir_data = payload + 15;
+                uint8_t *temp_eir_data = eir_data;
+
+                inqres->cod[2] = payload[9+resp_offset];
+                inqres->cod[1] = payload[10+resp_offset];
+                inqres->cod[0] = payload[11+resp_offset];
+                //memcpy(inqres->cod, ((uint8_t *)p->payload)+9+resp_offset, 3);
+                inqres->co = *((uint16_t *)(payload+12+resp_offset));
+                if(temp_rssi & 0x80) /* negative rssi */
+                    inqres->rssi = ((int8_t)(temp_rssi & (~0x80)) -128)&0xff;
+                else
+                    inqres->rssi = temp_rssi;
+
+                while(temp_eir_data[0] != 0)
+                {
+                    uint8_t eir_element_len = temp_eir_data[0];
+                    uint8_t eir_element_type = temp_eir_data[1];
+                    if(eir_element_type == BT_DT_COMPLETE_LOCAL_NAME)
+                    {
+                        memset(inqres->remote_name,0,HCI_REMOTE_NAME_LEN);
+                        memcpy(inqres->remote_name,temp_eir_data+2,eir_element_len-1);
+                        break;
+                    }
+                    temp_eir_data += eir_element_len + 1;
+                }
+            }
+            else
+            {
+                inqres->cod[2] = payload[10+resp_offset];
+                inqres->cod[1] = payload[11+resp_offset];
+                inqres->cod[0] = payload[12+resp_offset];
+                inqres->co = *((uint16_t *)(payload+13+resp_offset));
+            }
+            HCI_REG(&(hci_pcb->ires), inqres);
+
+            HCI_EVENT_INQ_RESULT(hci_pcb,inqres);
+        }
+        else
+        {
+            BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_memp_malloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        }
+    }
+
+    return BT_ERR_OK;
+}
+
+
+static err_t _hci_conn_comp_evt_process(uint8_t *payload,uint16_t payload_len)
+{
+    struct bd_addr_t *bdaddr = (void *)(payload+3); /* Get the Bluetooth address */
+    hci_link_t *link = _hci_get_link_by_addr(bdaddr);
+    switch(payload[0])
+    {
+    case HCI_SUCCESS:
+        BT_HCI_TRACE_DEBUG("hci_event_input: Conn successfully completed\n");
+        if(link == NULL)
+        {
+            if((link = _hci_new_link()) == NULL)
+            {
+                /* Could not allocate memory for link. Disconnect */
+                BT_HCI_TRACE_DEBUG("hci_event_input: Could not allocate memory for link. Disconnect\n");
+                hci_disconnect_acl(bdaddr, HCI_OTHER_END_TERMINATED_CONN_LOW_RESOURCES);
+                /* Notify L2CAP */
+                lp_disconnect_ind(bdaddr);
+                break;
+            }
+            bd_addr_set(&(link->bdaddr), bdaddr);
+            link->conhdl = *((uint16_t *)(payload+1));
+            HCI_REG(&(hci_active_links), link);
+            HCI_EVENT_CONN_COMPLETE(hci_pcb,bdaddr); /* Allow applicaton to do optional configuration of link */
+            BT_HCI_TRACE_DEBUG("hci_event_input: Calling l2cap cb 1\n");
+            hci_get_remote_feature(bdaddr);
+            if(link->state == SEND_CREATE_CONNECTION)
+            {
+                lp_connect_cfm(bdaddr, payload[10], BT_ERR_OK); /* Notify L2CAP */
+            }
+            else
+                lp_connect_ind(&(link->bdaddr)); /* Notify L2CAP */
+            link->state = OPEN;
+        }
+        else
+        {
+            link->conhdl = *((uint16_t *)(payload+1));
+            HCI_EVENT_CONN_COMPLETE(hci_pcb,bdaddr); /* Allow applicaton to do optional configuration of link */
+            BT_HCI_TRACE_DEBUG("hci_event_input: Calling l2cap cb 2\n");
+            hci_get_remote_feature(bdaddr);
+            if(link->state == SEND_CREATE_CONNECTION)
+                lp_connect_cfm(bdaddr, payload[10], BT_ERR_OK); /* Notify L2CAP */
+            else
+                lp_connect_ind(&(link->bdaddr)); /* Notify L2CAP */
+            link->state = OPEN;
+        }
+        //TODO: MASTER SLAVE SWITCH??
+        break;
+    default:
+        BT_HCI_TRACE_DEBUG("hci_event_input: Conn failed to complete, 0x%x %s\n"
+                           , payload[0], _hci_get_error_code(payload[0]));
+        if(link != NULL)
+        {
+            BT_HCI_TRACE_DEBUG("hci_event_input: Link exists. Notify upper layer\n");
+            if(link->state == SEND_CREATE_CONNECTION)
+                lp_connect_cfm(bdaddr, payload[10], BT_ERR_CONN); /* Notify L2CAP */
+            else
+                lp_connect_ind(&(link->bdaddr)); /* Notify L2CAP */
+
+            _hci_delete_link(link);
+        }
+        else
+        {
+            /* silently discard */
+            BT_HCI_TRACE_DEBUG("hci_event_input: Silently discard. Link does not exist\n");
+        }
+        break;
+    } /* switch */
+
+    BT_HCI_TRACE_DEBUG("Conn_hdl: 0x%x 0x%x\n", payload[1], payload[2]);
+    BT_HCI_TRACE_DEBUG("Address:");
+    bt_hex_dump(payload+3,BD_ADDR_LEN);
+    BT_HCI_TRACE_DEBUG("Link_type: 0x%x\n",payload[9]);
+    BT_HCI_TRACE_DEBUG("Encryption_Mode: 0x%x\n",payload[10]);
+
+    return BT_ERR_OK;
+}
+
+
+static err_t _hci_conn_req_evt_process(uint8_t *payload,uint16_t payload_len)
+{
+    struct bd_addr_t *bdaddr = (void *)payload; /* Get the Bluetooth address */
+    hci_link_t *link = _hci_get_link_by_addr(bdaddr);
+    uint8_t link_type = payload[9];
+
+    BT_HCI_TRACE_DEBUG("hci_event_input: recv conn req type %d\n",link_type);
+
+    if(link == NULL)
+    {
+        if((link = _hci_new_link()) == NULL)
+        {
+            link->state = RECEIVED_CONNECTION_REQUEST;
+            /* Could not allocate memory for link. Disconnect */
+
+            BT_HCI_TRACE_DEBUG("hci_event_input: Could not allocate memory for link. reject\n");
+            hci_reject_connection_request(bdaddr,HCI_HOST_REJECTED_DUE_TO_LIMITED_RESOURCES);
+            link->state = REJECTED_CONNECTION_REQUEST;
+        }
+        else
+        {
+
+            bd_addr_set(&(link->bdaddr), bdaddr);
+            memcpy(&link->cod,payload+6,3);
+            link->role = HCI_ROLE_SLAVE;
+
+            BT_HCI_TRACE_DEBUG("hci_event_input: con req cod 0x%x\n",link->cod);
+            HCI_REG(&(hci_active_links), link);
+            hci_accept_connection_request(bdaddr,HCI_ROLE_SLAVE);
+            link->state = ACCEPTED_CONNECTION_REQUEST;
+        }
+    }
+    else
+    {
+        if(link_type == HCI_LINK_TYPE_ACL)
+        {
+            /* Could not allocate memory for link. Disconnect */
+            BT_HCI_TRACE_DEBUG("hci_event_input: con exit. reject\n");
+            hci_reject_connection_request(bdaddr,HCI_ACL_CONNECTION_EXISTS);
+            link->state = REJECTED_CONNECTION_REQUEST;
+            _hci_delete_link(link);
+
+        }
+        else
+        {
+            HCI_EVENT_SCO_REQ(hci_pcb, bdaddr);
+        }
+    }
+
+    return BT_ERR_OK;
+}
+
+
+static err_t _hci_sco_conn_comp_evt_process(uint8_t *payload,uint16_t payload_len)
+{
+    uint8_t status = payload[0];
+    struct bd_addr_t *bdaddr = (void *)(payload+3);
+    hci_link_t *link = _hci_get_link_by_addr(bdaddr);
+
+    BT_HCI_TRACE_DEBUG("hci_event_input: sco connection complete\n");
+
+    if(status == HCI_SUCCESS && link != NULL)
+    {
+        link->sco_connhdl = bt_le_read_16(payload,1);
+        BT_HCI_TRACE_DEBUG("hci_event_input: status %d,handle 0%x\n",status,link->sco_connhdl);
+        HCI_EVENT_SCO_CONN_COMPLETE(hci_pcb,status,bdaddr);
+    }
+
+    return BT_ERR_OK;
+}
+
+static err_t _hci_disconn_comp_evt_process(uint8_t *payload,uint16_t payload_len)
+{
+    uint8_t sco_disconnect;
+    uint8_t status = payload[0];
+    uint16_t con_handle = bt_le_read_16(payload,1);
+    uint8_t reason = payload[3];
+    hci_link_t *link = NULL;
+
+    BT_HCI_TRACE_DEBUG("hci_event_input: Disconn has occurred\n");
+    BT_HCI_TRACE_DEBUG("Reason: 0x%x (%s)\n", reason, _hci_get_error_code(reason));
+
+    if(status == HCI_SUCCESS)
+    {
+        BT_HCI_TRACE_DEBUG("Conn_hdl: 0x%x\n", con_handle);
+
+        for(link = hci_active_links; link != NULL; link = link->next)
+        {
+            if(link->conhdl == con_handle)
+            {
+                sco_disconnect = 0;
+                break; /* Found */
+            }
+
+            if(link->sco_connhdl == con_handle)
+            {
+                sco_disconnect = 1;
+                break;
+            }
+        }
+
+        if(link != NULL && sco_disconnect == 0)
+        {
+            BT_HCI_TRACE_DEBUG("hci_event_input: acl disconnect handle 0x%x\n",link->conhdl);
+            lp_disconnect_ind(&(link->bdaddr)); /* Notify upper layer */
+            link->state = RECEIVED_DISCONNECTION_COMPLETE;
+            _hci_delete_link(link);
+        }
+        if(link != NULL && sco_disconnect == 1)
+        {
+            BT_HCI_TRACE_DEBUG("hci_event_input: sco disconnect  handle 0x%x\n",link->sco_connhdl);
+
+            link->sco_connhdl = 0;
+            HCI_EVENT_SCO_DISCONN_COMPLETE(hci_pcb,status,&(link->bdaddr));
+
+        }
+    }
+    else
+    {
+        BT_HCI_TRACE_DEBUG("hci_event_input: Disconn failed to complete, 0x%x %s\n", status, _hci_get_error_code(status));
+    }
+
+
+    return BT_ERR_OK;
+}
+
+
+static err_t _hci_remote_name_req_evt_process(uint8_t *payload,uint16_t payload_len)
+{
+    struct bd_addr_t *bdaddr = (void *)(payload+1);
+    uint8_t *remote_name = (void *)(payload+7);
+    BT_HCI_TRACE_DEBUG("hci_event_input: get remote name complete result = 0x%x\n", payload[0]);
+    HCI_EVENT_REMOTE_NAME_REQ_COMPLETE(hci_pcb,bdaddr,remote_name);
+
+    return BT_ERR_OK;
+}
+
+static err_t _hci_encryption_change_evt_process(uint8_t *payload,uint16_t payload_len)
+{
+    BT_HCI_TRACE_DEBUG("hci_event_input: Encryption changed. Status = 0x%x, Encryption enable = 0x%x\n", payload[0], payload[3]);
+    return BT_ERR_OK;
+}
+
+static err_t _hci_qos_setup_evt_process(uint8_t *payload,uint16_t payload_len)
+{
+    BT_HCI_TRACE_DEBUG("hci_event_input: QOS setup complete result = 0x%x\n", payload[0]);
+
+    return BT_ERR_OK;
+}
+
+static err_t _hci_cmd_comp_evt_process(uint8_t *payload,uint16_t payload_len)
+{
+    uint8_t num_complete_pack = payload[0];
+    uint16_t opcode = bt_le_read_16(payload,1);
+    uint8_t *param = payload+3;
+    BT_HCI_TRACE_DEBUG("hci_event_input: Command Complete\n");
+    BT_HCI_TRACE_DEBUG("Num_HCI_Command_Packets: 0x%x\n", num_complete_pack);
+
+    /* Add number of completed command packets to the number of command packets that the BT module can buffer */
+    hci_pcb->numcmd += num_complete_pack;
+
+    switch(opcode)
+    {
+    case HCI_OP_INQUIRY_CANCEL:
+    {
+        BT_HCI_TRACE_DEBUG("HCI_INQUIRY_CANCEL command complete\n");
+        HCI_EVENT_INQ_COMPLETE(hci_pcb,param[0]);
+        break;
+    }
+    case HCI_OP_WRITE_POLICY_SETTINGS:
+    {
+        if(param[0] == HCI_SUCCESS)
+        {
+            hci_link_t *link = NULL;
+            BT_HCI_TRACE_DEBUG("hci_event_input: Successful HCI_W_LINK_POLICY.\n");
+            for(link = hci_active_links; link != NULL; link = link->next)
+            {
+                if(link->conhdl == bt_le_read_16(param,1))
+                {
+                    break;
+                }
+            }
+            if(link == NULL)
+            {
+                BT_HCI_TRACE_DEBUG("hci_event_input: Connection does not exist\n");
+
+                return BT_ERR_CONN; /* Connection does not exist */
+            }
+            HCI_EVENT_WLP_COMPLETE(hci_pcb, &link->bdaddr); /* Notify application.*/
+        }
+        else
+        {
+            BT_HCI_TRACE_DEBUG("Unsuccessful HCI_W_LINK_POLICY.\n");
+        }
+        break;
+    }
+    case HCI_OP_SET_HC_TO_HOST_FLOW_CTRL:
+    {
+        hci_pcb->flow = 1;
+        break;
+    }
+    case HCI_OP_READ_BD_ADDR:
+    {
+        if(param[0] == HCI_SUCCESS)
+        {
+            struct bd_addr_t *bdaddr = (void *)(param + 1); /* Get the Bluetooth address */
+            HCI_EVENT_RBD_COMPLETE(hci_pcb, bdaddr); /* Notify application.*/
+        }
+        break;
+    }
+    case HCI_OP_BLE_WRITE_SCAN_ENABLE:
+    {
+        BT_HCI_TRACE_DEBUG("HCI_LE_SET_SCAN le_inq_w2_stop(%d)\n",hci_pcb->le_inq_w2_stop);
+        if(hci_pcb->le_inq_w2_stop == 1)
+        {
+            BT_HCI_TRACE_DEBUG("DEBUG:hci_event_input:le inquiry complete, 0x%x %s\n",param[0], _hci_get_error_code(param[0]));
+            HCI_EVENT_LE_INQ_COMPLETE(hci_pcb,param[0]);
+            hci_pcb->le_inq_w2_stop = 0;
+        }
+        break;
+    }
+    default:
+        break;
+    }
+
+    HCI_EVENT_CMD_COMPLETE(hci_pcb,opcode,param[0]);
+
+    return BT_ERR_OK;
+}
+
+
+static err_t _hci_cmd_status_evt_process(uint8_t *payload,uint16_t payload_len)
+{
+	uint8_t status = payload[0];
+
+	hci_pcb->numcmd += payload[1]; 
+	uint16_t opcode = bt_le_read_16(payload,2);
+
+	BT_HCI_TRACE_DEBUG("hci_event_input: Command Status OGF(0x%x),OCF(0x%x) status(0x%x)\n",HCI_OGF(opcode),HCI_OCF(opcode),status);
+	
+	return BT_ERR_OK;
+}
+
+static err_t _hci_hw_err_evt_process(uint8_t *payload,uint16_t payload_len)
+{
+	BT_HCI_TRACE_DEBUG("hci_event_input: Hardware Error\n");
+    BT_HCI_TRACE_DEBUG("Hardware_code: 0x%x\n\n", payload[0]);
+
+	return BT_ERR_OK;
+}
+
+static err_t _hci_role_change_evt_process(uint8_t *payload,uint16_t payload_len)
+{
+	BT_HCI_TRACE_DEBUG("hci_event_input: Role change\n");
+    BT_HCI_TRACE_DEBUG("Status: 0x%x\n", payload[0]);
+    BT_HCI_TRACE_DEBUG("New Role: 0x%x\n", payload[7]);
+	return BT_ERR_OK;
+}
+
+static err_t _hci_number_comp_evt_process(uint8_t *payload,uint16_t payload_len)
+{
+	uint8_t index = 0;
+	uint8_t resp_offset;
+	uint8_t num_handle = payload[0];
+	BT_HCI_TRACE_DEBUG("hci_event_input: Number Of Completed Packets\n");
+    BT_HCI_TRACE_DEBUG("Number_of_Handles: 0x%x\n", num_handle);
+	
+    for(index=0; index<num_handle; index++)
+    {
+        resp_offset = index*4;
+		uint16_t handle = bt_le_read_16(payload,1+resp_offset);
+		uint16_t num_comp_pack = bt_le_read_16(payload,3+resp_offset);
+        BT_HCI_TRACE_DEBUG("Conn_hdl: 0x%x\n", handle);
+        BT_HCI_TRACE_DEBUG("HC_Num_Of_Completed_Packets: 0x%x\n",num_comp_pack);
+        /* Add number of completed ACL packets to the number of ACL packets that the BT module can buffer */
+        hci_pcb->hc_num_acl += num_comp_pack;
+#if HCI_FLOW_QUEUEING
+        {
+        	hci_link_t *link = NULL;
+            struct bt_pbuf_t *q;
+            for(link = hci_active_links; link != NULL; link = link->next)
+            {
+                if(link->conhdl == handle)
+                {
+                    break;
+                }
+            }
+			if(link != NULL)
+			{
+	            q = link->p;
+	            /* Queued packet present? */
+	            if (q != NULL)
+	            {
+	                /* NULL attached buffer immediately */
+	                link->p = NULL;
+	                BT_HCI_TRACE_DEBUG("Sending queued packet.\n");
+	                /* Send the queued packet */
+	                hci_acl_write(&link->bdaddr, q, link->len, link->pb);
+	                /* Free the queued packet */
+	                bt_pbuf_free(q);
+	            }
+			}
+        }
+#endif /* HCI_FLOW_QUEUEING */
+    }
+	
+	return BT_ERR_OK;
+}
+
+static err_t _hci_mode_change_evt_process(uint8_t *payload,uint16_t payload_len)
+{
+	BT_HCI_TRACE_DEBUG("hci_event_input: Mode change\n");
+    BT_HCI_TRACE_DEBUG("Status: 0x%x\n", payload[0]);
+    BT_HCI_TRACE_DEBUG("Conn_hdl: 0x%x\n", bt_le_read_16(payload,1));
+	BT_HCI_TRACE_DEBUG("Mode: 0x%x\n", payload[3]);
+	BT_HCI_TRACE_DEBUG("Interval: 0x%x\n", bt_le_read_16(payload,4));
+	
+	return BT_ERR_OK;
+}
+
+static err_t _hci_data_buf_overflow_evt_process(uint8_t *payload,uint16_t payload_len)
+{
+	BT_HCI_TRACE_DEBUG("hci_event_input: Data Buffer Overflow\n");
+	BT_HCI_TRACE_DEBUG("Link_Type: 0x%x\n", payload[0]);
+
+	return BT_ERR_OK;
+}
+
+
+static err_t _hci_max_slot_change_evt_process(uint8_t *payload,uint16_t payload_len)
+{
+	BT_HCI_TRACE_DEBUG("hci_event_input: Max slots changed\n");
+	BT_HCI_TRACE_DEBUG("Conn_hdl: 0x%x\n", bt_le_read_16(payload,0));
+	BT_HCI_TRACE_DEBUG("LMP max slots: 0x%x\n", payload[2]);
+
+	return BT_ERR_OK;
+}
+
+static err_t _hci_pincode_req_evt_process(uint8_t *payload,uint16_t payload_len)
+{
+	struct bd_addr_t *bdaddr = (void *)payload;
+	BT_HCI_TRACE_DEBUG("hci_event_input: Pin code request\n");
+	HCI_EVENT_PIN_REQ(hci_pcb, bdaddr); /* Notify application. If event is not registered,send a negative reply */
+	return BT_ERR_OK;
+}
+
+static err_t _hci_linkkey_req_evt_process(uint8_t *payload,uint16_t payload_len)
+{
+	struct bd_addr_t *bdaddr = (void *)payload;
+	BT_HCI_TRACE_DEBUG("hci_event_input: link key request\n");
+    HCI_EVENT_LINK_REQ(hci_pcb, bdaddr);
+
+	return BT_ERR_OK;
+}
+
+static err_t _hci_linkkey_notify_evt_process(uint8_t *payload,uint16_t payload_len)
+{
+	struct bd_addr_t *bdaddr = (void *)payload;
+	uint8_t *link_key = payload+6;
+	uint8_t link_key_type = payload[6+16];
+	BT_HCI_TRACE_DEBUG("hci_event_input: link key notification\n");
+    HCI_EVENT_LINK_KEY_NOT(hci_pcb, bdaddr, link_key,link_key_type); /* Notify application.*/
+
+	return BT_ERR_OK;
+}
+
+static err_t _hci_io_cap_req_evt_process(uint8_t *payload,uint16_t payload_len)
+{
+	struct bd_addr_t *bdaddr = (void *)payload;
+	uint32_t num_value = bt_le_read_32(payload,6);
+	BT_HCI_TRACE_DEBUG("hci_event_input: io cap request num value(%d)\n",num_value);
+	hci_io_cap_req_replay(bdaddr,hci_pcb->ssp_io_cap,0x0,SSP_IO_AUTHREQ_MITM_PROTECTION_REQUIRED_DEDICATED_BONDING);
+
+	return BT_ERR_OK;
+}
+
+static err_t _hci_usr_confim_req_evt_process(uint8_t *payload,uint16_t payload_len)
+{
+	struct bd_addr_t *bdaddr = (void *)payload;
+	BT_HCI_TRACE_DEBUG("hci_event_input: user confirm request\n");
+    hci_user_confirm_req_reply(bdaddr);
+
+	return BT_ERR_OK;
+}
+
+#if BT_BLE_ENABLE > 0
+static err_t _hci_le_meta_evt_process(uint8_t *payload,uint16_t payload_len)
+{
+	uint8_t sub_event = payload[0];
+    BT_HCI_TRACE_DEBUG("hci_event_input: le meta event sub event 0x%x\n",sub_event);
+
+    switch(sub_event)
+    {
+    case HCI_SUBEVENT_LE_CONN_COMPLETE:
+    {
+        uint16_t con_handle = bt_le_read_16(payload,2);
+        hci_link_t * link = _hci_get_link_by_handle(con_handle);
+        struct bd_addr_t *bdaddr = (struct bd_addr_t *)(payload+6);
+
+        if(link == NULL)
+        {
+            if((link = _hci_new_link()) == NULL)
+            {
+                /* Could not allocate memory for link. Disconnect */
+                BT_HCI_TRACE_DEBUG("hci_event_input: Could not allocate memory for link. Disconnect\n");
+                break;
+            }
+            bd_addr_set(&(link->bdaddr), bdaddr);
+            bt_hex_dump((uint8_t *)&(link->bdaddr),6);
+            link->conhdl = con_handle;
+            HCI_REG(&(hci_active_links), link);
+            link->state = OPEN;
+        }
+        break;
+    }
+    case HCI_SUBEVENT_LE_ADV_REPORT:
+    {
+        hci_le_inq_res_t hci_le_inq_res = {0};
+
+        hci_le_inq_res.addr_type = payload[3];
+        memcpy(hci_le_inq_res.bdaddr.addr,payload+4,BD_ADDR_LEN);
+        hci_le_inq_res.adv_size = payload[10];
+        hci_le_inq_res.adv_type = payload[2];
+        memcpy(hci_le_inq_res.adv_data,payload+11,hci_le_inq_res.adv_size);
+        hci_le_inq_res.rssi = payload[11+hci_le_inq_res.adv_size];
+
+        HCI_EVENT_LE_INQ_RESULT(hci_pcb,&hci_le_inq_res);
+
+        break;
+    }
+
+    default:
+        break;
+    }
+
+	return BT_ERR_OK;
+}
+#endif
+
+static err_t _hci_vendor_evt_process(uint8_t *payload,uint16_t payload_len)
+{
+	return BT_ERR_OK;
+}
+
+
+static err_t _hci_init_cmd_compl_process(uint8_t *payload,uint16_t payload_len)
+{
+    uint16_t opcode = bt_le_read_16(payload,1);
+
+
+    BT_HCI_TRACE_DEBUG("_hci_init_cmd_compl_process:0x%x\n",opcode);
+
+    if((opcode&HCI_GRP_VENDOR_SPECIFIC) == HCI_GRP_VENDOR_SPECIFIC)
+    {
+        BT_HCI_TRACE_DEBUG("Init recv HCI_GRP_VENDOR_SPECIFIC\n");
+        vendor_init(HCI_OGF(opcode),HCI_OCF(opcode));
+    }
+
+    switch(opcode)
+    {
+    case HCI_OP_RESET:
+    {
+        BT_HCI_TRACE_DEBUG("Init recv HCI_OP_RESET\n");
+        utimer_cancel(hci_pcb->timer);
+        if (hci_pcb->vendor_init_status == VENDOR_NOT_INIT)
+        {
+            if(hci_pcb->chip_mgr != NULL)
+                vendor_init(HCI_OGF(opcode),HCI_OCF(opcode));
+        }
+        else
+        {
+            hci_read_local_version_info();
+        }
+
+        break;
+    }
+    case HCI_OP_READ_LOCAL_VERSION_INFO:
+    {
+        uint8_t hci_version = payload[4];
+        uint16_t hci_reversion = bt_le_read_16(payload,5);
+        uint8_t lmp_version = payload[7];
+        uint16_t manufacturer_name = bt_le_read_16(payload,8);
+        uint16_t lmp_subversion = bt_le_read_16(payload,10);
+
+        BT_HCI_TRACE_DEBUG("Init recv HCI_OP_READ_LOCAL_VERSION_INFO\n");
+        BT_HCI_TRACE_DEBUG("DEBUG:HCI version:0x%x\n",hci_version);
+        BT_HCI_TRACE_DEBUG("DEBUG:HCI reversion:0x%x\n",hci_reversion);
+        BT_HCI_TRACE_DEBUG("DEBUG:LMP version:0x%x\n",lmp_version);
+        BT_HCI_TRACE_DEBUG("DEBUG:LMP reversion:0x%x\n",lmp_subversion);
+        BT_HCI_TRACE_DEBUG("DEBUG:manufacturer_name:0x%x\n",manufacturer_name);
+
+        hci_read_buffer_size();
+        break;
+    }
+    case HCI_OP_READ_BUFFER_SIZE:
+    {
+        BT_HCI_TRACE_DEBUG("Init recv HCI_OP_READ_BUFFER_SIZE\n");
+
+
+        hci_pcb->acl_maxsize = bt_le_read_16(payload,4); /* Maximum size of an ACL packet that the BT module is able to accept */
+        hci_pcb->hc_num_acl = bt_le_read_16(payload,7); /* Number of ACL packets that the BT module can buffer */
+        BT_HCI_TRACE_DEBUG("Max ACL size(%d)\n",hci_pcb->acl_maxsize);
+        BT_HCI_TRACE_DEBUG("Max ACL count(%d)\n",hci_pcb->hc_num_acl);
+        hci_read_bd_addr(read_bdaddr_complete);
+        break;
+    }
+    case HCI_OP_READ_BD_ADDR:
+    {
+        struct bd_addr_t *bdaddr = (void *)(payload + 4);
+        BT_HCI_TRACE_DEBUG("Init recv HCI_OP_READ_BD_ADDR\n");
+        memcpy(hci_pcb->local_bd_addr.addr,bdaddr,BD_ADDR_LEN);
+
+        HCI_EVENT_RBD_COMPLETE(hci_pcb, bdaddr); /* Notify application.*/
+        hci_write_cod((uint8_t *)&hci_pcb->class_of_device);
+        break;
+    }
+    case HCI_OP_WRITE_CLASS_OF_DEVICE:
+    {
+        BT_HCI_TRACE_DEBUG("Init recv HCI_OP_WRITE_CLASS_OF_DEVICE\n");
+        hci_write_local_name((uint8_t *)hci_pcb->local_name, strlen((const char*)hci_pcb->local_name));
+        break;
+    }
+    case HCI_OP_CHANGE_LOCAL_NAME:
+    {
+        BT_HCI_TRACE_DEBUG("Init recv HCI_OP_CHANGE_LOCAL_NAME\n");
+        hci_write_page_timeout(BT_PAGE_TIMEOUT); /* value*0.625ms */
+        break;
+    }
+    case HCI_OP_WRITE_PAGE_TOUT:
+    {
+        BT_HCI_TRACE_DEBUG("Init recv HCI_OP_WRITE_PAGE_TOUT\n");
+#if BT_BLE_ENABLE > 0
+        hci_set_event_mask(0xffffffff,0x3FFFFFFF);
+#else
+        hci_set_event_mask(0xffffffff, 0x1FFFFFFF); /* base 0x1FFFFFFF:Add LE Meta event(bit 61) */
+#endif
+        break;
+    }
+    case HCI_OP_SET_EVENT_MASK:
+    {
+        BT_HCI_TRACE_DEBUG("Init recv HCI_OP_SET_EVENT_MASK\n");
+        hci_write_ssp_mode(hci_pcb->ssp_enable);
+        break;
+    }
+    case HCI_OP_WRITE_SIMPLE_PAIRING_MODE:
+    {
+        BT_HCI_TRACE_DEBUG("Init recv HCI_OP_WRITE_SIMPLE_PAIRING_MODE\n");
+        hci_write_inquiry_mode(INQUIRY_MODE_EIR);
+        break;
+    }
+    case HCI_OP_WRITE_INQUIRY_MODE:
+    {
+        BT_HCI_TRACE_DEBUG("Init recv HCI_OP_WRITE_INQUIRY_MODE\n");
+        hci_write_scan_enable(HCI_SCAN_EN_INQUIRY | HCI_SCAN_EN_PAGE);
+        break;
+    }
+    case HCI_OP_WRITE_SCAN_ENABLE:
+    {
+        BT_HCI_TRACE_DEBUG("Init recv HCI_OP_WRITE_SCAN_ENABLE\n");
+#if BT_BLE_ENABLE > 0
+        hci_write_le_enable(1,0);
+#else
+        if(hci_pcb->init_status == BLUETOOTH_INITING)
+            HCI_BT_WORKING(hci_pcb);
+        hci_pcb->init_status = BLUETOOTH_WORKING;
+#endif
+        break;
+
+    }
+    case HCI_OP_WRITE_LE_SUPPORT:
+    {
+        if(hci_pcb->init_status == BLUETOOTH_INITING)
+            HCI_BT_WORKING(hci_pcb);
+        hci_pcb->init_status = BLUETOOTH_WORKING;
+
+        break;
+    }
+    default:
+        break;
+    }
+    return BT_ERR_OK;
+}
+
+static hci_link_t *_hci_new_link(void)
+{
+    hci_link_t *link = bt_memp_malloc(MEMP_HCI_LINK);
+    if(link != NULL)
+    {
+        memset(link, 0, sizeof(hci_link_t));
+        return link;
+    }
+
+    BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_memp_malloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+    return NULL;
+}
+
+static err_t _hci_delete_link(hci_link_t *link)
+{
+#if HCI_FLOW_QUEUEING
+    if(link->p != NULL)
+    {
+        bt_pbuf_free(link->p);
+    }
+#endif
+    HCI_RMV(&(hci_active_links), link);
+    bt_memp_free(MEMP_HCI_LINK, link);
+    link = NULL;
+    return BT_ERR_OK;
+}
+
+
+
+static hci_link_t *_hci_get_link_by_addr(struct bd_addr_t *bdaddr)
+{
+    hci_link_t *link = NULL;
+
+    for(link = hci_active_links; link != NULL; link = link->next)
+    {
+        if(bd_addr_cmp(&(link->bdaddr), bdaddr))
+        {
+            break;
+        }
+    }
+    return link;
+}
+
+static hci_link_t *_hci_get_link_by_handle(uint16_t handle)
+{
+    hci_link_t *link = NULL;
+
+    for(link = hci_active_links; link != NULL; link = link->next)
+    {
+        if(link->conhdl == handle)
+        {
+            break;
+        }
+    }
+    return link;
+}
+
+
+static uint8_t *_hci_get_error_code(uint8_t code)
 {
     switch(code)
     {
@@ -542,808 +1338,192 @@ uint8_t *hci_get_error_code(uint8_t code)
 }
 
 
-static void vendor_init_done(uint8_t vendor_status)
+static err_t _hci_reset_cmd_timeout(void *para)
 {
-	BT_HCI_TRACE_DEBUG("vendor_init_done %d\n",vendor_status);
+    BT_HCI_TRACE_DEBUG("_hci_reset_cmd_timeout handle\n");
+    hci_reset();
 
-	if(vendor_status == VENDOR_STATUS_INITED)
-	{
-    	pcb->vendor_init_status = VENDOR_INITED;
-#if BT_VENDOR_BCM4345C5_SUPPORT > 0
-		hci_read_local_version_info();
-#else
-		hci_reset();
-#endif
-	} 
+	return BT_ERR_OK;
 }
 
-static void vendor_init(uint8_t ogf,uint8_t ocf)
+static err_t _hci_pin_req_handle(void *arg, struct bd_addr_t *bdaddr)
 {
-    pcb->chip_mgr->vendor_init(vendor_init_done,ogf,ocf);
+    return hci_pin_code_request_reply(bdaddr, strlen((const char*)hci_pcb->pincode), hci_pcb->pincode);
 }
 
-
-err_t read_bdaddr_complete(void *arg, struct bd_addr_t *bdaddr)
+static err_t _hci_set_chip_name(uint8_t *name)
 {
+    if(hci_pcb != NULL)
+    {
+        hci_pcb->chip_mgr = bt_vendor_get_chip_mrg(name);
 
-    BT_HCI_TRACE_DEBUG("DEBUG:read_bdaddr_complete: %02x:%02x:%02x:%02x:%02x:%02x\n",
-                       bdaddr->addr[5], bdaddr->addr[4], bdaddr->addr[3],
-                       bdaddr->addr[2], bdaddr->addr[1], bdaddr->addr[0]);
+        if(hci_pcb->chip_mgr != NULL)
+            return BT_ERR_ARG;
+    }
+
     return BT_ERR_OK;
 }
 
-static void hci_init_cmd_complete_handle(uint8_t ocf, uint8_t ogf,uint8_t * payload)
+
+static err_t _hci_init_process(struct bt_pbuf_t *p)
 {
-    	switch(ogf) {
-		case HCI_VENDOR_OGF:
-		{
-			if(pcb->vendor_init_status == VENDOR_NOT_INIT)
-				vendor_init(ogf,ocf);
-			break;
-		} 
-		
-		case HCI_HOST_C_N_BB: {
+    hci_evt_hdr_t *evt_hdr = p->payload;
 
-			switch (ocf) {
-				case HCI_RESET: {
-			        utimer_cancel(pcb->timer);
-					if (payload[0] == HCI_SUCCESS) {
-						if (pcb->vendor_init_status == VENDOR_NOT_INIT) 
-						{
-							if(pcb->chip_mgr != NULL)
-							{
-								vendor_init(ogf,ocf);								
-							}
-						}
-						else 
-						{
-							hci_read_local_version_info();
-						}
-					}
-				} break;
-				case HCI_WRITE_COD: {
-					hci_write_local_name((uint8_t *)pcb->local_name, strlen((const char*)pcb->local_name));
-
-				} break;
-				case  HCI_WRITE_LOCAL_NAME: {
-        	        hci_write_page_timeout(0x4000); /* 10.24s */
-        	    } break;
-
-				case HCI_WRITE_PAGE_TIMEOUT: {
-#if BT_BLE_ENABLE > 0
-    	        hci_set_event_mask(0xffffffff,0x3FFFFFFF);
-#else
-					hci_set_event_mask(0xffffffff, 0x1FFFFFFF); /* base 0x1FFFFFFF:Add LE Meta event(bit 61) */
-#endif
-				} break;
-
-				case HCI_SET_EVENT_MASK: {
-			        hci_write_ssp_mode(pcb->ssp_enable);
-			    } break;
-
-				case HCI_WRITE_SSP_MODE: {
-			        hci_write_inquiry_mode(INQUIRY_MODE_EIR);
-			    } break;
-
-				case HCI_WRITE_INQUIRY_MODE: {
-			        hci_write_scan_enable(HCI_SCAN_EN_INQUIRY | HCI_SCAN_EN_PAGE);
-			    } break;
-
-#if BT_BLE_ENABLE > 0
-				case HCI_WRITE_SCAN_ENABLE:  {
-					hci_write_le_enable(1,0);
-				} break;
-
-				case HCI_WRITE_LE_SUPPORT: {
-					if(pcb->init_status == BLUETOOTH_INITING)
-						HCI_BT_WORKING(pcb);
-					pcb->init_status = BLUETOOTH_WORKING;
-
-				} break;
-#else
-				case  HCI_WRITE_SCAN_ENABLE: {
-					if(pcb->init_status == BLUETOOTH_INITING)
-						HCI_BT_WORKING(pcb);
-					pcb->init_status = BLUETOOTH_WORKING;
-
-				} break;
-#endif
-
-				default: {
-
-				} break;
-			}
-		} break;
-		case HCI_INFO_PARAM: {
-			switch (ocf) {
-				case HCI_READ_LOCAL_VER_INFO: {
-			        if(((uint8_t *)payload)[0]  == HCI_SUCCESS) {
-			            uint8_t hci_version = payload[1];
-			            uint16_t hci_reversion = bt_le_read_16(payload,2);
-			            uint8_t lmp_version = payload[4];
-			            uint16_t manufacturer_name = bt_le_read_16(payload,5);
-			            uint16_t lmp_subversion = bt_le_read_16(payload,7);
-
-			            BT_HCI_TRACE_DEBUG("DEBUG:HCI version:0x%x\n",hci_version);
-			            BT_HCI_TRACE_DEBUG("DEBUG:HCI reversion:0x%x\n",hci_reversion);
-			            BT_HCI_TRACE_DEBUG("DEBUG:LMP version:0x%x\n",lmp_version);
-			            BT_HCI_TRACE_DEBUG("DEBUG:LMP reversion:0x%x\n",lmp_subversion);
-			            BT_HCI_TRACE_DEBUG("DEBUG:manufacturer_name:0x%x\n",manufacturer_name);
-
-						hci_read_buffer_size();
-			        }
-				} break;
-
-				case HCI_READ_BUFFER_SIZE: {
-			        hci_read_bd_addr(read_bdaddr_complete);
-				} break;
-				case HCI_READ_BD_ADDR: {
-			        /*TODO 2:此部分要注意是否需要反转 */
-			        memcpy(pcb->local_bd_addr.addr,&payload[1],6);
-			        hci_write_cod((uint8_t *)&pcb->class_of_device);
-				} break;
-				default: {
-
-				} break;
-			}
-
-		} break;
-
-		default: {
-
-		} break;
-	}
+    BT_HCI_TRACE_DEBUG("_hci_init_process:\n");
+    //bt_hex_dump(p->payload,evt_hdr->len+HCI_EVT_HDR_LEN);
 
 
+    switch(evt_hdr->code)
+    {
+    case HCI_COMMAND_COMPLETE:
+    {
+        bt_pbuf_header(p, -HCI_EVT_HDR_LEN); /* offset to para */
+        _hci_init_cmd_compl_process(p->payload,evt_hdr->len);
+        break;
+    }
+    case HCI_VENDOR_SPEC:
+    {
+        BT_HCI_TRACE_DEBUG("Init recv HCI_VENDOR_SPEC\n");
+        vendor_init(HCI_OGF(HCI_OP_NONE),HCI_OCF(HCI_OP_NONE));
+        break;
+    }
+    default:
+        break;
+    }
+
+	return BT_ERR_OK;
 }
+
 
 
 void hci_event_input(struct bt_pbuf_t *p)
 {
-    struct hci_inq_res_t *inqres;
-    struct hci_event_hdr_t *evhdr;
-    struct hci_link_t *link;
-    uint8_t i, j;
-    struct bd_addr_t *bdaddr;
-    uint8_t *remote_name;
-    uint8_t link_key_type;
-    uint8_t resp_offset;
-    err_t ret = BT_ERR_OK;
-    uint8_t ocf, ogf;
-    uint8_t link_type;
-    uint8_t status;
-    uint8_t sco_disconnect;
-    BT_UNUSED_ARG(ret);
+    hci_evt_hdr_t *evhdr;
+
+    if(hci_pcb->init_status == BLUETOOTH_INITING)
+    {
+        _hci_init_process(p);
+        return;
+    }
 
     evhdr = p->payload;
+    bt_pbuf_header(p, -HCI_EVT_HDR_LEN);
 
-    //BT_HCI_TRACE_DEBUG("DEBUG:BT RX event (0x%x) LEN:%d\n",evhdr->code,p->tot_len);
-    //bt_hex_dump(p->payload,evhdr->len + HCI_EVENT_HDR_LEN);
-
-
-    bt_pbuf_header(p, -HCI_EVENT_HDR_LEN);
 
     switch(evhdr->code)
     {
     case HCI_INQUIRY_COMPLETE:
-        BT_HCI_TRACE_DEBUG("DEBUG:hci_event_input: Inquiry complete, 0x%x %s\n",((uint8_t *)p->payload)[0], hci_get_error_code(((uint8_t *)p->payload)[0]));
-        HCI_EVENT_INQ_COMPLETE(pcb,((uint8_t *)p->payload)[0],ret);
+        _hci_inq_comp_evt_process(p->payload,evhdr->len);
         break;
     case HCI_INQUIRY_RESULT:
     case HCI_EXT_INQ_RESULT:
-        for(i=0; i<((uint8_t *)p->payload)[0]; i++)
-        {
-            resp_offset = i*14;
-            BT_HCI_TRACE_DEBUG("hci_event_input: Inquiry result %d\nBD_ADDR: 0x",i);
-            for(i = 0; i < BD_ADDR_LEN; i++)
-            {
-                BT_HCI_TRACE_DEBUG("%x",((uint8_t *)p->payload)[1+resp_offset+i]);
-            }
-            BT_HCI_TRACE_DEBUG("\n");
-
-            BT_HCI_TRACE_DEBUG("Page_Scan_Rep_Mode: 0x%x\n",((uint8_t *)p->payload)[7+resp_offset]);
-
-            BT_HCI_TRACE_DEBUG("Class_of_Dev: 0x%x 0x%x 0x%x\n",((uint8_t *)p->payload)[10+resp_offset],
-                               ((uint8_t *)p->payload)[11+resp_offset], ((uint8_t *)p->payload)[12+resp_offset]);
-            BT_HCI_TRACE_DEBUG("Clock_Offset: 0x%x%x\n",((uint8_t *)p->payload)[13+resp_offset],
-                               ((uint8_t *)p->payload)[14+resp_offset]);
-            bdaddr = (void *)(((uint8_t *)p->payload)+(1+resp_offset));
-            if((inqres = bt_memp_malloc(MEMP_HCI_INQ)) != NULL)
-            {
-                bd_addr_set(&(inqres->bdaddr), bdaddr);
-                inqres->psrm = ((uint8_t *)p->payload)[7+resp_offset];
-                inqres->psm = ((uint8_t *)p->payload)[9+resp_offset];
-
-                if(evhdr->code == HCI_EXT_INQ_RESULT)
-                {
-                    uint8_t temp_rssi = ((uint8_t *)p->payload)[14+resp_offset];
-                    uint8_t *eir_data = ((uint8_t *)p->payload) + 15;
-                    uint8_t *temp_eir_data = eir_data;
-
-                    inqres->cod[2] = ((uint8_t *)p->payload)[9+resp_offset];
-                    inqres->cod[1] = ((uint8_t *)p->payload)[10+resp_offset];
-                    inqres->cod[0] = ((uint8_t *)p->payload)[11+resp_offset];
-                    //memcpy(inqres->cod, ((uint8_t *)p->payload)+9+resp_offset, 3);
-                    inqres->co = *((uint16_t *)(((uint8_t *)p->payload)+12+resp_offset));
-                    if(temp_rssi & 0x80) /* negative rssi */
-                        inqres->rssi = ((int8_t)(temp_rssi & (~0x80)) -128)&0xff;
-                    else
-                        inqres->rssi = temp_rssi;
-
-                    while(temp_eir_data[0] != 0)
-                    {
-                        uint8_t eir_element_len = temp_eir_data[0];
-                        uint8_t eir_element_type = temp_eir_data[1];
-                        if(eir_element_type == BT_DT_COMPLETE_LOCAL_NAME)
-                        {
-                            memset(inqres->remote_name,0,HCI_REMOTE_NAME_LEN);
-                            memcpy(inqres->remote_name,temp_eir_data+2,eir_element_len-1);
-                            break;
-                        }
-                        temp_eir_data += eir_element_len + 1;
-                    }
-                }
-                else
-                {
-                    inqres->cod[2] = ((uint8_t *)p->payload)[10+resp_offset];
-                    inqres->cod[1] = ((uint8_t *)p->payload)[11+resp_offset];
-                    inqres->cod[0] = ((uint8_t *)p->payload)[12+resp_offset];
-                    //memcpy(inqres->cod, ((uint8_t *)p->payload)+10+resp_offset, 3);
-                    inqres->co = *((uint16_t *)(((uint8_t *)p->payload)+13+resp_offset));
-                }
-                HCI_REG(&(pcb->ires), inqres);
-
-                HCI_EVENT_INQ_RESULT(pcb,inqres,ret);
-            }
-            else
-            {
-                BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_memp_malloc fail\n",__FILE__,__FUNCTION__,__LINE__);
-            }
-        }
+        _hci_inq_result_evt_process(evhdr->code,p->payload,evhdr->len);
         break;
     case HCI_CONNECTION_COMPLETE:
-        bdaddr = (void *)(((uint8_t *)p->payload)+3); /* Get the Bluetooth address */
-        link = hci_get_link(bdaddr);
-        switch(((uint8_t *)p->payload)[0])
-        {
-        case HCI_SUCCESS:
-            BT_HCI_TRACE_DEBUG("hci_event_input: Conn successfully completed\n");
-            if(link == NULL)
-            {
-                if((link = hci_new()) == NULL)
-                {
-                    /* Could not allocate memory for link. Disconnect */
-                    BT_HCI_TRACE_DEBUG("hci_event_input: Could not allocate memory for link. Disconnect\n");
-                    hci_disconnect_acl(bdaddr, HCI_OTHER_END_TERMINATED_CONN_LOW_RESOURCES);
-                    /* Notify L2CAP */
-                    lp_disconnect_ind(bdaddr);
-                    break;
-                }
-                bd_addr_set(&(link->bdaddr), bdaddr);
-                link->conhdl = *((uint16_t *)(((uint8_t *)p->payload)+1));
-                HCI_REG(&(hci_active_links), link);
-                HCI_EVENT_CONN_COMPLETE(pcb,bdaddr,ret); /* Allow applicaton to do optional configuration of link */
-                BT_HCI_TRACE_DEBUG("hci_event_input: Calling l2cap cb 1\n");
-                hci_get_remote_feature(bdaddr);
-                if(link->state == SEND_CREATE_CONNECTION)
-                {
-                    lp_connect_cfm(bdaddr, ((uint8_t *)p->payload)[10], BT_ERR_OK); /* Notify L2CAP */
-                }
-                else
-                    lp_connect_ind(&(link->bdaddr)); /* Notify L2CAP */
-                link->state = OPEN;
-            }
-            else
-            {
-                link->conhdl = *((uint16_t *)(((uint8_t *)p->payload)+1));
-                HCI_EVENT_CONN_COMPLETE(pcb,bdaddr,ret); /* Allow applicaton to do optional configuration of link */
-                BT_HCI_TRACE_DEBUG("hci_event_input: Calling l2cap cb 2\n");
-                hci_get_remote_feature(bdaddr);
-                if(link->state == SEND_CREATE_CONNECTION)
-                    lp_connect_cfm(bdaddr, ((uint8_t *)p->payload)[10], BT_ERR_OK); /* Notify L2CAP */
-                else
-                    lp_connect_ind(&(link->bdaddr)); /* Notify L2CAP */
-                link->state = OPEN;
-            }
-            //TODO: MASTER SLAVE SWITCH??
-            break;
-        default:
-            BT_HCI_TRACE_DEBUG("hci_event_input: Conn failed to complete, 0x%x %s\n"
-                               , ((uint8_t *)p->payload)[0], hci_get_error_code(((uint8_t *)p->payload)[0]));
-            if(link != NULL)
-            {
-                BT_HCI_TRACE_DEBUG("hci_event_input: Link exists. Notify upper layer\n");
-                if(link->state == SEND_CREATE_CONNECTION)
-                    lp_connect_cfm(bdaddr, ((uint8_t *)p->payload)[10], BT_ERR_CONN); /* Notify L2CAP */
-                else
-                    lp_connect_ind(&(link->bdaddr)); /* Notify L2CAP */
-
-                hci_close(link);
-            }
-            else
-            {
-                /* silently discard */
-                BT_HCI_TRACE_DEBUG("hci_event_input: Silently discard. Link does not exist\n");
-            }
-            break;
-        } /* switch */
-
-        BT_HCI_TRACE_DEBUG("Conn_hdl: 0x%x 0x%x\n", ((uint8_t *)p->payload)[1], ((uint8_t *)p->payload)[2]);
-        BT_HCI_TRACE_DEBUG("bd_addr_t: 0x");
-        for(j=0; j<BD_ADDR_LEN; j++)
-        {
-            BT_HCI_TRACE_DEBUG("%x",((uint8_t *)p->payload)[3+j]);
-        }
-        BT_HCI_TRACE_DEBUG("\n");
-        BT_HCI_TRACE_DEBUG("Link_type: 0x%x\n",((uint8_t *)p->payload)[9]);
-        BT_HCI_TRACE_DEBUG("Encryption_Mode: 0x%x\n",((uint8_t *)p->payload)[10]);
+        _hci_conn_comp_evt_process(p->payload,evhdr->len);
         break;
     case HCI_CONNECTION_REQUEST:
-        bdaddr = (void *)(((uint8_t *)p->payload)); /* Get the Bluetooth address */
-        link_type = ((uint8_t *)p->payload)[9];
-
-        BT_HCI_TRACE_DEBUG("hci_event_input: recv conn req type %d\n",link_type);
-        link = hci_get_link(bdaddr);
-        if(link == NULL)
-        {
-            if((link = hci_new()) == NULL)
-            {
-                link->state = RECEIVED_CONNECTION_REQUEST;
-                /* Could not allocate memory for link. Disconnect */
-
-                BT_HCI_TRACE_DEBUG("hci_event_input: Could not allocate memory for link. reject\n");
-                hci_reject_connection_request(bdaddr,HCI_HOST_REJECTED_DUE_TO_LIMITED_RESOURCES);
-                link->state = REJECTED_CONNECTION_REQUEST;
-            }
-            else
-            {
-
-                bd_addr_set(&(link->bdaddr), bdaddr);
-                /* TODO 此部分是否需要反转 */
-                memcpy(&link->cod,((uint8_t *)p->payload)+6,3);
-                link->role = HCI_ROLE_SLAVE;
-
-                BT_HCI_TRACE_DEBUG("hci_event_input: con req cod 0x%x\n",link->cod);
-                HCI_REG(&(hci_active_links), link);
-                hci_accept_connection_request(bdaddr,HCI_ROLE_SLAVE);
-                link->state = ACCEPTED_CONNECTION_REQUEST;
-            }
-        }
-        else
-        {
-            if(link_type == HCI_LINK_TYPE_ACL)
-            {
-                /* Could not allocate memory for link. Disconnect */
-                BT_HCI_TRACE_DEBUG("hci_event_input: con exit. reject\n");
-                hci_reject_connection_request(bdaddr,HCI_ACL_CONNECTION_EXISTS);
-                link->state = REJECTED_CONNECTION_REQUEST;
-                hci_close(link);
-
-            }
-            else
-            {
-                HCI_EVENT_SCO_REQ(pcb, bdaddr, ret);
-            }
-        }
+        _hci_conn_req_evt_process(p->payload,evhdr->len);
         break;
     case HCI_SCO_CONNECTION_COMPLETE:
-        BT_HCI_TRACE_DEBUG("hci_event_input: sco connection complete\n");
-        status = ((uint8_t *)p->payload)[0];
-        bdaddr = (void *)(((uint8_t *)p->payload)+3);
-        link = hci_get_link(bdaddr);
-
-        if(status == HCI_SUCCESS && link != NULL)
-        {
-            link->sco_connhdl = bt_le_read_16(((uint8_t *)p->payload),1);
-            BT_HCI_TRACE_DEBUG("hci_event_input: status %d,handle 0%x\n",status,link->sco_connhdl);
-            HCI_EVENT_SCO_CONN_COMPLETE(pcb,status,bdaddr,ret);
-        }
+        _hci_sco_conn_comp_evt_process(p->payload,evhdr->len);
         break;
     case HCI_DISCONNECTION_COMPLETE:
-        switch(((uint8_t *)p->payload)[0])
-        {
-        case HCI_SUCCESS:
-            BT_HCI_TRACE_DEBUG("hci_event_input: Disconn has occurred\n");
-            for(link = hci_active_links; link != NULL; link = link->next)
-            {
-                if(link->conhdl == *((uint16_t *)(((uint8_t *)p->payload)+1)))
-                {
-                    sco_disconnect = 0;
-                    break; /* Found */
-                }
-
-                if(link->sco_connhdl == *((uint16_t *)(((uint8_t *)p->payload)+1)))
-                {
-                    sco_disconnect = 1;
-                    break;
-                }
-            }
-
-            if(link != NULL && sco_disconnect == 0)
-            {
-                BT_HCI_TRACE_DEBUG("hci_event_input: acl disconnect handle 0x%x\n",link->conhdl);
-                lp_disconnect_ind(&(link->bdaddr)); /* Notify upper layer */
-                link->state = RECEIVED_DISCONNECTION_COMPLETE;
-                hci_close(link);
-            }
-            if(link != NULL && sco_disconnect == 1)
-            {
-                BT_HCI_TRACE_DEBUG("hci_event_input: sco disconnect  handle 0x%x\n",link->sco_connhdl);
-
-                status = ((uint8_t *)p->payload)[0];
-                if(status == HCI_SUCCESS)
-                    link->sco_connhdl = 0;
-                HCI_EVENT_SCO_DISCONN_COMPLETE(pcb,status,&(link->bdaddr),ret);
-
-            }
-            /* else silently discard */
-            break;
-        default:
-            BT_HCI_TRACE_DEBUG("hci_event_input: Disconn failed to complete, 0x%x %s\n", ((uint8_t *)p->payload)[0], hci_get_error_code(((uint8_t *)p->payload)[0]));
-            return;
-        }
-        BT_HCI_TRACE_DEBUG("Conn_hdl: 0x%x%x\n", ((uint8_t *)p->payload)[1], ((uint8_t *)p->payload)[2]);
-        BT_HCI_TRACE_DEBUG("Reason: 0x%x (%s)\n", ((uint8_t *)p->payload)[3], hci_get_error_code(((uint8_t *)p->payload)[3]));
+        _hci_disconn_comp_evt_process(p->payload,evhdr->len);
         break;
-
     case HCI_GET_REMOTE_NAME_COMPLETE:
-        BT_HCI_TRACE_DEBUG("hci_event_input: get remote name complete result = 0x%x\n", ((uint8_t *)p->payload)[0]);
-        //bt_hex_dump(p->payload+1,evhdr->len);
-        bdaddr = (void *)(((uint8_t *)p->payload)+1);
-        remote_name = (void *)(((uint8_t *)p->payload)+7);
-        HCI_EVENT_REMOTE_NAME_REQ_COMPLETE(pcb,bdaddr,remote_name,ret);
+        _hci_remote_name_req_evt_process(p->payload,evhdr->len);
         break;
     case HCI_ENCRYPTION_CHANGE:
-        BT_HCI_TRACE_DEBUG("hci_event_input: Encryption changed. Status = 0x%x, Encryption enable = 0x%x\n", ((uint8_t *)p->payload)[0], ((uint8_t *)p->payload)[3]);
-
+        _hci_encryption_change_evt_process(p->payload,evhdr->len);
         break;
     case HCI_QOS_SETUP_COMPLETE:
-        BT_HCI_TRACE_DEBUG("hci_event_input: QOS setup complete result = 0x%x\n", ((uint8_t *)p->payload)[0]);
-
+        _hci_qos_setup_evt_process(p->payload,evhdr->len);
         break;
     case HCI_COMMAND_COMPLETE:
-        BT_HCI_TRACE_DEBUG("hci_event_input: Command Complete\n");
-        BT_HCI_TRACE_DEBUG("Num_HCI_Command_Packets: 0x%x\n", ((uint8_t *)p->payload)[0]);
-
-
-        pcb->numcmd += ((uint8_t *)p->payload)[0]; /* Add number of completed command packets to the
-					       number of command packets that the BT module
-					       can buffer */
-        bt_pbuf_header(p, -1); /* Adjust payload pointer not to cover
-			 Num_HCI_Command_Packets parameter */
-        ocf = *((uint16_t *)p->payload) & 0x03FF;
-        ogf = *((uint16_t *)p->payload) >> 10;
-
-        BT_HCI_TRACE_DEBUG("OCF == 0x%x OGF == 0x%x\n", ocf, ogf);
-
-        bt_pbuf_header(p, -2); /* Adjust payload pointer not to cover Command_Opcode parameter */
-
-        if(pcb->init_status == BLUETOOTH_INITING)
-        {
-            hci_init_cmd_complete_handle(ocf,ogf,(uint8_t *)p->payload);
-        }
-
-        if(ogf == HCI_LINK_CONTROL)
-        {
-            if(ocf == HCI_INQUIRY_CANCEL)
-            {
-                BT_HCI_TRACE_DEBUG("HCI_INQUIRY_CANCEL command complete\n");
-                HCI_EVENT_INQ_COMPLETE(pcb,((uint8_t *)p->payload)[0],ret);
-            }
-        }
-        else if(ogf == HCI_LINK_POLICY)
-        {
-            if(ocf == HCI_W_LINK_POLICY)
-            {
-                if(((uint8_t *)p->payload)[0] == HCI_SUCCESS)
-                {
-                    BT_HCI_TRACE_DEBUG("hci_event_input: Successful HCI_W_LINK_POLICY.\n");
-                    for(link = hci_active_links; link != NULL; link = link->next)
-                    {
-                        if(link->conhdl == *((uint16_t *)(((uint8_t *)p->payload)+1)))
-                        {
-                            break;
-                        }
-                    }
-                    if(link == NULL)
-                    {
-                        BT_HCI_TRACE_DEBUG("hci_event_input: Connection does not exist\n");
-
-                        return; /* Connection does not exist */
-                    }
-                    HCI_EVENT_WLP_COMPLETE(pcb, &link->bdaddr, ret); /* Notify application.*/
-                }
-                else
-                {
-                    BT_HCI_TRACE_DEBUG("Unsuccessful HCI_W_LINK_POLICY.\n");
-                    return;
-                }
-            }
-        }
-        else if(ogf == HCI_HOST_C_N_BB)
-        {
-            if(ocf == HCI_SET_HC_TO_H_FC)
-            {
-                if(((uint8_t *)p->payload)[0] == HCI_SUCCESS)
-                {
-                    pcb->flow = 1;
-                }
-            }
-        }
-        else if(ogf == HCI_INFO_PARAM)
-        {
-            if(ocf == HCI_READ_BUFFER_SIZE)
-            {
-                if(((uint8_t *)p->payload)[0] == HCI_SUCCESS)
-                {
-                    BT_HCI_TRACE_DEBUG("hci_event_input: Read_Buffer_Size command succeeded\n");
-                    BT_HCI_TRACE_DEBUG("HC_ACL_Data_Packet_Length: 0x%x%x\n", ((uint8_t *)p->payload)[1], ((uint8_t *)p->payload)[2]);
-                    BT_HCI_TRACE_DEBUG("HC_SCO_Data_Packet_Length: 0x%x\n", ((uint8_t *)p->payload)[3]);
-                    BT_HCI_TRACE_DEBUG("HC_Total_Num_ACL_Data_Packets: %d\n", *((uint16_t *)(((uint8_t *)p->payload)+4)));
-
-                    pcb->maxsize = *((uint16_t *)(((uint8_t *)p->payload)+1)); /* Maximum size of an ACL packet
-									  that the BT module is able to
-									  accept */
-                    pcb->hc_num_acl = *((uint16_t *)(((uint8_t *)p->payload)+4)); /* Number of ACL packets that the
-									     BT module can buffer */
-                    BT_HCI_TRACE_DEBUG("HC_Total_Num_SCO_Data_Packets: 0x%x%x\n", ((uint8_t *)p->payload)[6], ((uint8_t *)p->payload)[7]);
-                }
-                else
-                {
-                    BT_HCI_TRACE_DEBUG("hci_event_input: Read_Buffer_Size command failed, 0x%x %s\n", ((uint8_t *)p->payload)[0], hci_get_error_code(((uint8_t *)p->payload)[0]));
-                    return;
-                }
-            }
-            if(ocf == HCI_READ_BD_ADDR)
-            {
-                if(((uint8_t *)p->payload)[0] == HCI_SUCCESS)
-                {
-                    bdaddr = (void *)(((uint8_t *)p->payload) + 1); /* Get the Bluetooth address */
-                    HCI_EVENT_RBD_COMPLETE(pcb, bdaddr, ret); /* Notify application.*/
-                }
-            }
-        }
-        else if(ogf == HCI_STATUS_PARAM)
-        {
-        }
-        else if(ogf == HCI_TESTING)
-        {
-        }
-        else if(ogf == HCI_LE)
-        {
-            if(ocf == HCI_LE_SET_SCAN)
-            {
-                BT_HCI_TRACE_DEBUG("HCI_LE_SET_SCAN le_inq_w2_stop(%d)\n",pcb->le_inq_w2_stop);
-                if(pcb->le_inq_w2_stop == 1)
-                {
-                    BT_HCI_TRACE_DEBUG("DEBUG:hci_event_input:le inquiry complete, 0x%x %s\n",((uint8_t *)p->payload)[0], hci_get_error_code(((uint8_t *)p->payload)[0]));
-                    HCI_EVENT_LE_INQ_COMPLETE(pcb,((uint8_t *)p->payload)[0],ret);
-                    pcb->le_inq_w2_stop = 0;
-                }
-            }
-        }
-        else if(ogf == HCI_VENDOR_OGF)
-        {
-
-        }
-        else
-        {
-
-        }
-
-
-        HCI_EVENT_CMD_COMPLETE(pcb,ogf,ocf,((uint8_t *)p->payload)[0],ret);
+        _hci_cmd_comp_evt_process(p->payload,evhdr->len);
         break;
     case HCI_COMMAND_STATUS:
-        switch(((uint8_t *)p->payload)[0])
-        {
-        case HCI_SUCCESS:
-            BT_HCI_TRACE_DEBUG("hci_event_input: Command Status\n");
-            break;
-        default:
-            BT_HCI_TRACE_DEBUG("hci_event_input: Command failed, %s\n", hci_get_error_code(((uint8_t *)p->payload)[0]));
-            bt_pbuf_header(p, -2); /* Adjust payload pointer not to cover
-			     Num_HCI_Command_Packets and status parameter */
-            ocf = *((uint16_t *)p->payload) & 0x03FF;
-            ogf = *((uint16_t *)p->payload) >> 10;
-            bt_pbuf_header(p, -2); /* Adjust payload pointer not to cover Command_Opcode
-			   parameter */
-            HCI_EVENT_CMD_COMPLETE(pcb,ogf,ocf,((uint8_t *)p->payload)[0],ret);
-            bt_pbuf_header(p, 4);
-            break;
-        }
-        BT_HCI_TRACE_DEBUG("Num_HCI_Command_Packets: 0x%x\n", ((uint8_t *)p->payload)[1]);
-        pcb->numcmd += ((uint8_t *)p->payload)[1]; /* Add number of completed command packets to the
-					       number of command packets that the BT module
-					       can buffer */
-        BT_HCI_TRACE_DEBUG("Command_Opcode: 0x%x 0x%x\n", ((uint8_t *)p->payload)[2], ((uint8_t *)p->payload)[3]);
+        _hci_cmd_status_evt_process(p->payload,evhdr->len);
         break;
     case HCI_HARDWARE_ERROR:
-        BT_HCI_TRACE_DEBUG("hci_event_input: Hardware Error\n");
-        BT_HCI_TRACE_DEBUG("Hardware_code: 0x%x\n\n", ((uint8_t *)p->payload)[0]);
-
-        //TODO: IS THIS FATAL??
+		_hci_hw_err_evt_process(p->payload,evhdr->len);
         break;
     case HCI_ROLE_CHANGE:
-        BT_HCI_TRACE_DEBUG("hci_event_input: Role change\n");
-        BT_HCI_TRACE_DEBUG("Status: 0x%x\n", ((uint8_t *)p->payload)[0]);
-        BT_HCI_TRACE_DEBUG("New Role: 0x%x\n", ((uint8_t *)p->payload)[7]);
+		_hci_role_change_evt_process(p->payload,evhdr->len);
         break;
     case HCI_NBR_OF_COMPLETED_PACKETS:
-        BT_HCI_TRACE_DEBUG("hci_event_input: Number Of Completed Packets\n");
-        BT_HCI_TRACE_DEBUG("Number_of_Handles: 0x%x\n", ((uint8_t *)p->payload)[0]);
-        for(i=0; i<((uint8_t *)p->payload)[0]; i++)
-        {
-            resp_offset = i*4;
-            BT_HCI_TRACE_DEBUG("Conn_hdl: 0x%x%x\n", ((uint8_t *)p->payload)[1+resp_offset], ((uint8_t *)p->payload)[2+resp_offset]);
-            BT_HCI_TRACE_DEBUG("HC_Num_Of_Completed_Packets: 0x%x\n",*((uint16_t *)(((uint8_t *)p->payload)+3+resp_offset)));
-            /* Add number of completed ACL packets to the number of ACL packets that the
-            BT module can buffer */
-            pcb->hc_num_acl += *((uint16_t *)(((uint8_t *)p->payload) + 3 + resp_offset));
-#if HCI_FLOW_QUEUEING
-            {
-                uint16_t conhdl = *((uint16_t *)(((uint8_t *)p->payload) + 1 + resp_offset));
-                struct bt_pbuf_t *q;
-                for(link = hci_active_links; link != NULL; link = link->next)
-                {
-                    if(link->conhdl == conhdl)
-                    {
-                        break;
-                    }
-                }
-                q = link->p;
-                /* Queued packet present? */
-                if (q != NULL)
-                {
-                    /* NULL attached buffer immediately */
-                    link->p = NULL;
-                    BT_HCI_TRACE_DEBUG("rfcomm_input: Sending queued packet.\n");
-                    /* Send the queued packet */
-                    hci_acl_write(&link->bdaddr, q, link->len, link->pb);
-                    /* Free the queued packet */
-                    bt_pbuf_free(q);
-                }
-            }
-#endif /* HCI_FLOW_QUEUEING */
-        }
+		_hci_number_comp_evt_process(p->payload,evhdr->len);
         break;
     case HCI_MODE_CHANGE:
-        BT_HCI_TRACE_DEBUG("hci_event_input: Mode change\n");
-        BT_HCI_TRACE_DEBUG("Status: 0x%x\n", ((uint8_t *)p->payload)[0]);
-        BT_HCI_TRACE_DEBUG("Conn_hdl: 0x%x\n", ((uint16_t *)(((uint8_t *)p->payload) + 1))[0]);
-
+		_hci_mode_change_evt_process(p->payload,evhdr->len);
         break;
     case HCI_DATA_BUFFER_OVERFLOW:
-        BT_HCI_TRACE_DEBUG("hci_event_input: Data Buffer Overflow\n");
-        BT_HCI_TRACE_DEBUG("Link_Type: 0x%x\n", ((uint8_t *)p->payload)[0]);
-
-        //TODO: IS THIS FATAL????
+		_hci_data_buf_overflow_evt_process(p->payload,evhdr->len);
         break;
     case HCI_MAX_SLOTS_CHANGE:
-        BT_HCI_TRACE_DEBUG("hci_event_input: Max slots changed\n");
-        BT_HCI_TRACE_DEBUG("Conn_hdl: 0x%x\n", ((uint16_t *)p->payload)[0]);
-        BT_HCI_TRACE_DEBUG("LMP max slots: 0x%x\n", ((uint8_t *)p->payload)[2]);
-
+		_hci_max_slot_change_evt_process(p->payload,evhdr->len);
         break;
     case HCI_PIN_CODE_REQUEST:
-        bdaddr = (void *)((uint8_t *)p->payload); /* Get the Bluetooth address */
-        HCI_EVENT_PIN_REQ(pcb, bdaddr, ret); /* Notify application. If event is not registered,
-					    send a negative reply */
+		_hci_pincode_req_evt_process(p->payload,evhdr->len);
         break;
     case HCI_LINK_KEY_REQUEST:
-        BT_HCI_TRACE_DEBUG("hci_event_input: link key request\n");
-        bdaddr = (void *)((uint8_t *)p->payload);
-        HCI_EVENT_LINK_REQ(pcb, bdaddr, ret);
+		_hci_linkkey_req_evt_process(p->payload,evhdr->len);
         break;
     case HCI_LINK_KEY_NOTIFICATION:
-        BT_HCI_TRACE_DEBUG("hci_event_input: link key notification\n");
-        bdaddr = (void *)((uint8_t *)p->payload); /* Get the Bluetooth address */
-        link_key_type = *(((uint8_t *)p->payload) + 6+16);
-        HCI_EVENT_LINK_KEY_NOT(pcb, bdaddr, ((uint8_t *)p->payload) + 6,link_key_type, ret); /* Notify application.*/
+		_hci_linkkey_notify_evt_process(p->payload,evhdr->len);
         break;
     case HCI_IO_CAP_REQ:
-        BT_HCI_TRACE_DEBUG("hci_event_input: io cap request\n");
-        bdaddr = (void *)((uint8_t *)p->payload);
-        hci_io_cap_req_replay(bdaddr,pcb->ssp_io_cap,0x0,SSP_IO_AUTHREQ_MITM_PROTECTION_REQUIRED_DEDICATED_BONDING);
+		_hci_io_cap_req_evt_process(p->payload,evhdr->len);
         break;
     case HCI_USER_CONF_REQ:
-        BT_HCI_TRACE_DEBUG("hci_event_input: user confirm request\n");
-        bdaddr = (void *)((uint8_t *)p->payload);
-        hci_user_confirm_req_reply(bdaddr);
+		_hci_usr_confim_req_evt_process(p->payload,evhdr->len);
         break;
-
+	case HCI_VENDOR_SPEC:
+        _hci_vendor_evt_process(p->payload,evhdr->len);
+        break;
 #if BT_BLE_ENABLE > 0
     case HCI_LE_META:
-    {
-        uint8_t sub_event = ((uint8_t *)p->payload)[0];
-        BT_HCI_TRACE_DEBUG("hci_event_input: le meta event sub event 0x%x\n",sub_event);
-
-        switch(sub_event)
-        {
-        case HCI_SUBEVENT_LE_CONN_COMPLETE:
-        {
-			uint16_t con_handle = bt_le_read_16((uint8_t *)p->payload,2);
-			link = hci_get_link_by_handle(con_handle);
-			bdaddr = (void *)((uint8_t *)p->payload)+6;
-
-        	if(link == NULL)
-            {
-                if((link = hci_new()) == NULL)
-                {
-                    /* Could not allocate memory for link. Disconnect */
-                    BT_HCI_TRACE_DEBUG("hci_event_input: Could not allocate memory for link. Disconnect\n");
-                    break;
-                }
-				bd_addr_set(&(link->bdaddr), bdaddr);
-				bt_hex_dump(&(link->bdaddr),6);
-                link->conhdl = con_handle;
-                HCI_REG(&(hci_active_links), link);
-                link->state = OPEN;
-            }
-			break;
-        }
-        case HCI_SUBEVENT_LE_ADV_REPORT:
-        {
-            struct hci_le_inq_res_t hci_le_inq_res = {0};
-
-            hci_le_inq_res.addr_type = ((uint8_t *)p->payload)[3];
-            memcpy(hci_le_inq_res.bdaddr.addr,((uint8_t *)p->payload)+4,BD_ADDR_LEN);
-            hci_le_inq_res.adv_size = ((uint8_t *)p->payload)[10];
-            hci_le_inq_res.adv_type = ((uint8_t *)p->payload)[2];
-            memcpy(hci_le_inq_res.adv_data,((uint8_t *)p->payload)+11,hci_le_inq_res.adv_size);
-            hci_le_inq_res.rssi = ((uint8_t *)p->payload)[11+hci_le_inq_res.adv_size];
-
-			HCI_EVENT_LE_INQ_RESULT(pcb,&hci_le_inq_res,ret);
-
-            break;
-        }
-
-        default:
-            break;
-        }
-
+		_hci_le_meta_evt_process(p->payload,evhdr->len);
         break;
-    }
-#endif
-    case HCI_VENDOR_SPEC:
-        vendor_init(ogf,ocf);
-        break;
+#endif 
     default:
         BT_HCI_TRACE_DEBUG("hci_event_input: Undefined event code 0x%x\n", evhdr->code);
         break;
     }/* switch */
 }
 
+
 struct bt_pbuf_t *hci_cmd_ass(struct bt_pbuf_t *p, uint8_t ocf, uint8_t ogf, uint8_t len)
 {
     ((uint8_t *)p->payload)[0] = (ocf & 0xff); /* OCF & OGF */
     ((uint8_t *)p->payload)[1] = (ocf >> 8)|(ogf << 2);
     ((uint8_t *)p->payload)[2] = len-HCI_CMD_HDR_LEN; /* Param len = plen - cmd hdr  */
-    if(pcb->numcmd != 0)
+    if(hci_pcb->numcmd != 0)
     {
-        --pcb->numcmd; /* Reduce number of cmd packets that the host controller can buffer */
+        --hci_pcb->numcmd; /* Reduce number of cmd packets that the host controller can buffer */
     }
     return p;
 }
 
 
 err_t hci_inquiry(uint32_t lap, uint8_t inq_len, uint8_t num_resp,
-                  err_t (*inq_result)(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres),
-                  err_t (* inq_complete)(struct hci_pcb_t *pcb,uint16_t result))
+                  err_t (*inq_result)(hci_inq_res_t *inqres),
+                  err_t (* inq_complete)(uint16_t result))
 {
     struct bt_pbuf_t *p;
-    struct hci_inq_res_t *tmpres;
+    hci_inq_res_t *tmpres;
 
     /* Free any previous inquiry result list */
-    while(pcb->ires != NULL)
+    while(hci_pcb->ires != NULL)
     {
-        tmpres = pcb->ires;
-        pcb->ires = pcb->ires->next;
+        tmpres = hci_pcb->ires;
+        hci_pcb->ires = hci_pcb->ires->next;
         bt_memp_free(MEMP_HCI_INQ, tmpres);
     }
 
-    pcb->inq_complete = inq_complete;
-    pcb->inq_result = inq_result;
+    hci_pcb->inq_complete = inq_complete;
+    hci_pcb->inq_result = inq_result;
 
     if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_INQUIRY_PLEN, BT_PBUF_RAM)) == NULL)
     {
@@ -1366,13 +1546,13 @@ err_t hci_inquiry(uint32_t lap, uint8_t inq_len, uint8_t num_resp,
 err_t hci_cancel_inquiry(void)
 {
     struct bt_pbuf_t *p;
-    struct hci_inq_res_t *tmpres;
+    hci_inq_res_t *tmpres;
 
     /* Free any previous inquiry result list */
-    while(pcb->ires != NULL)
+    while(hci_pcb->ires != NULL)
     {
-        tmpres = pcb->ires;
-        pcb->ires = pcb->ires->next;
+        tmpres = hci_pcb->ires;
+        hci_pcb->ires = hci_pcb->ires->next;
         bt_memp_free(MEMP_HCI_INQ, tmpres);
     }
 
@@ -1393,22 +1573,22 @@ err_t hci_cancel_inquiry(void)
 
 
 err_t hci_periodic_inquiry(uint16_t min_periodic,uint16_t max_periodic,uint32_t lap, uint8_t inq_len, uint8_t num_resp,
-                           err_t (*inq_result)(struct hci_pcb_t *pcb,struct hci_inq_res_t *inqres),
-                           err_t (* inq_complete)(struct hci_pcb_t *pcb,uint16_t result))
+                           err_t (*inq_result)(hci_inq_res_t *inqres),
+                           err_t (* inq_complete)(uint16_t result))
 {
     struct bt_pbuf_t *p;
-    struct hci_inq_res_t *tmpres;
+    hci_inq_res_t *tmpres;
 
     /* Free any previous inquiry result list */
-    while(pcb->ires != NULL)
+    while(hci_pcb->ires != NULL)
     {
-        tmpres = pcb->ires;
-        pcb->ires = pcb->ires->next;
+        tmpres = hci_pcb->ires;
+        hci_pcb->ires = hci_pcb->ires->next;
         bt_memp_free(MEMP_HCI_INQ, tmpres);
     }
 
-    pcb->inq_complete = inq_complete;
-    pcb->inq_result = inq_result;
+    hci_pcb->inq_complete = inq_complete;
+    hci_pcb->inq_result = inq_result;
 
     if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_PERIDIC_INQUIRY, BT_PBUF_RAM)) == NULL)
     {
@@ -1434,13 +1614,13 @@ err_t hci_periodic_inquiry(uint16_t min_periodic,uint16_t max_periodic,uint32_t 
 err_t hci_cancel_periodic_inquiry(void)
 {
     struct bt_pbuf_t *p;
-    struct hci_inq_res_t *tmpres;
+    hci_inq_res_t *tmpres;
 
     /* Free any previous inquiry result list */
-    while(pcb->ires != NULL)
+    while(hci_pcb->ires != NULL)
     {
-        tmpres = pcb->ires;
-        pcb->ires = pcb->ires->next;
+        tmpres = hci_pcb->ires;
+        hci_pcb->ires = hci_pcb->ires->next;
         bt_memp_free(MEMP_HCI_INQ, tmpres);
     }
 
@@ -1467,8 +1647,8 @@ err_t hci_connect_req(struct bd_addr_t *bdaddr, uint8_t allow_role_switch)
     uint8_t page_scan_repetition_mode, page_scan_mode;
     uint16_t clock_offset;
     struct bt_pbuf_t *p;
-    struct hci_link_t *link = hci_new();
-    struct hci_inq_res_t *inqres;
+    hci_link_t *link = _hci_new_link();
+    hci_inq_res_t *inqres;
 
     if(link == NULL)
     {
@@ -1482,7 +1662,7 @@ err_t hci_connect_req(struct bd_addr_t *bdaddr, uint8_t allow_role_switch)
 
 
     /* Check if module has been discovered in a recent inquiry */
-    for(inqres = pcb->ires; inqres != NULL; inqres = inqres->next)
+    for(inqres = hci_pcb->ires; inqres != NULL; inqres = inqres->next)
     {
         if(bd_addr_cmp(&inqres->bdaddr, bdaddr))
         {
@@ -1531,9 +1711,9 @@ err_t hci_connect_req(struct bd_addr_t *bdaddr, uint8_t allow_role_switch)
 err_t hci_disconnect_acl(struct bd_addr_t *bdaddr, uint8_t reason)
 {
     struct bt_pbuf_t *p;
-    struct hci_link_t *link;
+    hci_link_t *link;
 
-    link = hci_get_link(bdaddr);
+    link = _hci_get_link_by_addr(bdaddr);
 
     if(link == NULL)
     {
@@ -1563,9 +1743,9 @@ err_t hci_disconnect_acl(struct bd_addr_t *bdaddr, uint8_t reason)
 err_t hci_disconnect_sco(struct bd_addr_t *bdaddr, uint8_t reason)
 {
     struct bt_pbuf_t *p;
-    struct hci_link_t *link;
+    hci_link_t *link;
 
-    link = hci_get_link(bdaddr);
+    link = _hci_get_link_by_addr(bdaddr);
 
     if(link == NULL)
     {
@@ -1720,16 +1900,16 @@ err_t hci_pin_code_request_neg_reply(struct bd_addr_t *bdaddr)
     return BT_ERR_OK;
 }
 
-err_t hci_get_remote_name(struct bd_addr_t *bdaddr,err_t (*name_req_complete)(struct hci_pcb_t *pcb,struct bd_addr_t *bdaddr,uint8_t * name))
+err_t hci_get_remote_name(struct bd_addr_t *bdaddr,err_t (*name_req_complete)(struct bd_addr_t *bdaddr,uint8_t * name))
 {
     uint8_t page_scan_repetition_mode;
     uint16_t clock_offset;
     struct bt_pbuf_t *p;
-    struct hci_inq_res_t *inqres;
+    hci_inq_res_t *inqres;
 
-    pcb->name_req_complete = name_req_complete;
+    hci_pcb->name_req_complete = name_req_complete;
     /* Check if module has been discovered in a recent inquiry */
-    for(inqres = pcb->ires; inqres != NULL; inqres = inqres->next)
+    for(inqres = hci_pcb->ires; inqres != NULL; inqres = inqres->next)
     {
         if(bd_addr_cmp(&inqres->bdaddr, bdaddr))
         {
@@ -1791,9 +1971,9 @@ err_t hci_cancel_get_remote_name(struct bd_addr_t *bdaddr)
 err_t hci_get_remote_feature(struct bd_addr_t *bdaddr)
 {
     struct bt_pbuf_t *p;
-    struct hci_link_t *link;
+    hci_link_t *link;
 
-    link = hci_get_link(bdaddr);
+    link = _hci_get_link_by_addr(bdaddr);
 
     if(link == NULL)
     {
@@ -1827,7 +2007,7 @@ err_t hci_connect_sco(struct bd_addr_t *bdaddr,uint32_t transmit_bandwidth,uint3
 {
     struct bt_pbuf_t *p;
     uint8_t offset = 0;
-    struct hci_link_t *link = hci_get_link(bdaddr);
+    hci_link_t *link = _hci_get_link_by_addr(bdaddr);
     if(link == NULL)
     {
         BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] Connection does not existl\n",__FILE__,__FUNCTION__,__LINE__);
@@ -2055,10 +2235,10 @@ err_t hci_io_cap_req_neg_reply(struct bd_addr_t *bdaddr,uint8_t reason)
 err_t hci_hold_mode(struct bd_addr_t *bdaddr, uint16_t max_interval, uint16_t min_interval)
 {
     struct bt_pbuf_t *p;
-    struct hci_link_t *link;
+    hci_link_t *link;
 
     /* Check if an ACL connection exists */
-    link = hci_get_link(bdaddr);
+    link = _hci_get_link_by_addr(bdaddr);
 
     if(link == NULL)
     {
@@ -2091,10 +2271,10 @@ err_t hci_sniff_mode(struct bd_addr_t *bdaddr, uint16_t max_interval, uint16_t m
                      uint16_t attempt, uint16_t timeout)
 {
     struct bt_pbuf_t *p;
-    struct hci_link_t *link;
+    hci_link_t *link;
 
     /* Check if an ACL connection exists */
-    link = hci_get_link(bdaddr);
+    link = _hci_get_link_by_addr(bdaddr);
 
     if(link == NULL)
     {
@@ -2128,10 +2308,10 @@ err_t hci_sniff_mode(struct bd_addr_t *bdaddr, uint16_t max_interval, uint16_t m
 err_t hci_exit_sniff_mode(struct bd_addr_t *bdaddr)
 {
     struct bt_pbuf_t *p;
-    struct hci_link_t *link;
+    hci_link_t *link;
 
     /* Check if an ACL connection exists */
-    link = hci_get_link(bdaddr);
+    link = _hci_get_link_by_addr(bdaddr);
 
     if(link == NULL)
     {
@@ -2160,10 +2340,10 @@ err_t hci_exit_sniff_mode(struct bd_addr_t *bdaddr)
 err_t hci_role_discovery(struct bd_addr_t *bdaddr)
 {
     struct bt_pbuf_t *p;
-    struct hci_link_t *link;
+    hci_link_t *link;
 
     /* Check if an ACL connection exists */
-    link = hci_get_link(bdaddr);
+    link = _hci_get_link_by_addr(bdaddr);
 
     if(link == NULL)
     {
@@ -2212,10 +2392,10 @@ err_t hci_switch_role(struct bd_addr_t *bdaddr,uint8_t role)
 err_t hci_read_link_policy(struct bd_addr_t *bdaddr)
 {
     struct bt_pbuf_t *p;
-    struct hci_link_t *link;
+    hci_link_t *link;
 
     /* Check if an ACL connection exists */
-    link = hci_get_link(bdaddr);
+    link = _hci_get_link_by_addr(bdaddr);
 
     if(link == NULL)
     {
@@ -2245,10 +2425,10 @@ err_t hci_read_link_policy(struct bd_addr_t *bdaddr)
 err_t hci_write_link_policy(struct bd_addr_t *bdaddr, uint16_t link_policy)
 {
     struct bt_pbuf_t *p;
-    struct hci_link_t *link;
+    hci_link_t *link;
 
     /* Check if an ACL connection exists */
-    link = hci_get_link(bdaddr);
+    link = _hci_get_link_by_addr(bdaddr);
 
     if(link == NULL)
     {
@@ -2344,7 +2524,7 @@ err_t hci_reset(void)
 
     /* Assembling command packet */
     p = hci_cmd_ass(p, HCI_RESET, HCI_HOST_C_N_BB, HCI_RESET_PLEN);
-    pcb->timer = utimer_create(HCI_RESET_TIMEOUT, hci_reset_timeout, 0);
+    hci_pcb->timer = utimer_create(HCI_RESET_TIMEOUT, _hci_reset_cmd_timeout, 0);
     /* Assembling cmd prameters */
     phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
     bt_pbuf_free(p);
@@ -2584,11 +2764,11 @@ err_t hci_write_voice_setting(uint16_t voice_setting)
 
 err_t hci_write_flush_timeout(struct bd_addr_t *bdaddr, uint16_t flushto)
 {
-    struct hci_link_t *link;
+    hci_link_t *link;
     struct bt_pbuf_t *p;
 
     /* Check if an ACL connection exists */
-    link = hci_get_link(bdaddr);
+    link = _hci_get_link_by_addr(bdaddr);
 
     if(link == NULL)
     {
@@ -2651,7 +2831,7 @@ err_t hci_host_buffer_size(void)
     phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
     bt_pbuf_free(p);
 
-    pcb->host_num_acl = HCI_HOST_MAX_NUM_ACL;
+    hci_pcb->host_num_acl = HCI_HOST_MAX_NUM_ACL;
 
     return BT_ERR_OK;
 }
@@ -2672,7 +2852,7 @@ err_t hci_host_num_comp_packets(uint16_t conhdl, uint16_t num_complete)
     phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
     bt_pbuf_free(p);
 
-    pcb->host_num_acl += num_complete;
+    hci_pcb->host_num_acl += num_complete;
 
     return BT_ERR_OK;
 }
@@ -2797,7 +2977,7 @@ err_t hci_read_bd_addr(err_t (* rbd_complete)(void *arg, struct bd_addr_t *bdadd
 {
     struct bt_pbuf_t *p;
 
-    pcb->rbd_complete = rbd_complete;
+    hci_pcb->rbd_complete = rbd_complete;
 
     if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_R_BD_ADDR_PLEN, BT_PBUF_RAM)) == NULL)
     {
@@ -2816,11 +2996,11 @@ err_t hci_read_bd_addr(err_t (* rbd_complete)(void *arg, struct bd_addr_t *bdadd
 
 err_t hci_read_rssi(struct bd_addr_t *bdaddr)
 {
-    struct hci_link_t *link;
+    hci_link_t *link;
     struct bt_pbuf_t *p;
 
     /* Check if an ACL connection exists */
-    link = hci_get_link(bdaddr);
+    link = _hci_get_link_by_addr(bdaddr);
 
     if(link == NULL)
     {
@@ -2891,8 +3071,8 @@ err_t hci_set_le_scan_param(uint8_t scan_type,uint16_t scan_interval,uint16_t sc
 }
 
 err_t hci_le_inquiry(uint8_t filter_duplicates,
-					err_t (*le_inq_result)(struct hci_pcb_t *pcb,struct hci_le_inq_res_t *le_inqres),
-                     err_t (* le_inq_complete)(struct hci_pcb_t *pcb,uint16_t result))
+                     err_t (*le_inq_result)(hci_le_inq_res_t *le_inqres),
+                     err_t (* le_inq_complete)(uint16_t result))
 
 {
     struct bt_pbuf_t *p;
@@ -2903,8 +3083,8 @@ err_t hci_le_inquiry(uint8_t filter_duplicates,
         return BT_ERR_MEM;
     }
 
-    pcb->le_inq_result = le_inq_result;
-	pcb->le_inq_complete = le_inq_complete;
+    hci_pcb->le_inq_result = le_inq_result;
+    hci_pcb->le_inq_complete = le_inq_complete;
 
     /* Assembling command packet */
     p = hci_cmd_ass(p, HCI_LE_SET_SCAN, HCI_LE, HCI_SET_LE_SCAN_PLEN);
@@ -2929,7 +3109,7 @@ err_t hci_le_cancel_inquiry(void)
         return BT_ERR_MEM;
     }
 
-    pcb->le_inq_w2_stop  = 1;
+    hci_pcb->le_inq_w2_stop  = 1;
     /* Assembling command packet */
     p = hci_cmd_ass(p, HCI_LE_SET_SCAN, HCI_LE, HCI_SET_LE_SCAN_PLEN);
     /* Assembling cmd prameters */
@@ -2943,9 +3123,9 @@ err_t hci_le_cancel_inquiry(void)
 }
 
 err_t hci_le_set_adv_param(uint16_t adv_int_min, uint16_t adv_int_max, uint8_t adv_type,
-    uint8_t own_address_typ, uint8_t peer_address_type,struct bd_addr_t *peer_address, uint8_t channel_map, uint8_t filter_policy)
+                           uint8_t own_address_typ, uint8_t peer_address_type,struct bd_addr_t *peer_address, uint8_t channel_map, uint8_t filter_policy)
 {
-	struct bt_pbuf_t *p;
+    struct bt_pbuf_t *p;
     uint8_t offset = 0;
     if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_SET_LE_ADV_PARAM_PLEN, BT_PBUF_RAM)) == NULL)
     {
@@ -2961,13 +3141,13 @@ err_t hci_le_set_adv_param(uint16_t adv_int_min, uint16_t adv_int_max, uint8_t a
     offset += 2;
     ((uint8_t *)p->payload)[offset] = adv_type;
     offset += 1;
-	((uint8_t *)p->payload)[offset] = own_address_typ;
+    ((uint8_t *)p->payload)[offset] = own_address_typ;
     offset += 1;
-	((uint8_t *)p->payload)[offset] = peer_address_type;
+    ((uint8_t *)p->payload)[offset] = peer_address_type;
     offset += 1;
-	memcpy(((uint8_t *)p->payload)+offset, peer_address->addr, BD_ADDR_LEN);
-	offset += BD_ADDR_LEN;
-	((uint8_t *)p->payload)[offset] = channel_map;
+    memcpy(((uint8_t *)p->payload)+offset, peer_address->addr, BD_ADDR_LEN);
+    offset += BD_ADDR_LEN;
+    ((uint8_t *)p->payload)[offset] = channel_map;
     offset += 1;
     ((uint8_t *)p->payload)[offset] = filter_policy;
     phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
@@ -2978,7 +3158,7 @@ err_t hci_le_set_adv_param(uint16_t adv_int_min, uint16_t adv_int_max, uint8_t a
 
 err_t hci_le_set_adv_data(uint8_t adv_len,uint8_t *adv_data)
 {
-	struct bt_pbuf_t *p;
+    struct bt_pbuf_t *p;
     uint8_t offset = 0;
     if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_SET_LE_ADV_DATA_PLEN, BT_PBUF_RAM)) == NULL)
     {
@@ -2988,11 +3168,11 @@ err_t hci_le_set_adv_data(uint8_t adv_len,uint8_t *adv_data)
     /* Assembling command packet */
     p = hci_cmd_ass(p, HCI_LE_SET_ADV_DATA, HCI_LE, HCI_SET_LE_ADV_DATA_PLEN);
     offset += 3;
-	((uint8_t *)p->payload)[offset] = adv_len;
+    ((uint8_t *)p->payload)[offset] = adv_len;
     offset += 1;
 
-	memset(((uint8_t *)p->payload) + offset,0,HCI_SET_LE_ADV_DATA_PLEN-offset);
-	memcpy(((uint8_t *)p->payload)+offset, adv_data, adv_len);
+    memset(((uint8_t *)p->payload) + offset,0,HCI_SET_LE_ADV_DATA_PLEN-offset);
+    memcpy(((uint8_t *)p->payload)+offset, adv_data, adv_len);
 
     phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
     bt_pbuf_free(p);
@@ -3002,7 +3182,7 @@ err_t hci_le_set_adv_data(uint8_t adv_len,uint8_t *adv_data)
 
 err_t hci_le_set_adv_enable(uint8_t enable)
 {
-	struct bt_pbuf_t *p;
+    struct bt_pbuf_t *p;
     uint8_t offset = 0;
     if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_SET_LE_ADV_ENABLE_PLEN, BT_PBUF_RAM)) == NULL)
     {
@@ -3012,7 +3192,7 @@ err_t hci_le_set_adv_enable(uint8_t enable)
     /* Assembling command packet */
     p = hci_cmd_ass(p, HCI_LE_SET_ADV_ENABLE, HCI_LE, HCI_SET_LE_ADV_ENABLE_PLEN);
     offset += 3;
-	((uint8_t *)p->payload)[offset] = enable;
+    ((uint8_t *)p->payload)[offset] = enable;
 
     phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
     bt_pbuf_free(p);
