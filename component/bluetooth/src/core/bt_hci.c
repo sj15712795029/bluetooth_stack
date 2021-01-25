@@ -1447,7 +1447,7 @@ uint16_t hci_pdu_maxsize(void)
 void hci_acl_input(struct bt_pbuf_t *p)
 {
     hci_acl_hdr_t *aclhdr;
-    hci_link_t *link;
+    hci_link_t *link = NULL;
     uint16_t conhdl;
 
     aclhdr = p->payload;
@@ -1457,8 +1457,7 @@ void hci_acl_input(struct bt_pbuf_t *p)
 
     //bt_pbuf_header(p, -HCI_ACL_HDR_LEN);
 
-    conhdl = aclhdr->conhdl_pb_bc & 0x0FFF; /* Get the connection handle from the first
-						   12 bits */
+    conhdl = aclhdr->conhdl_pb_bc & 0x0FFF; /* Get the connection handle from the first 12 bits */
     if(hci_pcb->flow)
     {
         //TODO: XXX??? DO WE SAVE NUMACL PACKETS COMPLETED IN LINKS LIST?? SHOULD WE CALL
@@ -1487,14 +1486,6 @@ void hci_acl_input(struct bt_pbuf_t *p)
             BT_HCI_TRACE_DEBUG("DEBUG:Forward ACL packet to higher layer p->tot_len = %d\n",p->tot_len);
             l2cap_acl_input(p, &(link->bdaddr));
         }
-        else
-        {
-            bt_pbuf_free(p); /* If length of ACL packet is zero, we silently discard it */
-        }
-    }
-    else
-    {
-        bt_pbuf_free(p); /* If no acitve ACL link was found, we silently discard the packet */
     }
 }
 
@@ -1644,8 +1635,6 @@ err_t hci_cancel_periodic_inquiry(void)
 
     return BT_ERR_OK;
 }
-
-
 
 
 err_t hci_connect_req(struct bd_addr_t *bdaddr, uint8_t allow_role_switch)
