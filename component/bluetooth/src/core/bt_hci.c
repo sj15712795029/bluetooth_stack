@@ -105,6 +105,8 @@ static uint8_t *_hci_get_error_code(uint8_t code);
 static err_t _hci_reset_cmd_timeout(void *para);
 static err_t _hci_pin_req_handle(void *arg, struct bd_addr_t *bdaddr);
 static err_t _hci_set_chip_name(uint8_t *name);
+static void _hci_vendor_init_done(uint8_t vendor_status);
+static err_t _hci_vendor_init(uint8_t ogf,uint8_t ocf);
 static err_t _hci_init_process(struct bt_pbuf_t *p);
 static err_t _hci_init_cmd_compl_process(uint8_t *payload,uint16_t payload_len);
 static err_t _hci_inq_comp_evt_process(uint8_t *payload,uint16_t payload_len);
@@ -174,7 +176,7 @@ err_t hci_init(void)
 }
 
 
-void hci_reset_all(void)
+void hci_deinit(void)
 {
     hci_link_t *link, *tlink;
     hci_inq_res_t *ires, *tires;
@@ -203,212 +205,64 @@ void hci_reset_all(void)
 }
 
 
-void hci_register_cmd_complete(err_t (* cmd_complete)(void *arg,uint16_t opcode, uint8_t result))
+void hci_register_cmd_complete(cmd_complete_fun_cb cmd_complete)
+
 {
     hci_pcb->cmd_complete = cmd_complete;
 }
 
-void hci_register_pin_req(err_t (* pin_req)(void *arg, struct bd_addr_t *bdaddr))
+void hci_register_pin_req(pin_req_fun_cb pin_req)
 {
     hci_pcb->pin_req = pin_req;
 }
 
 
-void hci_register_bt_working(err_t (* bt_working)(void *arg))
+void hci_register_bt_working(bt_working_fun_cb bt_working)
 {
     hci_pcb->bt_working = bt_working;
 }
 
-void hci_register_sco_req(err_t (* sco_conn_req)(void *arg, struct bd_addr_t *bdaddr))
+void hci_register_sco_req(sco_conn_req_fun_cb sco_conn_req)
 {
     hci_pcb->sco_conn_req = sco_conn_req;
 }
 
-void hci_register_sco_conn_complete(err_t (* sco_conn_complete)(void *arg, uint8_t status,struct bd_addr_t *bdaddr))
+void hci_register_sco_conn_complete(sco_conn_complete_fun_cb sco_conn_complete)
 {
     hci_pcb->sco_conn_complete = sco_conn_complete;
 }
 
-void hci_register_sco_disconn_complete(err_t (* sco_disconn_complete)(void *arg, uint8_t status,struct bd_addr_t *bdaddr))
+void hci_register_sco_disconn_complete(sco_disconn_complete_fun_cb sco_disconn_complete)
 {
     hci_pcb->sco_disconn_complete = sco_disconn_complete;
 }
 
-void hci_register_link_key_req(err_t (* link_key_req)(void *arg,struct bd_addr_t *bdaddr))
+void hci_register_link_key_req(link_key_req_fun_cb link_key_req)
 {
     hci_pcb->link_key_req= link_key_req;
 }
 
 
-void hci_register_link_key_not(err_t (* link_key_not)(void *arg, struct bd_addr_t *bdaddr, uint8_t *key,uint8_t key_type))
+void hci_register_link_key_not(link_key_not_fun_cb link_key_not)
 {
     hci_pcb->link_key_not = link_key_not;
 }
 
-void hci_register_connection_complete(err_t (* conn_complete)(void *arg, struct bd_addr_t *bdaddr))
+void hci_register_connection_complete(conn_complete_fun_cb conn_complete)
 {
     hci_pcb->conn_complete = conn_complete;
 }
 
-void hci_register_write_policy_complete(err_t (* wlp_complete)(void *arg, struct bd_addr_t *bdaddr))
+void hci_register_write_policy_complete(wlp_complete_fun_cb wlp_complete)
 {
     hci_pcb->wlp_complete = wlp_complete;
 }
 
 
-err_t hci_acl_write(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p, uint16_t len, uint8_t pb)
+
+static void _hci_vendor_init_done(uint8_t vendor_status)
 {
-    hci_link_t *link;
-    static hci_acl_hdr_t *aclhdr;
-    struct bt_pbuf_t *q;
-
-    /* Check if an ACL connection exists */
-    link = _hci_get_link_by_addr(bdaddr);
-
-    if(link == NULL)
-    {
-        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] Connection does not exist\n",__FILE__,__FUNCTION__,__LINE__);
-
-        return BT_ERR_CONN;
-    }
-    BT_HCI_TRACE_DEBUG("hci_acl_write: HC num ACL %d\n", hci_pcb->hc_num_acl);
-
-    if(hci_pcb->hc_num_acl == 0)
-    {
-        BT_HCI_TRACE_DEBUG("hci_acl_write: HC out of buffer space\n");
-
-#if HCI_FLOW_QUEUEING
-        if(p != NULL)
-        {
-            /* Packet can be queued? */
-            if(link->p != NULL)
-            {
-                BT_HCI_TRACE_DEBUG("hci_acl_write: Host buffer full. Dropped packet\n");
-                return BT_ERR_OK; /* Drop packet */
-            }
-            else
-            {
-                p = bt_pbuf_take(p);
-                /* Remember bt_pbuf_t to queue, if any */
-                link->p = p;
-                link->len = len;
-                link->pb = pb;
-                /* Pbufs are queued, increase the reference count */
-                bt_pbuf_ref(p);
-                BT_HCI_TRACE_DEBUG("hci_acl_write: Host queued packet %p\n", (void *)p);
-
-            }
-        }
-#else
-        BT_HCI_TRACE_DEBUG("hci_acl_write: Dropped packet\n");
-#endif
-        return BT_ERR_OK;
-    }
-
-    if((q = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_ACL_HDR_LEN, BT_PBUF_RAM)) == NULL)
-    {
-        /* Could not allocate memory for bt_pbuf_t */
-        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
-        return BT_ERR_MEM;
-    }
-    bt_pbuf_chain(q, p);
-
-    aclhdr = (void *)(((uint8_t*)q->payload));
-    aclhdr->conhdl_pb_bc = link->conhdl; /* Received from connection complete event */
-    aclhdr->conhdl_pb_bc |= pb << 12; /* Packet boundary flag */
-    aclhdr->conhdl_pb_bc &= 0x3FFF; /* Point-to-point */
-    aclhdr->len = len;
-
-    BT_HCI_TRACE_DEBUG("hci_acl_write: q->tot_len = %d aclhdr->len + q->len = %d\n", q->tot_len, aclhdr->len + q->len);
-
-    phybusif_output(q, aclhdr->len + q->len,PHYBUSIF_PACKET_TYPE_ACL_DATA);
-
-    --hci_pcb->hc_num_acl;
-
-    /* Free ACL header. Upper layers will handle rest of packet */
-    p = bt_pbuf_dechain(q);
-    bt_pbuf_free(q);
-    return BT_ERR_OK;
-}
-
-uint8_t hci_is_connected(struct bd_addr_t *bdaddr)
-{
-    hci_link_t *link;
-
-    link = _hci_get_link_by_addr(bdaddr);
-
-    if(link == NULL)
-    {
-        return 0;
-    }
-    return 1;
-}
-
-
-uint16_t hci_pdu_maxsize(void)
-{
-    return hci_pcb->acl_maxsize;
-}
-
-void hci_acl_input(struct bt_pbuf_t *p)
-{
-    hci_acl_hdr_t *aclhdr;
-    hci_link_t *link;
-    uint16_t conhdl;
-
-    aclhdr = p->payload;
-
-    BT_HCI_TRACE_DEBUG("DEBUG:BT RX ACL LEN:%d\n",aclhdr->len);
-    bt_hex_dump(p->payload,aclhdr->len + HCI_ACL_HDR_LEN);
-
-    //bt_pbuf_header(p, -HCI_ACL_HDR_LEN);
-
-    conhdl = aclhdr->conhdl_pb_bc & 0x0FFF; /* Get the connection handle from the first
-						   12 bits */
-    if(hci_pcb->flow)
-    {
-        //TODO: XXX??? DO WE SAVE NUMACL PACKETS COMPLETED IN LINKS LIST?? SHOULD WE CALL
-        //hci_host_num_comp_packets from the main loop when no data has been received from the
-        //serial port???
-        --hci_pcb->host_num_acl;
-        if(hci_pcb->host_num_acl == 0)
-        {
-            hci_host_num_comp_packets(conhdl, HCI_HOST_MAX_NUM_ACL);
-            hci_pcb->host_num_acl = HCI_HOST_MAX_NUM_ACL;
-        }
-    }
-
-    for(link = hci_active_links; link != NULL; link = link->next)
-    {
-        if(link->conhdl == conhdl)
-        {
-            break;
-        }
-    }
-
-    if(link != NULL)
-    {
-        if(aclhdr->len)
-        {
-            BT_HCI_TRACE_DEBUG("DEBUG:Forward ACL packet to higher layer p->tot_len = %d\n",p->tot_len);
-            l2cap_acl_input(p, &(link->bdaddr));
-        }
-        else
-        {
-            bt_pbuf_free(p); /* If length of ACL packet is zero, we silently discard it */
-        }
-    }
-    else
-    {
-        bt_pbuf_free(p); /* If no acitve ACL link was found, we silently discard the packet */
-    }
-}
-
-
-
-static void vendor_init_done(uint8_t vendor_status)
-{
-    BT_HCI_TRACE_DEBUG("vendor_init_done %d\n",vendor_status);
+    BT_HCI_TRACE_DEBUG("_hci_vendor_init_done %d\n",vendor_status);
 
     if(vendor_status == VENDOR_STATUS_INITED)
     {
@@ -421,9 +275,11 @@ static void vendor_init_done(uint8_t vendor_status)
     }
 }
 
-static void vendor_init(uint8_t ogf,uint8_t ocf)
+static err_t _hci_vendor_init(uint8_t ogf,uint8_t ocf)
 {
-    hci_pcb->chip_mgr->vendor_init(vendor_init_done,ogf,ocf);
+    hci_pcb->chip_mgr->vendor_init(_hci_vendor_init_done,ogf,ocf);
+
+	return BT_ERR_OK;
 }
 
 
@@ -1058,7 +914,7 @@ static err_t _hci_init_cmd_compl_process(uint8_t *payload,uint16_t payload_len)
     if((opcode&HCI_GRP_VENDOR_SPECIFIC) == HCI_GRP_VENDOR_SPECIFIC)
     {
         BT_HCI_TRACE_DEBUG("Init recv HCI_GRP_VENDOR_SPECIFIC\n");
-        vendor_init(HCI_OGF(opcode),HCI_OCF(opcode));
+        _hci_vendor_init(HCI_OGF(opcode),HCI_OCF(opcode));
     }
 
     switch(opcode)
@@ -1070,7 +926,7 @@ static err_t _hci_init_cmd_compl_process(uint8_t *payload,uint16_t payload_len)
         if (hci_pcb->vendor_init_status == VENDOR_NOT_INIT)
         {
             if(hci_pcb->chip_mgr != NULL)
-                vendor_init(HCI_OGF(opcode),HCI_OCF(opcode));
+                _hci_vendor_init(HCI_OGF(opcode),HCI_OCF(opcode));
         }
         else
         {
@@ -1384,7 +1240,7 @@ static err_t _hci_init_process(struct bt_pbuf_t *p)
     case HCI_VENDOR_SPEC:
     {
         BT_HCI_TRACE_DEBUG("Init recv HCI_VENDOR_SPEC\n");
-        vendor_init(HCI_OGF(HCI_OP_NONE),HCI_OCF(HCI_OP_NONE));
+        _hci_vendor_init(HCI_OGF(HCI_OP_NONE),HCI_OCF(HCI_OP_NONE));
         break;
     }
     default:
@@ -1494,6 +1350,156 @@ void hci_event_input(struct bt_pbuf_t *p)
 }
 
 
+err_t hci_acl_write(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p, uint16_t len, uint8_t pb)
+{
+    hci_link_t *link;
+    static hci_acl_hdr_t *aclhdr;
+    struct bt_pbuf_t *q;
+
+    /* Check if an ACL connection exists */
+    link = _hci_get_link_by_addr(bdaddr);
+
+    if(link == NULL)
+    {
+        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] Connection does not exist\n",__FILE__,__FUNCTION__,__LINE__);
+
+        return BT_ERR_CONN;
+    }
+    BT_HCI_TRACE_DEBUG("hci_acl_write: HC num ACL %d\n", hci_pcb->hc_num_acl);
+
+    if(hci_pcb->hc_num_acl == 0)
+    {
+        BT_HCI_TRACE_DEBUG("hci_acl_write: HC out of buffer space\n");
+
+#if HCI_FLOW_QUEUEING
+        if(p != NULL)
+        {
+            /* Packet can be queued? */
+            if(link->p != NULL)
+            {
+                BT_HCI_TRACE_DEBUG("hci_acl_write: Host buffer full. Dropped packet\n");
+                return BT_ERR_OK; /* Drop packet */
+            }
+            else
+            {
+                p = bt_pbuf_take(p);
+                /* Remember bt_pbuf_t to queue, if any */
+                link->p = p;
+                link->len = len;
+                link->pb = pb;
+                /* Pbufs are queued, increase the reference count */
+                bt_pbuf_ref(p);
+                BT_HCI_TRACE_DEBUG("hci_acl_write: Host queued packet %p\n", (void *)p);
+
+            }
+        }
+#else
+        BT_HCI_TRACE_DEBUG("hci_acl_write: Dropped packet\n");
+#endif
+        return BT_ERR_OK;
+    }
+
+    if((q = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_ACL_HDR_LEN, BT_PBUF_RAM)) == NULL)
+    {
+        /* Could not allocate memory for bt_pbuf_t */
+        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_MEM;
+    }
+    bt_pbuf_chain(q, p);
+
+    aclhdr = (void *)(((uint8_t*)q->payload));
+    aclhdr->conhdl_pb_bc = link->conhdl; /* Received from connection complete event */
+    aclhdr->conhdl_pb_bc |= pb << 12; /* Packet boundary flag */
+    aclhdr->conhdl_pb_bc &= 0x3FFF; /* Point-to-point */
+    aclhdr->len = len;
+
+    BT_HCI_TRACE_DEBUG("hci_acl_write: q->tot_len = %d aclhdr->len + q->len = %d\n", q->tot_len, aclhdr->len + q->len);
+
+    phybusif_output(q, aclhdr->len + q->len,PHYBUSIF_PACKET_TYPE_ACL_DATA);
+
+    --hci_pcb->hc_num_acl;
+
+    /* Free ACL header. Upper layers will handle rest of packet */
+    p = bt_pbuf_dechain(q);
+    bt_pbuf_free(q);
+    return BT_ERR_OK;
+}
+
+uint8_t hci_is_connected(struct bd_addr_t *bdaddr)
+{
+    hci_link_t *link;
+
+    link = _hci_get_link_by_addr(bdaddr);
+
+    if(link == NULL)
+    {
+        return 0;
+    }
+    return 1;
+}
+
+
+uint16_t hci_pdu_maxsize(void)
+{
+    return hci_pcb->acl_maxsize;
+}
+
+void hci_acl_input(struct bt_pbuf_t *p)
+{
+    hci_acl_hdr_t *aclhdr;
+    hci_link_t *link;
+    uint16_t conhdl;
+
+    aclhdr = p->payload;
+
+    BT_HCI_TRACE_DEBUG("DEBUG:BT RX ACL LEN:%d\n",aclhdr->len);
+    bt_hex_dump(p->payload,aclhdr->len + HCI_ACL_HDR_LEN);
+
+    //bt_pbuf_header(p, -HCI_ACL_HDR_LEN);
+
+    conhdl = aclhdr->conhdl_pb_bc & 0x0FFF; /* Get the connection handle from the first
+						   12 bits */
+    if(hci_pcb->flow)
+    {
+        //TODO: XXX??? DO WE SAVE NUMACL PACKETS COMPLETED IN LINKS LIST?? SHOULD WE CALL
+        //hci_host_num_comp_packets from the main loop when no data has been received from the
+        //serial port???
+        --hci_pcb->host_num_acl;
+        if(hci_pcb->host_num_acl == 0)
+        {
+            hci_host_num_comp_packets(conhdl, HCI_HOST_MAX_NUM_ACL);
+            hci_pcb->host_num_acl = HCI_HOST_MAX_NUM_ACL;
+        }
+    }
+
+    for(link = hci_active_links; link != NULL; link = link->next)
+    {
+        if(link->conhdl == conhdl)
+        {
+            break;
+        }
+    }
+
+    if(link != NULL)
+    {
+        if(aclhdr->len)
+        {
+            BT_HCI_TRACE_DEBUG("DEBUG:Forward ACL packet to higher layer p->tot_len = %d\n",p->tot_len);
+            l2cap_acl_input(p, &(link->bdaddr));
+        }
+        else
+        {
+            bt_pbuf_free(p); /* If length of ACL packet is zero, we silently discard it */
+        }
+    }
+    else
+    {
+        bt_pbuf_free(p); /* If no acitve ACL link was found, we silently discard the packet */
+    }
+}
+
+
+
 struct bt_pbuf_t *hci_cmd_ass(struct bt_pbuf_t *p, uint8_t ocf, uint8_t ogf, uint8_t len)
 {
     ((uint8_t *)p->payload)[0] = (ocf & 0xff); /* OCF & OGF */
@@ -1508,8 +1514,8 @@ struct bt_pbuf_t *hci_cmd_ass(struct bt_pbuf_t *p, uint8_t ocf, uint8_t ogf, uin
 
 
 err_t hci_inquiry(uint32_t lap, uint8_t inq_len, uint8_t num_resp,
-                  err_t (*inq_result)(hci_inq_res_t *inqres),
-                  err_t (* inq_complete)(uint16_t result))
+                  inq_result_fun_cb inq_result,
+                  inq_complete_fun_cb inq_complete)
 {
     struct bt_pbuf_t *p;
     hci_inq_res_t *tmpres;
@@ -1573,8 +1579,8 @@ err_t hci_cancel_inquiry(void)
 
 
 err_t hci_periodic_inquiry(uint16_t min_periodic,uint16_t max_periodic,uint32_t lap, uint8_t inq_len, uint8_t num_resp,
-                           err_t (*inq_result)(hci_inq_res_t *inqres),
-                           err_t (* inq_complete)(uint16_t result))
+                           inq_result_fun_cb inq_result,
+                           inq_complete_fun_cb inq_complete)
 {
     struct bt_pbuf_t *p;
     hci_inq_res_t *tmpres;
@@ -3071,9 +3077,8 @@ err_t hci_set_le_scan_param(uint8_t scan_type,uint16_t scan_interval,uint16_t sc
 }
 
 err_t hci_le_inquiry(uint8_t filter_duplicates,
-                     err_t (*le_inq_result)(hci_le_inq_res_t *le_inqres),
-                     err_t (* le_inq_complete)(uint16_t result))
-
+					le_inq_result_fun_cb le_inq_result,
+                     le_inq_complete_fun_cb le_inq_complete)
 {
     struct bt_pbuf_t *p;
     if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_SET_LE_SCAN_PLEN, BT_PBUF_RAM)) == NULL)

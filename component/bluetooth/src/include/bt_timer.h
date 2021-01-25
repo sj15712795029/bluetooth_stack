@@ -13,7 +13,7 @@
 #include "bt_common.h"
 
 
-typedef void(*timer_cb)(void *para);
+typedef err_t(*timer_cb)(void *para);
 typedef struct
 {
     uint8_t used;

@@ -679,7 +679,11 @@
 #define HCI_SUBEVENT_LE_ENHANCED_CONN_COMPLETE       0x0A
 #define HCI_SUBEVENT_LE_DIRECT_AD_REPORT          0x0B
 
-
+typedef struct
+{
+	uint16_t opcode;
+	uint8_t len;
+}BT_PACK_END hci_cmd_hdr_t;
 
 typedef struct 
 {
@@ -689,8 +693,7 @@ typedef struct
 
 typedef struct 
 {
-    uint16_t conhdl_pb_bc; /* Connection handle, packet boundary and broadcast flag
-			 flag */
+    uint16_t conhdl_pb_bc; /* Connection handle, packet boundary and broadcast flag flag */
     uint16_t len; /* length of data */
 } BT_PACK_END hci_acl_hdr_t;
 
@@ -772,6 +775,26 @@ typedef enum hci_vendor_init_status
 } hci_vendor_init_status_e;
 
 
+
+typedef err_t (* cmd_complete_fun_cb)(void *arg, uint16_t opcode, uint8_t result);
+typedef err_t (* pin_req_fun_cb)(void *arg, struct bd_addr_t *bdaddr);
+typedef err_t (* bt_working_fun_cb)(void *arg);
+typedef err_t (* sco_conn_req_fun_cb)(void *arg, struct bd_addr_t *bdaddr);
+typedef err_t (*sco_conn_complete_fun_cb)(void *arg, uint8_t status,struct bd_addr_t *bdaddr);
+typedef err_t (*sco_disconn_complete_fun_cb)(void *arg, uint8_t status,struct bd_addr_t *bdaddr);
+typedef err_t (*inq_result_fun_cb)(hci_inq_res_t *inqres);
+typedef err_t (* inq_complete_fun_cb)(uint16_t result);
+typedef err_t (*le_inq_result_fun_cb)(hci_le_inq_res_t *le_inqres);
+typedef err_t (*le_inq_complete_fun_cb)(uint16_t result);
+typedef err_t (*name_req_complete_fun_cb)(struct bd_addr_t *bdaddr,uint8_t * name);
+typedef err_t (* rbd_complete_fun_cb)(void *arg, struct bd_addr_t *bdaddr);
+typedef err_t (* link_key_not_fun_cb)(void *arg, struct bd_addr_t *bdaddr, uint8_t *key,uint8_t key_type);
+typedef err_t (*link_key_req_fun_cb)(void *arg,struct bd_addr_t *bdaddr);
+typedef err_t (* wlp_complete_fun_cb)(void *arg, struct bd_addr_t *bdaddr);
+typedef err_t (* conn_complete_fun_cb)(void *arg, struct bd_addr_t *bdaddr);
+
+
+
 typedef struct
 {
     void *callback_arg;
@@ -802,39 +825,39 @@ typedef struct
     hci_inq_res_t *ires; /* Results of an inquiry */
 
     uint8_t le_inq_w2_stop;
-    err_t (* pin_req)(void *arg, struct bd_addr_t *bdaddr);
-    err_t (* bt_working)(void *arg);
-    err_t (* sco_conn_req)(void *arg, struct bd_addr_t *bdaddr);
-    err_t (*sco_conn_complete)(void *arg, uint8_t status,struct bd_addr_t *bdaddr);
-    err_t (*sco_disconn_complete)(void *arg, uint8_t status,struct bd_addr_t *bdaddr);
-    err_t (*inq_result)(hci_inq_res_t *inqres);
-    err_t (* inq_complete)(uint16_t result);
-    err_t (*le_inq_result)(hci_le_inq_res_t *le_inqres);
-    err_t (*le_inq_complete)(uint16_t result);
-    err_t (*name_req_complete)(struct bd_addr_t *bdaddr,uint8_t * name);
-    err_t (* rbd_complete)(void *arg, struct bd_addr_t *bdaddr);
-    err_t (* link_key_not)(void *arg, struct bd_addr_t *bdaddr, uint8_t *key,uint8_t key_type);
-    err_t (*link_key_req)(void *arg,struct bd_addr_t *bdaddr );
-    err_t (* wlp_complete)(void *arg, struct bd_addr_t *bdaddr);
-    err_t (* conn_complete)(void *arg, struct bd_addr_t *bdaddr);
-    err_t (* cmd_complete)(void *arg,uint16_t opcode, uint8_t result);
+	pin_req_fun_cb pin_req;
+    bt_working_fun_cb bt_working;
+    sco_conn_req_fun_cb sco_conn_req;
+    sco_conn_complete_fun_cb sco_conn_complete;
+    sco_disconn_complete_fun_cb sco_disconn_complete;
+	inq_result_fun_cb inq_result;
+	inq_complete_fun_cb inq_complete;
+	le_inq_result_fun_cb le_inq_result;
+	le_inq_complete_fun_cb le_inq_complete;
+	name_req_complete_fun_cb name_req_complete;
+	rbd_complete_fun_cb rbd_complete;
+	link_key_not_fun_cb link_key_not;
+	link_key_req_fun_cb link_key_req;
+	wlp_complete_fun_cb wlp_complete;
+	conn_complete_fun_cb conn_complete;
+	cmd_complete_fun_cb cmd_complete;
 }hci_pcb_t;
 
 
 /*-------------------- common api ----------------------------------------*/
 /*  Functions for interfacing with HCI */
 err_t hci_init(void);
-void hci_reset_all(void);
-void hci_register_cmd_complete(err_t (* cmd_complete)(void *arg, uint16_t opcode, uint8_t result));
-void hci_register_pin_req(err_t (* pin_req)(void *arg, struct bd_addr_t *bdaddr));
-void hci_register_bt_working(err_t (* bt_working)(void *arg));
-void hci_register_sco_req(err_t (* sco_conn_req)(void *arg, struct bd_addr_t *bdaddr));
-void hci_register_sco_conn_complete(err_t (* sco_conn_complete)(void *arg, uint8_t status,struct bd_addr_t *bdaddr));
-void hci_register_sco_disconn_complete(err_t (* sco_disconn_complete)(void *arg, uint8_t status,struct bd_addr_t *bdaddr));
-void hci_register_link_key_req(err_t (* link_key_req)(void *arg,struct bd_addr_t *bdaddr));
-void hci_register_link_key_not(err_t (* link_key_not)(void *arg, struct bd_addr_t *bdaddr, uint8_t *key,uint8_t key_type));
-void hci_register_write_policy_complete(err_t (* wlp_complete)(void *arg, struct bd_addr_t *bdaddr));
-void hci_register_connection_complete(err_t (* conn_complete)(void *arg, struct bd_addr_t *bdaddr));
+void hci_deinit(void);
+void hci_register_cmd_complete(cmd_complete_fun_cb cmd_complete);
+void hci_register_pin_req(pin_req_fun_cb pin_req);
+void hci_register_bt_working(bt_working_fun_cb bt_working);
+void hci_register_sco_req(sco_conn_req_fun_cb sco_conn_req);
+void hci_register_sco_conn_complete(sco_conn_complete_fun_cb sco_conn_complete);
+void hci_register_sco_disconn_complete(sco_disconn_complete_fun_cb sco_disconn_complete);
+void hci_register_link_key_req(link_key_req_fun_cb link_key_req);
+void hci_register_link_key_not(link_key_not_fun_cb link_key_not);
+void hci_register_write_policy_complete(wlp_complete_fun_cb wlp_complete);
+void hci_register_connection_complete(conn_complete_fun_cb conn_complete);
 err_t hci_acl_write(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p, uint16_t len, uint8_t pb);
 uint8_t hci_is_connected(struct bd_addr_t *bdaddr);
 uint16_t hci_pdu_maxsize(void);
@@ -844,12 +867,12 @@ void hci_event_input(struct bt_pbuf_t *p);
 /*-------------------- hci command ----------------------------------------*/
 /* OGF = 0x01 LINK CONTROL COMMANDS */
 err_t hci_inquiry(uint32_t lap, uint8_t inq_len, uint8_t num_resp,
-                  err_t (*inq_result)(hci_inq_res_t *inqres),
-                  err_t (* inq_complete)(uint16_t result));
+                  inq_result_fun_cb inq_result,
+                  inq_complete_fun_cb inq_complete);
 err_t hci_cancel_inquiry(void);
 err_t hci_periodic_inquiry(uint16_t min_periodic,uint16_t max_periodic,uint32_t lap, uint8_t inq_len, uint8_t num_resp,
-                           err_t (*inq_result)(hci_inq_res_t *inqres),
-                           err_t (* inq_complete)(uint16_t result));
+                           inq_result_fun_cb inq_result,
+                           inq_complete_fun_cb inq_complete);
 err_t hci_cancel_periodic_inquiry(void);
 err_t hci_connect_req(struct bd_addr_t *bdaddr, uint8_t allow_role_switch);
 err_t hci_disconnect_acl(struct bd_addr_t *bdaddr, uint8_t reason);
@@ -860,7 +883,7 @@ err_t hci_link_key_request_reply(struct bd_addr_t *bdaddr, uint8_t *link_key);
 err_t hci_link_key_request_negative_reply(struct bd_addr_t *bdaddr);
 err_t hci_pin_code_request_reply(struct bd_addr_t *bdaddr, uint8_t pinlen, uint8_t *pincode);
 err_t hci_pin_code_request_neg_reply(struct bd_addr_t *bdaddr);
-err_t hci_get_remote_name(struct bd_addr_t *bdaddr,err_t (*name_req_complete)(struct bd_addr_t *bdaddr,uint8_t * name));
+err_t hci_get_remote_name(struct bd_addr_t *bdaddr,name_req_complete_fun_cb name_req_complete);
 err_t hci_cancel_get_remote_name(struct bd_addr_t *bdaddr);
 err_t hci_get_remote_feature(struct bd_addr_t *bdaddr);
 err_t hci_connect_sco(struct bd_addr_t *bdaddr,uint32_t transmit_bandwidth,uint32_t receive_bandwidth,
@@ -907,7 +930,7 @@ err_t hci_write_le_enable(uint8_t le_support,uint8_t simultaneous);
 /* OGF = 0x04 INFORMATIONAL PARAMETERS */
 err_t hci_read_local_version_info(void);
 err_t hci_read_buffer_size(void);
-err_t hci_read_bd_addr(err_t (* rbd_complete)(void *arg, struct bd_addr_t *bdaddr));
+err_t hci_read_bd_addr(rbd_complete_fun_cb rbd_complete);
 /* OGF = 0x05 STATUS PARAMETERS */
 err_t hci_read_rssi(struct bd_addr_t *bdaddr);
 /* OGF = 0x06 TESTING COMMANDS */
@@ -916,8 +939,8 @@ err_t hci_enable_dut_mode(void);
 #if BT_BLE_ENABLE > 0
 err_t hci_set_le_scan_param(uint8_t scan_type,uint16_t scan_interval,uint16_t scan_window,uint8_t own_type,uint8_t scan_filter);
 err_t hci_le_inquiry(uint8_t filter_duplicates,
-					err_t (*le_inq_result)(hci_le_inq_res_t *le_inqres),
-                     err_t (* le_inq_complete)(uint16_t result));
+					le_inq_result_fun_cb le_inq_result,
+                     le_inq_complete_fun_cb le_inq_complete);
 err_t hci_le_cancel_inquiry(void);
 err_t hci_le_set_adv_param(uint16_t adv_int_min, uint16_t adv_int_max, uint8_t adv_type,
     uint8_t own_address_typ, uint8_t peer_address_type,struct bd_addr_t *peer_address, uint8_t channel_map, uint8_t filter_policy);
