@@ -594,7 +594,7 @@ static void pbap_close(struct pbap_pcb_t *pcb)
 }
 
 
-static err_t l2cap_connect_cfm(void *arg, struct l2cap_pcb_t *l2cappcb, uint16_t result, uint16_t status)
+static err_t l2cap_connect_cfm(void *arg,l2cap_pcb_t *l2cappcb, uint16_t result, uint16_t status)
 {
     struct pbap_pcb_t *pbappcb = pbap_get_active_pcb(&(l2cappcb->remote_bdaddr));
 
@@ -657,7 +657,7 @@ static err_t l2cap_connect_cfm(void *arg, struct l2cap_pcb_t *l2cappcb, uint16_t
 }
 
 
-static err_t l2cap_disconnect_cfm(void *arg, struct l2cap_pcb_t *pcb)
+static err_t l2cap_disconnect_cfm(void *arg,l2cap_pcb_t *pcb)
 {
     struct pbap_pcb_t *pbappcb = pbap_get_active_pcb(&(pcb->remote_bdaddr));
 
@@ -909,7 +909,6 @@ static err_t pbap_client_run(struct pbap_pcb_t *pcb)
         l2cap_connect_req(pcb->l2cappcb, &(pcb->remote_addr), RFCOMM_PSM, HCI_ALLOW_ROLE_SWITCH, l2cap_connect_cfm);
         break;
     case PBAP_W2_SERVER_CN_CONNECTED:
-        /* TODO:处理OBEX 的disconnect，做一个假的，只让OBEX关闭PCB */
         rfcomm_connect(pcb->rfcommpcb, pcb->remote_cn, pbap_client_rf_connect_cfm);
         break;
 

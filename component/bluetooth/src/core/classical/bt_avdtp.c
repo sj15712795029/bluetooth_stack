@@ -56,12 +56,12 @@ struct avdtp_sep_t *avdtp_tmp_sep;      /* Only used for temporary storage. */
 avdtp_event_handle avdtp_event_handler;
 avdtp_media_handle avdtp_media_handler;
 
-static err_t avdtp_connect_ind(void *arg, struct l2cap_pcb_t *l2cap_pcb, err_t err);
-static err_t avdtp_signal_disconnect_ind(void *arg, struct l2cap_pcb_t *l2cap_pcb, err_t err);
-static err_t avdtp_stream_disconnect_ind(void *arg, struct l2cap_pcb_t *l2cap_pcb, err_t err);
+static err_t avdtp_connect_ind(void *arg, l2cap_pcb_t *l2cap_pcb, err_t err);
+static err_t avdtp_signal_disconnect_ind(void *arg, l2cap_pcb_t *l2cap_pcb, err_t err);
+static err_t avdtp_stream_disconnect_ind(void *arg, l2cap_pcb_t *l2cap_pcb, err_t err);
 
-err_t avdtp_signal_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err);
-err_t avdtp_media_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err);
+err_t avdtp_signal_input(void *arg, l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err);
+err_t avdtp_media_input(void *arg, l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err);
 
 
 struct avdtp_pcb_t *avdtp_new(void)
@@ -468,7 +468,7 @@ struct avdtp_pcb_t *avdtp_get_active_pcb( struct bd_addr_t *bdaddr)
     return avdtp_pcb;
 }
 
-static err_t avdtp_connect_ind(void *arg, struct l2cap_pcb_t *l2cap_pcb, err_t err)
+static err_t avdtp_connect_ind(void *arg, l2cap_pcb_t *l2cap_pcb, err_t err)
 {
     struct avdtp_pcb_t *avdtp_pcb;
 
@@ -494,7 +494,7 @@ static err_t avdtp_connect_ind(void *arg, struct l2cap_pcb_t *l2cap_pcb, err_t e
 }
 
 
-static err_t avdtp_signal_disconnect_ind(void *arg, struct l2cap_pcb_t *l2cap_pcb, err_t err)
+static err_t avdtp_signal_disconnect_ind(void *arg, l2cap_pcb_t *l2cap_pcb, err_t err)
 {
 	struct avdtp_pcb_t *avdtp_pcb = NULL;
     BT_AVDTP_TRACE_DEBUG("avdtp_signal_disconnect_ind psm 0x%x\n",l2cap_pcb->psm);
@@ -509,7 +509,7 @@ static err_t avdtp_signal_disconnect_ind(void *arg, struct l2cap_pcb_t *l2cap_pc
 }
 
 
-static err_t avdtp_stream_disconnect_ind(void *arg, struct l2cap_pcb_t *l2cap_pcb, err_t err)
+static err_t avdtp_stream_disconnect_ind(void *arg, l2cap_pcb_t *l2cap_pcb, err_t err)
 {
 	struct avdtp_pcb_t *avdtp_pcb = NULL;
     BT_AVDTP_TRACE_DEBUG("avdtp_stream_disconnect_ind psm 0x%x\n",l2cap_pcb->psm);
@@ -525,12 +525,12 @@ static err_t avdtp_stream_disconnect_ind(void *arg, struct l2cap_pcb_t *l2cap_pc
 
 
 
-err_t avdtp_media_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err)
+err_t avdtp_media_input(void *arg, l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err)
 {
-
     uint8_t marker,payload_type;
     uint16_t sequence_number;
     uint32_t timestamp,synchronization_source;
+
     struct avdtp_pcb_t *avdtp_pcb =  avdtp_get_active_pcb(&l2cappcb->remote_bdaddr);
     uint8_t *data = (uint8_t *)p->payload;
     uint8_t data_pos = 0;
@@ -556,14 +556,14 @@ err_t avdtp_media_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_
     BT_AVDTP_INFO_DEBUG("sequence_number 0x%x,timestamp %d,synchronization_source %d\n",sequence_number,timestamp,synchronization_source);
 
 
-
     bt_pbuf_header(p, -(data_pos));
+
     avdtp_media_handler(avdtp_pcb,p);
 
     return BT_ERR_OK;
 }
 
-err_t avdtp_signal_input(void *arg, struct l2cap_pcb_t *l2cap_pcb, struct bt_pbuf_t *p, err_t err)
+err_t avdtp_signal_input(void *arg, l2cap_pcb_t *l2cap_pcb, struct bt_pbuf_t *p, err_t err)
 {
     uint8_t *data = (uint8_t *)p->payload;
     uint8_t transaction_label = data[0] >> 4;
@@ -711,19 +711,13 @@ void avdtp_register_media_codec_category(struct avdtp_sep_t* sep,uint8_t * media
 
 err_t avdtp_init(avdtp_event_handle avdtp_evt_handle,avdtp_media_handle avdtp_media_handle)
 {
-    struct l2cap_pcb_t *l2cappcb;
     /* Clear globals */
     avdtp_tmp_pcb = NULL;
 
     avdtp_event_handler = avdtp_evt_handle;
     avdtp_media_handler = avdtp_media_handle;
-    if((l2cappcb = l2cap_new()) == NULL)
-    {
-        BT_AVDTP_TRACE_DEBUG("avdtp_init: Could not alloc L2CAP PCB for AVDTP_PSM\n");
 
-        return BT_ERR_MEM;
-    }
-    l2cap_register_connect_ind(l2cappcb, AVDTP_PSM, avdtp_connect_ind);
+    l2cap_register_connect_ind(AVDTP_PSM, avdtp_connect_ind);
     return BT_ERR_OK;
 }
 

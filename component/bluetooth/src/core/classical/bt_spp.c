@@ -71,8 +71,8 @@ struct spp_pcb_t *spp_tmp_pcb;
 static struct spp_pcb_t *spp_new(struct rfcomm_pcb_t *rfcommpcb);
 static struct spp_pcb_t *spp_get_active_pcb(struct bd_addr_t *bdaddr);
 static void spp_close(struct spp_pcb_t *pcb);
-static err_t l2cap_connect_cfm(void *arg, struct l2cap_pcb_t *l2cappcb, uint16_t result, uint16_t status);
-static err_t l2cap_disconnect_cfm(void *arg, struct l2cap_pcb_t *pcb);
+static err_t l2cap_connect_cfm(void *arg, l2cap_pcb_t *l2cappcb, uint16_t result, uint16_t status);
+static err_t l2cap_disconnect_cfm(void *arg, l2cap_pcb_t *pcb);
 static err_t spp_connect_cfm(void *arg, struct rfcomm_pcb_t *pcb, err_t err);
 static err_t spp_connect_ind(void *arg, struct rfcomm_pcb_t *pcb, err_t err);
 static err_t spp_disconnected(void *arg, struct rfcomm_pcb_t *pcb, err_t err);
@@ -287,7 +287,7 @@ static err_t spp_connect_ind(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
 }
 
 
-static err_t l2cap_connect_cfm(void *arg, struct l2cap_pcb_t *l2cappcb, uint16_t result, uint16_t status)
+static err_t l2cap_connect_cfm(void *arg, l2cap_pcb_t *l2cappcb, uint16_t result, uint16_t status)
 {
     struct spp_pcb_t *spppcb = spp_get_active_pcb(&(l2cappcb->remote_bdaddr));
 
@@ -349,7 +349,7 @@ static err_t l2cap_connect_cfm(void *arg, struct l2cap_pcb_t *l2cappcb, uint16_t
 
 }
 
-static err_t l2cap_disconnect_cfm(void *arg, struct l2cap_pcb_t *pcb)
+static err_t l2cap_disconnect_cfm(void *arg, l2cap_pcb_t *pcb)
 {
     struct spp_pcb_t *spppcb = spp_get_active_pcb(&(pcb->remote_bdaddr));
 

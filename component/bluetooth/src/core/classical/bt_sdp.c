@@ -67,10 +67,10 @@ const uint8_t sdp_base_uuid[] = { 0x00, 0x00, 0x00, 0x00, /* - */ 0x00, 0x00, /*
                             } while(0)
 
 
-static err_t sdp_connect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err);
-static err_t sdp_disconnect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err);
+static err_t sdp_connect_ind(void *arg, l2cap_pcb_t *pcb, err_t err);
+static err_t sdp_disconnect_ind(void *arg, l2cap_pcb_t *pcb, err_t err);
 
-static err_t sdp_connect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err)
+static err_t sdp_connect_ind(void *arg, l2cap_pcb_t *pcb, err_t err)
 {
     BT_SDP_TRACE_DEBUG("sdp_connect_ind psm 0x%x\n",pcb->psm);
 
@@ -80,7 +80,7 @@ static err_t sdp_connect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err)
     return BT_ERR_OK;
 }
 
-static err_t sdp_disconnect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err)
+static err_t sdp_disconnect_ind(void *arg, l2cap_pcb_t *pcb, err_t err)
 {
     err_t ret = BT_ERR_OK;
     BT_UNUSED_ARG(ret);
@@ -103,7 +103,6 @@ static void sdp_uuid16_to_uuid128(uint8_t *uuid, uint32_t shortUUID)
 
 void sdp_init(void)
 {
-    struct l2cap_pcb_t *l2cappcb;
     /* Clear globals */
     sdp_server_records = NULL;
     sdp_tmp_record = NULL;
@@ -114,12 +113,7 @@ void sdp_init(void)
     /* Initialize transaction ids */
     tid_next = 0x0000;
 
-    if((l2cappcb = l2cap_new()) == NULL)
-    {
-        BT_SDP_TRACE_DEBUG("sdp_init: Could not alloc L2CAP PCB for SDP_PSM\n");
-        return;
-    }
-    l2cap_register_connect_ind(l2cappcb, SDP_PSM,sdp_connect_ind);
+    l2cap_register_connect_ind(SDP_PSM,sdp_connect_ind);
 }
 
 uint32_t sdp_next_rhdl(void)
@@ -350,7 +344,7 @@ struct bt_pbuf_t *sdp_attribute_search(uint16_t max_attribl_bc, struct bt_pbuf_t
     return q;
 }
 
-struct sdp_pcb_t *sdp_new(struct l2cap_pcb_t *l2cappcb)
+struct sdp_pcb_t *sdp_new(l2cap_pcb_t *l2cappcb)
 {
     struct sdp_pcb_t *pcb;
 
@@ -401,7 +395,7 @@ void sdp_arg(struct sdp_pcb_t *pcb, void *arg)
     pcb->callback_arg = arg;
 }
 
-void sdp_lp_disconnected(struct l2cap_pcb_t *l2cappcb)
+void sdp_lp_disconnected(l2cap_pcb_t *l2cappcb)
 {
     struct sdp_pcb_t *pcb, *tpcb;
 
@@ -533,7 +527,7 @@ err_t sdp_service_search_attrib_req(struct sdp_pcb_t *pcb, uint16_t max_abc, uin
     return l2cap_datawrite(pcb->l2cappcb, p);
 }
 
-err_t sdp_service_search_rsp(struct l2cap_pcb_t *pcb, struct bt_pbuf_t *p, struct sdp_hdr_t *reqhdr)
+err_t sdp_service_search_rsp(l2cap_pcb_t *pcb, struct bt_pbuf_t *p, struct sdp_hdr_t *reqhdr)
 {
     struct sdp_record_t *record;
     struct sdp_hdr_t *rsphdr;
@@ -626,7 +620,7 @@ err_t sdp_service_search_rsp(struct l2cap_pcb_t *pcb, struct bt_pbuf_t *p, struc
 }
 
 
-err_t sdp_service_attrib_rsp(struct l2cap_pcb_t *pcb, struct bt_pbuf_t *p, struct sdp_hdr_t *reqhdr)
+err_t sdp_service_attrib_rsp(l2cap_pcb_t *pcb, struct bt_pbuf_t *p, struct sdp_hdr_t *reqhdr)
 {
     struct sdp_record_t *record;
     struct sdp_hdr_t *rsphdr;
@@ -703,7 +697,7 @@ err_t sdp_service_attrib_rsp(struct l2cap_pcb_t *pcb, struct bt_pbuf_t *p, struc
     return BT_ERR_OK;
 }
 
-err_t sdp_service_search_attrib_rsp(struct l2cap_pcb_t *pcb, struct bt_pbuf_t *p, struct sdp_hdr_t *reqhdr)
+err_t sdp_service_search_attrib_rsp(l2cap_pcb_t *pcb, struct bt_pbuf_t *p, struct sdp_hdr_t *reqhdr)
 {
     struct sdp_record_t *record;
     struct sdp_hdr_t *rsphdr;
@@ -816,7 +810,7 @@ err_t sdp_service_search_attrib_rsp(struct l2cap_pcb_t *pcb, struct bt_pbuf_t *p
     return l2cap_datawrite(pcb, q);
 }
 
-err_t sdp_recv(void *arg, struct l2cap_pcb_t *pcb, struct bt_pbuf_t *s, err_t err)
+err_t sdp_recv(void *arg, l2cap_pcb_t *pcb, struct bt_pbuf_t *s, err_t err)
 {
     struct sdp_hdr_t *sdphdr;
     struct sdp_pcb_t *sdppcb;

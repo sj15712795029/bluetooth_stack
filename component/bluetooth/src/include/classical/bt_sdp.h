@@ -89,7 +89,7 @@ struct sdp_record_t {
 struct sdp_pcb_t {
   struct sdp_pcb_t *next; /* For the linked list */
 
-  struct l2cap_pcb_t *l2cappcb; /* The L2CAP connection */
+  l2cap_pcb_t *l2cappcb; /* The L2CAP connection */
 
   uint16_t tid; /* Transaction ID */
   
@@ -313,7 +313,7 @@ void sdp_init(void);
 uint32_t sdp_next_rhdl(void);
 
 /* Client API */
-struct sdp_pcb_t *sdp_new(struct l2cap_pcb_t *l2cappcb);
+struct sdp_pcb_t *sdp_new(l2cap_pcb_t *l2cappcb);
 void sdp_free(struct sdp_pcb_t *pcb);
 void sdp_reset_all(void);
 void sdp_arg(struct sdp_pcb_t *pcb, void *arg);
@@ -332,8 +332,8 @@ err_t sdp_register_service(struct sdp_record_t *record);
 void sdp_unregister_service(struct sdp_record_t *record);
 
 /* Lower layer API */
-void sdp_lp_disconnected(struct l2cap_pcb_t *l2cappcb);
-err_t sdp_recv(void *arg, struct l2cap_pcb_t *pcb, struct bt_pbuf_t *p, err_t err);
+void sdp_lp_disconnected(l2cap_pcb_t *l2cappcb);
+err_t sdp_recv(void *arg, l2cap_pcb_t *pcb, struct bt_pbuf_t *p, err_t err);
 
 
 

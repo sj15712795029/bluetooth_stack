@@ -192,24 +192,24 @@
 #define L2CAP_CFG_OUT_SUCCESS 0x04
 #define L2CAP_CFG_OUT_REQ 0x08
 
-struct l2cap_hdr_t
+typedef struct 
 {
     uint16_t len;
     uint16_t cid;
-} BT_PACK_END;
+} BT_PACK_END l2cap_hdr_t;
 
-struct l2cap_sig_hdr_t
+typedef struct 
 {
     uint8_t code;
     uint8_t id;
     uint16_t len;
-} BT_PACK_END;
+} BT_PACK_END l2cap_sig_hdr_t;
 
-struct l2cap_cfgopt_hdr_t
+typedef struct 
 {
     uint8_t type;
     uint8_t len;
-} BT_PACK_END;
+} BT_PACK_END l2cap_cfgopt_hdr_t;
 
 enum l2cap_state_e
 {
@@ -217,25 +217,25 @@ enum l2cap_state_e
     L2CAP_OPEN, W4_L2CAP_DISCONNECT_RSP, W4_L2CA_DISCONNECT_RSP
 };
 
-struct l2cap_acl_link
+typedef struct _l2cap_acl_link_t
 {
-    struct l2cap_acl_link *next;
+    struct _l2cap_acl_link_t *next;
     struct bd_addr_t bdaddr;
-};
+}l2cap_acl_link_t;
 
 /* This structure is used to represent L2CAP signals. */
-struct l2cap_sig_t
+typedef struct _l2cap_sig_t
 {
-    struct l2cap_sig_t *next;    /* for the linked list, used when putting signals
+    struct _l2cap_sig_t *next;    /* for the linked list, used when putting signals
 				on a queue */
     struct bt_pbuf_t *p;          /* buffer containing data + L2CAP header */
     uint16_t sigid; /* Identification */
     uint16_t ertx; /* extended response timeout expired */
     uint8_t rtx; /* response timeout expired */
     uint8_t nrtx; /* number of retransmissions */
-};
+}l2cap_sig_t;
 
-struct l2cap_cfg_t
+typedef struct 
 {
     uint16_t inmtu; /* Maximum transmission unit this channel can accept */
     uint16_t outmtu; /* Maximum transmission unit that can be sent on this channel */
@@ -251,23 +251,22 @@ struct l2cap_cfg_t
 		  * Bit 3 indicates if a successful configuration response has been sent
 		  * Bit 4 indicates if an initial configuration request has been sent
 		  */
-};
+}l2cap_cfg_t;
 
-struct l2cap_seg_t
+
+struct _l2cap_pcb_t;
+typedef err_t (* l2ca_connect_ind_cb)(void *arg, struct _l2cap_pcb_t *pcb, err_t err);
+typedef err_t (* l2ca_disconnect_ind_cb)(void *arg, struct _l2cap_pcb_t *pcb, err_t err);
+typedef err_t (* l2ca_connect_cfm_cb)(void *arg, struct _l2cap_pcb_t *pcb, uint16_t result, uint16_t status);
+typedef err_t (* l2ca_timeout_ind_cb)(void *arg, struct _l2cap_pcb_t *newpcb, err_t err);
+typedef err_t (* l2ca_recv_cb)(void *arg, struct _l2cap_pcb_t *pcb, struct bt_pbuf_t *p, err_t err);
+typedef err_t (* l2ca_disconnect_cfm_cb)(void *arg, struct _l2cap_pcb_t *pcb);
+typedef err_t (* l2ca_ping_cb)(void *arg, struct _l2cap_pcb_t *pcb, uint8_t result);
+
+
+typedef struct _l2cap_pcb_t
 {
-    struct l2cap_seg_t *next; /* For the linked list */
-
-    struct bd_addr_t bdaddr;
-
-    struct bt_pbuf_t *p;          /* Buffer containing data + L2CAP header */
-    uint16_t len;               /* The L2CAP length of this segment */
-    struct l2cap_hdr_t *l2caphdr;  /* The L2CAP header */
-    struct l2cap_pcb_t *pcb; /* The L2CAP Protocol Control Block */
-};
-
-struct l2cap_pcb_t
-{
-    struct l2cap_pcb_t *next; /* For the linked list */
+    struct _l2cap_pcb_t *next; /* For the linked list */
 
     enum l2cap_state_e state; /* L2CAP state */
 
@@ -282,93 +281,96 @@ struct l2cap_pcb_t
     uint16_t ursp_id; /* Signal id to respond to */
     uint8_t encrypt; /* encryption mode */
 
-    struct l2cap_sig_t *unrsp_sigs;  /* List of sent but unresponded signals */
+    l2cap_sig_t *unrsp_sigs;  /* List of sent but unresponded signals */
 
     struct bd_addr_t remote_bdaddr;
 
-    struct l2cap_cfg_t cfg; /* Configuration parameters */
+    l2cap_cfg_t cfg; /* Configuration parameters */
 
     uint8_t mode;
     /* Upper layer to L2CAP confirmation functions */
 
     /* Function to be called when a connection has been set up */
-    err_t (* l2ca_connect_cfm)(void *arg, struct l2cap_pcb_t *pcb, uint16_t result, uint16_t status);
+	l2ca_connect_cfm_cb l2ca_connect_cfm;
     /* Function to be called when a connection has been closed */
-    err_t (* l2ca_disconnect_cfm)(void *arg, struct l2cap_pcb_t *pcb);
+	l2ca_disconnect_cfm_cb l2ca_disconnect_cfm;
     /* Function to be called when a echo reply has been received */
-    err_t (* l2ca_pong)(void *arg, struct l2cap_pcb_t *pcb, uint8_t result);
+	l2ca_ping_cb l2ca_ping;
 
     /* L2CAP to upper layer indication functions */
 
     /* Function to be called when a connection indication event occurs */
-    err_t (* l2ca_connect_ind)(void *arg, struct l2cap_pcb_t *pcb, err_t err);
+	l2ca_connect_ind_cb l2ca_connect_ind;
     /* Function to be called when a disconnection indication event occurs */
-    err_t (* l2ca_disconnect_ind)(void *arg, struct l2cap_pcb_t *pcb, err_t err);
+	l2ca_disconnect_ind_cb l2ca_disconnect_ind;
     /* Function to be called when a timeout indication event occurs */
-    err_t (* l2ca_timeout_ind)(void *arg, struct l2cap_pcb_t *newpcb, err_t err);
+    l2ca_timeout_ind_cb l2ca_timeout_ind;
     /* Function to be called when a L2CAP connection receives data */
-    err_t (* l2ca_recv)(void *arg, struct l2cap_pcb_t *pcb, struct bt_pbuf_t *p, err_t err);
-};
+	l2ca_recv_cb l2ca_recv;
+}l2cap_pcb_t;
 
-struct l2cap_pcb_listen_t
+
+
+typedef struct _l2cap_seg_t
 {
-    struct l2cap_pcb_listen_t *next; /* for the linked list */
+    struct l2cap_seg_t *next; /* For the linked list */
+
+    struct bd_addr_t bdaddr;
+
+    struct bt_pbuf_t *p;          /* Buffer containing data + L2CAP header */
+    uint16_t len;               /* The L2CAP length of this segment */
+    l2cap_hdr_t *l2caphdr;  /* The L2CAP header */
+    l2cap_pcb_t *pcb; /* The L2CAP Protocol Control Block */
+}l2cap_seg_t;
+
+
+
+
+typedef struct _l2cap_pcb_listen_t
+{
+    struct _l2cap_pcb_listen_t *next; /* for the linked list */
 
     enum l2cap_state_e state; /* L2CAP state */
 
     void *callback_arg;
 
     uint16_t psm; /* Protocol/Service Multiplexer */
-
     /* Function to call when a connection request has been received
        from a remote device. */
-    err_t (* l2ca_connect_ind)(void *arg, struct l2cap_pcb_t *pcb, err_t err);
-};
+    l2ca_connect_ind_cb l2ca_connect_ind;
+}l2cap_pcb_listen_t;
+
 
 #define l2cap_psm(pcb) ((pcb)->psm)
 
 
 /* Functions for interfacing with L2CAP */
 void l2cap_init(void); /* Must be called first to initialize L2CAP */
+void l2cap_deinit(void);
 void l2cap_tmr(void); /* Must be called every 1s */
-struct l2cap_pcb_t *l2cap_new(void);
-err_t l2cap_close(struct l2cap_pcb_t *pcb);
-void l2cap_reset_all(void);
-void l2cap_arg(struct l2cap_pcb_t *pcb, void *arg);
-err_t l2cap_register_connect_ind(struct l2cap_pcb_t *lpcb, uint8_t psm,
-                                 err_t (* l2ca_connect_ind)(void *arg, struct l2cap_pcb_t *pcb, err_t err));
-void l2cap_register_disconnect_ind(struct l2cap_pcb_t *pcb,
-                                   err_t (* l2ca_disconnect_ind)(void *arg, struct l2cap_pcb_t *newpcb,
-                                           err_t err));
-void l2cap_register_timeout_ind(struct l2cap_pcb_t *pcb,
-                                err_t (* l2ca_timeout_ind)(void *arg, struct l2cap_pcb_t *newpcb,
-                                        err_t err));
-void l2cap_register_recv(struct l2cap_pcb_t *pcb,
-                         err_t (* l2ca_recv)(void *arg, struct l2cap_pcb_t *pcb, struct bt_pbuf_t *p, err_t err));
-
+l2cap_pcb_t *l2cap_new(void);
+err_t l2cap_close(l2cap_pcb_t *pcb);
+err_t l2cap_register_connect_ind(uint8_t psm,l2ca_connect_ind_cb l2ca_connect_ind);
+void l2cap_register_disconnect_ind(l2cap_pcb_t *pcb,l2ca_disconnect_ind_cb l2ca_disconnect_ind);
+void l2cap_register_timeout_ind(l2cap_pcb_t *pcb,l2ca_timeout_ind_cb l2ca_timeout_ind);
+void l2cap_register_recv(l2cap_pcb_t *pcb,l2ca_recv_cb l2ca_recv);
 err_t l2cap_fixed_channel_register_recv(uint16_t cid,
-							err_t (* l2ca_connect_ind)(void *arg, struct l2cap_pcb_t *pcb, err_t err),
-							err_t (* l2ca_disconnect_ind)(void *arg, struct l2cap_pcb_t *pcb, err_t err),
-							err_t (* l2ca_recv)(void *arg, struct l2cap_pcb_t *pcb, struct bt_pbuf_t *p, err_t err));
-err_t l2cap_connect_req(struct l2cap_pcb_t *pcb, struct bd_addr_t *bdaddr, uint16_t psm, uint8_t role_switch,
-                        err_t (* l2ca_connect_cfm)(void *arg, struct l2cap_pcb_t *lpcb,
-                                uint16_t result, uint16_t status));
-err_t l2cap_ertm_connect_req(struct l2cap_pcb_t *pcb, struct bd_addr_t *bdaddr, uint16_t psm, uint8_t role_switch,
-                             err_t (* l2ca_connect_cfm)(void *arg, struct l2cap_pcb_t *lpcb,
-                                     uint16_t result, uint16_t status));
-
-err_t l2cap_disconnect_req(struct l2cap_pcb_t *pcb,
-                           err_t (* l2ca_disconnect_cfm)(void *arg, struct l2cap_pcb_t *pcb));
-err_t l2cap_datawrite(struct l2cap_pcb_t *pcb, struct bt_pbuf_t *p);
-err_t l2cap_fixed_channel_datawrite(struct l2cap_pcb_t *pcb, struct bt_pbuf_t *p,uint16_t cid);
-err_t l2cap_ping(struct bd_addr_t *bdaddr, struct l2cap_pcb_t *tpcb,
-                 err_t (* l2ca_pong)(void *arg, struct l2cap_pcb_t *pcb, uint8_t result));
-
+							l2ca_connect_ind_cb l2ca_connect_ind,
+							l2ca_disconnect_ind_cb l2ca_disconnect_ind,
+							l2ca_recv_cb l2ca_recv);
+err_t l2cap_connect_req(l2cap_pcb_t *pcb, struct bd_addr_t *bdaddr, uint16_t psm, uint8_t role_switch,
+                        l2ca_connect_cfm_cb l2ca_connect_cfm);
+err_t l2cap_ertm_connect_req(l2cap_pcb_t *pcb, struct bd_addr_t *bdaddr, uint16_t psm, uint8_t role_switch,
+                             l2ca_connect_cfm_cb l2ca_connect_cfm);
+err_t l2cap_disconnect_req(l2cap_pcb_t *pcb,l2ca_disconnect_cfm_cb l2ca_disconnect_cfm);
+err_t l2cap_datawrite(l2cap_pcb_t *pcb, struct bt_pbuf_t *p);
+err_t l2cap_fixed_channel_datawrite(l2cap_pcb_t *pcb, struct bt_pbuf_t *p,uint16_t cid);
+err_t l2cap_ping(struct bd_addr_t *bdaddr, l2cap_pcb_t *tpcb,l2ca_ping_cb l2ca_ping);
 void l2cap_acl_input(struct bt_pbuf_t *p, struct bd_addr_t *bdaddr);
-
 void lp_connect_cfm(struct bd_addr_t *bdaddr, uint8_t encrypt_mode, err_t err);
 void lp_connect_ind(struct bd_addr_t *bdaddr);
 void lp_disconnect_ind(struct bd_addr_t *bdaddr);
+
 
 
 

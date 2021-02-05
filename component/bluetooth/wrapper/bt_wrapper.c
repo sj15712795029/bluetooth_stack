@@ -1069,7 +1069,7 @@ uint8_t bt_stop(void)
     bt_profile_mask = 0;
     bt_wrapper_cb = NULL;
     hci_deinit();
-    l2cap_reset_all();
+    l2cap_deinit();
     sdp_reset_all();
     rfcomm_reset_all();
     return 0;

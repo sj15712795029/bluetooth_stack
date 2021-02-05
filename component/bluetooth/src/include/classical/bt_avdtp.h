@@ -123,8 +123,8 @@ struct avdtp_pcb_t
 {
     struct avdtp_pcb_t *next; /* For the linked list */
     uint8_t avdtp_conn_status;
-    struct l2cap_pcb_t *avdtp_signal_l2cappcb; /* The L2CAP connection */
-    struct l2cap_pcb_t *avdtp_media_l2cappcb;
+    l2cap_pcb_t *avdtp_signal_l2cappcb; /* The L2CAP connection */
+    l2cap_pcb_t *avdtp_media_l2cappcb;
 	struct bd_addr_t remote_bdaddr;
 };
 

@@ -320,8 +320,8 @@ static err_t hfp_hf_handle_at_ok(struct hfp_pcb_t *pcb);
 static err_t hfp_hf_parse_receive_data(struct hfp_pcb_t *pcb,uint8_t *data,uint16_t data_len);
 static void hfp_hf_sdp_attributes_recv(void *arg, struct sdp_pcb_t *sdppcb, uint16_t attribl_bc, struct bt_pbuf_t *p);
 static uint8_t hfp_hf_get_rfcomm_cn(uint16_t attribl_bc, struct bt_pbuf_t *attribute_list);
-static err_t l2cap_connect_cfm(void *arg, struct l2cap_pcb_t *l2cappcb, uint16_t result, uint16_t status);
-static err_t l2cap_disconnect_cfm(void *arg, struct l2cap_pcb_t *pcb);
+static err_t l2cap_connect_cfm(void *arg, l2cap_pcb_t *l2cappcb, uint16_t result, uint16_t status);
+static err_t l2cap_disconnect_cfm(void *arg, l2cap_pcb_t *pcb);
 static err_t hfp_connect_cfm(void *arg, struct rfcomm_pcb_t *pcb, err_t err);
 static err_t hfp_connect_ind(void *arg, struct rfcomm_pcb_t *pcb, err_t err);
 static err_t hfp_hf_disconnected(void *arg, struct rfcomm_pcb_t *pcb, err_t err);
@@ -2200,7 +2200,7 @@ static uint8_t hfp_hf_get_rfcomm_cn(uint16_t attribl_bc, struct bt_pbuf_t *attri
     return 0;
 }
 
-static err_t l2cap_connect_cfm(void *arg, struct l2cap_pcb_t *l2cappcb, uint16_t result, uint16_t status)
+static err_t l2cap_connect_cfm(void *arg, l2cap_pcb_t *l2cappcb, uint16_t result, uint16_t status)
 {
     struct hfp_pcb_t *hfppcb = hfp_get_active_pcb(&(l2cappcb->remote_bdaddr));
 
@@ -2263,7 +2263,7 @@ static err_t l2cap_connect_cfm(void *arg, struct l2cap_pcb_t *l2cappcb, uint16_t
 
 }
 
-static err_t l2cap_disconnect_cfm(void *arg, struct l2cap_pcb_t *pcb)
+static err_t l2cap_disconnect_cfm(void *arg, l2cap_pcb_t *pcb)
 {
     struct hfp_pcb_t *hfppcb = hfp_get_active_pcb(&(pcb->remote_bdaddr));
 

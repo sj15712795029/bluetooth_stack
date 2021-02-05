@@ -152,7 +152,7 @@ struct pbap_pcb_t
     struct pbap_pcb_t *next; /* For the linked list */
     struct rfcomm_pcb_t *rfcommpcb;
     struct sdp_pcb_t *sdppcb;
-    struct l2cap_pcb_t*l2cappcb;
+    l2cap_pcb_t*l2cappcb;
 
     struct bd_addr_t remote_addr;
 

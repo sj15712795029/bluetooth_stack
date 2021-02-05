@@ -76,10 +76,10 @@ struct rfcomm_pcb_t *rfcomm_tmp_pcb;
 /* Forward declarations */
 struct rfcomm_pcb_t *rfcomm_get_active_pcb(uint8_t cn, struct bd_addr_t *bdaddr);
 
-static err_t rfcomm_connect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err);
-static err_t rfcomm_disconnect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err);
+static err_t rfcomm_connect_ind(void *arg, l2cap_pcb_t *pcb, err_t err);
+static err_t rfcomm_disconnect_ind(void *arg, l2cap_pcb_t *pcb, err_t err);
 
-static err_t rfcomm_connect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err)
+static err_t rfcomm_connect_ind(void *arg, l2cap_pcb_t *pcb, err_t err)
 {
     BT_RFCOMM_TRACE_DEBUG("rfcomm_connect_ind\n");
 
@@ -89,7 +89,7 @@ static err_t rfcomm_connect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err)
 }
 
 
-static err_t rfcomm_disconnect_ind(void *arg, struct l2cap_pcb_t *pcb, err_t err)
+static err_t rfcomm_disconnect_ind(void *arg, l2cap_pcb_t *pcb, err_t err)
 {
     BT_RFCOMM_TRACE_DEBUG("bt_disconnect_ind\n");
 
@@ -127,19 +127,13 @@ static err_t rfcomm_accept(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
 
 err_t rfcomm_init(void)
 {
-    struct l2cap_pcb_t *l2cappcb;
     struct rfcomm_pcb_t *rfcommpcb;
     /* Clear globals */
     rfcomm_listen_pcbs = NULL;
     rfcomm_active_pcbs = NULL;
     rfcomm_tmp_pcb = NULL;
 
-    if((l2cappcb = l2cap_new()) == NULL)
-    {
-        BT_RFCOMM_TRACE_DEBUG("rfcomm_init: Could not alloc L2CAP PCB for RFCOMM_PSM\n");
-        return BT_ERR_MEM;
-    }
-    l2cap_register_connect_ind(l2cappcb, RFCOMM_PSM, rfcomm_connect_ind);
+    l2cap_register_connect_ind(RFCOMM_PSM, rfcomm_connect_ind);
 
     BT_RFCOMM_TRACE_DEBUG("rfcomm_init: Allocate RFCOMM PCB for CN 0\n");
     if((rfcommpcb = rfcomm_new(NULL)) == NULL)
@@ -193,7 +187,7 @@ void rfcomm_tmr(void)
     }
 }
 
-err_t rfcomm_lp_disconnected(struct l2cap_pcb_t *l2cappcb)
+err_t rfcomm_lp_disconnected(l2cap_pcb_t *l2cappcb)
 {
     struct rfcomm_pcb_t *pcb, *tpcb;
     err_t ret = BT_ERR_OK;
@@ -213,7 +207,7 @@ err_t rfcomm_lp_disconnected(struct l2cap_pcb_t *l2cappcb)
     return ret;
 }
 
-struct rfcomm_pcb_t *rfcomm_new(struct l2cap_pcb_t *l2cappcb)
+struct rfcomm_pcb_t *rfcomm_new(l2cap_pcb_t *l2cappcb)
 {
     struct rfcomm_pcb_t *pcb;
 
@@ -295,7 +289,7 @@ struct rfcomm_pcb_t *rfcomm_get_active_pcb(uint8_t cn, struct bd_addr_t *bdaddr)
     return pcb;
 }
 
-static err_t rfcomm_dm(struct l2cap_pcb_t *pcb, struct rfcomm_hdr_t *hdr)
+static err_t rfcomm_dm(l2cap_pcb_t *pcb, struct rfcomm_hdr_t *hdr)
 {
     struct bt_pbuf_t *p;
     struct rfcomm_hdr_t *rfcommhdr;
@@ -410,7 +404,7 @@ err_t rfcomm_disconnect(struct rfcomm_pcb_t *pcb)
     return ret;
 }
 
-static err_t rfcomm_ua(struct l2cap_pcb_t *pcb, struct rfcomm_hdr_t *hdr)
+static err_t rfcomm_ua(l2cap_pcb_t *pcb, struct rfcomm_hdr_t *hdr)
 {
     struct bt_pbuf_t *p;
     struct rfcomm_hdr_t *rfcommhdr;
@@ -910,7 +904,7 @@ err_t rfcomm_issue_credits(struct rfcomm_pcb_t *pcb, uint8_t credits)
     return ret;
 }
 
-void rfcomm_process_msg(struct rfcomm_pcb_t *pcb, struct rfcomm_hdr_t *rfcommhdr, struct l2cap_pcb_t *l2cappcb,
+void rfcomm_process_msg(struct rfcomm_pcb_t *pcb, struct rfcomm_hdr_t *rfcommhdr, l2cap_pcb_t *l2cappcb,
                    struct bt_pbuf_t *p)
 {
     struct rfcomm_msg_hdr_t *cmdhdr, *rsphdr;
@@ -1257,7 +1251,7 @@ void rfcomm_process_msg(struct rfcomm_pcb_t *pcb, struct rfcomm_hdr_t *rfcommhdr
     }
 }
 
-err_t rfcomm_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err)
+err_t rfcomm_input(void *arg, l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err)
 {
     struct rfcomm_hdr_t rfcommhdr;
     struct rfcomm_pcb_t *pcb, *tpcb;

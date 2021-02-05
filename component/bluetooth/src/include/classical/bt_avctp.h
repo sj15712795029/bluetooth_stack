@@ -18,7 +18,7 @@
 struct avctp_pcb_t
 {
     struct avctp_pcb_t *next; /* For the linked list */
-    struct l2cap_pcb_t *l2cappcb; /* The L2CAP connection */
+    l2cap_pcb_t *l2cappcb; /* The L2CAP connection */
     struct bd_addr_t remote_bdaddr;
     uint8_t local_transaction_label;
 

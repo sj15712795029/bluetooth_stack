@@ -140,7 +140,7 @@ struct rfcomm_pcb_t {
 
   enum rfcomm_state_e state; /* RFCOMM state */
 
-  struct l2cap_pcb_t *l2cappcb; /* The L2CAP connection */
+  l2cap_pcb_t *l2cappcb; /* The L2CAP connection */
 
   uint8_t cn; /* Channel number */
   
@@ -208,7 +208,7 @@ err_t rfcomm_init(void); /* Must be called first to initialize RFCOMM */
 void rfcomm_tmr(void); /* Must be called every 1s interval */
 
 /* Application program's interface: */
-struct rfcomm_pcb_t *rfcomm_new(struct l2cap_pcb_t *pcb);
+struct rfcomm_pcb_t *rfcomm_new(l2cap_pcb_t *pcb);
 void rfcomm_close(struct rfcomm_pcb_t *pcb);
 void rfcomm_reset_all(void);
 void rfcomm_arg(struct rfcomm_pcb_t *pcb, void *arg);
@@ -217,7 +217,7 @@ void rfcomm_recv(struct rfcomm_pcb_t *pcb,
 void rfcomm_disc(struct rfcomm_pcb_t *pcb, 
 		 err_t (* disc)(void *arg, struct rfcomm_pcb_t *pcb, err_t err));
 
-err_t rfcomm_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err);
+err_t rfcomm_input(void *arg, l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err);
 
 err_t rfcomm_connect(struct rfcomm_pcb_t *pcb, uint8_t cn, 
 		     err_t (* connected)(void *arg, struct rfcomm_pcb_t *tpcb, err_t err));
@@ -235,7 +235,7 @@ err_t rfcomm_rpn(struct rfcomm_pcb_t *pcb, uint8_t br,
 err_t rfcomm_uih(struct rfcomm_pcb_t *pcb, uint8_t cn, struct bt_pbuf_t *q);
 err_t rfcomm_uih_credits(struct rfcomm_pcb_t *pcb, uint8_t credits, struct bt_pbuf_t *q);
 err_t rfcomm_issue_credits(struct rfcomm_pcb_t *pcb, uint8_t credits);
-err_t rfcomm_lp_disconnected(struct l2cap_pcb_t *pcb);
+err_t rfcomm_lp_disconnected(l2cap_pcb_t *pcb);
 
 #endif
 

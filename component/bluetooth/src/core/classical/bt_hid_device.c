@@ -196,7 +196,7 @@ static err_t hid_device_send_handshake(struct hid_device_pcb_t *hid_pcb,uint8_t 
 	return BT_ERR_OK;
 }
 
-static err_t hid_device_disconnect_ind(void *arg, struct l2cap_pcb_t *l2cap_pcb, err_t err)
+static err_t hid_device_disconnect_ind(void *arg, l2cap_pcb_t *l2cap_pcb, err_t err)
 {
 	struct hid_device_pcb_t *hid_pcb = hid_get_active_pcb(&l2cap_pcb->remote_bdaddr);
     BT_HID_TRACE_DEBUG("hid_device_disconnect_ind psm 0x%x\n",l2cap_psm(l2cap_pcb));
@@ -212,7 +212,7 @@ static err_t hid_device_disconnect_ind(void *arg, struct l2cap_pcb_t *l2cap_pcb,
     return BT_ERR_OK;
 }
 
-err_t hid_device_input(void *arg, struct l2cap_pcb_t *l2cap_pcb, struct bt_pbuf_t *p, err_t err)
+err_t hid_device_input(void *arg, l2cap_pcb_t *l2cap_pcb, struct bt_pbuf_t *p, err_t err)
 {
 	struct hid_device_pcb_t *hid_pcb = hid_get_active_pcb(&l2cap_pcb->remote_bdaddr);
 	uint8_t message_type = (((uint8_t *)p->payload)[0]) >> 4;
@@ -232,7 +232,7 @@ err_t hid_device_input(void *arg, struct l2cap_pcb_t *l2cap_pcb, struct bt_pbuf_
 }
 
 
-static err_t hid_device_connect_ind(void *arg, struct l2cap_pcb_t *l2cap_pcb, err_t err)
+static err_t hid_device_connect_ind(void *arg, l2cap_pcb_t *l2cap_pcb, err_t err)
 {
 	struct hid_device_pcb_t *hid_pcb;
     BT_HID_TRACE_DEBUG("hid_connect_ind psm 0x%x\n",l2cap_psm(l2cap_pcb));
@@ -259,23 +259,8 @@ static err_t hid_device_connect_ind(void *arg, struct l2cap_pcb_t *l2cap_pcb, er
 
 err_t hid_device_init(hid_cbs_t *cb)
 {
-    struct l2cap_pcb_t *hid_control_l2cappcb;
-    struct l2cap_pcb_t *hid_interrupt_l2cappcb;
-
-    if((hid_control_l2cappcb = l2cap_new()) == NULL)
-    {
-        BT_HID_TRACE_ERROR("rfcomm_init: Could not alloc L2CAP PCB for hid control psm\n");
-        return BT_ERR_MEM;
-    }
-
-    if((hid_interrupt_l2cappcb = l2cap_new()) == NULL)
-    {
-        BT_HID_TRACE_ERROR("rfcomm_init: Could not alloc L2CAP PCB for hid interfupt psm\n");
-        return BT_ERR_MEM;
-    }
-
-    l2cap_register_connect_ind(hid_control_l2cappcb, HID_CONTROL_PSM, hid_device_connect_ind);
-    l2cap_register_connect_ind(hid_interrupt_l2cappcb, HID_INTERRUPT_PSM, hid_device_connect_ind);
+    l2cap_register_connect_ind(HID_CONTROL_PSM, hid_device_connect_ind);
+    l2cap_register_connect_ind(HID_INTERRUPT_PSM, hid_device_connect_ind);
 
 	hid_cbs = cb;
 

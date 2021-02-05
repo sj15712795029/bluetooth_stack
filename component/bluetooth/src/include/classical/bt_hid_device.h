@@ -48,8 +48,8 @@ typedef enum {
 struct hid_device_pcb_t
 {
     struct hid_device_pcb_t *next; /* For the linked list */
-    struct l2cap_pcb_t *hid_device_control_l2cappcb; /* The L2CAP connection */
-    struct l2cap_pcb_t *hid_device_interrupt_l2cappcb;
+    l2cap_pcb_t *hid_device_control_l2cappcb; /* The L2CAP connection */
+    l2cap_pcb_t *hid_device_interrupt_l2cappcb;
 	struct bd_addr_t remote_bdaddr;
 };
 

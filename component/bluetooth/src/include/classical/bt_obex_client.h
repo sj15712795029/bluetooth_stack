@@ -87,7 +87,7 @@ struct obex_pcb_t
     struct obex_pcb_t *next; /* For the linked list */
     struct rfcomm_pcb_t *rfcommpcb;
     struct sdp_pcb_t *sdppcb;
-    struct l2cap_pcb_t*l2cappcb;
+    l2cap_pcb_t*l2cappcb;
 
 	uint8_t last_opcode;
 	uint8_t remote_cn;

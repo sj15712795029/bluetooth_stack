@@ -72,7 +72,7 @@ struct avctp_pcb_t *avctp_get_active_pcb( struct bd_addr_t *bdaddr)
 }
 
 
-static err_t avctp_disconnect_ind(void *arg, struct l2cap_pcb_t *l2cap_pcb, err_t err)
+static err_t avctp_disconnect_ind(void *arg, l2cap_pcb_t *l2cap_pcb, err_t err)
 {
     struct avctp_pcb_t *avctp_pcb = NULL;
     BT_AVCTP_TRACE_DEBUG("avctp_disconnect_ind psm 0x%x\n",l2cap_pcb->psm);
@@ -86,7 +86,7 @@ static err_t avctp_disconnect_ind(void *arg, struct l2cap_pcb_t *l2cap_pcb, err_
     return BT_ERR_OK;
 }
 
-err_t avctp_data_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err)
+err_t avctp_data_input(void *arg,l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err)
 {
     uint8_t *cmd_resp = p->payload;
     uint8_t local_transaction_label = (cmd_resp[0] >> 4) & 0xf;
@@ -114,7 +114,7 @@ err_t avctp_data_input(void *arg, struct l2cap_pcb_t *l2cappcb, struct bt_pbuf_t
     return BT_ERR_OK;
 }
 
-static err_t avctp_connect_ind(void *arg, struct l2cap_pcb_t *l2cap_pcb, err_t err)
+static err_t avctp_connect_ind(void *arg,l2cap_pcb_t *l2cap_pcb, err_t err)
 {
     struct avctp_pcb_t *avctp_pcb;
     BT_AVCTP_TRACE_DEBUG("avctp_connect_ind\n");
@@ -131,18 +131,10 @@ static err_t avctp_connect_ind(void *arg, struct l2cap_pcb_t *l2cap_pcb, err_t e
 
 err_t avctp_init(avctp_event_handle avctp_evt_handle,avctp_data_handle avctp_data_handle)
 {
-    struct l2cap_pcb_t *l2cappcb;
-
     avctp_event_handler = avctp_evt_handle;
     avctp_data_handler = avctp_data_handle;
 
-    if((l2cappcb = l2cap_new()) == NULL)
-    {
-        BT_AVCTP_TRACE_DEBUG("avctp_init: Could not alloc L2CAP PCB for AVCTP_PSM\n");
-
-        return BT_ERR_MEM;
-    }
-    l2cap_register_connect_ind(l2cappcb, AVCTP_PSM, avctp_connect_ind);
+    l2cap_register_connect_ind(AVCTP_PSM, avctp_connect_ind);
     return BT_ERR_OK;
 }
 
