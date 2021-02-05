@@ -2841,6 +2841,7 @@ err_t hci_host_num_comp_packets(uint16_t conhdl, uint16_t num_complete)
     }
     /* Assembling command packet */
     p = hci_cmd_ass(p, HCI_HOST_NUM_COMPL, HCI_HOST_C_N_BB, HCI_H_NUM_COMPL_PLEN);
+	((uint8_t *)p->payload)[3] = 1; 
     bt_le_store_16((uint8_t *)p->payload,4,conhdl);
     bt_le_store_16((uint8_t *)p->payload,6,num_complete); /* Number of completed acl packets */
 
