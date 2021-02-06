@@ -267,9 +267,9 @@ err_t gatt_server_init(void)
 	gatt_server_manager.server_mtu = GATT_BLE_MTU_SIZE;
 	gatt_server_manager.gatt_server_pri_service_count = 0;
 	
-    gatt_server_add_pri_service(&gap_service,GATT_GAP_SERVICE_HANDLE,GATT_GAP_NAME_HANDLE,
+    gatt_server_add_pri_service((gatt_server_service_t *)&gap_service,GATT_GAP_SERVICE_HANDLE,GATT_GAP_NAME_HANDLE,
 			sizeof(gap_service)/sizeof(gatt_server_service_t),BT_UUID_SERVCLASS_GAP_SERVER,NULL,NULL);
-    gatt_server_add_pri_service(&gatt_service,GATT_SERVICE_HANLE,GATT_SERVICE_HANLE,
+    gatt_server_add_pri_service((gatt_server_service_t *)&gatt_service,GATT_SERVICE_HANLE,GATT_SERVICE_HANLE,
 			sizeof(gatt_service)/sizeof(gatt_server_service_t),BT_UUID_SERVCLASS_GATT_SERVER,NULL,NULL);
 
     return BT_ERR_OK;
@@ -288,6 +288,8 @@ err_t gatt_server_add_pri_service(gatt_server_service_t *service,uint16_t start_
 	if(pri_uuid128)
 		memcpy(gatt_server_pri_service[server_pri_service_cnt].pri_uuid128,pri_uuid128,16);
     gatt_server_manager.gatt_server_pri_service_count++;
+	
+	return BT_ERR_OK;
 }
 
 err_t gatt_server_notification(uint16_t handle,uint8_t *value,uint8_t value_length)
@@ -572,7 +574,7 @@ static err_t gatts_handle_read_type_req(struct bd_addr_t *bdaddr, struct bt_pbuf
     uint8_t rsp_buf_len = 0;
     uint8_t rsp_buf[GATT_BLE_MTU_SIZE] = {0};
     
-    att_parse_read_type_req(p,&start_handle,&end_handle,&uuid_format,&uuid,&uuid128);
+    att_parse_read_type_req(p,&start_handle,&end_handle,&uuid_format,&uuid,(uint8_t **)&uuid128);
 
 
 	for(index = 0; index < gatt_server_manager.gatt_server_pri_service_count; index++)

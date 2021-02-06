@@ -313,7 +313,7 @@ typedef struct _l2cap_pcb_t
 
 typedef struct _l2cap_seg_t
 {
-    struct l2cap_seg_t *next; /* For the linked list */
+    struct _l2cap_seg_t *next; /* For the linked list */
 
     struct bd_addr_t bdaddr;
 

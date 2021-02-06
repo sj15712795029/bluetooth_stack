@@ -143,6 +143,8 @@ err_t att_parse_find_type_value_rsp(struct bt_pbuf_t *p,uint8_t *info_num,uint8_
 err_t att_find_type_value_req(uint16_t start_handle,uint16_t end_handle,uint16_t uuid,uint8_t *value,uint8_t value_len);
 err_t att_read_type_req(uint16_t start_handle,uint16_t end_handle,uint8_t *value,uint8_t value_len);
 err_t att_read_req(uint16_t handle);
+err_t att_read_group_type_req(uint16_t start_handle,uint16_t end_handle,uint16_t uuid);
+
 
 
 #endif

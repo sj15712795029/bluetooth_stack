@@ -76,11 +76,11 @@ err_t bas_init(uint8_t bat_level)
 {
 	bas_manager.bat_level = bat_level;
 	BT_BAS_TRACE_DEBUG("bas_init\n");
-	gatt_server_add_pri_service(&bas_service,GATT_BAS_SERVICE_HANDLE,GATT_BAS_CLIENT_CHARA_CONF_HANDLE,
+	gatt_server_add_pri_service((gatt_server_service_t *)&bas_service,GATT_BAS_SERVICE_HANDLE,GATT_BAS_CLIENT_CHARA_CONF_HANDLE,
 		sizeof(bas_service)/sizeof(gatt_server_service_t),BT_UUID_SERVCLASS_BATTERY,NULL,&gatt_bas_service_cbs);
 
 	/* Test */
-	gatt_server_add_pri_service(&test_service,0x09,0x0d,
+	gatt_server_add_pri_service((gatt_server_service_t *)&test_service,0x09,0x0d,
 		sizeof(test_service)/sizeof(gatt_server_service_t),0,uuid_test,NULL);
 	return BT_ERR_OK;
 }

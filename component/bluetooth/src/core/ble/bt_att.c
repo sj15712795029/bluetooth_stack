@@ -343,7 +343,7 @@ err_t att_parse_find_info_type_value_req(struct bt_pbuf_t *p,uint16_t *s_handle,
 	*att_type = bt_le_read_16(data,5);
 
 	*value_len = data_len-7;
-	memcpy(value,data+7,value_len);
+	memcpy(value,data+7,*value_len);
 
     return BT_ERR_OK;
 }
@@ -392,7 +392,7 @@ err_t att_parse_write_cmd(struct bt_pbuf_t *p,uint16_t *handle,uint8_t *att_valu
     *handle = bt_le_read_16(data,1);
 
 	*value_len = data_len-3;
-	memcpy(att_value,data+7,value_len);
+	memcpy(att_value,data+7,*value_len);
 
     return BT_ERR_OK;
 }

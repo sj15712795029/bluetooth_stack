@@ -659,7 +659,7 @@ static err_t _l2cap_sig_cfg_req_process(l2cap_pcb_t *pcb,struct bt_pbuf_t *p,l2c
 static err_t _l2cap_sig_cfg_rsp_process(l2cap_pcb_t *pcb,struct bt_pbuf_t *p,l2cap_sig_hdr_t *sighdr,l2cap_sig_t *sig)
 {
     uint16_t result, flags;;
-    uint16_t scid;
+    //uint16_t scid;
     uint16_t siglen;
     l2cap_cfgopt_hdr_t *opthdr;
     struct bt_pbuf_t  *data;
@@ -678,7 +678,7 @@ static err_t _l2cap_sig_cfg_rsp_process(l2cap_pcb_t *pcb,struct bt_pbuf_t *p,l2c
               pcb->state == L2CAP_CONFIG);
 
     siglen = sighdr->len;
-    scid = ((uint16_t *)p->payload)[0];
+    //scid = ((uint16_t *)p->payload)[0];
     flags = ((uint16_t *)p->payload)[1];
     result = ((uint16_t *)p->payload)[2];
     siglen -= 6;
@@ -806,13 +806,13 @@ static err_t _l2cap_sig_disconn_req_process(l2cap_pcb_t *pcb,struct bt_pbuf_t *p
 {
     uint16_t siglen;
     uint16_t dcid;
-    uint16_t flags;
+    //uint16_t flags;
     struct bt_pbuf_t *data;
 
     siglen = sighdr->len;
     dcid = ((uint16_t *)p->payload)[0];
     siglen = siglen - 2;
-    flags = ((uint16_t *)p->payload)[1];
+    //flags = ((uint16_t *)p->payload)[1];
     siglen = siglen - 2;
     bt_pbuf_header(p, -4);
 
@@ -1111,7 +1111,7 @@ void l2cap_process_sig(struct bt_pbuf_t *q, l2cap_hdr_t *l2caphdr, struct bd_add
     } /* while */
 }
 
-static struct l2cap_seg_t * l2cap_reassembly_data(struct bt_pbuf_t *p, struct bd_addr_t *bdaddr,uint8_t *can_continue)
+static l2cap_seg_t * l2cap_reassembly_data(struct bt_pbuf_t *p, struct bd_addr_t *bdaddr,uint8_t *can_continue)
 {
 
     l2cap_seg_t *inseg;
@@ -1203,7 +1203,7 @@ static struct l2cap_seg_t * l2cap_reassembly_data(struct bt_pbuf_t *p, struct bd
     {
         BT_L2CAP_TRACE_DEBUG("l2cap_acl_input: Get continuing segments\n");
         *can_continue = 0;
-        return; /* Get continuing segments */
+        return inseg; /* Get continuing segments */
     }
 
     *can_continue = 1;
@@ -1306,7 +1306,7 @@ static err_t _l2cap_dynamic_cid_process(l2cap_pcb_t *l2cap_pcb,struct bt_pbuf_t 
 
 void l2cap_acl_input(struct bt_pbuf_t *p, struct bd_addr_t *bdaddr)
 {
-    uint8_t *can_contiue;
+    uint8_t can_contiue;
 
     l2cap_seg_t *inseg = l2cap_reassembly_data(p,bdaddr,&can_contiue);
 

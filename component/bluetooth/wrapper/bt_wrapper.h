@@ -40,6 +40,9 @@
 #if BT_BLE_ENABLE > 0
 #include "bt_att.h"
 #include "bt_gatt.h"
+#if PROFILE_BAS_ENABLE > 0
+#include "bt_bas.h"
+#endif
 #endif
 
 

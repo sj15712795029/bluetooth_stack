@@ -81,7 +81,6 @@ static err_t pbap_client_run(struct pbap_pcb_t *pcb);
 
 err_t pbap_app_para_append(uint8_t para_id,uint8_t *para_data,uint8_t para_data_len)
 {
-    uint8_t index = 0;
     pbap_app_para[pbap_app_para_offset++] = para_id;
     pbap_app_para[pbap_app_para_offset++] = para_data_len;
     memcpy(pbap_app_para+pbap_app_para_offset,para_data,para_data_len);
@@ -747,7 +746,7 @@ static err_t pbap_client_rf_connect_cfm(void *arg, rfcomm_pcb_t *pcb, err_t err)
 
 static err_t pbap_client_parse_pull_vcard_list_resp(struct pbap_pcb_t *pcb,uint8_t *data,uint16_t data_len,uint8_t status)
 {
-    int16_t vcard_length;
+    uint16_t vcard_length;
     uint16_t data_offset;
 
     if(status == OBEX_RESP_CONTINUE)
@@ -781,7 +780,7 @@ static err_t pbap_client_parse_pull_vcard_list_resp(struct pbap_pcb_t *pcb,uint8
 
 static err_t pbap_client_parse_pull_vcard_entry_resp(struct pbap_pcb_t *pcb,uint8_t *data,uint16_t data_len,uint8_t status)
 {
-    int16_t vcard_length;
+    uint16_t vcard_length;
     uint16_t data_offset;
 
     if(status == OBEX_RESP_SUCCESS)
