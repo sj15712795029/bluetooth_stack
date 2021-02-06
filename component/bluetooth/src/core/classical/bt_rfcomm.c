@@ -12,41 +12,41 @@
 #include "bt_common.h"
 #include "bt_pbuf.h"
 
-struct rfcomm_pcb_listen_t *rfcomm_listen_pcbs; /* List of all RFCOMM PCBs listening for
+rfcomm_pcb_listen_t *rfcomm_listen_pcbs; /* List of all RFCOMM PCBs listening for
 					      an incomming connection on a specific
 					      server channel */
-struct rfcomm_pcb_t *rfcomm_active_pcbs;  /* List of all active RFCOMM PCBs */
-struct rfcomm_pcb_t *rfcomm_tmp_pcb;
+rfcomm_pcb_t *rfcomm_active_pcbs;  /* List of all active RFCOMM PCBs */
+rfcomm_pcb_t *rfcomm_tmp_pcb;
 
 
 
-#define RFCOMM_EVENT_CONNECTED(pcb,err,ret) \
+#define RFCOMM_EVENT_CONNECTED(pcb,err) \
                               if((pcb)->connected != NULL) \
-                              (ret = (pcb)->connected((pcb)->callback_arg,(pcb),(err)))
-#define RFCOMM_EVENT_ACCEPT(pcb,err,ret) \
+                              ((pcb)->connected((pcb)->callback_arg,(pcb),(err)))
+#define RFCOMM_EVENT_ACCEPT(pcb,err) \
                               if((pcb)->accept != NULL) \
-                              (ret = (pcb)->accept((pcb)->callback_arg,(pcb),(err)))
-#define RFCOMM_EVENT_DISCONNECTED(pcb,err,ret) \
+                              ((pcb)->accept((pcb)->callback_arg,(pcb),(err)))
+#define RFCOMM_EVENT_DISCONNECTED(pcb,err) \
                                  if((pcb)->disconnected != NULL) { \
-                                   (ret = (pcb)->disconnected((pcb)->callback_arg,(pcb),(err))); \
+                                   ((pcb)->disconnected((pcb)->callback_arg,(pcb),(err))); \
                                  } else { \
                                    rfcomm_close(pcb); \
 				 }
-#define RFCOMM_EVENT_PN_RSP(pcb,err,ret) \
+#define RFCOMM_EVENT_PN_RSP(pcb,err) \
                        if((pcb)->pn_rsp != NULL) \
-                       (ret = (pcb)->pn_rsp((pcb)->callback_arg,(pcb),(err)))
-#define RFCOMM_EVENT_TEST(pcb,err,ret) \
+                       ((pcb)->pn_rsp((pcb)->callback_arg,(pcb),(err)))
+#define RFCOMM_EVENT_TEST(pcb,err) \
                        if((pcb)->test_rsp != NULL) \
-                       (ret = (pcb)->test_rsp((pcb)->callback_arg,(pcb),(err)))
-#define RFCOMM_EVENT_MSC(pcb,err,ret) \
+                       ((pcb)->test_rsp((pcb)->callback_arg,(pcb),(err)))
+#define RFCOMM_EVENT_MSC(pcb,err) \
                         if((pcb)->msc_rsp != NULL) \
-                        (ret = (pcb)->msc_rsp((pcb)->callback_arg,(pcb),(err)))
-#define RFCOMM_EVENT_RPN(pcb,err,ret) \
+                        ((pcb)->msc_rsp((pcb)->callback_arg,(pcb),(err)))
+#define RFCOMM_EVENT_RPN(pcb,err) \
                         if((pcb)->rpn_rsp != NULL) \
-                        (ret = (pcb)->rpn_rsp((pcb)->callback_arg,(pcb),(err)))
-#define RFCOMM_EVENT_RECV(pcb,err,p,ret) \
+                        ((pcb)->rpn_rsp((pcb)->callback_arg,(pcb),(err)))
+#define RFCOMM_EVENT_RECV(pcb,err,p) \
                           if((pcb)->recv != NULL) { \
-                            (ret = (pcb)->recv((pcb)->callback_arg,(pcb),(p),(err))); \
+                            ((pcb)->recv((pcb)->callback_arg,(pcb),(p),(err))); \
                           } else { \
                             bt_pbuf_free(p); \
                           }
@@ -74,7 +74,7 @@ struct rfcomm_pcb_t *rfcomm_tmp_pcb;
 
 
 /* Forward declarations */
-struct rfcomm_pcb_t *rfcomm_get_active_pcb(uint8_t cn, struct bd_addr_t *bdaddr);
+rfcomm_pcb_t *rfcomm_get_active_pcb(uint8_t cn, struct bd_addr_t *bdaddr);
 
 static err_t rfcomm_connect_ind(void *arg, l2cap_pcb_t *pcb, err_t err);
 static err_t rfcomm_disconnect_ind(void *arg, l2cap_pcb_t *pcb, err_t err);
@@ -103,7 +103,7 @@ static err_t rfcomm_disconnect_ind(void *arg, l2cap_pcb_t *pcb, err_t err)
 }
 
 
-err_t rfcomm_disconnected(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
+err_t rfcomm_disconnected(void *arg, rfcomm_pcb_t *pcb, err_t err)
 {
     err_t ret = BT_ERR_OK;
 
@@ -114,12 +114,12 @@ err_t rfcomm_disconnected(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
 }
 
 
-static err_t rfcomm_accept(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
+static err_t rfcomm_accept(void *arg, rfcomm_pcb_t *pcb, err_t err)
 {
     BT_RFCOMM_TRACE_DEBUG("rfcomm_accept: CN = %d\n", rfcomm_cn(pcb));
 
 
-    rfcomm_disc(pcb, rfcomm_disconnected);
+    rfcomm_register_disc(pcb, rfcomm_disconnected);
 
     return BT_ERR_OK;
 }
@@ -127,7 +127,7 @@ static err_t rfcomm_accept(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
 
 err_t rfcomm_init(void)
 {
-    struct rfcomm_pcb_t *rfcommpcb;
+    rfcomm_pcb_t *rfcommpcb;
     /* Clear globals */
     rfcomm_listen_pcbs = NULL;
     rfcomm_active_pcbs = NULL;
@@ -149,7 +149,7 @@ err_t rfcomm_init(void)
 
 void rfcomm_tmr(void)
 {
-    struct rfcomm_pcb_t *pcb, *tpcb;
+    rfcomm_pcb_t *pcb, *tpcb;
     err_t ret = BT_ERR_OK;
 
 	BT_UNUSED_ARG(ret);
@@ -173,7 +173,7 @@ void rfcomm_tmr(void)
                         {
                             //RFCOMM_RMV(&rfcomm_active_pcbs, tpcb); /* Remove pcb from active list */
                             tpcb->state = RFCOMM_CLOSED;
-                            RFCOMM_EVENT_DISCONNECTED(tpcb,BT_ERR_OK,ret); /* Notify upper layer */
+                            RFCOMM_EVENT_DISCONNECTED(tpcb,BT_ERR_OK); /* Notify upper layer */
                         }
                     }
                 }
@@ -181,7 +181,7 @@ void rfcomm_tmr(void)
                 BT_RFCOMM_TRACE_DEBUG("rfcomm_tmr: Timeout! Disconnect this DLC. State = %d\n", pcb->state);
                 //RFCOMM_RMV(&rfcomm_active_pcbs, pcb); /* Remove pcb from active list */
                 pcb->state = RFCOMM_CLOSED;
-                RFCOMM_EVENT_DISCONNECTED(pcb,BT_ERR_OK,ret); /* Notify upper layer */
+                RFCOMM_EVENT_DISCONNECTED(pcb,BT_ERR_OK); /* Notify upper layer */
             }
         }
     }
@@ -189,7 +189,7 @@ void rfcomm_tmr(void)
 
 err_t rfcomm_lp_disconnected(l2cap_pcb_t *l2cappcb)
 {
-    struct rfcomm_pcb_t *pcb, *tpcb;
+    rfcomm_pcb_t *pcb, *tpcb;
     err_t ret = BT_ERR_OK;
 
     pcb = rfcomm_active_pcbs;
@@ -199,7 +199,7 @@ err_t rfcomm_lp_disconnected(l2cap_pcb_t *l2cappcb)
         if(bd_addr_cmp(&(l2cappcb->remote_bdaddr), &(pcb->l2cappcb->remote_bdaddr)))
         {
             pcb->state = RFCOMM_CLOSED;
-            RFCOMM_EVENT_DISCONNECTED(pcb,BT_ERR_OK,ret); /* Notify upper layer */
+            RFCOMM_EVENT_DISCONNECTED(pcb,BT_ERR_OK); /* Notify upper layer */
         }
         pcb = tpcb;
     }
@@ -207,14 +207,14 @@ err_t rfcomm_lp_disconnected(l2cap_pcb_t *l2cappcb)
     return ret;
 }
 
-struct rfcomm_pcb_t *rfcomm_new(l2cap_pcb_t *l2cappcb)
+rfcomm_pcb_t *rfcomm_new(l2cap_pcb_t *l2cappcb)
 {
-    struct rfcomm_pcb_t *pcb;
+    rfcomm_pcb_t *pcb;
 
     pcb = bt_memp_malloc(MEMP_RFCOMM_PCB);
     if(pcb != NULL)
     {
-        memset(pcb, 0, sizeof(struct rfcomm_pcb_t));
+        memset(pcb, 0, sizeof(rfcomm_pcb_t));
         pcb->l2cappcb = l2cappcb;
 
         pcb->cl = RFCOMM_CL; /* Default convergence layer */
@@ -228,12 +228,12 @@ struct rfcomm_pcb_t *rfcomm_new(l2cap_pcb_t *l2cappcb)
     return NULL;
 }
 
-void rfcomm_close(struct rfcomm_pcb_t *pcb)
+void rfcomm_close(rfcomm_pcb_t *pcb)
 {
 
     if(pcb->state == RFCOMM_LISTEN)
     {
-        RFCOMM_RMV((struct rfcomm_pcb_t **)&rfcomm_listen_pcbs, pcb);
+        RFCOMM_RMV((rfcomm_pcb_t **)&rfcomm_listen_pcbs, pcb);
         bt_memp_free(MEMP_RFCOMM_PCB_LISTEN, pcb);
     }
     else
@@ -250,10 +250,10 @@ void rfcomm_close(struct rfcomm_pcb_t *pcb)
     pcb = NULL;
 }
 
-void rfcomm_reset_all(void)
+void rfcomm_deinit(void)
 {
-    struct rfcomm_pcb_t *pcb, *tpcb;
-    struct rfcomm_pcb_listen_t *lpcb, *tlpcb;
+    rfcomm_pcb_t *pcb, *tpcb;
+    rfcomm_pcb_listen_t *lpcb, *tlpcb;
 
     for(pcb = rfcomm_active_pcbs; pcb != NULL;)
     {
@@ -265,7 +265,7 @@ void rfcomm_reset_all(void)
     for(lpcb = rfcomm_listen_pcbs; lpcb != NULL;)
     {
         tlpcb = lpcb->next;
-        rfcomm_close((struct rfcomm_pcb_t *)lpcb);
+        rfcomm_close((rfcomm_pcb_t *)lpcb);
         lpcb = tlpcb;
     }
 
@@ -275,9 +275,9 @@ void rfcomm_reset_all(void)
     rfcomm_tmp_pcb = NULL;
 }
 
-struct rfcomm_pcb_t *rfcomm_get_active_pcb(uint8_t cn, struct bd_addr_t *bdaddr)
+rfcomm_pcb_t *rfcomm_get_active_pcb(uint8_t cn, struct bd_addr_t *bdaddr)
 {
-    struct rfcomm_pcb_t *pcb;
+    rfcomm_pcb_t *pcb;
     for(pcb = rfcomm_active_pcbs; pcb != NULL; pcb = pcb->next)
     {
         if(pcb->cn == cn && bd_addr_cmp(&(pcb->l2cappcb->remote_bdaddr),
@@ -289,10 +289,10 @@ struct rfcomm_pcb_t *rfcomm_get_active_pcb(uint8_t cn, struct bd_addr_t *bdaddr)
     return pcb;
 }
 
-static err_t rfcomm_dm(l2cap_pcb_t *pcb, struct rfcomm_hdr_t *hdr)
+static err_t rfcomm_dm(l2cap_pcb_t *pcb, rfcomm_hdr_t *hdr)
 {
     struct bt_pbuf_t *p;
-    struct rfcomm_hdr_t *rfcommhdr;
+    rfcomm_hdr_t *rfcommhdr;
     err_t ret;
 
     BT_RFCOMM_TRACE_DEBUG("rfcomm_dm\n");
@@ -314,14 +314,12 @@ static err_t rfcomm_dm(l2cap_pcb_t *pcb, struct rfcomm_hdr_t *hdr)
     return ret;
 }
 
-err_t rfcomm_connect(struct rfcomm_pcb_t *pcb, uint8_t cn, err_t (* connected)(void *arg,
-               struct rfcomm_pcb_t *tpcb,
-               err_t err))
+err_t rfcomm_connect(rfcomm_pcb_t *pcb, uint8_t cn, rfcomm_connected_cb connected)
 {
-    struct rfcomm_hdr_t *hdr;
+    rfcomm_hdr_t *hdr;
     struct bt_pbuf_t *p;
     err_t ret;
-    struct rfcomm_pcb_t *tpcb;
+    rfcomm_pcb_t *tpcb;
 
     BT_RFCOMM_TRACE_DEBUG("rfcomm_connect\n");
 
@@ -373,9 +371,9 @@ err_t rfcomm_connect(struct rfcomm_pcb_t *pcb, uint8_t cn, err_t (* connected)(v
     return ret;
 }
 
-err_t rfcomm_disconnect(struct rfcomm_pcb_t *pcb)
+err_t rfcomm_disconnect(rfcomm_pcb_t *pcb)
 {
-    struct rfcomm_hdr_t *hdr;
+    rfcomm_hdr_t *hdr;
     struct bt_pbuf_t *p;
     err_t ret;
 
@@ -404,10 +402,10 @@ err_t rfcomm_disconnect(struct rfcomm_pcb_t *pcb)
     return ret;
 }
 
-static err_t rfcomm_ua(l2cap_pcb_t *pcb, struct rfcomm_hdr_t *hdr)
+static err_t rfcomm_ua(l2cap_pcb_t *pcb, rfcomm_hdr_t *hdr)
 {
     struct bt_pbuf_t *p;
-    struct rfcomm_hdr_t *rfcommhdr;
+    rfcomm_hdr_t *rfcommhdr;
     err_t ret;
 
     BT_RFCOMM_TRACE_DEBUG("rfcomm_ua\n");
@@ -430,14 +428,13 @@ static err_t rfcomm_ua(l2cap_pcb_t *pcb, struct rfcomm_hdr_t *hdr)
     return ret;
 }
 
-err_t rfcomm_pn(struct rfcomm_pcb_t *pcb,
-          err_t (* pn_rsp)(void *arg, struct rfcomm_pcb_t *pcb, err_t err))
+err_t rfcomm_pn(rfcomm_pcb_t *pcb,rfcomm_pn_rsp_cbs pn_rsp)
 {
     struct bt_pbuf_t *p;
-    struct rfcomm_msg_hdr_t *cmdhdr;
-    struct rfcomm_pn_msg_t *pnmsg;
+    rfcomm_msg_hdr_t *cmdhdr;
+    rfcomm_pn_msg_t *pnmsg;
     err_t ret;
-    struct rfcomm_pcb_t *opcb;
+    rfcomm_pcb_t *opcb;
 
     BT_RFCOMM_TRACE_DEBUG("rfcomm_pn\n");
 
@@ -474,12 +471,12 @@ err_t rfcomm_pn(struct rfcomm_pcb_t *pcb,
     return ret;
 }
 
-err_t rfcomm_test(struct rfcomm_pcb_t *pcb, err_t (* test_rsp)(void *arg, struct rfcomm_pcb_t *tpcb, err_t err))
+err_t rfcomm_test(rfcomm_pcb_t *pcb, rfcomm_test_rsp_cb test_rsp)
 {
     struct bt_pbuf_t *p;
-    struct rfcomm_msg_hdr_t *cmdhdr;
+    rfcomm_msg_hdr_t *cmdhdr;
     err_t ret;
-    struct rfcomm_pcb_t *opcb;
+    rfcomm_pcb_t *opcb;
 
     BT_RFCOMM_TRACE_DEBUG("rfcomm_test\n");
 
@@ -506,14 +503,13 @@ err_t rfcomm_test(struct rfcomm_pcb_t *pcb, err_t (* test_rsp)(void *arg, struct
     return ret;
 }
 
-err_t rfcomm_msc(struct rfcomm_pcb_t *pcb, uint8_t fc,
-           err_t (* msc_rsp)(void *arg, struct rfcomm_pcb_t *pcb, err_t err))
+err_t rfcomm_msc(rfcomm_pcb_t *pcb, uint8_t fc,rfcomm_msc_rsp_cb msc_rsp)
 {
     struct bt_pbuf_t *p;
-    struct rfcomm_msg_hdr_t *cmdhdr;
-    struct rfcomm_msc_msg_t *mscmsg;
+    rfcomm_msg_hdr_t *cmdhdr;
+    rfcomm_msc_msg_t *mscmsg;
     err_t ret;
-    struct rfcomm_pcb_t *opcb;
+    rfcomm_pcb_t *opcb;
 
     BT_RFCOMM_TRACE_DEBUG("rfcomm_msc\n");
 
@@ -547,14 +543,13 @@ err_t rfcomm_msc(struct rfcomm_pcb_t *pcb, uint8_t fc,
     return ret;
 }
 
-err_t rfcomm_rpn(struct rfcomm_pcb_t *pcb, uint8_t br,
-           err_t (* rpn_rsp)(void *arg, struct rfcomm_pcb_t *pcb, err_t err))
+err_t rfcomm_rpn(rfcomm_pcb_t *pcb, uint8_t br,rfcomm_rpn_rsp_cb rpn_rsp)
 {
     struct bt_pbuf_t *p;
-    struct rfcomm_msg_hdr_t *cmdhdr;
-    struct rfcomm_rpn_msg_t *rpnmsg;
+    rfcomm_msg_hdr_t *cmdhdr;
+    rfcomm_rpn_msg_t *rpnmsg;
     err_t ret;
-    struct rfcomm_pcb_t *opcb;
+    rfcomm_pcb_t *opcb;
 
     BT_RFCOMM_TRACE_DEBUG("rfcomm_rpn\n");
 
@@ -589,7 +584,7 @@ err_t rfcomm_rpn(struct rfcomm_pcb_t *pcb, uint8_t br,
     return ret;
 }
 
-err_t rfcomm_uih(struct rfcomm_pcb_t *pcb, uint8_t cn, struct bt_pbuf_t *q)
+err_t rfcomm_uih(rfcomm_pcb_t *pcb, uint8_t cn, struct bt_pbuf_t *q)
 {
     struct bt_pbuf_t *p, *r;
     err_t ret;
@@ -728,7 +723,7 @@ err_t rfcomm_uih(struct rfcomm_pcb_t *pcb, uint8_t cn, struct bt_pbuf_t *q)
     return ret;
 }
 
-err_t rfcomm_uih_credits(struct rfcomm_pcb_t *pcb, uint8_t credits, struct bt_pbuf_t *q)
+err_t rfcomm_uih_credits(rfcomm_pcb_t *pcb, uint8_t credits, struct bt_pbuf_t *q)
 {
     struct bt_pbuf_t *p, *r;
     err_t ret;
@@ -860,7 +855,7 @@ err_t rfcomm_uih_credits(struct rfcomm_pcb_t *pcb, uint8_t credits, struct bt_pb
     return ret;
 }
 
-err_t rfcomm_issue_credits(struct rfcomm_pcb_t *pcb, uint8_t credits)
+err_t rfcomm_issue_credits(rfcomm_pcb_t *pcb, uint8_t credits)
 {
     struct bt_pbuf_t *p, *r;
     err_t ret;
@@ -904,15 +899,15 @@ err_t rfcomm_issue_credits(struct rfcomm_pcb_t *pcb, uint8_t credits)
     return ret;
 }
 
-void rfcomm_process_msg(struct rfcomm_pcb_t *pcb, struct rfcomm_hdr_t *rfcommhdr, l2cap_pcb_t *l2cappcb,
+void rfcomm_process_msg(rfcomm_pcb_t *pcb, rfcomm_hdr_t *rfcommhdr, l2cap_pcb_t *l2cappcb,
                    struct bt_pbuf_t *p)
 {
-    struct rfcomm_msg_hdr_t *cmdhdr, *rsphdr;
-    struct rfcomm_pn_msg_t *pnreq;
-    struct rfcomm_msc_msg_t *mscreq;
-    struct rfcomm_rpn_msg_t *rpnreq;
-    struct rfcomm_pcb_t *tpcb; /* Temp pcb */
-    struct rfcomm_pcb_listen_t *lpcb; /* Listen pcb */
+    rfcomm_msg_hdr_t *cmdhdr, *rsphdr;
+    rfcomm_pn_msg_t *pnreq;
+    rfcomm_msc_msg_t *mscreq;
+    rfcomm_rpn_msg_t *rpnreq;
+    rfcomm_pcb_t *tpcb; /* Temp pcb */
+    rfcomm_pcb_listen_t *lpcb; /* Listen pcb */
     struct bt_pbuf_t *q;
     err_t ret = BT_ERR_OK;
 	
@@ -1034,7 +1029,7 @@ void rfcomm_process_msg(struct rfcomm_pcb_t *pcb, struct rfcomm_hdr_t *rfcommhdr
             }
 
             pcb->state = RFCOMM_OPEN;
-            RFCOMM_EVENT_PN_RSP(tpcb,BT_ERR_OK,ret);
+            RFCOMM_EVENT_PN_RSP(tpcb,BT_ERR_OK);
         } /* else silently discard */
         break;
     case RFCOMM_TEST_CMD:
@@ -1046,7 +1041,7 @@ void rfcomm_process_msg(struct rfcomm_pcb_t *pcb, struct rfcomm_hdr_t *rfcommhdr
         break;
     case RFCOMM_TEST_RSP:
         pcb->to = 0; /* Reset response timer */
-        RFCOMM_EVENT_TEST(pcb,BT_ERR_OK,ret);
+        RFCOMM_EVENT_TEST(pcb,BT_ERR_OK);
         break;
     case RFCOMM_FCON_CMD:
         /* Enable transmission of data on all channels in session except cn 0 */
@@ -1125,11 +1120,11 @@ void rfcomm_process_msg(struct rfcomm_pcb_t *pcb, struct rfcomm_hdr_t *rfcommhdr
                 tpcb->state = RFCOMM_OPEN;
                 if(tpcb->rfcommcfg & RFCOMM_CFG_IR)
                 {
-                    RFCOMM_EVENT_CONNECTED(tpcb,BT_ERR_OK,ret);
+                    RFCOMM_EVENT_CONNECTED(tpcb,BT_ERR_OK);
                 }
                 else
                 {
-                    RFCOMM_EVENT_ACCEPT(tpcb,BT_ERR_OK,ret);
+                    RFCOMM_EVENT_ACCEPT(tpcb,BT_ERR_OK);
                 }
             }
         } /* else silently discard */
@@ -1150,7 +1145,7 @@ void rfcomm_process_msg(struct rfcomm_pcb_t *pcb, struct rfcomm_hdr_t *rfcommhdr
 
             if(tpcb->rfcommcfg & RFCOMM_CFG_MSC_IN)
             {
-                RFCOMM_EVENT_MSC(tpcb,BT_ERR_OK,ret); /* We have sent a MSC after initial configuration of
+                RFCOMM_EVENT_MSC(tpcb,BT_ERR_OK); /* We have sent a MSC after initial configuration of
 					      the connection was done */
             }
             else
@@ -1161,11 +1156,11 @@ void rfcomm_process_msg(struct rfcomm_pcb_t *pcb, struct rfcomm_hdr_t *rfcommhdr
                     tpcb->state = RFCOMM_OPEN;
                     if(tpcb->rfcommcfg & RFCOMM_CFG_IR)
                     {
-                        RFCOMM_EVENT_CONNECTED(tpcb,BT_ERR_OK,ret);
+                        RFCOMM_EVENT_CONNECTED(tpcb,BT_ERR_OK);
                     }
                     else
                     {
-                        RFCOMM_EVENT_ACCEPT(tpcb,BT_ERR_OK,ret);
+                        RFCOMM_EVENT_ACCEPT(tpcb,BT_ERR_OK);
                     }
                 }
             }
@@ -1223,7 +1218,7 @@ void rfcomm_process_msg(struct rfcomm_pcb_t *pcb, struct rfcomm_hdr_t *rfcommhdr
 
         if(tpcb != NULL)
         {
-            RFCOMM_EVENT_RPN(tpcb,BT_ERR_OK,ret);
+            RFCOMM_EVENT_RPN(tpcb,BT_ERR_OK);
         }
         break;
     case RFCOMM_RLS_CMD:
@@ -1253,9 +1248,9 @@ void rfcomm_process_msg(struct rfcomm_pcb_t *pcb, struct rfcomm_hdr_t *rfcommhdr
 
 err_t rfcomm_input(void *arg, l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err)
 {
-    struct rfcomm_hdr_t rfcommhdr;
-    struct rfcomm_pcb_t *pcb, *tpcb;
-    struct rfcomm_pcb_listen_t *lpcb;
+    rfcomm_hdr_t rfcommhdr;
+    rfcomm_pcb_t *pcb, *tpcb;
+    rfcomm_pcb_listen_t *lpcb;
 
     int16_t len = 0;
     uint8_t hdrlen;
@@ -1331,17 +1326,6 @@ err_t rfcomm_input(void *arg, l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t 
                 bt_pbuf_free(p);
                 return BT_ERR_OK;
             }
-        }
-    }
-    else if(rfcommhdr.ctrl == RFCOMM_UIH)
-    {
-        if(fcs != pcb->uih_in_fcs)   /* Check against the precalculated fcs */
-        {
-            //if(fcs8_crc_check(p, RFCOMM_UIHCRC_CHECK_LEN, fcs) != 0) {
-            /* Packet discarded due to failing frame check sequence */
-            BT_RFCOMM_TRACE_DEBUG("rfcomm_input: UIH packet discarded due to failing frame check sequence\n");
-            bt_pbuf_free(p);
-            return BT_ERR_OK;
         }
     }
     else if(rfcommhdr.ctrl == RFCOMM_UIH_PF)
@@ -1519,7 +1503,7 @@ err_t rfcomm_input(void *arg, l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t 
         {
             //RFCOMM_RMV(&rfcomm_active_pcbs, pcb);
             pcb->state = RFCOMM_CLOSED;
-            RFCOMM_EVENT_DISCONNECTED(pcb,BT_ERR_OK,ret);
+            RFCOMM_EVENT_DISCONNECTED(pcb,BT_ERR_OK);
         }
         else
         {
@@ -1537,12 +1521,12 @@ err_t rfcomm_input(void *arg, l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t 
         if(pcb->state ==  W4_RFCOMM_SABM_RSP)
         {
             pcb->state = RFCOMM_CLOSED;
-            RFCOMM_EVENT_CONNECTED(pcb,BT_ERR_CONN,ret);
+            RFCOMM_EVENT_CONNECTED(pcb,BT_ERR_CONN);
         }
         else
         {
             pcb->state = RFCOMM_CLOSED;
-            RFCOMM_EVENT_DISCONNECTED(pcb,BT_ERR_CONN,ret);
+            RFCOMM_EVENT_DISCONNECTED(pcb,BT_ERR_CONN);
         }
         bt_pbuf_free(p);
         break;
@@ -1552,7 +1536,7 @@ err_t rfcomm_input(void *arg, l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t 
         /* Send UA frame as response to DISC frame */
         ret = rfcomm_ua(l2cappcb, &rfcommhdr);
         pcb->state = RFCOMM_CLOSED;
-        RFCOMM_EVENT_DISCONNECTED(pcb,BT_ERR_OK,ret);
+        RFCOMM_EVENT_DISCONNECTED(pcb,BT_ERR_OK);
         bt_pbuf_free(p);
         break;
     case RFCOMM_UIH_PF:
@@ -1603,13 +1587,13 @@ err_t rfcomm_input(void *arg, l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t 
             }
 
             BT_RFCOMM_TRACE_DEBUG("rfcomm_input: Forward RFCOMM_UIH_PF credit packet to higher layer\n");
-            RFCOMM_EVENT_RECV(pcb,BT_ERR_OK,p,ret); /* Process information. Application must free bt_pbuf_t */
+            RFCOMM_EVENT_RECV(pcb,BT_ERR_OK,p); /* Process information. Application must free bt_pbuf_t */
         }
         else
         {
             BT_RFCOMM_TRACE_DEBUG("rfcomm_input: Forward RFCOMM_UIH_PF non credit packet to higher layer\n");
 
-            RFCOMM_EVENT_RECV(pcb,BT_ERR_OK,p,ret); /* Process information. Application must free bt_pbuf_t */
+            RFCOMM_EVENT_RECV(pcb,BT_ERR_OK,p); /* Process information. Application must free bt_pbuf_t */
         }
         break;
     case RFCOMM_UIH:
@@ -1632,7 +1616,7 @@ err_t rfcomm_input(void *arg, l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t 
             }
             BT_RFCOMM_TRACE_DEBUG("rfcomm_input: Forward RFCOMM_UIH packet to higher layer\n");
             BT_RFCOMM_TRACE_DEBUG("rfcomm_input: Rremote credit %d\n",pcb->rk);
-            RFCOMM_EVENT_RECV(pcb,BT_ERR_OK,p,ret); /* Process information. Application must free bt_pbuf_t */
+            RFCOMM_EVENT_RECV(pcb,BT_ERR_OK,p); /* Process information. Application must free bt_pbuf_t */
         }
         break;
     default:
@@ -1643,27 +1627,21 @@ err_t rfcomm_input(void *arg, l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t 
     return BT_ERR_OK;
 }
 
-void rfcomm_arg(struct rfcomm_pcb_t *pcb, void *arg)
-{
-    pcb->callback_arg = arg;
-}
 
-void rfcomm_recv(struct rfcomm_pcb_t *pcb,
-            err_t (* recv)(void *arg, struct rfcomm_pcb_t *pcb, struct bt_pbuf_t *p, err_t err))
+
+void rfcomm_register_recv(rfcomm_pcb_t *pcb,rfcomm_recv_cb recv)
 {
     pcb->recv = recv;
 }
 
-void rfcomm_disc(struct rfcomm_pcb_t *pcb,
-            err_t (* disc)(void *arg, struct rfcomm_pcb_t *pcb, err_t err))
+void rfcomm_register_disc(rfcomm_pcb_t *pcb,rfcomm_disconnected_cb disconnected)
 {
-    pcb->disconnected = disc;
+    pcb->disconnected = disconnected;
 }
 
-err_t rfcomm_listen(struct rfcomm_pcb_t *npcb, uint8_t cn,
-              err_t (* accept)(void *arg, struct rfcomm_pcb_t *pcb, err_t err))
+err_t rfcomm_listen(rfcomm_pcb_t *npcb, uint8_t cn,rfcomm_accept_cb accept)
 {
-    struct rfcomm_pcb_listen_t *lpcb;
+    rfcomm_pcb_listen_t *lpcb;
 
     if((lpcb = bt_memp_malloc(MEMP_RFCOMM_PCB_LISTEN)) == NULL)
     {

@@ -270,7 +270,7 @@ err_t hid_device_init(hid_cbs_t *cb)
 err_t hid_device_sdp_init(uint8_t *descriptor,uint16_t descriptor_len)
 {
     uint16_t hid_sdp_len = 0;
-    struct sdp_record_t *record;
+    sdp_record_t *record;
     uint16_t hid_sdp_base_size = sizeof(hid_service_record_base);
     uint32_t hid_record_hdl = sdp_next_rhdl();
 

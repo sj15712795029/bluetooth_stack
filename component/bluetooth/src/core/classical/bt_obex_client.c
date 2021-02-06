@@ -37,7 +37,7 @@ uint8_t obex_header_offset = 0;
 
 
 
-static struct obex_pcb_t *obex_new(struct rfcomm_pcb_t *rfcommpcb);
+static struct obex_pcb_t *obex_new(rfcomm_pcb_t *rfcommpcb);
 static struct obex_pcb_t *obex_get_active_pcb(struct bd_addr_t *bdaddr);
 static void obex_close(struct obex_pcb_t *pcb);
 
@@ -171,7 +171,7 @@ static err_t obex_client_parse_abort_resp(struct obex_pcb_t *pcb, struct bt_pbuf
 }
 
 
-static err_t obex_client_disconnected(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
+static err_t obex_client_disconnected(void *arg, rfcomm_pcb_t *pcb, err_t err)
 {
     struct obex_pcb_t *obex_pcb;
 
@@ -192,7 +192,7 @@ static err_t obex_client_disconnected(void *arg, struct rfcomm_pcb_t *pcb, err_t
 }
 
 
-static err_t obex_client_recv(void *arg, struct rfcomm_pcb_t *pcb, struct bt_pbuf_t *p, err_t err)
+static err_t obex_client_recv(void *arg, rfcomm_pcb_t *pcb, struct bt_pbuf_t *p, err_t err)
 {
     struct obex_pcb_t *obexpcb = obex_get_active_pcb(&(pcb->l2cappcb->remote_bdaddr));
     if(!obexpcb)
@@ -225,7 +225,7 @@ static err_t obex_client_recv(void *arg, struct rfcomm_pcb_t *pcb, struct bt_pbu
     return BT_ERR_OK;
 }
 
-err_t obex_client_connect(struct rfcomm_pcb_t *rfcommpcb,obex_client_cbs_t *cb,uint16_t mtu,uint8_t scn)
+err_t obex_client_connect(rfcomm_pcb_t *rfcommpcb,obex_client_cbs_t *cb,uint16_t mtu,uint8_t scn)
 {
     uint8_t offset = 0;
     struct bt_pbuf_t *p = NULL;
@@ -241,8 +241,8 @@ err_t obex_client_connect(struct rfcomm_pcb_t *rfcommpcb,obex_client_cbs_t *cb,u
     obexpcb->obex_client_cbs = cb;
     obexpcb->last_opcode = OBEX_OPCODE_CONNECT;
     OBEX_PCB_REG(&obex_active_pcbs, obexpcb);
-    rfcomm_recv(rfcommpcb, obex_client_recv);
-    rfcomm_disc(rfcommpcb, obex_client_disconnected);
+    rfcomm_register_recv(rfcommpcb, obex_client_recv);
+    rfcomm_register_disc(rfcommpcb, obex_client_disconnected);
     if((p = bt_pbuf_alloc(BT_PBUF_RAW, OBEX_CONNECT_FIELD_LEN+obex_header_offset, BT_PBUF_RAM)) == NULL)
     {
         /* Could not allocate memory for bt_pbuf_t */
@@ -267,7 +267,7 @@ err_t obex_client_connect(struct rfcomm_pcb_t *rfcommpcb,obex_client_cbs_t *cb,u
     return BT_ERR_OK;
 }
 
-err_t obex_client_get(struct rfcomm_pcb_t *rfcommpcb)
+err_t obex_client_get(rfcomm_pcb_t *rfcommpcb)
 {
     uint8_t offset = 0;
     struct bt_pbuf_t *p = NULL;
@@ -296,7 +296,7 @@ err_t obex_client_get(struct rfcomm_pcb_t *rfcommpcb)
     return BT_ERR_OK;
 }
 
-err_t obex_client_setpath(struct rfcomm_pcb_t *rfcommpcb)
+err_t obex_client_setpath(rfcomm_pcb_t *rfcommpcb)
 {
     uint8_t offset = 0;
     struct bt_pbuf_t *p = NULL;
@@ -328,7 +328,7 @@ err_t obex_client_setpath(struct rfcomm_pcb_t *rfcommpcb)
     return BT_ERR_OK;
 }
 
-err_t obex_client_abort(struct rfcomm_pcb_t *rfcommpcb)
+err_t obex_client_abort(rfcomm_pcb_t *rfcommpcb)
 {
     uint8_t offset = 0;
     struct bt_pbuf_t *p = NULL;
@@ -358,7 +358,7 @@ err_t obex_client_abort(struct rfcomm_pcb_t *rfcommpcb)
 }
 
 
-static struct obex_pcb_t *obex_new(struct rfcomm_pcb_t *rfcommpcb)
+static struct obex_pcb_t *obex_new(rfcomm_pcb_t *rfcommpcb)
 {
     struct obex_pcb_t *pcb;
 

@@ -793,7 +793,7 @@ err_t avrcp_controller_data_handle(struct avctp_pcb_t *avctp_pcb,struct bt_pbuf_
 
 err_t avrcp_controller_init(avrcp_controller_cbs_t *cb)
 {
-    struct sdp_record_t *record;
+    sdp_record_t *record;
 
     uint32_t controller_record_hdl = sdp_next_rhdl();
 

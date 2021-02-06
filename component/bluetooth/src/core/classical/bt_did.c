@@ -46,7 +46,7 @@ static  uint8_t did_service_record[] =
 
 err_t did_init(void)
 {
-    struct sdp_record_t *record;
+    sdp_record_t *record;
 
     uint8_t did_sdp_size = sizeof(did_service_record);
     uint32_t did_record_hdl = sdp_next_rhdl();

@@ -97,19 +97,22 @@ enum rfcomm_state_e {
 };
 
 /* The RFCOMM frame header */
-struct rfcomm_hdr_t {
+typedef struct  
+{
   uint8_t addr;
   uint8_t ctrl;
   uint16_t len;
   uint8_t k;
-}BT_PACK_END;
+}BT_PACK_END rfcomm_hdr_t;
 
-struct rfcomm_msg_hdr_t {
+typedef struct  
+{
   uint8_t type;
   uint8_t len;
-}BT_PACK_END;
+}BT_PACK_END rfcomm_msg_hdr_t;
 
-struct rfcomm_pn_msg_t {
+typedef struct  
+{
   uint8_t dlci; /* Data link connection id */
   uint8_t i_cl; /* Type frame for information and Convergece layer to use */
   uint8_t p; /* Priority */
@@ -117,14 +120,16 @@ struct rfcomm_pn_msg_t {
   uint16_t n; /* Maximum frame size */
   uint8_t na; /* Maximum number of retransmissions */
   uint8_t k; /* Initial credit value */
-}BT_PACK_END;
+}BT_PACK_END rfcomm_pn_msg_t;
 
-struct rfcomm_msc_msg_t {
+typedef struct  
+{
   uint8_t dlci; /* Data link connection id */
   uint8_t rs232; /* RS232 control signals */
-}BT_PACK_END;
+}BT_PACK_END rfcomm_msc_msg_t;
 
-struct rfcomm_rpn_msg_t {
+typedef struct  
+{
   uint8_t dlci; /* Data link connection id */
   uint8_t br; /* Baud Rate */
   uint8_t cfg; /* Data bits, Stop bits, Parity, Parity type */
@@ -132,11 +137,25 @@ struct rfcomm_rpn_msg_t {
   uint8_t xon;
   uint8_t xoff;
   uint16_t mask;
-}BT_PACK_END;
+}BT_PACK_END rfcomm_rpn_msg_t;
+
+
+struct _rfcomm_pcb_t;
+typedef err_t (* rfcomm_connected_cb)(void *arg, struct _rfcomm_pcb_t *pcb, err_t err);
+typedef err_t (* rfcomm_accept_cb)(void *arg, struct _rfcomm_pcb_t *pcb, err_t err);
+typedef err_t (* rfcomm_disconnected_cb)(void *arg, struct _rfcomm_pcb_t *pcb, err_t err);
+typedef err_t (* rfcomm_pn_rsp_cbs)(void *arg, struct _rfcomm_pcb_t *pcb, err_t err);
+typedef err_t (* rfcomm_test_rsp_cb)(void *arg, struct _rfcomm_pcb_t *pcb, err_t err);
+typedef err_t (* rfcomm_msc_rsp_cb)(void *arg, struct _rfcomm_pcb_t *pcb, err_t err);
+typedef err_t (* rfcomm_rpn_rsp_cb)(void *arg, struct _rfcomm_pcb_t *pcb, err_t err);
+typedef err_t (* rfcomm_recv_cb)(void *arg, struct _rfcomm_pcb_t *pcb, struct bt_pbuf_t *p, err_t err);
+
+
 
 /* The RFCOMM protocol control block */
-struct rfcomm_pcb_t {
-  struct rfcomm_pcb_t *next; /* For the linked list */
+typedef struct  _rfcomm_pcb_t
+{
+  struct _rfcomm_pcb_t *next; /* For the linked list */
 
   enum rfcomm_state_e state; /* RFCOMM state */
 
@@ -173,22 +192,23 @@ struct rfcomm_pcb_t {
   void *callback_arg;
   
   /* RFCOMM Frame commands and responses */
-  err_t (* connected)(void *arg, struct rfcomm_pcb_t *pcb, err_t err);
-  err_t (* accept)(void *arg, struct rfcomm_pcb_t *pcb, err_t err);
-  err_t (* disconnected)(void *arg, struct rfcomm_pcb_t *pcb, err_t err);
+  rfcomm_connected_cb connected;
+  rfcomm_accept_cb accept;
+  rfcomm_disconnected_cb disconnected;
 
   /* RFCOMM Multiplexer responses */
-  err_t (* pn_rsp)(void *arg, struct rfcomm_pcb_t *pcb, err_t err);
-  err_t (* test_rsp)(void *arg, struct rfcomm_pcb_t *pcb, err_t err);
-  err_t (* msc_rsp)(void *arg, struct rfcomm_pcb_t *pcb, err_t err);
-  err_t (* rpn_rsp)(void *arg, struct rfcomm_pcb_t *pcb, err_t err);
+  rfcomm_pn_rsp_cbs pn_rsp;
+  rfcomm_test_rsp_cb test_rsp;
+  rfcomm_msc_rsp_cb msc_rsp;
+  rfcomm_rpn_rsp_cb rpn_rsp;
 
-  err_t (* recv)(void *arg, struct rfcomm_pcb_t *pcb, struct bt_pbuf_t *p, err_t err);
-};
+	rfcomm_recv_cb recv;
+}rfcomm_pcb_t;
 
 /* The server channel */
-struct rfcomm_pcb_listen_t {
-  struct rfcomm_pcb_listen_t *next; /* For the linked list */
+typedef struct  _rfcomm_pcb_listen_t
+{
+  struct _rfcomm_pcb_listen_t *next; /* For the linked list */
 
   enum rfcomm_state_e state; /* RFCOMM state */
 
@@ -196,8 +216,8 @@ struct rfcomm_pcb_listen_t {
 
   void *callback_arg;
 
-  err_t (* accept)(void *arg, struct rfcomm_pcb_t *pcb, err_t err);
-};
+  rfcomm_accept_cb accept;
+}rfcomm_pcb_listen_t;
 
 
 
@@ -205,36 +225,24 @@ struct rfcomm_pcb_listen_t {
 
 /* Lower layer interface to RFCOMM: */
 err_t rfcomm_init(void); /* Must be called first to initialize RFCOMM */
+void rfcomm_deinit(void);
 void rfcomm_tmr(void); /* Must be called every 1s interval */
-
 /* Application program's interface: */
-struct rfcomm_pcb_t *rfcomm_new(l2cap_pcb_t *pcb);
-void rfcomm_close(struct rfcomm_pcb_t *pcb);
-void rfcomm_reset_all(void);
-void rfcomm_arg(struct rfcomm_pcb_t *pcb, void *arg);
-void rfcomm_recv(struct rfcomm_pcb_t *pcb, 
-		 err_t (* recv)(void *arg, struct rfcomm_pcb_t *pcb, struct bt_pbuf_t *p, err_t err));
-void rfcomm_disc(struct rfcomm_pcb_t *pcb, 
-		 err_t (* disc)(void *arg, struct rfcomm_pcb_t *pcb, err_t err));
-
+rfcomm_pcb_t *rfcomm_new(l2cap_pcb_t *pcb);
+void rfcomm_close(rfcomm_pcb_t *pcb);
+void rfcomm_register_recv(rfcomm_pcb_t *pcb,rfcomm_recv_cb recv);
+void rfcomm_register_disc(rfcomm_pcb_t *pcb,rfcomm_disconnected_cb disconnected);
 err_t rfcomm_input(void *arg, l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err);
-
-err_t rfcomm_connect(struct rfcomm_pcb_t *pcb, uint8_t cn, 
-		     err_t (* connected)(void *arg, struct rfcomm_pcb_t *tpcb, err_t err));
-err_t rfcomm_disconnect(struct rfcomm_pcb_t *pcb);
-err_t rfcomm_listen(struct rfcomm_pcb_t *npcb, uint8_t cn, 
-		    err_t (* accept)(void *arg, struct rfcomm_pcb_t *pcb, err_t err));
-err_t rfcomm_pn(struct rfcomm_pcb_t *pcb,
-		err_t (* pn_rsp)(void *arg, struct rfcomm_pcb_t *pcb, err_t err));
-err_t rfcomm_test(struct rfcomm_pcb_t *pcb, 
-		  err_t (* test_rsp)(void *arg, struct rfcomm_pcb_t *tpcb, err_t err));
-err_t rfcomm_msc(struct rfcomm_pcb_t *pcb, uint8_t fc, 
-		 err_t (* msc_rsp)(void *arg, struct rfcomm_pcb_t *pcb, err_t err));
-err_t rfcomm_rpn(struct rfcomm_pcb_t *pcb, uint8_t br,
-	   err_t (* rpn_rsp)(void *arg, struct rfcomm_pcb_t *pcb, err_t err));
-err_t rfcomm_uih(struct rfcomm_pcb_t *pcb, uint8_t cn, struct bt_pbuf_t *q);
-err_t rfcomm_uih_credits(struct rfcomm_pcb_t *pcb, uint8_t credits, struct bt_pbuf_t *q);
-err_t rfcomm_issue_credits(struct rfcomm_pcb_t *pcb, uint8_t credits);
+err_t rfcomm_connect(rfcomm_pcb_t *pcb, uint8_t cn,rfcomm_connected_cb connected);
+err_t rfcomm_disconnect(rfcomm_pcb_t *pcb);
+err_t rfcomm_listen(rfcomm_pcb_t *npcb, uint8_t cn, rfcomm_accept_cb accept);
+err_t rfcomm_pn(rfcomm_pcb_t *pcb,rfcomm_pn_rsp_cbs pn_rsp);
+err_t rfcomm_test(rfcomm_pcb_t *pcb,rfcomm_test_rsp_cb test_rsp);
+err_t rfcomm_msc(rfcomm_pcb_t *pcb, uint8_t fc,rfcomm_msc_rsp_cb msc_rsp);
+err_t rfcomm_rpn(rfcomm_pcb_t *pcb, uint8_t br,rfcomm_rpn_rsp_cb rpn_rsp);
+err_t rfcomm_uih(rfcomm_pcb_t *pcb, uint8_t cn, struct bt_pbuf_t *q);
+err_t rfcomm_uih_credits(rfcomm_pcb_t *pcb, uint8_t credits, struct bt_pbuf_t *q);
+err_t rfcomm_issue_credits(rfcomm_pcb_t *pcb, uint8_t credits);
 err_t rfcomm_lp_disconnected(l2cap_pcb_t *pcb);
 
 #endif

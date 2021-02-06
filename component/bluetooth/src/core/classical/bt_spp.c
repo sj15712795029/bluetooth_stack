@@ -68,24 +68,24 @@ spp_cbs_t *spp_cbs;
 struct spp_pcb_t *spp_active_pcbs;  /* List of all active SPP PCBs */
 struct spp_pcb_t *spp_tmp_pcb;
 
-static struct spp_pcb_t *spp_new(struct rfcomm_pcb_t *rfcommpcb);
+static struct spp_pcb_t *spp_new(rfcomm_pcb_t *rfcommpcb);
 static struct spp_pcb_t *spp_get_active_pcb(struct bd_addr_t *bdaddr);
 static void spp_close(struct spp_pcb_t *pcb);
 static err_t l2cap_connect_cfm(void *arg, l2cap_pcb_t *l2cappcb, uint16_t result, uint16_t status);
 static err_t l2cap_disconnect_cfm(void *arg, l2cap_pcb_t *pcb);
-static err_t spp_connect_cfm(void *arg, struct rfcomm_pcb_t *pcb, err_t err);
-static err_t spp_connect_ind(void *arg, struct rfcomm_pcb_t *pcb, err_t err);
-static err_t spp_disconnected(void *arg, struct rfcomm_pcb_t *pcb, err_t err);
-static err_t spp_recv_data(void *arg, struct rfcomm_pcb_t *pcb, struct bt_pbuf_t *p, err_t err);
-static void spp_sdp_attributes_recv(void *arg, struct sdp_pcb_t *sdppcb, uint16_t attribl_bc, struct bt_pbuf_t *p);
+static err_t spp_connect_cfm(void *arg, rfcomm_pcb_t *pcb, err_t err);
+static err_t spp_connect_ind(void *arg, rfcomm_pcb_t *pcb, err_t err);
+static err_t spp_disconnected(void *arg, rfcomm_pcb_t *pcb, err_t err);
+static err_t spp_recv_data(void *arg, rfcomm_pcb_t *pcb, struct bt_pbuf_t *p, err_t err);
+static void spp_sdp_attributes_recv(void *arg,sdp_pcb_t *sdppcb, uint16_t attribl_bc, struct bt_pbuf_t *p);
 static uint8_t spp_get_rfcomm_cn(uint16_t attribl_bc, struct bt_pbuf_t *attribute_list);
 static err_t spp_run(struct spp_pcb_t *pcb);
 
 
 err_t spp_init(spp_cbs_t *cb)
 {
-    struct sdp_record_t *record;
-    struct rfcomm_pcb_t *rfcommpcb;
+    sdp_record_t *record;
+    rfcomm_pcb_t *rfcommpcb;
     uint16_t spp_de_size = 0;
     uint32_t spp_record_hdl = sdp_next_rhdl();
 
@@ -164,7 +164,7 @@ err_t spp_send_data(struct bd_addr_t *addr,uint8_t *data,uint16_t data_len)
     return BT_ERR_OK;
 }
 
-static struct spp_pcb_t *spp_new(struct rfcomm_pcb_t *rfcommpcb)
+static struct spp_pcb_t *spp_new(rfcomm_pcb_t *rfcommpcb)
 {
     struct spp_pcb_t *pcb;
 
@@ -203,7 +203,7 @@ static void spp_close(struct spp_pcb_t *pcb)
     }
 }
 
-static err_t spp_recv_data(void *arg, struct rfcomm_pcb_t *pcb, struct bt_pbuf_t *p, err_t err)
+static err_t spp_recv_data(void *arg, rfcomm_pcb_t *pcb, struct bt_pbuf_t *p, err_t err)
 {
     struct spp_pcb_t *spppcb = spp_get_active_pcb(&(pcb->l2cappcb->remote_bdaddr));
     if(!spppcb)
@@ -218,7 +218,7 @@ static err_t spp_recv_data(void *arg, struct rfcomm_pcb_t *pcb, struct bt_pbuf_t
     return BT_ERR_OK;
 }
 
-static err_t spp_disconnected(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
+static err_t spp_disconnected(void *arg, rfcomm_pcb_t *pcb, err_t err)
 {
     struct spp_pcb_t *spppcb;
     BT_SPP_TRACE_DEBUG("spp_disconnected: CN = %d\n", rfcomm_cn(pcb));
@@ -237,7 +237,7 @@ static err_t spp_disconnected(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
     return BT_ERR_OK;
 }
 
-static err_t spp_connect_cfm(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
+static err_t spp_connect_cfm(void *arg, rfcomm_pcb_t *pcb, err_t err)
 {
 
     struct spp_pcb_t *spppcb = spp_get_active_pcb(&(pcb->l2cappcb->remote_bdaddr));
@@ -246,8 +246,8 @@ static err_t spp_connect_cfm(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
     {
         BT_SPP_TRACE_DEBUG("spp_connect_cfm. CN = %d\n", rfcomm_cn(pcb));
 
-        rfcomm_disc(pcb, spp_disconnected);
-        rfcomm_recv(pcb, spp_recv_data);
+        rfcomm_register_disc(pcb, spp_disconnected);
+        rfcomm_register_recv(pcb, spp_recv_data);
         spppcb->rfcommpcb = pcb;
         spppcb->state = SPP_SERVER_CN_CONNECTED;
         spp_run(spppcb);
@@ -262,7 +262,7 @@ static err_t spp_connect_cfm(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
     return BT_ERR_OK;
 }
 
-static err_t spp_connect_ind(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
+static err_t spp_connect_ind(void *arg, rfcomm_pcb_t *pcb, err_t err)
 {
     struct spp_pcb_t *spppcb;
     BT_SPP_TRACE_DEBUG("spp_connect_ind: CN = %d\n", rfcomm_cn(pcb));
@@ -275,10 +275,10 @@ static err_t spp_connect_ind(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
     }
     bd_addr_set(&(spppcb->remote_addr),&(pcb->l2cappcb->remote_bdaddr));
     SPP_PCB_REG(&spp_active_pcbs, spppcb);
-    rfcomm_disc(pcb, spp_disconnected);
+    rfcomm_register_disc(pcb, spp_disconnected);
     if(pcb->cn == RFCOMM_SPP_SERVER_CHNL)
     {
-        rfcomm_recv(pcb, spp_recv_data);
+        rfcomm_register_recv(pcb, spp_recv_data);
     }
     spppcb->rfcommpcb = pcb;
     spppcb->state = SPP_SERVER_CN_CONNECTED;
@@ -377,7 +377,7 @@ static err_t l2cap_disconnect_cfm(void *arg, l2cap_pcb_t *pcb)
     return BT_ERR_OK;
 }
 
-static void spp_sdp_attributes_recv(void *arg, struct sdp_pcb_t *sdppcb, uint16_t attribl_bc, struct bt_pbuf_t *p)
+static void spp_sdp_attributes_recv(void *arg, sdp_pcb_t *sdppcb, uint16_t attribl_bc, struct bt_pbuf_t *p)
 {
     struct spp_pcb_t *spppcb = spp_get_active_pcb(&(sdppcb->l2cappcb->remote_bdaddr));
 

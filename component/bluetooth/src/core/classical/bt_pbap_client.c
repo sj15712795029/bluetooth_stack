@@ -67,7 +67,7 @@ static const uint8_t pbap_mch_name[] = "mch";
 static const uint8_t pbap_cch_name[] = "cch";
 static const uint8_t pbap_vcard_suffix[] = ".vcf";
 
-static struct pbap_pcb_t *pbap_new(struct rfcomm_pcb_t *rfcommpcb);
+static struct pbap_pcb_t *pbap_new(rfcomm_pcb_t *rfcommpcb);
 static struct pbap_pcb_t *pbap_get_active_pcb(struct bd_addr_t *bdaddr);
 static void pbap_close(struct pbap_pcb_t *pcb);
 static err_t pbap_client_parse_pull_phonebook_resp(struct pbap_pcb_t *pcb,uint8_t *data,uint16_t data_len,uint8_t status);
@@ -100,7 +100,7 @@ err_t pbap_app_para_reset()
 
 err_t pbap_client_init(pbap_client_cbs_t *cb)
 {
-    struct sdp_record_t *record;
+    sdp_record_t *record;
 
     uint8_t pbap_client_sdp_size = sizeof(pbap_client_service_record);
     uint32_t pbap_client_record_hdl = sdp_next_rhdl();
@@ -554,7 +554,7 @@ obex_client_cbs_t pbap_obex_client_cbs =
     pbap_obex_client_abort,
 };
 
-static struct pbap_pcb_t *pbap_new(struct rfcomm_pcb_t *rfcommpcb)
+static struct pbap_pcb_t *pbap_new(rfcomm_pcb_t *rfcommpcb)
 {
     struct pbap_pcb_t *pcb;
 
@@ -703,7 +703,7 @@ static uint8_t pbap_get_rfcomm_cn(uint16_t attribl_bc, struct bt_pbuf_t *attribu
 }
 
 
-static void pbap_client_sdp_attributes_recv(void *arg, struct sdp_pcb_t *sdppcb, uint16_t attribl_bc, struct bt_pbuf_t *p)
+static void pbap_client_sdp_attributes_recv(void *arg, sdp_pcb_t *sdppcb, uint16_t attribl_bc, struct bt_pbuf_t *p)
 {
     struct pbap_pcb_t *pbappcb = pbap_get_active_pcb(&(sdppcb->l2cappcb->remote_bdaddr));
 
@@ -722,7 +722,7 @@ static void pbap_client_sdp_attributes_recv(void *arg, struct sdp_pcb_t *sdppcb,
 }
 
 
-static err_t pbap_client_rf_connect_cfm(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
+static err_t pbap_client_rf_connect_cfm(void *arg, rfcomm_pcb_t *pcb, err_t err)
 {
 
     struct pbap_pcb_t *pbappcb = pbap_get_active_pcb(&(pcb->l2cappcb->remote_bdaddr));

@@ -528,11 +528,11 @@ static err_t a2dp_sink_media_handle(struct avdtp_pcb_t *avdtp_pcb,struct bt_pbuf
     data += 1;
     data_len -= 1;
 
-
     while(data_len > 0)
     {
         sbc_frame_size = sbc_decode(&sbc_context, data, data_len,
                                     pcm_data, 1024, &pcm_data_len);
+
         if (sbc_frame_size <= 0)
             break;
 
@@ -547,7 +547,7 @@ static err_t a2dp_sink_media_handle(struct avdtp_pcb_t *avdtp_pcb,struct bt_pbuf
 
 err_t a2dp_sink_init(a2dp_sink_cbs_t *cb)
 {
-    struct sdp_record_t *record;
+    sdp_record_t *record;
 
     uint32_t sink_record_hdl = sdp_next_rhdl();
 

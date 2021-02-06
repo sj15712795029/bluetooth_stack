@@ -1070,8 +1070,8 @@ uint8_t bt_stop(void)
     bt_wrapper_cb = NULL;
     hci_deinit();
     l2cap_deinit();
-    sdp_reset_all();
-    rfcomm_reset_all();
+    sdp_deinit();
+    rfcomm_deinit();
     return 0;
 }
 

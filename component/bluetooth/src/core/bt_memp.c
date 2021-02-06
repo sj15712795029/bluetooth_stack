@@ -39,10 +39,10 @@ static const uint16_t memp_sizes[MEMP_BT_MAX] =
     sizeof(l2cap_pcb_listen_t),
     sizeof(l2cap_sig_t),
     sizeof(l2cap_seg_t),
-    sizeof(struct sdp_pcb_t),
-    sizeof(struct sdp_record_t),
-    sizeof(struct rfcomm_pcb_t),
-    sizeof(struct rfcomm_pcb_listen_t),
+    sizeof(sdp_pcb_t),
+    sizeof(sdp_record_t),
+    sizeof(rfcomm_pcb_t),
+    sizeof(rfcomm_pcb_listen_t),
     sizeof(struct obex_pcb_t),
     sizeof(struct avdtp_pcb_t),
     sizeof(struct avdtp_sep_t),
@@ -104,16 +104,16 @@ static uint8_t memp_memory[(MEMP_NUM_HCI_PCB *
                          MEM_ALIGN_SIZE(sizeof(l2cap_seg_t) +
                                         sizeof(struct bt_memp_t)) +
                          MEMP_NUM_SDP_PCB *
-                         MEM_ALIGN_SIZE(sizeof(struct sdp_pcb_t) +
+                         MEM_ALIGN_SIZE(sizeof(sdp_pcb_t) +
                                         sizeof(struct bt_memp_t)) +
                          MEMP_NUM_SDP_RECORD *
-                         MEM_ALIGN_SIZE(sizeof(struct sdp_record_t) +
+                         MEM_ALIGN_SIZE(sizeof(sdp_record_t) +
                                         sizeof(struct bt_memp_t)) +
                          MEMP_NUM_RFCOMM_PCB *
-                         MEM_ALIGN_SIZE(sizeof(struct rfcomm_pcb_t) +
+                         MEM_ALIGN_SIZE(sizeof(rfcomm_pcb_t) +
                                         sizeof(struct bt_memp_t)) +
                          MEMP_NUM_RFCOMM_PCB_LISTEN *
-                         MEM_ALIGN_SIZE(sizeof(struct rfcomm_pcb_listen_t) +
+                         MEM_ALIGN_SIZE(sizeof(rfcomm_pcb_listen_t) +
                                         sizeof(struct bt_memp_t)) +
                           MEMP_NUM_OBEX *
                          MEM_ALIGN_SIZE(sizeof(struct obex_pcb_t) +

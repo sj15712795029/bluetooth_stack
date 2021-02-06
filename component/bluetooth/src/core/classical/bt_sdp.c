@@ -18,12 +18,12 @@ uint32_t rhdl_next;
 uint16_t tid_next;
 
 /* The SDP PCB lists */
-struct sdp_pcb_t *sdp_pcbs;
-struct sdp_pcb_t *sdp_tmp_pcb;
+sdp_pcb_t *sdp_pcbs;
+sdp_pcb_t *sdp_tmp_pcb;
 
 /* List of all active service records in the SDP server */
-struct sdp_record_t *sdp_server_records;
-struct sdp_record_t *sdp_tmp_record; /* Only used for temp storage */
+sdp_record_t *sdp_server_records;
+sdp_record_t *sdp_tmp_record; /* Only used for temp storage */
 
 /* Bluetooth Base UUID: 00000000-0000-1000-8000- 00805F9B34FB */
 const uint8_t sdp_base_uuid[] = { 0x00, 0x00, 0x00, 0x00, /* - */ 0x00, 0x00, /* - */ 0x10, 0x00, /* - */
@@ -126,9 +126,9 @@ uint32_t sdp_next_rhdl(void)
     return rhdl_next;
 }
 
-struct sdp_record_t *sdp_record_new(uint8_t *record_de_list, uint8_t rlen,uint32_t hdl)
+sdp_record_t *sdp_record_new(uint8_t *record_de_list, uint8_t rlen,uint32_t hdl)
 {
-    struct sdp_record_t *record;
+    sdp_record_t *record;
 
     record = bt_memp_malloc(MEMP_SDP_RECORD);
     if(record != NULL)
@@ -143,13 +143,13 @@ struct sdp_record_t *sdp_record_new(uint8_t *record_de_list, uint8_t rlen,uint32
     return NULL;
 }
 
-void sdp_record_free(struct sdp_record_t *record)
+void sdp_record_free(sdp_record_t *record)
 {
     bt_memp_free(MEMP_SDP_RECORD, record);
 }
 
 
-err_t sdp_register_service(struct sdp_record_t *record)
+err_t sdp_register_service(sdp_record_t *record)
 {
     if(record == NULL)
     {
@@ -158,7 +158,7 @@ err_t sdp_register_service(struct sdp_record_t *record)
     SDP_RECORD_REG(&sdp_server_records, record);
     return BT_ERR_OK;
 }
-void sdp_unregister_service(struct sdp_record_t *record)
+void sdp_unregister_service(sdp_record_t *record)
 {
     SDP_RECORD_RMV(&sdp_server_records, record);
 }
@@ -169,7 +169,7 @@ uint16_t sdp_next_transid(void)
     return tid_next;
 }
 
-uint8_t sdp_pattern_search(struct sdp_record_t *record, uint8_t size, struct bt_pbuf_t *p)
+uint8_t sdp_pattern_search(sdp_record_t *record, uint8_t size, struct bt_pbuf_t *p)
 {
     uint8_t i, j;
     uint8_t *payload = (uint8_t *)p->payload;
@@ -234,7 +234,7 @@ uint8_t sdp_pattern_search(struct sdp_record_t *record, uint8_t size, struct bt_
     return 0;
 }
 
-struct bt_pbuf_t *sdp_attribute_search(uint16_t max_attribl_bc, struct bt_pbuf_t *p, struct sdp_record_t *record)
+struct bt_pbuf_t *sdp_attribute_search(uint16_t max_attribl_bc, struct bt_pbuf_t *p, sdp_record_t *record)
 {
     struct bt_pbuf_t *q = NULL;
     struct bt_pbuf_t *r;
@@ -344,14 +344,14 @@ struct bt_pbuf_t *sdp_attribute_search(uint16_t max_attribl_bc, struct bt_pbuf_t
     return q;
 }
 
-struct sdp_pcb_t *sdp_new(l2cap_pcb_t *l2cappcb)
+sdp_pcb_t *sdp_new(l2cap_pcb_t *l2cappcb)
 {
-    struct sdp_pcb_t *pcb;
+    sdp_pcb_t *pcb;
 
     pcb = bt_memp_malloc(MEMP_SDP_PCB);
     if(pcb != NULL)
     {
-        memset(pcb, 0, sizeof(struct sdp_pcb_t));
+        memset(pcb, 0, sizeof(sdp_pcb_t));
         pcb->l2cappcb = l2cappcb;
         return pcb;
     }
@@ -360,16 +360,16 @@ struct sdp_pcb_t *sdp_new(l2cap_pcb_t *l2cappcb)
     return NULL;
 }
 
-void sdp_free(struct sdp_pcb_t *pcb)
+void sdp_free(sdp_pcb_t *pcb)
 {
     bt_memp_free(MEMP_SDP_PCB, pcb);
     pcb = NULL;
 }
 
-void sdp_reset_all(void)
+void sdp_deinit(void)
 {
-    struct sdp_pcb_t *pcb, *tpcb;
-    struct sdp_record_t *record, *trecord;
+    sdp_pcb_t *pcb, *tpcb;
+    sdp_record_t *record, *trecord;
 
     for(pcb = sdp_pcbs; pcb != NULL;)
     {
@@ -387,17 +387,16 @@ void sdp_reset_all(void)
         record = trecord;
     }
 
-    sdp_init();
 }
 
-void sdp_arg(struct sdp_pcb_t *pcb, void *arg)
+void sdp_arg(sdp_pcb_t *pcb, void *arg)
 {
     pcb->callback_arg = arg;
 }
 
 void sdp_lp_disconnected(l2cap_pcb_t *l2cappcb)
 {
-    struct sdp_pcb_t *pcb, *tpcb;
+    sdp_pcb_t *pcb, *tpcb;
 
     pcb = sdp_pcbs;
     while(pcb != NULL)
@@ -412,11 +411,10 @@ void sdp_lp_disconnected(l2cap_pcb_t *l2cappcb)
     }
 }
 
-err_t sdp_service_search_req(struct sdp_pcb_t *pcb, uint8_t *ssp, uint8_t ssplen, uint16_t max_src,
-                       void (* service_searched)(void *arg, struct sdp_pcb_t *pcb, uint16_t tot_src,uint16_t curr_src, uint32_t *rhdls))
+err_t sdp_service_search_req(sdp_pcb_t *pcb, uint8_t *ssp, uint8_t ssplen, uint16_t max_src,sdp_service_searched_cb service_searched)
 {
     struct bt_pbuf_t *p;
-    struct sdp_hdr_t *sdphdr;
+    sdp_hdr_t *sdphdr;
 
     /* Update PCB */
     pcb->tid = sdp_next_transid(); /* Set transaction id */
@@ -445,10 +443,9 @@ err_t sdp_service_search_req(struct sdp_pcb_t *pcb, uint8_t *ssp, uint8_t ssplen
     return l2cap_datawrite(pcb->l2cappcb, p);
 }
 
-err_t sdp_service_attrib_req(struct sdp_pcb_t *pcb, uint32_t srhdl, uint16_t max_abc, uint8_t *attrids, uint8_t attrlen,
-                       void (* attributes_recv)(void *arg, struct sdp_pcb_t *pcb, uint16_t attribl_bc, struct bt_pbuf_t *p))
+err_t sdp_service_attrib_req(sdp_pcb_t *pcb, uint32_t srhdl, uint16_t max_abc, uint8_t *attrids, uint8_t attrlen,sdp_attributes_recv_cb attributes_recv)
 {
-    struct sdp_hdr_t *sdphdr;
+    sdp_hdr_t *sdphdr;
     uint8_t *payload;
     struct bt_pbuf_t *p;
 
@@ -485,10 +482,9 @@ err_t sdp_service_attrib_req(struct sdp_pcb_t *pcb, uint32_t srhdl, uint16_t max
     return l2cap_datawrite(pcb->l2cappcb, p);
 }
 
-err_t sdp_service_search_attrib_req(struct sdp_pcb_t *pcb, uint16_t max_abc, uint8_t *ssp, uint8_t ssplen, uint8_t *attrids,
-                              uint8_t attrlen, void (* attributes_searched)(void *arg, struct sdp_pcb_t *pcb,uint16_t attribl_bc,struct bt_pbuf_t *p))
+err_t sdp_service_search_attrib_req(sdp_pcb_t *pcb, uint16_t max_abc, uint8_t *ssp, uint8_t ssplen, uint8_t *attrids,uint8_t attrlen, sdp_attributes_searched_cb attributes_searched)
 {
-    struct sdp_hdr_t *sdphdr;
+    sdp_hdr_t *sdphdr;
 
     struct bt_pbuf_t *p;
     uint8_t *payload;
@@ -527,10 +523,10 @@ err_t sdp_service_search_attrib_req(struct sdp_pcb_t *pcb, uint16_t max_abc, uin
     return l2cap_datawrite(pcb->l2cappcb, p);
 }
 
-err_t sdp_service_search_rsp(l2cap_pcb_t *pcb, struct bt_pbuf_t *p, struct sdp_hdr_t *reqhdr)
+err_t sdp_service_search_rsp(l2cap_pcb_t *pcb, struct bt_pbuf_t *p, sdp_hdr_t *reqhdr)
 {
-    struct sdp_record_t *record;
-    struct sdp_hdr_t *rsphdr;
+    sdp_record_t *record;
+    sdp_hdr_t *rsphdr;
 
     struct bt_pbuf_t *q; /* response packet */
     struct bt_pbuf_t *r; /* tmp buffer */
@@ -620,10 +616,10 @@ err_t sdp_service_search_rsp(l2cap_pcb_t *pcb, struct bt_pbuf_t *p, struct sdp_h
 }
 
 
-err_t sdp_service_attrib_rsp(l2cap_pcb_t *pcb, struct bt_pbuf_t *p, struct sdp_hdr_t *reqhdr)
+err_t sdp_service_attrib_rsp(l2cap_pcb_t *pcb, struct bt_pbuf_t *p, sdp_hdr_t *reqhdr)
 {
-    struct sdp_record_t *record;
-    struct sdp_hdr_t *rsphdr;
+    sdp_record_t *record;
+    sdp_hdr_t *rsphdr;
 
     struct bt_pbuf_t *q;
     struct bt_pbuf_t *r;
@@ -697,10 +693,10 @@ err_t sdp_service_attrib_rsp(l2cap_pcb_t *pcb, struct bt_pbuf_t *p, struct sdp_h
     return BT_ERR_OK;
 }
 
-err_t sdp_service_search_attrib_rsp(l2cap_pcb_t *pcb, struct bt_pbuf_t *p, struct sdp_hdr_t *reqhdr)
+err_t sdp_service_search_attrib_rsp(l2cap_pcb_t *pcb, struct bt_pbuf_t *p, sdp_hdr_t *reqhdr)
 {
-    struct sdp_record_t *record;
-    struct sdp_hdr_t *rsphdr;
+    sdp_record_t *record;
+    sdp_hdr_t *rsphdr;
 
     struct bt_pbuf_t *q; /* response packet */
     struct bt_pbuf_t *r = NULL; /* tmp buffer */
@@ -812,8 +808,8 @@ err_t sdp_service_search_attrib_rsp(l2cap_pcb_t *pcb, struct bt_pbuf_t *p, struc
 
 err_t sdp_recv(void *arg, l2cap_pcb_t *pcb, struct bt_pbuf_t *s, err_t err)
 {
-    struct sdp_hdr_t *sdphdr;
-    struct sdp_pcb_t *sdppcb;
+    sdp_hdr_t *sdphdr;
+    sdp_pcb_t *sdppcb;
     err_t ret = BT_ERR_OK;
     uint16_t i;
     struct bt_pbuf_t *p, *q, *r;

@@ -238,12 +238,12 @@ static uint8_t nbs_codecs[] = {HFP_CODEC_CVSD};
 
 
 
-static struct hfp_pcb_t *hfp_new(struct rfcomm_pcb_t *rfcommpcb);
+static struct hfp_pcb_t *hfp_new(rfcomm_pcb_t *rfcommpcb);
 static struct hfp_pcb_t *hfp_get_active_pcb(struct bd_addr_t *bdaddr);
 static void hfp_close(struct hfp_pcb_t *pcb);
 static err_t hfp_hf_run(struct hfp_pcb_t *pcb);
 static err_t hfp_hf_send(struct hfp_pcb_t *pcb,uint8_t *data,uint16_t data_len);
-static err_t hfp_hf_recv(void *arg, struct rfcomm_pcb_t *pcb, struct bt_pbuf_t *p, err_t err);
+static err_t hfp_hf_recv(void *arg, rfcomm_pcb_t *pcb, struct bt_pbuf_t *p, err_t err);
 static uint8_t hfp_has_codec_negotiation_feature(struct hfp_pcb_t *pcb);
 static uint16_t hfp_has_three_call_feature(struct hfp_pcb_t *pcb);
 static uint16_t hfp_has_hf_indicators_feature(struct hfp_pcb_t *pcb);
@@ -318,13 +318,13 @@ static err_t hfp_hf_handle_at_clcc(struct hfp_pcb_t *pcb,uint8_t *data,uint16_t 
 static err_t hfp_hf_handle_at_error(struct hfp_pcb_t *pcb);
 static err_t hfp_hf_handle_at_ok(struct hfp_pcb_t *pcb);
 static err_t hfp_hf_parse_receive_data(struct hfp_pcb_t *pcb,uint8_t *data,uint16_t data_len);
-static void hfp_hf_sdp_attributes_recv(void *arg, struct sdp_pcb_t *sdppcb, uint16_t attribl_bc, struct bt_pbuf_t *p);
+static void hfp_hf_sdp_attributes_recv(void *arg, sdp_pcb_t *sdppcb, uint16_t attribl_bc, struct bt_pbuf_t *p);
 static uint8_t hfp_hf_get_rfcomm_cn(uint16_t attribl_bc, struct bt_pbuf_t *attribute_list);
 static err_t l2cap_connect_cfm(void *arg, l2cap_pcb_t *l2cappcb, uint16_t result, uint16_t status);
 static err_t l2cap_disconnect_cfm(void *arg, l2cap_pcb_t *pcb);
-static err_t hfp_connect_cfm(void *arg, struct rfcomm_pcb_t *pcb, err_t err);
-static err_t hfp_connect_ind(void *arg, struct rfcomm_pcb_t *pcb, err_t err);
-static err_t hfp_hf_disconnected(void *arg, struct rfcomm_pcb_t *pcb, err_t err);
+static err_t hfp_connect_cfm(void *arg, rfcomm_pcb_t *pcb, err_t err);
+static err_t hfp_connect_ind(void *arg, rfcomm_pcb_t *pcb, err_t err);
+static err_t hfp_hf_disconnected(void *arg, rfcomm_pcb_t *pcb, err_t err);
 static err_t hfp_hf_sco_connect_ind(void *arg, struct bd_addr_t *bdaddr);
 static err_t hfp_hf_sco_conn_complete(void *arg, uint8_t status,struct bd_addr_t *bdaddr);
 static err_t  sco_hfp_disconn_complete(void *arg, uint8_t status,struct bd_addr_t *bdaddr);
@@ -335,8 +335,8 @@ static err_t hfp_hf_run(struct hfp_pcb_t *pcb);
 
 err_t hfp_hf_init(uint16_t hf_support_feature,uint8_t support_wbs,hfp_hf_cbs_t *cb)
 {
-    struct sdp_record_t *record;
-    struct rfcomm_pcb_t *rfcommpcb;
+    sdp_record_t *record;
+    rfcomm_pcb_t *rfcommpcb;
 
     uint8_t hf_sdp_size = sizeof(hfp_hf_service_record);
     uint32_t hf_record_hdl = sdp_next_rhdl();
@@ -788,7 +788,7 @@ err_t hfp_hf_get_pid(struct bd_addr_t *addr)
         return BT_ERR_CONN;
 }
 
-static struct hfp_pcb_t *hfp_new(struct rfcomm_pcb_t *rfcommpcb)
+static struct hfp_pcb_t *hfp_new(rfcomm_pcb_t *rfcommpcb)
 {
     struct hfp_pcb_t *pcb;
 
@@ -846,7 +846,7 @@ static err_t hfp_hf_send(struct hfp_pcb_t *pcb,uint8_t *data,uint16_t data_len)
     return BT_ERR_OK;
 }
 
-static err_t hfp_hf_recv(void *arg, struct rfcomm_pcb_t *pcb, struct bt_pbuf_t *p, err_t err)
+static err_t hfp_hf_recv(void *arg, rfcomm_pcb_t *pcb, struct bt_pbuf_t *p, err_t err)
 {
     struct hfp_pcb_t *hfppcb = hfp_get_active_pcb(&(pcb->l2cappcb->remote_bdaddr));
     if(!hfppcb)
@@ -2167,7 +2167,7 @@ static err_t hfp_hf_parse_receive_data(struct hfp_pcb_t *pcb,uint8_t *data,uint1
 }
 
 
-static void hfp_hf_sdp_attributes_recv(void *arg, struct sdp_pcb_t *sdppcb, uint16_t attribl_bc, struct bt_pbuf_t *p)
+static void hfp_hf_sdp_attributes_recv(void *arg, sdp_pcb_t *sdppcb, uint16_t attribl_bc, struct bt_pbuf_t *p)
 {
     struct hfp_pcb_t *hfppcb = hfp_get_active_pcb(&(sdppcb->l2cappcb->remote_bdaddr));
 
@@ -2290,7 +2290,7 @@ static err_t l2cap_disconnect_cfm(void *arg, l2cap_pcb_t *pcb)
     return BT_ERR_OK;
 }
 
-static err_t hfp_connect_cfm(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
+static err_t hfp_connect_cfm(void *arg, rfcomm_pcb_t *pcb, err_t err)
 {
 
     struct hfp_pcb_t *hfppcb = hfp_get_active_pcb(&(pcb->l2cappcb->remote_bdaddr));
@@ -2298,8 +2298,8 @@ static err_t hfp_connect_cfm(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
     if(err == BT_ERR_OK)
     {
         BT_HFP_TRACE_DEBUG("hfp_connect_cfm. CN = %d\n", rfcomm_cn(pcb));
-        rfcomm_disc(pcb, hfp_hf_disconnected);
-        rfcomm_recv(pcb, hfp_hf_recv);
+        rfcomm_register_disc(pcb, hfp_hf_disconnected);
+        rfcomm_register_recv(pcb, hfp_hf_recv);
         hfppcb->rfcommpcb = pcb;
         hfppcb->state = HFP_EXCHANGE_SUPPORTED_FEATURES;
         hfp_hf_run(hfppcb);
@@ -2313,7 +2313,7 @@ static err_t hfp_connect_cfm(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
     return BT_ERR_OK;
 }
 
-static err_t hfp_connect_ind(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
+static err_t hfp_connect_ind(void *arg, rfcomm_pcb_t *pcb, err_t err)
 {
     struct hfp_pcb_t *hfppcb;
 
@@ -2330,10 +2330,10 @@ static err_t hfp_connect_ind(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
     HFP_PCB_REG(&hfp_active_pcbs, hfppcb);
 
 
-    rfcomm_disc(pcb, hfp_hf_disconnected);
+    rfcomm_register_disc(pcb, hfp_hf_disconnected);
     if(pcb->cn == RFCOMM_HFP_HF_CHNL)
     {
-        rfcomm_recv(pcb, hfp_hf_recv);
+        rfcomm_register_recv(pcb, hfp_hf_recv);
     }
     hfppcb->rfcommpcb = pcb;
     hfppcb->state = HFP_EXCHANGE_SUPPORTED_FEATURES;
@@ -2341,7 +2341,7 @@ static err_t hfp_connect_ind(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
     return BT_ERR_OK;
 }
 
-static err_t hfp_hf_disconnected(void *arg, struct rfcomm_pcb_t *pcb, err_t err)
+static err_t hfp_hf_disconnected(void *arg, rfcomm_pcb_t *pcb, err_t err)
 {
     struct hfp_pcb_t *hfppcb;
 

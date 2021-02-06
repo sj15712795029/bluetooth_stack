@@ -266,8 +266,8 @@ typedef struct
 struct hfp_pcb_t
 {
     struct hfp_pcb_t *next; /* For the linked list */
-    struct rfcomm_pcb_t *rfcommpcb;
-    struct sdp_pcb_t *sdppcb;
+    rfcomm_pcb_t *rfcommpcb;
+    sdp_pcb_t *sdppcb;
     l2cap_pcb_t*l2cappcb;
 
     struct bd_addr_t remote_addr;

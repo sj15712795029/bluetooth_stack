@@ -85,8 +85,8 @@ typedef struct
 struct obex_pcb_t
 {
     struct obex_pcb_t *next; /* For the linked list */
-    struct rfcomm_pcb_t *rfcommpcb;
-    struct sdp_pcb_t *sdppcb;
+    rfcomm_pcb_t *rfcommpcb;
+    sdp_pcb_t *sdppcb;
     l2cap_pcb_t*l2cappcb;
 
 	uint8_t last_opcode;
@@ -97,10 +97,10 @@ struct obex_pcb_t
 };
 
 
-err_t obex_client_connect(struct rfcomm_pcb_t *rfcommpcb,obex_client_cbs_t *cb,uint16_t mtu,uint8_t scn);
-err_t obex_client_get(struct rfcomm_pcb_t *rfcommpcb);
-err_t obex_client_setpath(struct rfcomm_pcb_t *rfcommpcb);
-err_t obex_client_abort(struct rfcomm_pcb_t *rfcommpcb);
+err_t obex_client_connect(rfcomm_pcb_t *rfcommpcb,obex_client_cbs_t *cb,uint16_t mtu,uint8_t scn);
+err_t obex_client_get(rfcomm_pcb_t *rfcommpcb);
+err_t obex_client_setpath(rfcomm_pcb_t *rfcommpcb);
+err_t obex_client_abort(rfcomm_pcb_t *rfcommpcb);
 err_t obex_header_para_append(uint8_t hdr_id,uint8_t *hdr_data,uint8_t hdr_data_len);
 err_t obex_header_para_get(uint8_t hdr_id,uint8_t *data_in,uint16_t data_in_len,uint16_t *find_offset,uint16_t *hdr_data_len);
 
