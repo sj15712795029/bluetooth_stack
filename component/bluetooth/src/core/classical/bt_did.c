@@ -37,7 +37,7 @@ static  uint8_t did_service_record[] =
 
             SDP_DES_SIZE8, 0x5,
             SDP_UINT16, DID_PRIMARY_RECORD>>8&0xff, DID_PRIMARY_RECORD&0xff,/* PrimaryRecord ID 0x204 */
-            SDP_UINT8,DID_PRIMARY_RECORD_VALUE,
+            SDP_BOOL,DID_PRIMARY_RECORD_VALUE,
 
             SDP_DES_SIZE8, 0x6,
             SDP_UINT16, DID_VENDOR_ID_SOURCE>>8&0xff, DID_VENDOR_ID_SOURCE&0xff, /* VendorIDSource ID 0x205 */
