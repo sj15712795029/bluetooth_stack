@@ -11,6 +11,9 @@
 #define BT_HID_DEVICE_H_H_H
 
 #include "bt_common.h"
+
+#if PROFILE_HID_ENABLE
+
 #include "bt_l2cap.h"
 #include "bt_sdp.h"
 
@@ -67,6 +70,6 @@ err_t hid_device_sdp_init(uint8_t *descriptor,uint16_t descriptor_len);
 err_t hid_device_interupt_report(struct bd_addr_t *remote_addr,uint8_t *report,uint8_t report_size);
 
 
-
+#endif
 #endif
 

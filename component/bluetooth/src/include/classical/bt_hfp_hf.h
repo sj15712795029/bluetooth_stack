@@ -11,6 +11,10 @@
 #define BT_HFP_HF_H_H_H
 
 #include "bt_common.h"
+
+
+#if PROFILE_HFP_ENABLE
+
 #include "bt_l2cap.h"
 #include "bt_sdp.h"
 #include "bt_rfcomm.h"
@@ -333,7 +337,7 @@ err_t hfp_hf_get_model_id(struct bd_addr_t *addr);
 err_t hfp_hf_get_revision_id(struct bd_addr_t *addr);
 err_t hfp_hf_get_pid(struct bd_addr_t *addr);
 
-
+#endif
 
 #endif
 

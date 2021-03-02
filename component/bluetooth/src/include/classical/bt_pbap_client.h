@@ -11,6 +11,10 @@
 #define BT_PBAP_CLIENT_H_H_H
 
 #include "bt_common.h"
+
+#if PROFILE_PBAP_ENABLE
+
+
 #include "bt_l2cap.h"
 #include "bt_sdp.h"
 #include "bt_rfcomm.h"
@@ -183,6 +187,8 @@ err_t pbap_client_set_path(struct bd_addr_t *addr,uint8_t repositories,uint8_t t
 err_t pbap_client_download_vcard_list(struct bd_addr_t *addr,uint8_t repositories,uint8_t type);
 err_t pbap_client_download_vcard_entry(struct bd_addr_t *addr,uint8_t repositories,uint8_t type,uint16_t entry_number);
 err_t pbap_client_download_abort(struct bd_addr_t *addr);
+
+#endif
 
 #endif
 

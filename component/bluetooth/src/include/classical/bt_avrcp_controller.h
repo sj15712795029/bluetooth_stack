@@ -10,8 +10,12 @@
 #ifndef BT_AVRCP_CONTROLLER_H_H_H
 #define BT_AVRCP_CONTROLLER_H_H_H
 
-#include "bt_sdp.h"
 #include "bt_common.h"
+
+#if PROFILE_AVRCP_ENABLE
+
+
+#include "bt_sdp.h"
 #include "bt_avctp.h"
 
 
@@ -283,7 +287,7 @@ err_t avrcp_controller_register_notification(struct bd_addr_t *remote_addr,uint8
 err_t avrcp_controller_get_element_attributes(struct bd_addr_t *remote_addr);
 err_t avrcp_controller_control(struct bd_addr_t *remote_addr,uint8_t control_id);
 
-
+#endif
 
 #endif
 

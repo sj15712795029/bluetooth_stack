@@ -47,12 +47,24 @@ static const uint16_t memp_sizes[MEMP_BT_MAX] =
     sizeof(struct avdtp_pcb_t),
     sizeof(struct avdtp_sep_t),
     sizeof(struct avctp_pcb_t),
+#if PROFILE_HFP_ENABLE
     sizeof(struct hfp_pcb_t),
+#endif
+#if PROFILE_A2DP_ENABLE
     sizeof(struct a2dp_pcb_t),
+#endif
+#if PROFILE_AVRCP_ENABLE
     sizeof(struct avrcp_pcb_t),
+#endif
+#if PROFILE_SPP_ENABLE
     sizeof(struct spp_pcb_t),
+#endif
+#if PROFILE_PBAP_ENABLE
     sizeof(struct pbap_pcb_t),
+#endif
+#if PROFILE_HID_ENABLE
     sizeof(struct hid_device_pcb_t),
+#endif
     PBUF_POOL_BUFSIZE,
 };
 
@@ -73,80 +85,110 @@ static const uint16_t memp_num[MEMP_BT_MAX] =
     MEMP_NUM_AVDTP,
     MEMP_NUM_AVDTP_SEP,
     MEMP_NUM_AVCTP,
+#if PROFILE_HFP_ENABLE
     MEMP_NUM_HFP,
+#endif
+#if PROFILE_A2DP_ENABLE
     MEMP_NUM_A2DP,
+#endif
+#if PROFILE_AVRCP_ENABLE
     MEMP_NUM_AVRCP,
+#endif
+#if PROFILE_SPP_ENABLE
     MEMP_NUM_SPP,
+#endif
+#if PROFILE_PBAP_ENABLE
     MEMP_NUM_PBAP,
+#endif
+#if PROFILE_HID_ENABLE
     MEMP_NUM_HID,
+#endif
     MEMP_NUM_BT_PBUF,
 };
 
 static uint8_t memp_memory[(MEMP_NUM_HCI_PCB *
-                         MEM_ALIGN_SIZE(sizeof(hci_pcb_t) +
-                                        sizeof(struct bt_memp_t)) +
-                         MEMP_NUM_HCI_LINK *
-                         MEM_ALIGN_SIZE(sizeof(hci_link_t) +
-                                        sizeof(struct bt_memp_t)) +
-                         MEMP_NUM_HCI_INQ *
-                         MEM_ALIGN_SIZE(sizeof(hci_inq_res_t) +
-                                        sizeof(struct bt_memp_t)) +
-                         MEMP_NUM_L2CAP_PCB *
-                         MEM_ALIGN_SIZE(sizeof(l2cap_pcb_t) +
-                                        sizeof(struct bt_memp_t)) +
-                         MEMP_NUM_L2CAP_PCB_LISTEN *
-                         MEM_ALIGN_SIZE(sizeof(l2cap_pcb_listen_t) +
-                                        sizeof(struct bt_memp_t)) +
-                         MEMP_NUM_L2CAP_SIG *
-                         MEM_ALIGN_SIZE(sizeof(l2cap_sig_t) +
-                                        sizeof(struct bt_memp_t)) +
-                         MEMP_NUM_L2CAP_SEG *
-                         MEM_ALIGN_SIZE(sizeof(l2cap_seg_t) +
-                                        sizeof(struct bt_memp_t)) +
-                         MEMP_NUM_SDP_PCB *
-                         MEM_ALIGN_SIZE(sizeof(sdp_pcb_t) +
-                                        sizeof(struct bt_memp_t)) +
-                         MEMP_NUM_SDP_RECORD *
-                         MEM_ALIGN_SIZE(sizeof(sdp_record_t) +
-                                        sizeof(struct bt_memp_t)) +
-                         MEMP_NUM_RFCOMM_PCB *
-                         MEM_ALIGN_SIZE(sizeof(rfcomm_pcb_t) +
-                                        sizeof(struct bt_memp_t)) +
-                         MEMP_NUM_RFCOMM_PCB_LISTEN *
-                         MEM_ALIGN_SIZE(sizeof(rfcomm_pcb_listen_t) +
-                                        sizeof(struct bt_memp_t)) +
-                          MEMP_NUM_OBEX *
-                         MEM_ALIGN_SIZE(sizeof(struct obex_pcb_t) +
-                                        sizeof(struct bt_memp_t)) +
-                         MEMP_NUM_AVDTP *
-                         MEM_ALIGN_SIZE(sizeof(struct avdtp_pcb_t) +
-                                        sizeof(struct bt_memp_t)) +
-                         MEMP_NUM_AVDTP_SEP *
-                         MEM_ALIGN_SIZE(sizeof(struct avdtp_sep_t) +
-                                        sizeof(struct bt_memp_t)) +
-                         MEMP_NUM_AVCTP *
-                         MEM_ALIGN_SIZE(sizeof(struct avctp_pcb_t) +
-                                        sizeof(struct bt_memp_t)) +
-                         MEMP_NUM_HFP *
-                         MEM_ALIGN_SIZE(sizeof(struct hfp_pcb_t) +
-                                        sizeof(struct bt_memp_t)) +
-                         MEMP_NUM_A2DP *
-                         MEM_ALIGN_SIZE(sizeof(struct a2dp_pcb_t) +
-                                        sizeof(struct bt_memp_t)) +
-                         MEMP_NUM_AVRCP *
-                         MEM_ALIGN_SIZE(sizeof(struct avrcp_pcb_t) +
-                                        sizeof(struct bt_memp_t)) +
-                         MEMP_NUM_SPP *
-                         MEM_ALIGN_SIZE(sizeof(struct spp_pcb_t) +
-                                        sizeof(struct bt_memp_t)) +
-                         MEMP_NUM_PBAP *
-                         MEM_ALIGN_SIZE(sizeof(struct pbap_pcb_t) +
-                                        sizeof(struct bt_memp_t)) +
-                         MEMP_NUM_HID *
-                         MEM_ALIGN_SIZE(sizeof(struct hid_device_pcb_t) +
-                                        sizeof(struct bt_memp_t)) +
-                         MEMP_NUM_BT_PBUF *
-                         MEM_ALIGN_SIZE(0x500))];
+                            MEM_ALIGN_SIZE(sizeof(hci_pcb_t) +
+                                    sizeof(struct bt_memp_t)) +
+                            MEMP_NUM_HCI_LINK *
+                            MEM_ALIGN_SIZE(sizeof(hci_link_t) +
+                                    sizeof(struct bt_memp_t)) +
+                            MEMP_NUM_HCI_INQ *
+                            MEM_ALIGN_SIZE(sizeof(hci_inq_res_t) +
+                                    sizeof(struct bt_memp_t)) +
+                            MEMP_NUM_L2CAP_PCB *
+                            MEM_ALIGN_SIZE(sizeof(l2cap_pcb_t) +
+                                    sizeof(struct bt_memp_t)) +
+                            MEMP_NUM_L2CAP_PCB_LISTEN *
+                            MEM_ALIGN_SIZE(sizeof(l2cap_pcb_listen_t) +
+                                    sizeof(struct bt_memp_t)) +
+                            MEMP_NUM_L2CAP_SIG *
+                            MEM_ALIGN_SIZE(sizeof(l2cap_sig_t) +
+                                    sizeof(struct bt_memp_t)) +
+                            MEMP_NUM_L2CAP_SEG *
+                            MEM_ALIGN_SIZE(sizeof(l2cap_seg_t) +
+                                    sizeof(struct bt_memp_t)) +
+                            MEMP_NUM_SDP_PCB *
+                            MEM_ALIGN_SIZE(sizeof(sdp_pcb_t) +
+                                    sizeof(struct bt_memp_t)) +
+                            MEMP_NUM_SDP_RECORD *
+                            MEM_ALIGN_SIZE(sizeof(sdp_record_t) +
+                                    sizeof(struct bt_memp_t)) +
+                            MEMP_NUM_RFCOMM_PCB *
+                            MEM_ALIGN_SIZE(sizeof(rfcomm_pcb_t) +
+                                    sizeof(struct bt_memp_t)) +
+                            MEMP_NUM_RFCOMM_PCB_LISTEN *
+                            MEM_ALIGN_SIZE(sizeof(rfcomm_pcb_listen_t) +
+                                    sizeof(struct bt_memp_t)) +
+                            MEMP_NUM_OBEX *
+                            MEM_ALIGN_SIZE(sizeof(struct obex_pcb_t) +
+                                    sizeof(struct bt_memp_t)) +
+                            MEMP_NUM_AVDTP *
+                            MEM_ALIGN_SIZE(sizeof(struct avdtp_pcb_t) +
+                                    sizeof(struct bt_memp_t)) +
+                            MEMP_NUM_AVDTP_SEP *
+                            MEM_ALIGN_SIZE(sizeof(struct avdtp_sep_t) +
+                                    sizeof(struct bt_memp_t)) +
+                            MEMP_NUM_AVCTP *
+                            MEM_ALIGN_SIZE(sizeof(struct avctp_pcb_t) +
+                                    sizeof(struct bt_memp_t)) +
+                                    
+#if PROFILE_HFP_ENABLE
+                            MEMP_NUM_HFP *
+                            MEM_ALIGN_SIZE(sizeof(struct hfp_pcb_t) +
+                                    sizeof(struct bt_memp_t)) +
+
+#endif
+#if PROFILE_A2DP_ENABLE
+                            MEMP_NUM_A2DP *
+                            MEM_ALIGN_SIZE(sizeof(struct a2dp_pcb_t) +
+                                    sizeof(struct bt_memp_t)) +
+
+#endif
+#if PROFILE_AVRCP_ENABLE
+                            MEMP_NUM_AVRCP *
+                            MEM_ALIGN_SIZE(sizeof(struct avrcp_pcb_t) +
+                                    sizeof(struct bt_memp_t)) +
+
+#endif
+#if PROFILE_SPP_ENABLE
+                            MEMP_NUM_SPP *
+                            MEM_ALIGN_SIZE(sizeof(struct spp_pcb_t) +
+                                    sizeof(struct bt_memp_t)) +
+
+#endif
+#if PROFILE_PBAP_ENABLE
+                            MEMP_NUM_PBAP *
+                            MEM_ALIGN_SIZE(sizeof(struct pbap_pcb_t) +
+                                    sizeof(struct bt_memp_t)) +
+
+#endif
+#if PROFILE_HID_ENABLE
+                            MEMP_NUM_HID *
+                            MEM_ALIGN_SIZE(sizeof(struct hid_device_pcb_t) +
+                                    sizeof(struct bt_memp_t)) +
+#endif
+                            MEMP_NUM_BT_PBUF *
+                            MEM_ALIGN_SIZE(0x500))];
 
 /******************************************************************************
  * func name   : bt_memp_init

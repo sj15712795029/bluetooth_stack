@@ -7,7 +7,11 @@
   * @brief          bt spp source file
 ******************************************************************************/
 
+
 #include "bt_spp.h"
+
+#if PROFILE_SPP_ENABLE
+
 
 /* TODO:断开连接不上 */
 #if 0
@@ -475,4 +479,5 @@ static err_t spp_run(struct spp_pcb_t *pcb)
     return BT_ERR_OK;
 }
 
+#endif
 

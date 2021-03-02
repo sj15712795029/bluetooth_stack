@@ -7,7 +7,10 @@
   * @brief          bt pbap client source file
 ******************************************************************************/
 
+
 #include "bt_pbap_client.h"
+
+#if PROFILE_PBAP_ENABLE
 
 
 
@@ -938,4 +941,6 @@ static err_t pbap_client_run(struct pbap_pcb_t *pcb)
 
     return BT_ERR_OK;
 }
+
+#endif
 

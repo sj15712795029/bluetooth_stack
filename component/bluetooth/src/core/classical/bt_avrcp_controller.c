@@ -9,6 +9,8 @@
 
 #include "bt_avrcp_controller.h"
 
+#if PROFILE_AVRCP_ENABLE
+
 
 struct avctp_pcb_t *temp_avcrp;
 uint8_t wait_press_resp;
@@ -947,5 +949,5 @@ err_t avrcp_controller_control(struct bd_addr_t *remote_addr,uint8_t control_id)
 	return BT_ERR_OK;
 }
 
-
+#endif
 

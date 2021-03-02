@@ -10,7 +10,11 @@
 #ifndef BT_SPP_H_H_H
 #define BT_SPP_H_H_H
 
+
 #include "bt_common.h"
+
+#if PROFILE_SPP_ENABLE
+
 #include "bt_l2cap.h"
 #include "bt_sdp.h"
 #include "bt_rfcomm.h"
@@ -80,6 +84,8 @@ extern struct spp_pcb_t *spp_tmp_pcb;
                             } \
                             npcb->next = NULL; \
                             } while(0)
+
+#endif
 
 #endif
 

@@ -8,7 +8,12 @@
 ******************************************************************************/
 #ifndef A2DP_SINK_H_H_H
 #define A2DP_SINK_H_H_H
+
 #include "bt_common.h"
+
+#if PROFILE_A2DP_ENABLE
+
+
 #include "bt_avdtp.h"
 
 typedef enum{
@@ -66,5 +71,7 @@ typedef struct
 
 
 err_t a2dp_sink_init(a2dp_sink_cbs_t *cb);
+
+#endif
 
 #endif

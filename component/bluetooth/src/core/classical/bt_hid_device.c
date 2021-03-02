@@ -1,4 +1,8 @@
+
+
 #include "bt_hid_device.h"
+
+#if PROFILE_HID_ENABLE
 
 
 uint8_t hid_service_record[512] = {0};
@@ -332,4 +336,5 @@ err_t hid_device_interupt_report(struct bd_addr_t *remote_addr,uint8_t *report,u
 
 }
 
+#endif
 

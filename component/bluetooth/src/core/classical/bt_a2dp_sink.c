@@ -1,4 +1,10 @@
+
 #include "bt_a2dp_sink.h"
+
+
+#if PROFILE_A2DP_ENABLE
+
+
 #include "bt_sdp.h"
 #include "sbc.h"
 
@@ -568,4 +574,6 @@ err_t a2dp_sink_init(a2dp_sink_cbs_t *cb)
     avdtp_create_sep(AVDTP_CODEC_SBC,(uint8_t *)sbc_snk_codec_caps,sizeof(sbc_snk_codec_caps));
     return BT_ERR_OK;
 }
+
+#endif
 

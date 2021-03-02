@@ -7,6 +7,8 @@
   * @brief          bt did source file
 ******************************************************************************/
 
+#if PROFILE_DID_ENABLE
+
 #include "bt_did.h"
 
 
@@ -64,4 +66,6 @@ err_t did_init(void)
 
 	return BT_ERR_OK;
 }
+
+#endif
 

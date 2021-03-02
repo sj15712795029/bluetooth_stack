@@ -10,6 +10,9 @@
 #include "bt_hfp_hf.h"
 
 
+#if PROFILE_HFP_ENABLE
+
+
 /* TODO */
 /*
 * 测试安卓，iphone手机主动被动连接，至少10只(OPPO A3/IPHONE8)--> DONE
@@ -2542,4 +2545,7 @@ static err_t hfp_hf_run(struct hfp_pcb_t *pcb)
 
     return BT_ERR_OK;
 }
+
+#endif
+
 

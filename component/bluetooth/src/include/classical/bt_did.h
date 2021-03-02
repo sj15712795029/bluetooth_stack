@@ -10,6 +10,9 @@
 #ifndef BT_DID_H_H_H
 #define BT_DID_H_H_H
 
+#if PROFILE_DID_ENABLE
+
+
 #include "bt_sdp.h"
 #include "bt_common.h"
 
@@ -32,5 +35,7 @@
 
 
 err_t did_init(void);
+
+#endif
 
 #endif
