@@ -72,7 +72,7 @@ spp_cbs_t *spp_cbs;
 struct spp_pcb_t *spp_active_pcbs;  /* List of all active SPP PCBs */
 struct spp_pcb_t *spp_tmp_pcb;
 
-static struct spp_pcb_t *spp_new(rfcomm_pcb_t *rfcommpcb);
+static struct spp_pcb_t *spp_new(void);
 static struct spp_pcb_t *spp_get_active_pcb(struct bd_addr_t *bdaddr);
 static void spp_close(struct spp_pcb_t *pcb);
 static err_t l2cap_connect_cfm(void *arg, l2cap_pcb_t *l2cappcb, uint16_t result, uint16_t status);
@@ -89,18 +89,12 @@ static err_t spp_run(struct spp_pcb_t *pcb);
 err_t spp_init(spp_cbs_t *cb)
 {
     sdp_record_t *record;
-    rfcomm_pcb_t *rfcommpcb;
     uint16_t spp_de_size = 0;
     uint32_t spp_record_hdl = sdp_next_rhdl();
 
     BT_SPP_TRACE_DEBUG("spp_init: Allocate RFCOMM PCB for CN %d\n", RFCOMM_SPP_SERVER_CHNL);
-    if((rfcommpcb = rfcomm_new(NULL)) == NULL)
-    {
-        BT_SPP_TRACE_DEBUG("spp_init: Could not alloc RFCOMM PCB for channel RFCOMM_SPP_SERVER_CHNL\n");
 
-        return BT_ERR_MEM;
-    }
-    rfcomm_listen(rfcommpcb, RFCOMM_SPP_SERVER_CHNL, spp_connect_ind);
+    rfcomm_listen(RFCOMM_SPP_SERVER_CHNL, spp_connect_ind);
 
     BT_SPP_TRACE_DEBUG("spp_init: spp_de_size %d\n",spp_de_size);
 
@@ -123,7 +117,7 @@ err_t spp_connect(struct bd_addr_t *addr)
 {
     struct spp_pcb_t *spppcb;
 
-    if((spppcb = spp_new(NULL)) == NULL)
+    if((spppcb = spp_new()) == NULL)
     {
         BT_SPP_TRACE_DEBUG("spp_connect: Could not alloc rfcomm pcb\n");
 
@@ -168,7 +162,7 @@ err_t spp_send_data(struct bd_addr_t *addr,uint8_t *data,uint16_t data_len)
     return BT_ERR_OK;
 }
 
-static struct spp_pcb_t *spp_new(rfcomm_pcb_t *rfcommpcb)
+static struct spp_pcb_t *spp_new(void)
 {
     struct spp_pcb_t *pcb;
 
@@ -176,7 +170,6 @@ static struct spp_pcb_t *spp_new(rfcomm_pcb_t *rfcommpcb)
     if(pcb != NULL)
     {
         memset(pcb, 0, sizeof(struct spp_pcb_t));
-        pcb->rfcommpcb = rfcommpcb;
         return pcb;
     }
 
@@ -271,7 +264,7 @@ static err_t spp_connect_ind(void *arg, rfcomm_pcb_t *pcb, err_t err)
     struct spp_pcb_t *spppcb;
     BT_SPP_TRACE_DEBUG("spp_connect_ind: CN = %d\n", rfcomm_cn(pcb));
 
-    if((spppcb = spp_new(NULL)) == NULL)
+    if((spppcb = spp_new()) == NULL)
     {
         BT_SPP_TRACE_DEBUG("spp_connect_ind: Could not alloc rfcomm pcb\n");
 

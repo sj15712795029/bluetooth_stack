@@ -235,7 +235,7 @@ void rfcomm_register_disc(rfcomm_pcb_t *pcb,rfcomm_disconnected_cb disconnected)
 err_t rfcomm_input(void *arg, l2cap_pcb_t *l2cappcb, struct bt_pbuf_t *p, err_t err);
 err_t rfcomm_connect(rfcomm_pcb_t *pcb, uint8_t cn,rfcomm_connected_cb connected);
 err_t rfcomm_disconnect(rfcomm_pcb_t *pcb);
-err_t rfcomm_listen(rfcomm_pcb_t *npcb, uint8_t cn, rfcomm_accept_cb accept);
+err_t rfcomm_listen(uint8_t cn, rfcomm_accept_cb connet_ind);
 err_t rfcomm_pn(rfcomm_pcb_t *pcb,rfcomm_pn_rsp_cbs pn_rsp);
 err_t rfcomm_test(rfcomm_pcb_t *pcb,rfcomm_test_rsp_cb test_rsp);
 err_t rfcomm_msc(rfcomm_pcb_t *pcb, uint8_t fc,rfcomm_msc_rsp_cb msc_rsp);

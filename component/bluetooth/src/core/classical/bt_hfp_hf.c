@@ -339,7 +339,6 @@ static err_t hfp_hf_run(struct hfp_pcb_t *pcb);
 err_t hfp_hf_init(uint16_t hf_support_feature,uint8_t support_wbs,hfp_hf_cbs_t *cb)
 {
     sdp_record_t *record;
-    rfcomm_pcb_t *rfcommpcb;
 
     uint8_t hf_sdp_size = sizeof(hfp_hf_service_record);
     uint32_t hf_record_hdl = sdp_next_rhdl();
@@ -367,13 +366,7 @@ err_t hfp_hf_init(uint16_t hf_support_feature,uint8_t support_wbs,hfp_hf_cbs_t *
     bt_hex_dump((uint8_t *)hfp_hf_service_record,sizeof(hfp_hf_service_record));
 
 
-    if((rfcommpcb = rfcomm_new(NULL)) == NULL)
-    {
-        BT_HFP_TRACE_DEBUG("hfp_hf_init: Could not alloc RFCOMM PCB for channel RFCOMM_HFP_SERVER_CHNL\n");
-
-        return BT_ERR_MEM;
-    }
-    rfcomm_listen(rfcommpcb, RFCOMM_HFP_HF_CHNL, hfp_connect_ind);
+    rfcomm_listen(RFCOMM_HFP_HF_CHNL, hfp_connect_ind);
 
     hfp_hf_cbs = cb;
     hci_register_sco_req(hfp_hf_sco_connect_ind);

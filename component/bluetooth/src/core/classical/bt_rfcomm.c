@@ -127,7 +127,6 @@ static err_t rfcomm_accept(void *arg, rfcomm_pcb_t *pcb, err_t err)
 
 err_t rfcomm_init(void)
 {
-    rfcomm_pcb_t *rfcommpcb;
     /* Clear globals */
     rfcomm_listen_pcbs = NULL;
     rfcomm_active_pcbs = NULL;
@@ -136,12 +135,8 @@ err_t rfcomm_init(void)
     l2cap_register_connect_ind(RFCOMM_PSM, rfcomm_connect_ind);
 
     BT_RFCOMM_TRACE_DEBUG("rfcomm_init: Allocate RFCOMM PCB for CN 0\n");
-    if((rfcommpcb = rfcomm_new(NULL)) == NULL)
-    {
-        BT_RFCOMM_TRACE_DEBUG("rfcomm_init: Could not alloc RFCOMM PCB for channel 0\n");
-        return BT_ERR_MEM;
-    }
-    rfcomm_listen(rfcommpcb, 0, rfcomm_accept);
+
+    rfcomm_listen(0, rfcomm_accept);
 
     return BT_ERR_OK;
 
@@ -1639,22 +1634,20 @@ void rfcomm_register_disc(rfcomm_pcb_t *pcb,rfcomm_disconnected_cb disconnected)
     pcb->disconnected = disconnected;
 }
 
-err_t rfcomm_listen(rfcomm_pcb_t *npcb, uint8_t cn,rfcomm_accept_cb accept)
+err_t rfcomm_listen(uint8_t cn, rfcomm_accept_cb connet_ind)
 {
-    rfcomm_pcb_listen_t *lpcb;
+    rfcomm_pcb_listen_t *listen_pcb;
 
-    if((lpcb = bt_memp_malloc(MEMP_RFCOMM_PCB_LISTEN)) == NULL)
+    if((listen_pcb = bt_memp_malloc(MEMP_RFCOMM_PCB_LISTEN)) == NULL)
     {
         BT_RFCOMM_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_memp_malloc fail\n",__FILE__,__FUNCTION__,__LINE__);
         return BT_ERR_MEM;
     }
-    lpcb->cn = cn;
-    lpcb->callback_arg = npcb->callback_arg;
-    lpcb->accept = accept;
-    lpcb->state = RFCOMM_LISTEN;
+    listen_pcb->cn = cn;
+    listen_pcb->accept = connet_ind;
+    listen_pcb->state = RFCOMM_LISTEN;
 
-    bt_memp_free(MEMP_RFCOMM_PCB, npcb);
-    RFCOMM_REG(&rfcomm_listen_pcbs, lpcb);
+    RFCOMM_REG(&rfcomm_listen_pcbs, listen_pcb);
     return BT_ERR_OK;
 }
 
