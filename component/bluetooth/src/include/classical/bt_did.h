@@ -10,11 +10,11 @@
 #ifndef BT_DID_H_H_H
 #define BT_DID_H_H_H
 
-#if PROFILE_DID_ENABLE
-
-
-#include "bt_sdp.h"
 #include "bt_common.h"
+
+#if PROFILE_DID_ENABLE
+#include "bt_sdp.h"
+
 
 #define DID_VENDOR_ID_SOURCE_BLUETOOTH 0x0001
 #define DIDS_VENDOR_ID_SOURCE_USB       0x0002

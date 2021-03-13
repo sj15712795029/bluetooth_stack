@@ -7,10 +7,9 @@
   * @brief          bt did source file
 ******************************************************************************/
 
-#if PROFILE_DID_ENABLE
-
 #include "bt_did.h"
 
+#if PROFILE_DID_ENABLE
 
 /* ≤‚ ‘EIR£¨–¥Œƒµµ */
 
