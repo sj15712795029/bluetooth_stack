@@ -471,12 +471,9 @@ static err_t _hci_conn_req_evt_process(uint8_t *payload,uint16_t payload_len)
     {
         if((link = _hci_new_link()) == NULL)
         {
-            link->state = RECEIVED_CONNECTION_REQUEST;
             /* Could not allocate memory for link. Disconnect */
-
             BT_HCI_TRACE_DEBUG("hci_event_input: Could not allocate memory for link. reject\n");
             hci_reject_connection_request(bdaddr,HCI_HOST_REJECTED_DUE_TO_LIMITED_RESOURCES);
-            link->state = REJECTED_CONNECTION_REQUEST;
         }
         else
         {
