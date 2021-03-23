@@ -397,6 +397,9 @@ err_t att_parse_write_cmd(struct bt_pbuf_t *p,uint16_t *handle,uint8_t *att_valu
     *handle = bt_le_read_16(data,1);
 
 	*value_len = data_len-3;
+    if (*value_len > GATT_BLE_MTU_SIZE)
+        *value_len = GATT_BLE_MTU_SIZE;
+        
 	memcpy(att_value,data+7,*value_len);
 
     return BT_ERR_OK;
