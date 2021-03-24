@@ -307,8 +307,8 @@ static err_t avrcp_controller_parse_get_element_attr_rsp(struct avctp_pcb_t *avc
         switch(attr_id)
         {
         case AVRCP_MEDIA_ATTR_TITLE:
-            if (attr_length > AVRCP_MEDIA_ATTR_TITLE )
-                attr_length = AVRCP_MEDIA_ATTR_TITLE;
+            if (attr_length > AVRCP_ID3_TITIL_MAX_SIZE )
+                attr_length = AVRCP_ID3_TITIL_MAX_SIZE;
 			memcpy(avrcp_pcb->now_playing_info.now_playing_title,para_palyload+8,attr_length);
             break;
         case AVRCP_MEDIA_ATTR_ARTIST:
