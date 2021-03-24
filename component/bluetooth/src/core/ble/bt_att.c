@@ -343,6 +343,8 @@ err_t att_parse_find_info_type_value_req(struct bt_pbuf_t *p,uint16_t *s_handle,
 	*att_type = bt_le_read_16(data,5);
 
 	*value_len = data_len-7;
+    if (*value_len > GATT_BLE_MTU_SIZE)
+        *value_len =  GATT_BLE_MTU_SIZE;
 	memcpy(value,data+7,*value_len);
 
     return BT_ERR_OK;
@@ -378,6 +380,9 @@ err_t att_parse_write_req(struct bt_pbuf_t *p,uint16_t *handle,uint8_t *att_valu
     *handle = bt_le_read_16(data,1);
 
 	*value_len = data_len-3;
+    if (*value_len > GATT_BLE_MTU_SIZE)
+        *value_len = GATT_BLE_MTU_SIZE;
+
 	memcpy(att_value,data+3,*value_len);
 
     return BT_ERR_OK;
@@ -392,6 +397,9 @@ err_t att_parse_write_cmd(struct bt_pbuf_t *p,uint16_t *handle,uint8_t *att_valu
     *handle = bt_le_read_16(data,1);
 
 	*value_len = data_len-3;
+    if (*value_len > GATT_BLE_MTU_SIZE)
+        *value_len = GATT_BLE_MTU_SIZE;
+        
 	memcpy(att_value,data+7,*value_len);
 
     return BT_ERR_OK;
@@ -558,7 +566,7 @@ err_t att_parse_find_type_value_rsp(struct bt_pbuf_t *p,uint8_t *info_num,uint8_
 
 err_t att_read_group_type_req(uint16_t start_handle,uint16_t end_handle,uint16_t uuid)
 {
-	/* TODO:UUIN128的支持 */
+	/* TODO:UUIN128锟斤拷支锟斤拷 */
 	struct bt_pbuf_t *send_pbuf;
     if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_READ_GROUP_TYPE_REQ_HDR_LEN, BT_PBUF_RAM)) == NULL)
     {
@@ -580,7 +588,7 @@ err_t att_read_group_type_req(uint16_t start_handle,uint16_t end_handle,uint16_t
 
 err_t att_find_type_value_req(uint16_t start_handle,uint16_t end_handle,uint16_t uuid,uint8_t *value,uint8_t value_len)
 {
-	/* TODO:UUIN128的支持 */
+	/* TODO:UUIN128锟斤拷支锟斤拷 */
 	struct bt_pbuf_t *send_pbuf;
     if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_FIND_TYPE_VALUE_REQ_HDR_LEN+value_len, BT_PBUF_RAM)) == NULL)
     {
@@ -603,7 +611,7 @@ err_t att_find_type_value_req(uint16_t start_handle,uint16_t end_handle,uint16_t
 
 err_t att_read_type_req(uint16_t start_handle,uint16_t end_handle,uint8_t *value,uint8_t value_len)
 {
-	/* TODO:UUIN128的支持 */
+	/* TODO:UUIN128锟斤拷支锟斤拷 */
 	struct bt_pbuf_t *send_pbuf;
     if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_READ_TYPE_REQ_HDR_LEN+value_len, BT_PBUF_RAM)) == NULL)
     {

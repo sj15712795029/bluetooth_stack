@@ -681,6 +681,10 @@ static err_t _l2cap_sig_cfg_rsp_process(l2cap_pcb_t *pcb,struct bt_pbuf_t *p,l2c
     //scid = ((uint16_t *)p->payload)[0];
     flags = ((uint16_t *)p->payload)[1];
     result = ((uint16_t *)p->payload)[2];
+    if (siglen <=6)
+    {
+        return BT_ERR_VAL;
+    }
     siglen -= 6;
     bt_pbuf_header(p, -6);
     BT_L2CAP_TRACE_DEBUG("l2cap_process_sig: Outgoing configuration result == %d continuation flag == %d\n", result, flags);

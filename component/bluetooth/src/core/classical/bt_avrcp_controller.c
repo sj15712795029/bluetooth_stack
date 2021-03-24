@@ -307,12 +307,18 @@ static err_t avrcp_controller_parse_get_element_attr_rsp(struct avctp_pcb_t *avc
         switch(attr_id)
         {
         case AVRCP_MEDIA_ATTR_TITLE:
+            if (attr_length > AVRCP_MEDIA_ATTR_TITLE )
+                attr_length = AVRCP_MEDIA_ATTR_TITLE;
 			memcpy(avrcp_pcb->now_playing_info.now_playing_title,para_palyload+8,attr_length);
             break;
         case AVRCP_MEDIA_ATTR_ARTIST:
+            if (attr_length > AVRCP_ID3_ARTIST_MAX_SIZE)
+                attr_length = AVRCP_ID3_ARTIST_MAX_SIZE;
 			memcpy(avrcp_pcb->now_playing_info.now_playing_artist,para_palyload+8,attr_length);
             break;
         case AVRCP_MEDIA_ATTR_ALBUM:
+            if (attr_length > AVRCP_ID3_ALBUM_MAX_SIZE)
+                attr_length = AVRCP_ID3_ALBUM_MAX_SIZE;
 			memcpy(avrcp_pcb->now_playing_info.now_playing_album,para_palyload+8,attr_length);
             break;
         case AVRCP_MEDIA_ATTR_TRACK:
