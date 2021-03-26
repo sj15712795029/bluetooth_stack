@@ -563,6 +563,7 @@ static err_t _hci_disconn_comp_evt_process(uint8_t *payload,uint16_t payload_len
             lp_disconnect_ind(&(link->bdaddr)); /* Notify upper layer */
             link->state = RECEIVED_DISCONNECTION_COMPLETE;
             _hci_delete_link(link);
+			hci_pcb->controller_num_acl = hci_pcb->controler_max_acl;
         }
         if(link != NULL && sco_disconnect == 1)
         {
@@ -957,6 +958,7 @@ static err_t _hci_init_cmd_compl_process(uint8_t *payload,uint16_t payload_len)
 
         hci_pcb->acl_maxsize = bt_le_read_16(payload,4); /* Maximum size of an ACL packet that the BT module is able to accept */
         hci_pcb->controller_num_acl = bt_le_read_16(payload,7); /* Number of ACL packets that the BT module can buffer */
+		hci_pcb->controler_max_acl = hci_pcb->controller_num_acl;
         BT_HCI_TRACE_DEBUG("Max ACL size(%d)\n",hci_pcb->acl_maxsize);
         BT_HCI_TRACE_DEBUG("Max ACL count(%d)\n",hci_pcb->controller_num_acl);
         hci_read_bd_addr(read_bdaddr_complete);

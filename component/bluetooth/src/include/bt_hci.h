@@ -815,6 +815,7 @@ typedef struct
     uint8_t numcmd; /* Number of command packets that the host controller (Bluetooth module)
 		  can buffer */
     uint16_t acl_maxsize; /* Maximum length of the data portion of each HCI ACL data packet that the Host Controller is able to accept */
+	uint16_t controler_max_acl;
     uint16_t controller_num_acl; /* Number of ACL packets that the Bluetooth module can buffer */
 
     /* Host controller to host flow control */
