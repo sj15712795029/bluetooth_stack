@@ -731,7 +731,7 @@ static err_t _hci_number_comp_evt_process(uint8_t *payload,uint16_t payload_len)
         BT_HCI_TRACE_DEBUG("Conn_hdl: 0x%x\n", handle);
         BT_HCI_TRACE_DEBUG("HC_Num_Of_Completed_Packets: 0x%x\n",num_comp_pack);
         /* Add number of completed ACL packets to the number of ACL packets that the BT module can buffer */
-        hci_pcb->hc_num_acl += num_comp_pack;
+        hci_pcb->controller_num_acl += num_comp_pack;
 #if HCI_FLOW_QUEUEING
         {
         	hci_link_t *link = NULL;
@@ -956,9 +956,9 @@ static err_t _hci_init_cmd_compl_process(uint8_t *payload,uint16_t payload_len)
 
 
         hci_pcb->acl_maxsize = bt_le_read_16(payload,4); /* Maximum size of an ACL packet that the BT module is able to accept */
-        hci_pcb->hc_num_acl = bt_le_read_16(payload,7); /* Number of ACL packets that the BT module can buffer */
+        hci_pcb->controller_num_acl = bt_le_read_16(payload,7); /* Number of ACL packets that the BT module can buffer */
         BT_HCI_TRACE_DEBUG("Max ACL size(%d)\n",hci_pcb->acl_maxsize);
-        BT_HCI_TRACE_DEBUG("Max ACL count(%d)\n",hci_pcb->hc_num_acl);
+        BT_HCI_TRACE_DEBUG("Max ACL count(%d)\n",hci_pcb->controller_num_acl);
         hci_read_bd_addr(read_bdaddr_complete);
         break;
     }
@@ -1362,9 +1362,9 @@ err_t hci_acl_write(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p, uint16_t len,
 
         return BT_ERR_CONN;
     }
-    BT_HCI_TRACE_DEBUG("hci_acl_write: HC num ACL %d\n", hci_pcb->hc_num_acl);
+    BT_HCI_TRACE_DEBUG("hci_acl_write: HC num ACL %d\n", hci_pcb->controller_num_acl);
 
-    if(hci_pcb->hc_num_acl == 0)
+    if(hci_pcb->controller_num_acl == 0)
     {
         BT_HCI_TRACE_DEBUG("hci_acl_write: HC out of buffer space\n");
 
@@ -1414,7 +1414,7 @@ err_t hci_acl_write(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p, uint16_t len,
 
     phybusif_output(q, aclhdr->len + q->len,PHYBUSIF_PACKET_TYPE_ACL_DATA);
 
-    --hci_pcb->hc_num_acl;
+    --hci_pcb->controller_num_acl;
 
     /* Free ACL header. Upper layers will handle rest of packet */
     p = bt_pbuf_dechain(q);

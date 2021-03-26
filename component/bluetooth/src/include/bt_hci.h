@@ -632,7 +632,7 @@
 
 
 #define hci_num_cmd(pcb) ((pcb)->numcmd)
-#define hci_num_acl(pcb) ((pcb)->hc_num_acl)
+#define hci_num_acl(pcb) ((pcb)->controller_num_acl)
 #define hci_maxsize(pcb) ((pcb)->acl_maxsize)
 
 
@@ -814,9 +814,8 @@ typedef struct
     /* Host to host controller flow control */
     uint8_t numcmd; /* Number of command packets that the host controller (Bluetooth module)
 		  can buffer */
-    uint16_t acl_maxsize; /* Maximum length of the data portion of each HCI ACL data packet that the
-		   Host Controller is able to accept */
-    uint16_t hc_num_acl; /* Number of ACL packets that the Bluetooth module can buffer */
+    uint16_t acl_maxsize; /* Maximum length of the data portion of each HCI ACL data packet that the Host Controller is able to accept */
+    uint16_t controller_num_acl; /* Number of ACL packets that the Bluetooth module can buffer */
 
     /* Host controller to host flow control */
     uint8_t flow; /* Indicates if host controller to host flow control is on */
