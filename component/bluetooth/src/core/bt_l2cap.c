@@ -681,7 +681,8 @@ static err_t _l2cap_sig_cfg_rsp_process(l2cap_pcb_t *pcb,struct bt_pbuf_t *p,l2c
     //scid = ((uint16_t *)p->payload)[0];
     flags = ((uint16_t *)p->payload)[1];
     result = ((uint16_t *)p->payload)[2];
-    if (siglen <=6)
+
+    if (siglen < 6)
     {
         return BT_ERR_VAL;
     }
