@@ -1124,7 +1124,7 @@ uint8_t bt_cancel_get_remote_name(struct bd_addr_t *bdaddr)
 #if BT_BLE_ENABLE > 0
 uint8_t bt_le_start_inquiry(void)
 {
-    hci_set_le_scan_param(1,0x30,0x30,0,0);
+    hci_le_set_scan_param(1,0x30,0x30,0,0);
     hci_le_inquiry(0,bt_le_inquiry_result,bt_le_inquiry_complete);
 
     if(bt_wrapper_cb && bt_wrapper_cb->app_common_cb && bt_wrapper_cb->app_common_cb->bt_le_inquiry_status)

@@ -948,7 +948,7 @@ err_t hci_le_set_event_mask(uint32_t mask_lo,uint32_t mask_hi);
 err_t hci_le_read_buffer_size(void);
 err_t hci_le_read_local_support_feature(void);
 err_t hci_le_set_random_address(struct bd_addr_t *bdaddr);
-err_t hci_set_le_scan_param(uint8_t scan_type,uint16_t scan_interval,uint16_t scan_window,uint8_t own_type,uint8_t scan_filter);
+err_t hci_le_set_scan_param(uint8_t scan_type,uint16_t scan_interval,uint16_t scan_window,uint8_t own_type,uint8_t scan_filter);
 err_t hci_le_inquiry(uint8_t filter_duplicates,
 					le_inq_result_fun_cb le_inq_result,
                      le_inq_complete_fun_cb le_inq_complete);

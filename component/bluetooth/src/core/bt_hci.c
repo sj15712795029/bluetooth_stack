@@ -3140,7 +3140,7 @@ err_t hci_le_set_random_address(struct bd_addr_t *bdaddr)
 
 
 
-err_t hci_set_le_scan_param(uint8_t scan_type,uint16_t scan_interval,uint16_t scan_window,uint8_t own_type,uint8_t scan_filter)
+err_t hci_le_set_scan_param(uint8_t scan_type,uint16_t scan_interval,uint16_t scan_window,uint8_t own_type,uint8_t scan_filter)
 {
     struct bt_pbuf_t *p;
     uint8_t offset = 0;
