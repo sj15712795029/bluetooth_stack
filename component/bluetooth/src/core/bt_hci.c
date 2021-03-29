@@ -1036,16 +1036,23 @@ static err_t _hci_init_cmd_compl_process(uint8_t *payload,uint16_t payload_len)
     case HCI_OP_BLE_SET_EVENT_MASK:
     {
         BT_HCI_TRACE_DEBUG("Init recv HCI_OP_BLE_SET_EVENT_MASK\n");
-		hci_le_read_buffer_size();
-        
+        hci_le_read_buffer_size();
+
         break;
     }
-	case HCI_OP_BLE_READ_BUFFER_SIZE:
-	{
-		BT_HCI_TRACE_DEBUG("Init recv HCI_OP_BLE_READ_BUFFER_SIZE\n");
-		hci_write_scan_enable(HCI_SCAN_EN_INQUIRY | HCI_SCAN_EN_PAGE);
-		break;
-		}
+    case HCI_OP_BLE_READ_BUFFER_SIZE:
+    {
+        BT_HCI_TRACE_DEBUG("Init recv HCI_OP_BLE_READ_BUFFER_SIZE\n");
+        hci_le_read_local_support_feature();
+
+        break;
+    }
+    case HCI_OP_BLE_READ_LOCAL_SPT_FEAT:
+    {
+        BT_HCI_TRACE_DEBUG("Init recv HCI_OP_BLE_READ_LOCAL_SPT_FEAT\n");
+        hci_write_scan_enable(HCI_SCAN_EN_INQUIRY | HCI_SCAN_EN_PAGE);
+        break;
+    }
 #endif
     default:
         break;
@@ -3091,6 +3098,25 @@ err_t hci_le_read_buffer_size(void)
     return BT_ERR_OK;
 
 }
+
+err_t hci_le_read_local_support_feature(void)
+{
+    struct bt_pbuf_t *p;
+    if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_LE_R_LOCAL_SUPPORT_FEATURES_PLEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+
+        return BT_ERR_MEM;
+    }
+    /* Assembling command packet */
+    p = hci_cmd_ass(p, HCI_LE_READ_LOCAL_SUPPORT_FEATURES, HCI_LE, HCI_LE_R_LOCAL_SUPPORT_FEATURES_PLEN);
+    /* Assembling cmd prameters */
+    phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
+    bt_pbuf_free(p);
+
+    return BT_ERR_OK;
+}
+
 
 
 err_t hci_set_le_scan_param(uint8_t scan_type,uint16_t scan_interval,uint16_t scan_window,uint8_t own_type,uint8_t scan_filter)
