@@ -3117,6 +3117,27 @@ err_t hci_le_read_local_support_feature(void)
     return BT_ERR_OK;
 }
 
+err_t hci_le_set_random_address(struct bd_addr_t *bdaddr)
+{
+	struct bt_pbuf_t *p;
+    if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_LE_SET_RANDOM_ADDR_PLEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+
+
+        return BT_ERR_MEM;
+    }
+    /* Assembling command packet */
+    p = hci_cmd_ass(p, HCI_LE_SET_RANDOM_ADDRESS, HCI_LE, HCI_LE_SET_RANDOM_ADDR_PLEN);
+    /* Assembling cmd prameters */
+    memcpy(((uint8_t *)p->payload) + 3, bdaddr->addr, BD_ADDR_LEN);
+    phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
+    bt_pbuf_free(p);
+
+    return BT_ERR_OK;
+}
+
+
 
 
 err_t hci_set_le_scan_param(uint8_t scan_type,uint16_t scan_interval,uint16_t scan_window,uint8_t own_type,uint8_t scan_filter)

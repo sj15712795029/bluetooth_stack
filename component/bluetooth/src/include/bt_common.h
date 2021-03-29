@@ -97,11 +97,13 @@ typedef enum {
 #define BT_LE_U16_TO_ARRAY(u16) (u16&0xff),(u16>>8&0xff)
 
 
+#define BD_ADDR_LEN 6
+
 struct bd_addr_t {
-  uint8_t addr[6];
+  uint8_t addr[BD_ADDR_LEN];
 };
 
-#define BD_ADDR_LEN 6
+
 
 #define BD_ADDR(bdaddr, a, b, c, d, e, f) do{ \
                                         bdaddr->addr[0] = a; \
