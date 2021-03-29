@@ -432,6 +432,7 @@
 
 /* LE commands */
 #define HCI_LE_SET_EVT_MASK 0x01
+#define HCI_LE_READ_BUF_SIZE 0x02
 #define HCI_LE_SET_ADV_PARAM 0x06
 #define HCI_LE_SET_ADV_DATA 0x08
 #define HCI_LE_SET_ADV_ENABLE 0x0a
@@ -607,6 +608,7 @@
 #define HCI_READ_RSSI_PLEN 5
 #define HCI_ENABLE_DUT_PLEN 3
 #define HCI_SET_LE_EVENT_MASK_PLEN 11
+#define HCI_LE_R_BUF_SIZE_PLEN 3
 #define HCI_SET_LE_SCAN_PLEN 5
 #define HCI_SET_LE_SCAN_PARAM_PLEN 10
 #define HCI_SET_LE_ADV_PARAM_PLEN 18
@@ -938,7 +940,8 @@ err_t hci_read_rssi(struct bd_addr_t *bdaddr);
 err_t hci_enable_dut_mode(void);
 /* OGF = 0x08 LE CONTROLLER COMMANDS */
 #if BT_BLE_ENABLE > 0
-err_t hci_ble_set_event_mask(uint32_t mask_lo,uint32_t mask_hi);
+err_t hci_le_set_event_mask(uint32_t mask_lo,uint32_t mask_hi);
+err_t hci_le_read_buffer_size(void);
 err_t hci_set_le_scan_param(uint8_t scan_type,uint16_t scan_interval,uint16_t scan_window,uint8_t own_type,uint8_t scan_filter);
 err_t hci_le_inquiry(uint8_t filter_duplicates,
 					le_inq_result_fun_cb le_inq_result,

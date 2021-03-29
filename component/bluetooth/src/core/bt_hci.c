@@ -1030,15 +1030,22 @@ static err_t _hci_init_cmd_compl_process(uint8_t *payload,uint16_t payload_len)
     case HCI_OP_WRITE_LE_SUPPORT:
     {
         BT_HCI_TRACE_DEBUG("Init recv HCI_OP_WRITE_LE_SUPPORT\n");
-        hci_ble_set_event_mask(0xff,0x0); /* some bt modem back invalid commmand para,do not care,skip it */
+        hci_le_set_event_mask(0xff,0x0); /* some bt modem back invalid commmand para,do not care,skip it */
         break;
     }
     case HCI_OP_BLE_SET_EVENT_MASK:
     {
         BT_HCI_TRACE_DEBUG("Init recv HCI_OP_BLE_SET_EVENT_MASK\n");
-        hci_write_scan_enable(HCI_SCAN_EN_INQUIRY | HCI_SCAN_EN_PAGE);
+		hci_le_read_buffer_size();
+        
         break;
     }
+	case HCI_OP_BLE_READ_BUFFER_SIZE:
+	{
+		BT_HCI_TRACE_DEBUG("Init recv HCI_OP_BLE_READ_BUFFER_SIZE\n");
+		hci_write_scan_enable(HCI_SCAN_EN_INQUIRY | HCI_SCAN_EN_PAGE);
+		break;
+		}
 #endif
     default:
         break;
@@ -3044,7 +3051,7 @@ err_t hci_enable_dut_mode(void)
 
 #if BT_BLE_ENABLE > 0
 
-err_t hci_ble_set_event_mask(uint32_t mask_lo,uint32_t mask_hi)
+err_t hci_le_set_event_mask(uint32_t mask_lo,uint32_t mask_hi)
 {
     struct bt_pbuf_t *p;
     if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_SET_LE_EVENT_MASK_PLEN, BT_PBUF_RAM)) == NULL)
@@ -3063,6 +3070,26 @@ err_t hci_ble_set_event_mask(uint32_t mask_lo,uint32_t mask_hi)
     bt_pbuf_free(p);
 
     return BT_ERR_OK;
+}
+
+
+err_t hci_le_read_buffer_size(void)
+{
+    struct bt_pbuf_t *p;
+    if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_LE_R_BUF_SIZE_PLEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+
+        return BT_ERR_MEM;
+    }
+    /* Assembling command packet */
+    p = hci_cmd_ass(p, HCI_LE_READ_BUF_SIZE, HCI_LE, HCI_LE_R_BUF_SIZE_PLEN);
+    /* Assembling cmd prameters */
+    phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
+    bt_pbuf_free(p);
+
+    return BT_ERR_OK;
+
 }
 
 
