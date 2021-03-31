@@ -317,7 +317,7 @@ static err_t _l2cap_sig_conn_req_process(l2cap_pcb_t *pcb,struct bt_pbuf_t *p,l2
         {
             ((uint16_t *)data->payload)[0] = L2CAP_CONN_REF_PSM;
             ((uint16_t *)data->payload)[1] = 0; /* No further info available */
-            _l2cap_signal_send(pcb, L2CAP_CONN_RSP, sighdr->id, &(pcb->remote_bdaddr), data);
+            _l2cap_signal_send(pcb, L2CAP_CONN_RSP, sighdr->id, bdaddr, data);
         }
         else
         {
