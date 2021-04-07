@@ -130,7 +130,7 @@ static uint8_t hid_device_descriptor[] = {
 
 #endif
 
-static err_t bt_ass_eir_data()
+static err_t bt_ass_eir_data(void)
 {
     uint8_t data_pos =0;
     uint8_t len = 0;

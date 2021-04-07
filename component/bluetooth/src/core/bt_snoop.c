@@ -95,7 +95,7 @@ err_t bt_snoop_deinit(void)
 err_t bt_snoop_write(uint8_t  packet_type, uint8_t  in, uint8_t *packet, uint16_t len)
 {
     struct timeval curr_time;
-    struct tm* ptm;
+    /* struct tm* ptm; */
     uint32_t length_he = 0;
     uint32_t flags = 0;
     uint64_t time_stamp = 0;
@@ -132,7 +132,7 @@ err_t bt_snoop_write(uint8_t  packet_type, uint8_t  in, uint8_t *packet, uint16_
         flags = 3;
         break;
     default:
-        return;
+        return BT_ERR_ARG;
     }
     header.length_original = bt_htonl(length_he);
     header.length_captured = header.length_original;
