@@ -21,7 +21,9 @@
 #include <string.h>
 #include <unistd.h>
 #include "bt_snoop.h"
-struct phybusif_cb uart_if;
+struct phybusif_cb uart_if = {
+    .uart_node = BT_UART_NODE_DEFAULT,
+};
 
 
 #define BT_DMA_BUF_SIZE	(4*1024)
@@ -72,12 +74,12 @@ uint8_t hw_uart_bt_init(uint32_t baud_rate)
     }
 #endif
 
-    printf("phybusif_open /dev/ttyUSB0\n");
+    printf("phybusif_open %s\n", uart_if.uart_node);
 
-    uart_if.phyuart_fd = open("/dev/ttyUSB0", flags);
+    uart_if.phyuart_fd = open(uart_if.uart_node, flags);
     if (uart_if.phyuart_fd == -1)
     {
-        printf("ERROR:Unable to open port /dev/ttyUSB0\n");
+        printf("ERROR:Unable to open port %s\n", uart_if.uart_node);
         return -1;
     }
 
@@ -146,7 +148,13 @@ void bt_uart_test()
     uart_bt_send(hci_reset,4);
 }
 
-
+void phybusif_set_uart_node(char *node)
+{
+    if(NULL == node)
+        return;
+    memset(uart_if.uart_node, 0x0, BT_UART_NODE_STR_SIZE);
+    strncpy(uart_if.uart_node, node, BT_UART_NODE_STR_SIZE);
+}
 
 err_t phybusif_reset(struct phybusif_cb *cb)
 {
@@ -239,6 +247,9 @@ void phybusif_close(void)
 
 void phybusif_output(struct bt_pbuf_t *p, uint16_t len,uint8_t packet_type)
 {
+   if(NULL == p)
+        return;
+
     bt_pbuf_header(p, 1);
     ((uint8_t *)p->payload)[0] = packet_type;
 
