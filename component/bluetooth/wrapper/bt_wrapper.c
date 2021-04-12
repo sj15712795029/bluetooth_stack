@@ -716,6 +716,11 @@ static a2dp_sink_cbs_t a2dp_sink_wrapper_cb =
     a2dp_sink_stream_suspend,
     a2dp_sink_stream_abort,
 };
+
+void a2dp_sink_stream_play_register(void (*a2dp_sink_stream_play)(uint16_t *pcm_data, uint32_t data_len))
+{
+    a2dp_sink_wrapper_cb.a2dp_sink_stream_play = a2dp_sink_stream_play;
+}
 #endif
 
 

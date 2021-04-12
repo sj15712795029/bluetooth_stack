@@ -542,6 +542,11 @@ static err_t a2dp_sink_media_handle(struct avdtp_pcb_t *avdtp_pcb,struct bt_pbuf
         if (sbc_frame_size <= 0)
             break;
 
+        if(a2dp_sink_cbs && a2dp_sink_cbs->a2dp_sink_stream_play)
+        {
+            a2dp_sink_cbs->a2dp_sink_stream_play((uint16_t*)pcm_data, pcm_data_len);            
+        }
+
         BT_A2DP_INFO_TRACE_DEBUG("sbc_frame_size %d,pcm_data_len %d\n",sbc_frame_size,pcm_data_len);
         data += sbc_frame_size;
         data_len -= sbc_frame_size;

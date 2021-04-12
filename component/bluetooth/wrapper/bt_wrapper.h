@@ -262,6 +262,8 @@ uint8_t bt_pbap_client_download_vcard_entry(struct bd_addr_t *addr,uint8_t repos
 uint8_t bt_pbap_client_download_abort(struct bd_addr_t *addr);
 #endif
 
-
+#if PROFILE_A2DP_ENABLE
+void a2dp_sink_stream_play_register(void (*a2dp_sink_stream_play)(uint16_t *pcm_data, uint32_t data_len));
+#endif
 
 #endif

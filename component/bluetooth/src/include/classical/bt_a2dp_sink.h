@@ -67,6 +67,7 @@ typedef struct
     void (*a2dp_sink_stream_realease)(struct bd_addr_t *remote_addr,uint8_t value);
     void (*a2dp_sink_stream_suspend)(struct bd_addr_t *remote_addr,uint8_t value);
     void (*a2dp_sink_stream_abort)(struct bd_addr_t *remote_addr,uint8_t value);
+    void (*a2dp_sink_stream_play)(uint16_t *pcm_data, uint32_t data_len);
 } a2dp_sink_cbs_t;
 
 
