@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
+#include <argp.h>
 #include "bt_wrapper.h"
 
 uint32_t sys_time = 0;
@@ -108,9 +109,6 @@ uint32_t last_sys_time = 0;
 #define BT_AVRCP_CONTROL_AVRCP_FB_DES "AVRCP control:fast baward"
 #define BT_PBAP_CONNECT_CMD "PBAP_CON"
 #define BT_PBAP_CONNECT_DES "Connect pbap profile"
-
-
-
 
 
 typedef struct
@@ -1412,11 +1410,59 @@ void board_init()
 
 }
 
+struct g_opt {
+    char *uart_name;
+};
 
+static error_t parse_opt(int key, char *arg, struct argp_state *state)
+{
+    struct g_opt *opt = (struct g_opt*)(state->input);
+    error_t ret = 0;
+
+    switch (key) {
+    case 'd':
+        opt->uart_name = strdup(arg);
+        break;
+    case ARGP_KEY_INIT:
+        memset(opt, 0, sizeof(*opt));
+        break;
+    case ARGP_KEY_ARG:
+        ret =  ARGP_ERR_UNKNOWN;
+        break;
+    case ARGP_KEY_END:
+      break;
+    default:
+        ret = ARGP_ERR_UNKNOWN;
+    }
+    return ret;
+}
+
+static struct argp_option options[] = {
+	/* name, key, arg, flags, doc, group */
+  {"device", 'd', "FILE", 0, "serial node device", 0},
+  {NULL, 0, NULL, 0, NULL, 0}
+};
+
+static struct argp argp = {
+  .options = options,
+  .parser = parse_opt,
+};
 
 extern struct phybusif_cb uart_if;
-int main()
+int main(int argc, char *argv[])
 {
+  struct g_opt opts;
+
+  argp_parse(&argp, argc, argv, 0, NULL, &opts);
+	if (!opts.uart_name) 
+  {
+    printf("Using default UART Node: %s\n", BT_UART_NODE_DEFAULT);
+  }
+  else 
+  {
+    phybusif_set_uart_node(opts.uart_name);
+  }
+	
     stdin_process_init();
     board_init();
 

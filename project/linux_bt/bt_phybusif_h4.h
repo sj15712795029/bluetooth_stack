@@ -21,6 +21,9 @@
 #define PHYBUSIF_PACKET_TYPE_EVT  0x04
 #define PHYBUSIF_PACKET_TYPE_ISO  0x05
 
+#define BT_UART_NODE_STR_SIZE     (32)
+#define BT_UART_NODE_DEFAULT      "/dev/ttyUSB0"
+
 struct phybusif_cb;
 
 /* Application program's interface: */
@@ -29,6 +32,7 @@ void phybusif_reopen(uint32_t baud_rate);
 void phybusif_close(void);
 err_t phybusif_reset(struct phybusif_cb *cb);
 err_t phybusif_input(struct phybusif_cb *cb);
+void phybusif_set_uart_node(char *node);
 
 /* Upper layer interface: */
 void phybusif_output(struct bt_pbuf_t *p, uint16_t len,uint8_t packet_type);
@@ -48,6 +52,7 @@ enum phybusif_state
 struct phybusif_cb
 {
 	int phyuart_fd;
+	char uart_node[BT_UART_NODE_STR_SIZE];
     enum phybusif_state state;
 
     uint32_t offset;
