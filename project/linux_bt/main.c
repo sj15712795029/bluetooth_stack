@@ -13,6 +13,7 @@ uint32_t sys_time = 0;
 uint32_t last_sys_time = 0;
 
 #define CONF_BSP_TICKS_PER_SEC 100
+#define MAIN_LOOP_PERIOD_US 1000
 
 
 #define HW_DEBUG	printf
@@ -1410,6 +1411,13 @@ void board_init()
 
 }
 
+int64_t getCurrentTime()
+{
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return (tv.tv_sec * 1000000 + tv.tv_usec);
+}
+
 struct g_opt {
     char *uart_name;
 };
@@ -1452,6 +1460,10 @@ extern struct phybusif_cb uart_if;
 int main(int argc, char *argv[])
 {
   struct g_opt opts;
+  int64_t usleep_time = 0;
+  int64_t last_us = 0;
+  int64_t now_us = 0;
+  // int counter = 0;
 
   argp_parse(&argp, argc, argv, 0, NULL, &opts);
 	if (!opts.uart_name) 
@@ -1468,19 +1480,26 @@ int main(int argc, char *argv[])
 
     while(1)
     {
+        last_us = getCurrentTime();
 
         stdin_process_run();
         if(phybusif_input(&uart_if) != BT_ERR_OK)
             usleep(1000);
+        
+        //printf("bt stack running\n");
+        l2cap_tmr();
+        rfcomm_tmr();
 
-        if(sys_time - last_sys_time > 1000)
-        {
-            //printf("bt stack running\n");
-            last_sys_time = sys_time;
-            l2cap_tmr();
-            rfcomm_tmr();
-        }
+        now_us = getCurrentTime();
+        usleep_time = MAIN_LOOP_PERIOD_US - (now_us - last_us);
+        if(usleep_time > 0)
+            usleep(usleep_time);
 
+        // if(counter++ > 50)
+        // {
+        //   printf("sleep:%ld\n", usleep_time);
+        //   counter = 0;
+        // }
 
     }
 }

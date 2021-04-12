@@ -135,6 +135,7 @@ uint32_t bt_atoi(const uint8_t *str)
 #define SHOW_LINE_SIZE 16
 void bt_hex_dump(uint8_t *data,uint32_t len)
 {
+#if (BT_HEX_TRACE_LEVEL > BT_TRACE_LEVEL_NONE)
     uint32_t line;
     uint32_t curline = 0;
     uint32_t curcol = 0;
@@ -169,13 +170,16 @@ void bt_hex_dump(uint8_t *data,uint32_t len)
         }
         BT_HEX_TRACE_DEBUG("\n");
     }
+#endif
 }
 
 void bt_addr_dump(uint8_t *addr)
 {
+#if (BT_HEX_TRACE_LEVEL > BT_TRACE_LEVEL_NONE)
 	uint8_t addr_buff[32];
 	sprintf((char*)addr_buff,"BT ADDR:%02x:%02x:%02x:%02x:%02x:%02x\n",addr[0],addr[1],addr[2],addr[3],addr[5],addr[5]);
 	BT_HEX_TRACE_DEBUG((char*)addr_buff);
+#endif
 }
 
 
