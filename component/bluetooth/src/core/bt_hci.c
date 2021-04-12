@@ -1468,6 +1468,9 @@ void hci_acl_input(struct bt_pbuf_t *p)
     hci_link_t *link = NULL;
     uint16_t conhdl;
 
+    if(NULL == p)
+        return;
+
     aclhdr = p->payload;
 
     BT_HCI_TRACE_DEBUG("DEBUG:BT RX ACL LEN:%d\n",aclhdr->len);
