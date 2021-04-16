@@ -1080,7 +1080,7 @@ SBC_EXPORT ssize_t sbc_decode(sbc_t *sbc, const void *input, size_t input_len,
 	char *ptr;
 	int i, ch, framelen, samples;
 
-	if (!sbc || !input)
+	if (!sbc || !input || !sbc->priv)
 		return -EIO;
 
 	priv = sbc->priv;
