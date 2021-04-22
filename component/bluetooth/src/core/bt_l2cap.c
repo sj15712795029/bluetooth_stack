@@ -1121,6 +1121,8 @@ static l2cap_seg_t * l2cap_reassembly_data(struct bt_pbuf_t *p, struct bd_addr_t
 
     l2cap_seg_t *inseg;
     hci_acl_hdr_t *aclhdr = p->payload;
+    static struct bt_pbuf_t *asse_pack;
+    static uint16_t asse_pack_len = 0;
 
     bt_pbuf_header(p, -HCI_ACL_HDR_LEN);
     bt_pbuf_realloc(p, aclhdr->len);
@@ -1136,6 +1138,8 @@ static l2cap_seg_t * l2cap_reassembly_data(struct bt_pbuf_t *p, struct bd_addr_t
 
     if(((aclhdr->conhdl_pb_bc >> 12) & 0x03)== L2CAP_ACL_CONT)	 /* Continuing fragment */
     {
+        BT_L2CAP_TRACE_DEBUG("l2cap_acl_input: Continuing fragment packet p->len = %d, p->tot_len = %d\n",
+                             p->len, p->tot_len);
         if(inseg == NULL)
         {
             /* Discard packet */
@@ -1144,7 +1148,7 @@ static l2cap_seg_t * l2cap_reassembly_data(struct bt_pbuf_t *p, struct bd_addr_t
             *can_continue = 0;
             return inseg;
         }
-        else if(inseg->p->tot_len + p->tot_len > inseg->len)
+        else if(asse_pack_len + p->len > inseg->len)
         {
             /* Check if length of
             							segment exceeds
@@ -1159,8 +1163,18 @@ static l2cap_seg_t * l2cap_reassembly_data(struct bt_pbuf_t *p, struct bd_addr_t
             *can_continue = 0;
             return inseg;
         }
+        else if(asse_pack_len + p->len == inseg->len)
+        {
+            if(NULL != asse_pack)
+            {
+                memcpy(asse_pack->payload + asse_pack_len, p->payload, p->len);
+                inseg->p = asse_pack;
+                inseg->l2caphdr = asse_pack->payload;
+                BT_L2CAP_TRACE_DEBUG("l2cap_acl_input: assembly packet tot_len %d\n", inseg->p->tot_len);
+            }
+        }
         /* Add bt_pbuf_t to segement */
-        bt_pbuf_chain(inseg->p, p);
+        // bt_pbuf_chain(inseg->p, p);
         bt_pbuf_free(p);
 
     }
@@ -1189,6 +1203,17 @@ static l2cap_seg_t * l2cap_reassembly_data(struct bt_pbuf_t *p, struct bd_addr_t
             {
                 break; /* found */
             }
+        }
+
+        if(p->len < inseg->len)
+        {
+          /* wait next package */
+          bt_pbuf_free(asse_pack);
+          if((asse_pack = bt_pbuf_alloc(BT_PBUF_RAW, inseg->len, BT_PBUF_RAM)) != NULL)
+          {
+            memcpy(asse_pack->payload, p->payload, p->len);
+            asse_pack_len = p->len;
+          }
         }
     }
     else
