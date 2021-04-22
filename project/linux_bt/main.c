@@ -1472,7 +1472,7 @@ int main(int argc, char *argv[])
         stdin_process_run();
         if(phybusif_input(&uart_if) != BT_ERR_OK)
             usleep(1000);
-
+        
         if(sys_time - last_sys_time > 1000)
         {
             //printf("bt stack running\n");
@@ -1480,7 +1480,7 @@ int main(int argc, char *argv[])
             l2cap_tmr();
             rfcomm_tmr();
         }
-
+        usleep(1000);
 
     }
 }
