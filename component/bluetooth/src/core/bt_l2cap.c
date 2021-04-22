@@ -1195,10 +1195,12 @@ static l2cap_seg_t * l2cap_reassembly_data(struct bt_pbuf_t *p, struct bd_addr_t
     {
         /* Discard packet */
         BT_L2CAP_TRACE_DEBUG("l2cap_acl_input: Discard packet\n");
-
-        bt_pbuf_free(inseg->p);
-        L2CAP_SEG_RMV(&(l2cap_insegs), inseg);
-        bt_memp_free(MEMP_L2CAP_SEG, inseg);
+        if(inseg != NULL)
+        {
+          bt_pbuf_free(inseg->p);
+          L2CAP_SEG_RMV(&(l2cap_insegs), inseg);
+          bt_memp_free(MEMP_L2CAP_SEG, inseg);
+        }
 
         bt_pbuf_free(p);
         *can_continue = 0;
@@ -1312,8 +1314,13 @@ static err_t _l2cap_dynamic_cid_process(l2cap_pcb_t *l2cap_pcb,struct bt_pbuf_t 
 void l2cap_acl_input(struct bt_pbuf_t *p, struct bd_addr_t *bdaddr)
 {
     uint8_t can_contiue;
+    
+     if(NULL == p || NULL == bdaddr)
+        return;
 
     l2cap_seg_t *inseg = l2cap_reassembly_data(p,bdaddr,&can_contiue);
+    if(NULL == inseg)
+        return;
 
     if(!can_contiue)
         return;
