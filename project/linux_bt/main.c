@@ -211,6 +211,12 @@ void bt_app_inquiry_result(struct bd_addr_t *address,uint8_t dev_type,uint8_t *n
     printf("----------------------- ----------\n");
 }
 
+void bt_app_hardware_error(uint8_t reason)
+{
+	printf("bt_app_hardware_error reason %d\n",reason);
+}
+
+
 
 #if BT_BLE_ENABLE > 0
 void bt_app_le_inquiry_result(struct bd_addr_t *address,int8_t rssi,uint8_t adv_type,uint8_t adv_size,uint8_t *adv_data)
@@ -277,6 +283,7 @@ static bt_app_common_cb_t bt_app_common_cb =
     bt_app_init_result,
     bt_app_inquiry_status,
     bt_app_inquiry_result,
+    bt_app_hardware_error,
 #if BT_BLE_ENABLE > 0
     bt_app_le_inquiry_status,
     bt_app_le_inquiry_result,
@@ -739,6 +746,7 @@ static bt_app_cb_t bt_app_cb =
 
 
 #define LINUX_SPP_SEND_STRING "Hello,I am SPP in Linux"
+uint8_t spp_buf[2048];
 uint8_t shell_parse(uint8_t *shell_string)
 {
 
@@ -809,10 +817,31 @@ uint8_t shell_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
+	if(hw_strncmp("SPP_TEST1",(const char*)shell_string,hw_strlen("SPP_TEST1")) == 0)
+    {
+    	uint16_t index = 0;
+		for(index = 0; index < sizeof(spp_buf);index++)
+			spp_buf[index] = index%0xff;
+        HW_DEBUG("SHELL:operate bt spp send1 len\n");
+        spp_send_data(&connect_addr,(uint8_t *)spp_buf,990);
+        return HW_ERR_OK;
+    }
+
+	if(hw_strncmp("SPP_TEST2",(const char*)shell_string,hw_strlen("SPP_TEST2")) == 0)
+    {
+    	uint16_t index = 0;
+		for(index = 0; index < sizeof(spp_buf);index++)
+			spp_buf[index] = index%0xff;
+        HW_DEBUG("SHELL:operate bt spp send2 len\n");
+		
+        spp_send_data(&connect_addr,(uint8_t *)spp_buf+1,990);
+        return HW_ERR_OK;
+    }
+
     if(hw_strncmp(BT_SPP_CON_CMD,(const char*)shell_string,hw_strlen(BT_SPP_CON_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate spp CON\n");
-
+		
         spp_connect(&connect_addr);
         return HW_ERR_OK;
     }

@@ -800,6 +800,7 @@ typedef err_t (* link_key_not_fun_cb)(void *arg, struct bd_addr_t *bdaddr, uint8
 typedef err_t (*link_key_req_fun_cb)(void *arg,struct bd_addr_t *bdaddr);
 typedef err_t (* wlp_complete_fun_cb)(void *arg, struct bd_addr_t *bdaddr);
 typedef err_t (* conn_complete_fun_cb)(void *arg, struct bd_addr_t *bdaddr);
+typedef err_t (* hardware_error_fun_cb)(uint8_t reson);
 
 
 
@@ -848,6 +849,7 @@ typedef struct
 	wlp_complete_fun_cb wlp_complete;
 	conn_complete_fun_cb conn_complete;
 	cmd_complete_fun_cb cmd_complete;
+	hardware_error_fun_cb hardware_error;
 }hci_pcb_t;
 
 
@@ -865,6 +867,7 @@ void hci_register_link_key_req(link_key_req_fun_cb link_key_req);
 void hci_register_link_key_not(link_key_not_fun_cb link_key_not);
 void hci_register_write_policy_complete(wlp_complete_fun_cb wlp_complete);
 void hci_register_connection_complete(conn_complete_fun_cb conn_complete);
+void hci_register_hardware_error(hardware_error_fun_cb hardware_error);
 err_t hci_acl_write(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p, uint16_t len, uint8_t pb);
 uint8_t hci_is_connected(struct bd_addr_t *bdaddr);
 uint16_t hci_pdu_maxsize(void);

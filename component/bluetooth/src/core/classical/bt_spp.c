@@ -152,9 +152,13 @@ err_t spp_send_data(struct bd_addr_t *addr,uint8_t *data,uint16_t data_len)
         return BT_ERR_CONN;
 
     p = bt_pbuf_alloc(BT_PBUF_RAW, data_len, BT_PBUF_RAM);
-
+	if(!p)
+	{
+		BT_SPP_TRACE_ERROR("spp_send_data: Could not alloc spp pbuf\n");
+		return BT_ERR_MEM;
+	}
     memcpy((uint8_t *)p->payload, data, data_len);
-
+	
     rfcomm_uih(spppcb->rfcommpcb, rfcomm_cn(spppcb->rfcommpcb), p);
 
     bt_pbuf_free(p);

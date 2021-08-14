@@ -2363,7 +2363,7 @@ static err_t hfp_hf_sco_connect_ind(void *arg, struct bd_addr_t *bdaddr)
 
     BT_HFP_TRACE_DEBUG("hfp_hf_sco_connect_ind: hfp sco req handle\n");
 
-	bt_addr_dump(bdaddr->addr);
+    bt_addr_dump(bdaddr->addr);
 
     hfppcb = hfp_get_active_pcb(bdaddr);
     if(!hfppcb)
@@ -2381,7 +2381,7 @@ static err_t hfp_hf_sco_conn_complete(void *arg, uint8_t status,struct bd_addr_t
 
     BT_HFP_TRACE_DEBUG("hfp_hf_sco_conn_complete: hfp sco conn complete status %d\n",status);
 
-	bt_addr_dump(bdaddr->addr);
+    bt_addr_dump(bdaddr->addr);
     hfppcb = hfp_get_active_pcb(bdaddr);
     if(!hfppcb)
         return BT_ERR_CONN;
@@ -2397,7 +2397,7 @@ static err_t  sco_hfp_disconn_complete(void *arg, uint8_t status,struct bd_addr_
 
     BT_HFP_TRACE_DEBUG("sco_hfp_disconn_complete: hfp sco disconn complete status %d\n",status);
 
-	bt_addr_dump(bdaddr->addr);
+    bt_addr_dump(bdaddr->addr);
     hfppcb = hfp_get_active_pcb(bdaddr);
     if(!hfppcb)
         return BT_ERR_CONN;
@@ -2429,7 +2429,7 @@ static err_t hfp_hf_run(struct hfp_pcb_t *pcb)
         uint8_t hfp[] = {0x35, 0x03, 0x19, 0x11, 0x1f}; /* Service search pattern with HFP UUID is default */
 
         uint8_t attrids[] = {0x35, 0x03, 0x09, 0x00, 0x04}; /* Attribute IDs to search for in data element
-										sequence form */
+						sequence form */
 
         sdp_service_search_attrib_req(pcb->sdppcb, 0xFFFF, hfp, sizeof(hfp),
                                       attrids, sizeof(attrids), hfp_hf_sdp_attributes_recv);

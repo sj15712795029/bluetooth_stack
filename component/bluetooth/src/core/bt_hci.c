@@ -79,6 +79,10 @@ static hci_pcb_t *hci_pcb = NULL;
 #define HCI_EVENT_CMD_COMPLETE(pcb,opcode,result) \
                               if((pcb)->cmd_complete != NULL) \
                               ((pcb)->cmd_complete((pcb)->callback_arg,(opcode),(result)))
+#define HCI_EVENT_HARDWARE_ERROR(pcb,reson) \
+ 							if((pcb)->hardware_error != NULL) \
+ 							((pcb)->hardware_error((reson)))
+
 
 
 #define HCI_REG(links, nlink) do { \
@@ -252,6 +256,12 @@ void hci_register_connection_complete(conn_complete_fun_cb conn_complete)
 {
     hci_pcb->conn_complete = conn_complete;
 }
+
+void hci_register_hardware_error(hardware_error_fun_cb hardware_error)
+{
+	hci_pcb->hardware_error = hardware_error;
+}
+
 
 void hci_register_write_policy_complete(wlp_complete_fun_cb wlp_complete)
 {
@@ -705,6 +715,7 @@ static err_t _hci_hw_err_evt_process(uint8_t *payload,uint16_t payload_len)
     BT_HCI_TRACE_DEBUG("hci_event_input: Hardware Error\n");
     BT_HCI_TRACE_DEBUG("Hardware_code: 0x%x\n\n", payload[0]);
 
+	HCI_EVENT_HARDWARE_ERROR(hci_pcb,payload[0]);
     return BT_ERR_OK;
 }
 
@@ -3119,7 +3130,7 @@ err_t hci_le_read_local_support_feature(void)
 
 err_t hci_le_set_random_address(struct bd_addr_t *bdaddr)
 {
-	struct bt_pbuf_t *p;
+    struct bt_pbuf_t *p;
     if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_LE_SET_RANDOM_ADDR_PLEN, BT_PBUF_RAM)) == NULL)
     {
         BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);

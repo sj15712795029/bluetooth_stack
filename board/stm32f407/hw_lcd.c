@@ -33,8 +33,9 @@ void hw_lcd_init(void)
 {
     hw_lcd_bk_init();
     hw_lcd_rst_init();
-    hw_lcd_rst();
+    
     hw_lcd_fsmc_init();
+	hw_lcd_rst();
     LCD_BK_HIGH;
 
 

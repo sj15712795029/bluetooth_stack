@@ -566,7 +566,7 @@ err_t att_parse_find_type_value_rsp(struct bt_pbuf_t *p,uint8_t *info_num,uint8_
 
 err_t att_read_group_type_req(uint16_t start_handle,uint16_t end_handle,uint16_t uuid)
 {
-	/* TODO:UUIN128��֧�� */
+	/* TODO:UUIN128µÄÖ§³Ö */
 	struct bt_pbuf_t *send_pbuf;
     if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_READ_GROUP_TYPE_REQ_HDR_LEN, BT_PBUF_RAM)) == NULL)
     {
@@ -588,7 +588,7 @@ err_t att_read_group_type_req(uint16_t start_handle,uint16_t end_handle,uint16_t
 
 err_t att_find_type_value_req(uint16_t start_handle,uint16_t end_handle,uint16_t uuid,uint8_t *value,uint8_t value_len)
 {
-	/* TODO:UUIN128��֧�� */
+	/* TODO:UUIN128µÄÖ§³Ö */
 	struct bt_pbuf_t *send_pbuf;
     if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_FIND_TYPE_VALUE_REQ_HDR_LEN+value_len, BT_PBUF_RAM)) == NULL)
     {
@@ -611,7 +611,7 @@ err_t att_find_type_value_req(uint16_t start_handle,uint16_t end_handle,uint16_t
 
 err_t att_read_type_req(uint16_t start_handle,uint16_t end_handle,uint8_t *value,uint8_t value_len)
 {
-	/* TODO:UUIN128��֧�� */
+	/* TODO:UUIN128µÄÖ§³Ö */
 	struct bt_pbuf_t *send_pbuf;
     if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_READ_TYPE_REQ_HDR_LEN+value_len, BT_PBUF_RAM)) == NULL)
     {

@@ -255,9 +255,23 @@ err_t bt_stack_worked(void *arg)
     {
         bt_wrapper_cb->app_common_cb->bt_init_result(BT_INIT_SUCCESS,bt_profile_mask);
     }
+	
 
     return 0;
 }
+
+err_t bt_hardware_error(uint8_t reson)
+{
+	printf("bt_hardware_error\r\n");
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_common_cb && bt_wrapper_cb->app_common_cb->bt_hardware_error)
+    {
+        bt_wrapper_cb->app_common_cb->bt_hardware_error(reson);
+    }
+
+    return 0;
+}
+
 
 #if PROFILE_SPP_ENABLE
 void spp_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
@@ -1009,6 +1023,7 @@ uint8_t bt_start(bt_app_cb_t *app_cb)
     hci_register_link_key_req(link_key_req);
     hci_register_link_key_not(link_key_not);
     hci_register_bt_working(bt_stack_worked);
+	hci_register_hardware_error(bt_hardware_error);
 
     l2cap_init();
     sdp_init();

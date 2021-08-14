@@ -95,6 +95,7 @@ typedef struct
 	void (*bt_init_result)(uint8_t status,uint16_t profile_mask);
 	void (*bt_inquiry_status)(uint8_t status);
 	void (*bt_inquiry_result)(struct bd_addr_t *address,uint8_t dev_type,uint8_t *name);
+	void (*bt_hardware_error)(uint8_t reason);
 #if BT_BLE_ENABLE > 0
 	void (*bt_le_inquiry_status)(uint8_t status);
 	void (*bt_le_inquiry_result)(struct bd_addr_t *address,int8_t rssi,uint8_t adv_type,uint8_t adv_size,uint8_t *adv_data);

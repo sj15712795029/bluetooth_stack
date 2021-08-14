@@ -636,7 +636,7 @@ err_t rfcomm_uih(rfcomm_pcb_t *pcb, uint8_t cn, struct bt_pbuf_t *q)
     /* Size of information must be less than maximum frame size */
     if(tot_len > pcb->n)
     {
-        BT_RFCOMM_TRACE_DEBUG("rfcomm_uih: Size of information must be less than maximum frame size\n");
+        BT_RFCOMM_TRACE_DEBUG("rfcomm_uih: Size of information must be less than maximum frame size tot_len[%d]>pcb->n[%d]\n",tot_len,pcb->n);
         return BT_ERR_MEM;
     }
 
@@ -699,7 +699,7 @@ err_t rfcomm_uih(rfcomm_pcb_t *pcb, uint8_t cn, struct bt_pbuf_t *q)
     }
     else
     {
-        ((uint8_t *)r->payload)[0] = pcb->uih_out_fcs;
+        	((uint8_t *)r->payload)[0] = pcb->uih_out_fcs;
     }
 
     bt_pbuf_chain(p, r);
