@@ -236,9 +236,10 @@ void phybusif_output(struct bt_pbuf_t *p, uint16_t len,uint8_t packet_type)
     uint8_t *tx_buffer = bt_get_tx_buffer();
     bt_pbuf_copy_partial(p, tx_buffer, p->tot_len, 0);
 
-    BT_TRANSPORT_TRACE_DEBUG("BT TX LEN:%d\n",p->tot_len);
-    bt_hex_dump(tx_buffer,p->tot_len);
-    uart_bt_send(tx_buffer,p->tot_len);
+    BT_TRANSPORT_TRACE_DEBUG("BT TX LEN:totol len:%d, len:%d\n",p->tot_len,len);
+    bt_hex_dump(tx_buffer,len+1);
+
+    uart_bt_send(tx_buffer,len+1);
 }
 
 
