@@ -116,6 +116,11 @@ void bt_app_inquiry_result(struct bd_addr_t *address,uint8_t dev_type,uint8_t *n
     uart_send_json("BT","BT_INQUIRY_RESULT",(uint8_t*)"SUCCESS",address_buf,device_type_buf,name,0,0);
 }
 
+void bt_app_hardware_error(uint8_t reason)
+{
+	printf("bt_app_hardware_error reason %d\n",reason);
+}
+
 #if BT_BLE_ENABLE > 0
 void bt_app_le_inquiry_result(struct bd_addr_t *address,int8_t rssi,uint8_t adv_type,uint8_t adv_size,uint8_t *adv_data)
 {
@@ -181,6 +186,7 @@ static bt_app_common_cb_t bt_app_common_cb =
     bt_app_init_result,
     bt_app_inquiry_status,
     bt_app_inquiry_result,
+	bt_app_hardware_error,
 #if BT_BLE_ENABLE > 0
     bt_app_le_inquiry_status,
     bt_app_le_inquiry_result,

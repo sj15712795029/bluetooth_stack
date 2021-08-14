@@ -1,2 +1,7 @@
-project/linux_bt/SI/*
 *.orig
+*.lst
+*.map
+project/linux_bt/SI/*
+/project/stm32f10x_bb_bt/Objects
+/project/stm32f407_bb_bt/Objects
+/project/stm32f412_bb_bt/Objects
