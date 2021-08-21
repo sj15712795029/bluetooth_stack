@@ -149,7 +149,7 @@ static err_t bt_ass_eir_data(void)
 #if PROFILE_DID_ENABLE
     len += 2;
 #endif
-#if PROFILE_HFP_ENABLE
+#if PROFILE_HFP_HF_ENABLE
     len += 2;
 #endif
 #if PROFILE_SPP_ENABLE
@@ -171,7 +171,7 @@ static err_t bt_ass_eir_data(void)
     eir_data[data_pos++] = BT_SERVICE_CLASS_PNP_INFORMATION & 0xff;
     eir_data[data_pos++] = (BT_SERVICE_CLASS_PNP_INFORMATION>>8) & 0xff;
 #endif
-#if PROFILE_HFP_ENABLE
+#if PROFILE_HFP_HF_ENABLE
     eir_data[data_pos++] = BT_SERVICE_CLASS_HANDSFREE & 0xff;
     eir_data[data_pos++] = (BT_SERVICE_CLASS_HANDSFREE>>8) & 0xff;
 #endif
@@ -316,7 +316,7 @@ static spp_cbs_t spp_wrapper_cb =
 
 #endif
 
-#if PROFILE_HFP_ENABLE
+#if PROFILE_HFP_HF_ENABLE
 void hfp_hf_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("WRAPPER << PROFILE:hfp_hf_connect_set_up,address is :\n");
@@ -458,7 +458,7 @@ void hfp_hf_battchg_status(struct bd_addr_t *remote_addr,uint8_t value)
 }
 void hfp_hf_server_status(struct bd_addr_t *remote_addr,uint8_t value)
 {
-    printf("WRAPPER << PROFILE:hfp_hf_server_status,address is :\n");
+    printf("WRAPPER << PROFILE:hfp_hf_server_status:%d,address is :\n",value);
 	bt_addr_dump(remote_addr->addr);
 }
 void hfp_hf_roam_status(struct bd_addr_t *remote_addr,uint8_t value)
@@ -1003,7 +1003,7 @@ static hid_cbs_t hid_wrapper_cb =
 
 uint8_t bt_start(bt_app_cb_t *app_cb)
 {
-#if PROFILE_HFP_ENABLE
+#if PROFILE_HFP_HF_ENABLE
     uint16_t hf_feature = HFP_HFSF_EC_NR_FUNCTION |  HFP_HFSF_THREE_WAY_CALLING|
                           HFP_HFSF_CLI_PRESENTATION_CAPABILITY | HFP_HFSF_VOICE_RECOGNITION_FUNCTION |
                           HFP_HFSF_REMOTE_VOLUME_CONTROL |HFP_HFSF_ENHANCED_CALL_STATUS |
@@ -1037,9 +1037,9 @@ uint8_t bt_start(bt_app_cb_t *app_cb)
     spp_init(&spp_wrapper_cb);
     bt_profile_mask |= BT_PROFILE_SPP_MASK;
 #endif
-#if PROFILE_HFP_ENABLE
-    hfp_hf_init(hf_feature,HFP_HF_SDP_UNSUPPORT_WBS,&hfp_hf_wrapper_cb);
-    //hfp_hf_init(hf_feature,HFP_HF_SDP_SUPPORT_WBS,&hfp_hf_wrapper_cb);
+#if PROFILE_HFP_HF_ENABLE
+    //hfp_hf_init(hf_feature,HFP_HF_SDP_UNSUPPORT_WBS,&hfp_hf_wrapper_cb);
+    hfp_hf_init(hf_feature,HFP_HF_SDP_SUPPORT_WBS,&hfp_hf_wrapper_cb);
     bt_profile_mask |= BT_PROFILE_HFP_HF_MASK;
 #endif
 #if PROFILE_PBAP_ENABLE
@@ -1205,7 +1205,7 @@ uint8_t bt_le_set_adv_disable(void)
 
 #endif
 
-#if PROFILE_HFP_ENABLE
+#if PROFILE_HFP_HF_ENABLE
 /************************* HFP API ***********************/
 uint8_t bt_hfp_hf_get_operator(struct bd_addr_t *bdaddr)
 {
@@ -1314,6 +1314,13 @@ uint8_t bt_hfp_hf_set_voice_recognition(struct bd_addr_t *addr,uint8_t enable)
 
     return 0;
 }
+
+uint8_t bt_hfp_hf_send_batt_level(struct bd_addr_t *addr,uint8_t batt_level)
+{
+	hfp_hf_transfer_hf_indicator_value(addr,HFP_BATT_LEVEL_IND,batt_level);
+	return 0;
+}
+
 
 uint8_t bt_hfp_hf_get_manufacturer_id(struct bd_addr_t *addr)
 {

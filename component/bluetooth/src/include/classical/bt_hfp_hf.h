@@ -13,7 +13,7 @@
 #include "bt_common.h"
 
 
-#if PROFILE_HFP_ENABLE
+#if PROFILE_HFP_HF_ENABLE
 
 #include "bt_l2cap.h"
 #include "bt_sdp.h"
@@ -192,6 +192,12 @@ typedef enum
     HFP_ACCEPT_HOLD_CALL,
     HFP_REJECT_HOLD_CALL,
 } hfp_hold_status_e;
+
+typedef enum
+{
+	HFP_EN_SAFE_IND = 1,
+	HFP_BATT_LEVEL_IND =2,
+}hfp_hf_indicator_e;
 
 typedef enum
 {

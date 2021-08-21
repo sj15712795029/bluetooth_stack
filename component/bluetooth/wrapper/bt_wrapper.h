@@ -15,7 +15,7 @@
 #if BT_ENABLE_SNOOP > 0
 #include "bt_snoop.h"
 #endif
-#if PROFILE_HFP_ENABLE > 0
+#if PROFILE_HFP_HF_ENABLE > 0
 #include "bt_hfp_hf.h"
 #endif
 #if PROFILE_SPP_ENABLE > 0
@@ -214,7 +214,7 @@ uint8_t bt_le_set_adv_disable(void);
 #endif
 
 
-#if PROFILE_HFP_ENABLE
+#if PROFILE_HFP_HF_ENABLE
 /************************* HFP hf API ***********************/
 uint8_t bt_hfp_hf_get_operator(struct bd_addr_t *bdaddr);
 uint8_t bt_hfp_hf_audio_transfer(struct bd_addr_t *bdaddr);
@@ -230,6 +230,7 @@ uint8_t bt_hfp_hf_set_mic_volume(struct bd_addr_t *addr,uint8_t value);
 uint8_t bt_hfp_hf_set_spk_volume(struct bd_addr_t *addr,uint8_t value);
 uint8_t bt_hfp_hf_transmit_dtmf(struct bd_addr_t *addr,uint8_t value);
 uint8_t bt_hfp_hf_set_voice_recognition(struct bd_addr_t *addr,uint8_t enable);
+uint8_t bt_hfp_hf_send_batt_level(struct bd_addr_t *addr,uint8_t batt_level);
 uint8_t bt_hfp_hf_get_manufacturer_id(struct bd_addr_t *addr);
 uint8_t bt_hfp_hf_get_model_id(struct bd_addr_t *addr);
 uint8_t bt_hfp_hf_get_revision_id(struct bd_addr_t *addr);

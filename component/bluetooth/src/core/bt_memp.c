@@ -47,7 +47,7 @@ static const uint16_t memp_sizes[MEMP_BT_MAX] =
     sizeof(struct avdtp_pcb_t),
     sizeof(struct avdtp_sep_t),
     sizeof(struct avctp_pcb_t),
-#if PROFILE_HFP_ENABLE
+#if PROFILE_HFP_HF_ENABLE
     sizeof(struct hfp_pcb_t),
 #endif
 #if PROFILE_A2DP_ENABLE
@@ -85,7 +85,7 @@ static const uint16_t memp_num[MEMP_BT_MAX] =
     MEMP_NUM_AVDTP,
     MEMP_NUM_AVDTP_SEP,
     MEMP_NUM_AVCTP,
-#if PROFILE_HFP_ENABLE
+#if PROFILE_HFP_HF_ENABLE
     MEMP_NUM_HFP,
 #endif
 #if PROFILE_A2DP_ENABLE
@@ -152,7 +152,7 @@ static uint8_t memp_memory[(MEMP_NUM_HCI_PCB *
                             MEM_ALIGN_SIZE(sizeof(struct avctp_pcb_t) +
                                     sizeof(struct bt_memp_t)) +
                                     
-#if PROFILE_HFP_ENABLE
+#if PROFILE_HFP_HF_ENABLE
                             MEMP_NUM_HFP *
                             MEM_ALIGN_SIZE(sizeof(struct hfp_pcb_t) +
                                     sizeof(struct bt_memp_t)) +

@@ -27,6 +27,33 @@ uint32_t last_sys_time = 0;
 #define HW_ERR_OK 0
 #define HW_ERR_SHELL_NO_CMD 1
 
+#define BT_HAVE_FUN "\
+ \t\t								 \n  \
+ \t\t                                \n  \
+ \t\t             ^_^  Wireless Link BT  ^_^\n \
+ \t\t                                \n  \
+ \t\t                                \n   \
+ \t\t                        _oo0oo_  \n   \
+ \t\t                       o8888888o  \n   \
+ \t\t                       88\" . \"88 \n   \
+ \t\t                       (| -_- |)    \n   \
+ \t\t                       0\\  =  /0     \n   \
+ \t\t                     ___/`---'\\__\\_   \n   \
+ \t\t                   .' \\\\|     |// '.   \n   \
+ \t\t                  / \\\\|||  :  |||// \\   \n   \
+ \t\t                 / _||||| -:- |||||- \\   \n   \
+ \t\t                |   | \\\\\\  - /// |   |    \n   \
+ \t\t                | \\_|  ''\\---/''  |_/ |    \n   \
+ \t\t                \\  .-\\__  '-'  ___/-. /     \n   \
+ \t\t              ___'. .'  /--.--\\  `. .'___    \n   \
+ \t\t           ."" '<  `.___\\_<|>_/___.' >' "".   \n   \
+ \t\t          | | :  `- \\`.;`\\ _ /`;.`/ - ` : | |  \n   \
+ \t\t          \\  \\ `_.   \\_ __\\ /__ _/   .-` /  /   \n   \
+ \t\t      =====`-.____`.___ \\_____/___.-`___.-'===== \n   \
+ \t\t                        `=---='                   \n"
+
+
+#define BT_SPLIT_NAME "---------------------------------------------------------------------------------------------------"
 
 #define BT_START_CMD "BT_START"
 #define BT_START_DES "Start bluetooth stack"
@@ -86,10 +113,17 @@ uint32_t last_sys_time = 0;
 #define BT_HFP_VOICE_RECOG_ENABLE_DES "HFP voice recogntion enable"
 #define BT_HFP_VOICE_RECOG_DISABLE_CMD "HFP_VGD"
 #define BT_HFP_VOICE_RECOG_DISABLE_DES "HFP voice recogntion disable"
+#define BT_HFP_GET_OP_NAME_CMD "HFP_GOPN"
+#define BT_HFP_GET_OP_NAME_DES "HFP get operator name"
 #define BT_HFP_GET_MANU_ID_CMD "HFP_CGMI"
 #define BT_HFP_GET_MANU_ID_DES "HFP get manu name"
 #define BT_HFP_GET_MODULE_ID_CMD "HFP_CGMM"
 #define BT_HFP_GET_MODULE_ID_DES "HFP get module name"
+#define BT_HFP_SET_BATT_LEVEL_CMD "HFP_BATT"
+#define BT_HFP_SET_BATT_LEVEL_DES "HFP Set batt level"
+
+
+
 #define BT_AVRCP_LIST_APP_ATTR_CMD "AVRCP_LIST_APP_ATTR"
 #define BT_AVRCP_LIST_APP_ATTR_DES "List application seeting attribute"
 #define BT_AVRCP_GET_SONG_INFO_CMD "AVRCP_GET_ID3"
@@ -127,18 +161,21 @@ cmd_desctiption_t cmd_usage[] =
     {(uint8_t *)BT_CANCEL_INQUIRY_CMD,(uint8_t *)BT_CANCEL_INQUIRY_DES},
     {(uint8_t *)BT_PERIOID_INQUIRY_CMD,(uint8_t *)BT_PERIOID_INQUIRY_DES},
     {(uint8_t *)BT_CANCEL_PERIOID_INQUIRY_CMD,(uint8_t *)BT_CANCEL_PERIOID_INQUIRY_DES},
+    {(uint8_t *)BT_SPLIT_NAME,NULL},
 #if BT_BLE_ENABLE > 0
     {(uint8_t *)BT_LE_INQUIRY_CMD,(uint8_t *)BT_LE_INQUIRY_DES},
     {(uint8_t *)BT_LE_INQUIRY_CANCEL_CMD,(uint8_t *)BT_LE_INQUIRY_CANCEL_DES},
     {(uint8_t *)BT_LE_ADV_ENABLE_CMD,(uint8_t *)BT_LE_ADV_ENABLE_DES},
     {(uint8_t *)BT_LE_ADV_DISABLE_CMD,(uint8_t *)BT_LE_ADV_DISABLE_CMD},
+    {(uint8_t *)BT_SPLIT_NAME,NULL},
 #endif
 #if PROFILE_SPP_ENABLE > 0
     {(uint8_t *)BT_SPP_CON_CMD,(uint8_t *)BT_SPP_CON_DES},
     {(uint8_t *)BT_SPP_SEND_CMD,(uint8_t *)BT_SPP_SEND_DES},
     {(uint8_t *)BT_SPP_DISCON_CMD,(uint8_t *)BT_SPP_DISCON_DES},
+    {(uint8_t *)BT_SPLIT_NAME,NULL},
 #endif
-#if PROFILE_HFP_ENABLE > 0
+#if PROFILE_HFP_HF_ENABLE > 0
     {(uint8_t *)BT_HFP_CON_CMD,(uint8_t *)BT_HFP_CON_DES},
     {(uint8_t *)BT_HFP_DISCON_CMD,(uint8_t *)BT_HFP_DISCON_DES},
     {(uint8_t *)BT_HFP_AUDIO_TRANSFER_CMD,(uint8_t *)BT_HFP_AUDIO_TRANSFER_DES},
@@ -157,6 +194,9 @@ cmd_desctiption_t cmd_usage[] =
     {(uint8_t *)BT_HFP_VOICE_RECOG_DISABLE_CMD,(uint8_t *)BT_HFP_VOICE_RECOG_DISABLE_DES},
     {(uint8_t *)BT_HFP_GET_MANU_ID_CMD,(uint8_t *)BT_HFP_GET_MANU_ID_DES},
     {(uint8_t *)BT_HFP_GET_MODULE_ID_CMD,(uint8_t *)BT_HFP_GET_MODULE_ID_DES},
+    {(uint8_t *)BT_HFP_SET_BATT_LEVEL_CMD,(uint8_t *)BT_HFP_SET_BATT_LEVEL_DES},
+	{(uint8_t *)BT_HFP_GET_OP_NAME_CMD,(uint8_t *)BT_HFP_GET_OP_NAME_DES},
+    {(uint8_t *)BT_SPLIT_NAME,NULL},
 #endif
 #if PROFILE_AVRCP_ENABLE > 0
 	{(uint8_t *)BT_AVRCP_LIST_APP_ATTR_CMD,(uint8_t *)BT_AVRCP_LIST_APP_ATTR_DES},
@@ -167,6 +207,7 @@ cmd_desctiption_t cmd_usage[] =
     {(uint8_t *)BT_AVRCP_CONTROL_AVRCP_NEXT_CMD,(uint8_t *)BT_AVRCP_CONTROL_AVRCP_NEXT_DES},
     {(uint8_t *)BT_AVRCP_CONTROL_AVRCP_FF_CMD,(uint8_t *)BT_AVRCP_CONTROL_AVRCP_FF_DES},
     {(uint8_t *)BT_AVRCP_CONTROL_AVRCP_FB_CMD,(uint8_t *)BT_AVRCP_CONTROL_AVRCP_FB_DES},
+    {(uint8_t *)BT_SPLIT_NAME,NULL},
 #endif
 #if PROFILE_PBAP_ENABLE > 0
 	{(uint8_t *)BT_PBAP_CONNECT_CMD,(uint8_t *)BT_PBAP_CONNECT_DES},
@@ -179,11 +220,28 @@ cmd_desctiption_t cmd_usage[] =
 
 void show_usage()
 {
-    uint32_t index = 0;
+	uint32_t index = 0;
+
+    printf("\033[40;33m %s \r\033[0m\n",BT_HAVE_FUN);
+    printf("\033[40;33m----------------------------------------------------------------------------------------------------|\033[0m\n");
     for(index = 0; index < sizeof(cmd_usage)/sizeof(cmd_desctiption_t); index++)
     {
-        HW_DEBUG("CMD(%s) -> DESCRIPTION(%s)\n",cmd_usage[index].cmd,cmd_usage[index].description);
+        if(cmd_usage[index].cmd[0] == '-')
+            HW_DEBUG("\033[40;33m|%s|\033[0m\n",cmd_usage[index].cmd);
+        else
+        {
+        	if(hw_strlen(cmd_usage[index].cmd) < 8)
+				HW_DEBUG("|\t\t\033[40;31m%s\033[0m\t\t\t\t -> \033[40;36m%s\033[0m\n",cmd_usage[index].cmd,cmd_usage[index].description);
+			else if((hw_strlen(cmd_usage[index].cmd) >= 8) && (hw_strlen(cmd_usage[index].cmd) < 16))
+				HW_DEBUG("|\t\t\033[40;31m%s\033[0m\t\t\t -> \033[40;36m%s\033[0m\n",cmd_usage[index].cmd,cmd_usage[index].description);
+			else if((hw_strlen(cmd_usage[index].cmd) >= 16) && (hw_strlen(cmd_usage[index].cmd) < 24))
+            	HW_DEBUG("|\t\t\033[40;31m%s\033[0m\t\t -> \033[40;36m%s\033[0m\n",cmd_usage[index].cmd,cmd_usage[index].description);
+			else
+				HW_DEBUG("|\t\t\033[40;31m%s\033[0m\t -> \033[40;36m%s\033[0m\n",cmd_usage[index].cmd,cmd_usage[index].description);
+        }
+
     }
+    printf("\033[40;33m----------------------------------------------------------------------------------------------------|\033[0m\n");
 }
 
 struct bd_addr_t connect_addr;
@@ -291,7 +349,7 @@ static bt_app_common_cb_t bt_app_common_cb =
 };
 
 
-#if PROFILE_HFP_ENABLE > 0
+#if PROFILE_HFP_HF_ENABLE > 0
 void bt_app_hfp_connect(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("bt_app_hfp_connect status %d address:\n",status);
@@ -710,7 +768,7 @@ static bt_app_cb_t bt_app_cb =
 	NULL,
 #endif
 
-#if PROFILE_HFP_ENABLE > 0
+#if PROFILE_HFP_HF_ENABLE > 0
     &bt_app_hfp_cb,
 #else
 	NULL,
@@ -1004,8 +1062,8 @@ uint8_t shell_parse(uint8_t *shell_string)
 #endif
 
 
-#if PROFILE_HFP_ENABLE > 0
-    if(hw_strcmp("HFP_CON",(const char*)shell_string) == 0)
+#if PROFILE_HFP_HF_ENABLE > 0
+	if(hw_strncmp(BT_HFP_CON_CMD,(const char*)shell_string,hw_strlen(BT_HFP_CON_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate HFP CON\n");
 
@@ -1013,7 +1071,7 @@ uint8_t shell_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-    if(hw_strcmp("HFP_DISCON",(const char*)shell_string) == 0)
+    if(hw_strncmp(BT_HFP_DISCON_CMD,(const char*)shell_string,hw_strlen(BT_HFP_DISCON_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate HFP DISCON\n");
 
@@ -1021,7 +1079,7 @@ uint8_t shell_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-    if(hw_strncmp("BT_AUDIO_TRANSFER",(const char*)shell_string,hw_strlen(BT_HFP_AUDIO_TRANSFER_CMD)) == 0)
+    if(hw_strncmp(BT_HFP_AUDIO_TRANSFER_CMD,(const char*)shell_string,hw_strlen(BT_HFP_AUDIO_TRANSFER_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate HFP AUDIO TRANSFER\n");
 
@@ -1029,7 +1087,7 @@ uint8_t shell_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-    if(hw_strncmp("HFP_ANSWER",(const char*)shell_string,hw_strlen(BT_HFP_ANSWER_CMD)) == 0)
+    if(hw_strncmp(BT_HFP_ANSWER_CMD,(const char*)shell_string,hw_strlen(BT_HFP_ANSWER_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate HFP ANSWER INCOMING CALL\n");
 
@@ -1037,49 +1095,49 @@ uint8_t shell_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-    if(hw_strncmp("HFP_CALLEND",(const char*)shell_string,hw_strlen(BT_HFP_END_CALL_CMD)) == 0)
+    if(hw_strncmp(BT_HFP_END_CALL_CMD,(const char*)shell_string,hw_strlen(BT_HFP_END_CALL_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate bt end call\n");
         bt_hfp_hf_end_call(&connect_addr);
         return HW_ERR_OK;
     }
 
-    if(hw_strncmp("HFP_CALLOUT_PN",(const char*)shell_string,hw_strlen(BT_HFP_CALLOUT_PN_CMD)) == 0)
+    if(hw_strncmp(BT_HFP_CALLOUT_PN_CMD,(const char*)shell_string,hw_strlen(BT_HFP_CALLOUT_PN_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate call out number 10086\n");
         bt_hfp_hf_callout_by_number(&connect_addr,"10086");
         return HW_ERR_OK;
     }
 
-    if(hw_strncmp("HFP_CALLOUT_MEM",(const char*)shell_string,hw_strlen(BT_HFP_CALLOUT_MEM_CMD)) == 0)
+    if(hw_strncmp(BT_HFP_CALLOUT_MEM_CMD,(const char*)shell_string,hw_strlen(BT_HFP_CALLOUT_MEM_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate bt stop\n");
         bt_hfp_hf_callout_by_memory(&connect_addr,1);
         return HW_ERR_OK;
     }
 
-    if(hw_strncmp("HFP_CALLOUT_LC",(const char*)shell_string,hw_strlen(BT_HFP_CALLOUT_LN_CMD)) == 0)
+    if(hw_strncmp(BT_HFP_CALLOUT_LN_CMD,(const char*)shell_string,hw_strlen(BT_HFP_CALLOUT_LN_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate bt stop\n");
         bt_hfp_hf_callout_by_last(&connect_addr);
         return HW_ERR_OK;
     }
 
-    if(hw_strncmp("HFP_LPN",(const char*)shell_string,hw_strlen(BT_HFP_LOCAL_PN_CMD)) == 0)
+    if(hw_strncmp(BT_HFP_LOCAL_PN_CMD,(const char*)shell_string,hw_strlen(BT_HFP_LOCAL_PN_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate local number\n");
         bt_hfp_hf_get_local_phone_number(&connect_addr);
         return HW_ERR_OK;
     }
 
-    if(hw_strncmp("HFP_CLCC",(const char*)shell_string,hw_strlen(BT_HFP_CALL_LIST_CMD)) == 0)
+    if(hw_strncmp(BT_HFP_CALL_LIST_CMD,(const char*)shell_string,hw_strlen(BT_HFP_CALL_LIST_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate bt get call list\n");
         bt_hfp_hf_get_call_list(&connect_addr);
         return HW_ERR_OK;
     }
 
-    if(hw_strncmp("HFP_NRECD",(const char*)shell_string,hw_strlen(BT_HFP_DISABLE_ECNR_CMD)) == 0)
+    if(hw_strncmp(BT_HFP_DISABLE_ECNR_CMD,(const char*)shell_string,hw_strlen(BT_HFP_DISABLE_ECNR_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate disable ag ecnr\n");
         bt_hfp_hf_disable_ecnr(&connect_addr);
@@ -1087,14 +1145,14 @@ uint8_t shell_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-    if(hw_strncmp("HFP_VGE",(const char*)shell_string,hw_strlen(BT_HFP_VOICE_RECOG_ENABLE_CMD)) == 0)
+    if(hw_strncmp(BT_HFP_VOICE_RECOG_ENABLE_CMD,(const char*)shell_string,hw_strlen(BT_HFP_VOICE_RECOG_ENABLE_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate voice_recognition enable\n");
         bt_hfp_hf_set_voice_recognition(&connect_addr,1);
         return HW_ERR_OK;
     }
 
-    if(hw_strncmp("HFP_VGD",(const char*)shell_string,hw_strlen(BT_HFP_VOICE_RECOG_DISABLE_CMD)) == 0)
+    if(hw_strncmp(BT_HFP_VOICE_RECOG_DISABLE_CMD,(const char*)shell_string,hw_strlen(BT_HFP_VOICE_RECOG_DISABLE_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate voice_recognition disable\n");
         bt_hfp_hf_set_voice_recognition(&connect_addr,0);
@@ -1102,21 +1160,21 @@ uint8_t shell_parse(uint8_t *shell_string)
     }
 
 
-    if(hw_strncmp("HFP_DTMF",(const char*)shell_string,hw_strlen(BT_HFP_DTMF_CMD)) == 0)
+    if(hw_strncmp(BT_HFP_DTMF_CMD,(const char*)shell_string,hw_strlen(BT_HFP_DTMF_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate hfp active call dtmf\n");
         bt_hfp_hf_transmit_dtmf(&connect_addr,1);
         return HW_ERR_OK;
     }
 
-    if(hw_strncmp("HFP_VGM",(const char*)shell_string,hw_strlen(BT_HFP_VGM_CMD)) == 0)
+    if(hw_strncmp(BT_HFP_VGM_CMD,(const char*)shell_string,hw_strlen(BT_HFP_VGM_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate VGM\n");
         bt_hfp_hf_set_mic_volume(&connect_addr,1);
         return HW_ERR_OK;
     }
 
-    if(hw_strncmp("HFP_VGS",(const char*)shell_string,hw_strlen(BT_HFP_VGS_CMD)) == 0)
+    if(hw_strncmp(BT_HFP_VGS_CMD,(const char*)shell_string,hw_strlen(BT_HFP_VGS_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate VGM\n");
         bt_hfp_hf_set_spk_volume(&connect_addr,1);
@@ -1124,19 +1182,34 @@ uint8_t shell_parse(uint8_t *shell_string)
     }
 
 
-    if(hw_strncmp("HFP_CGMI",(const char*)shell_string,hw_strlen(BT_HFP_GET_MANU_ID_CMD)) == 0)
+    if(hw_strncmp(BT_HFP_GET_MANU_ID_CMD,(const char*)shell_string,hw_strlen(BT_HFP_GET_MANU_ID_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate get manufacturer name\n");
         bt_hfp_hf_get_manufacturer_id(&connect_addr);
         return HW_ERR_OK;
     }
 
-    if(hw_strncmp("HFP_CGMM",(const char*)shell_string,hw_strlen(BT_HFP_GET_MODULE_ID_CMD)) == 0)
+    if(hw_strncmp(BT_HFP_GET_MODULE_ID_CMD,(const char*)shell_string,hw_strlen(BT_HFP_GET_MODULE_ID_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate get module id\n");
         bt_hfp_hf_get_model_id(&connect_addr);
         return HW_ERR_OK;
     }
+
+	if(hw_strncmp(BT_HFP_SET_BATT_LEVEL_CMD,(const char*)shell_string,hw_strlen(BT_HFP_SET_BATT_LEVEL_CMD)) == 0)
+    {
+        HW_DEBUG("SHELL:operate set batt level\n");
+        bt_hfp_hf_send_batt_level(&connect_addr,60);
+        return HW_ERR_OK;
+    }
+
+	
+	if(hw_strncmp(BT_HFP_GET_OP_NAME_CMD,(const char*)shell_string,hw_strlen(BT_HFP_GET_OP_NAME_CMD)) == 0)
+	{
+		HW_DEBUG("SHELL:operate get ag operator name\n");
+		bt_hfp_hf_get_operator(&connect_addr);
+		return HW_ERR_OK;
+	}
 
 #endif
 
@@ -1448,7 +1521,6 @@ int main()
 {
     stdin_process_init();
     board_init();
-
     while(1)
     {
 

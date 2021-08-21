@@ -21,6 +21,9 @@
 #include <string.h>
 #include <unistd.h>
 #include "bt_snoop.h"
+
+#define PHYBUSIF_NAME "/dev/ttyUSB1"
+
 struct phybusif_cb uart_if;
 
 
@@ -72,12 +75,12 @@ uint8_t hw_uart_bt_init(uint32_t baud_rate)
     }
 #endif
 
-    printf("phybusif_open /dev/ttyUSB0\n");
+    printf("phybusif_open %s\n",PHYBUSIF_NAME);
 
-    uart_if.phyuart_fd = open("/dev/ttyUSB0", flags);
+    uart_if.phyuart_fd = open(PHYBUSIF_NAME, flags);
     if (uart_if.phyuart_fd == -1)
     {
-        printf("ERROR:Unable to open port /dev/ttyUSB0\n");
+        printf("ERROR:Unable to open port %s\n",PHYBUSIF_NAME);
         return -1;
     }
 

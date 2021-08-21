@@ -10,7 +10,7 @@
 #include "bt_hfp_hf.h"
 
 
-#if PROFILE_HFP_ENABLE
+#if PROFILE_HFP_HF_ENABLE
 
 
 /* TODO */
@@ -140,7 +140,7 @@ static  uint8_t hfp_hf_service_record[] =
             SDP_DES_SIZE8, 0x8,
             SDP_DES_SIZE8,0x06,
             SDP_UUID16,BT_SERVICE_CLASS_HANDSFREE>>8&0xff, BT_SERVICE_CLASS_HANDSFREE&0xff,
-            SDP_UINT16,0x01,0x07,			/* V1.7 */
+            SDP_UINT16,0x01,0x08,			/* V1.8 */
 
             SDP_DES_SIZE8, 0x6,
             SDP_UINT16, BT_ATTRIBUTE_SUPPORTED_FEATURES>>8&0xff, BT_ATTRIBUTE_SUPPORTED_FEATURES&0xff,  /* support feature */
@@ -906,6 +906,12 @@ static uint16_t hfp_ag_has_nrec_feature(struct hfp_pcb_t *pcb)
     return ag_support_nrec;
 }
 
+static uint16_t hfp_has_hf_indicator_feature(struct hfp_pcb_t *pcb)
+{
+    return pcb->ag_battery_level_indicator_enable;
+}
+
+
 static err_t hfp_hf_exchange_supported_features(struct hfp_pcb_t *pcb)
 {
     uint8_t buffer[20] = {0};
@@ -1147,6 +1153,7 @@ static err_t hfp_hf_send_bvra(struct hfp_pcb_t *pcb,uint8_t value)
     BT_HFP_TRACE_DEBUG("hfp_hf_send_bvra:%s\n", buffer);
     return hfp_hf_send(pcb,buffer, strlen((const char*)buffer));
 }
+
 
 static err_t hfp_hf_send_binp(struct hfp_pcb_t *pcb)
 {
@@ -2429,7 +2436,7 @@ static err_t hfp_hf_run(struct hfp_pcb_t *pcb)
         uint8_t hfp[] = {0x35, 0x03, 0x19, 0x11, 0x1f}; /* Service search pattern with HFP UUID is default */
 
         uint8_t attrids[] = {0x35, 0x03, 0x09, 0x00, 0x04}; /* Attribute IDs to search for in data element
-						sequence form */
+		sequence form */
 
         sdp_service_search_attrib_req(pcb->sdppcb, 0xFFFF, hfp, sizeof(hfp),
                                       attrids, sizeof(attrids), hfp_hf_sdp_attributes_recv);
