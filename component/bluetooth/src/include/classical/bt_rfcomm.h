@@ -31,7 +31,7 @@
 #define RFCOMM_DM_PF 0x1F
 #define RFCOMM_DISC 0x53
 #define RFCOMM_UIH 0xEF
-#define RFCOMM_UIH_PF 0xFF 
+#define RFCOMM_UIH_PF 0xFF
 
 /* Multiplexer message types */
 #define RFCOMM_PN_CMD 0x83
@@ -47,7 +47,7 @@
 #define RFCOMM_RPN_CMD 0x93
 #define RFCOMM_RPN_RSP 0x91
 #define RFCOMM_RLS_CMD 0x53
-#define RFCOMM_RLS_RSP 0x51 
+#define RFCOMM_RLS_RSP 0x51
 #define RFCOMM_NSC_RSP 0x11
 
 /* Length of RFCOMM hdr with 1 or 2 byte lengh field excluding credit */
@@ -77,7 +77,7 @@
 #define RFCOMM_COM_CFG 0x03 /* Data bits (8 bits), stop bits (1), parity (no parity) 
 			       and parity type */
 #define RFCOMM_COM_FC 0x00 /* Flow control (no flow ctrl) */
-#define RFCOMM_COM_XON 0x00 /* No flow control (default DC1) */ 
+#define RFCOMM_COM_XON 0x00 /* No flow control (default DC1) */
 #define RFCOMM_COM_XOFF 0x00 /* No flow control (default DC3) */
 
 /* FCS calc */
@@ -91,53 +91,59 @@
 #define RFCOMM_CFG_MSC_OUT 0x04
 #define RFCOMM_CFG_MSC_IN 0x08
 
-enum rfcomm_state_e {
-  RFCOMM_CLOSED, RFCOMM_LISTEN, W4_RFCOMM_MULTIPLEXER, W4_RFCOMM_SABM_RSP, RFCOMM_CFG, RFCOMM_OPEN, 
-  W4_RFCOMM_DISC_RSP
+enum rfcomm_state_e
+{
+    RFCOMM_CLOSED,
+    RFCOMM_LISTEN,
+    W4_RFCOMM_MULTIPLEXER,
+    W4_RFCOMM_SABM_RSP,
+    RFCOMM_CFG,
+    RFCOMM_OPEN,
+    W4_RFCOMM_DISC_RSP
 };
 
 /* The RFCOMM frame header */
-typedef struct  
+typedef struct
 {
-  uint8_t addr;
-  uint8_t ctrl;
-  uint16_t len;
-  uint8_t k;
-}BT_PACK_END rfcomm_hdr_t;
+    uint8_t addr;
+    uint8_t ctrl;
+    uint16_t len;
+    uint8_t k;
+} BT_PACK_END rfcomm_hdr_t;
 
-typedef struct  
+typedef struct
 {
-  uint8_t type;
-  uint8_t len;
-}BT_PACK_END rfcomm_msg_hdr_t;
+    uint8_t type;
+    uint8_t len;
+} BT_PACK_END rfcomm_msg_hdr_t;
 
-typedef struct  
+typedef struct
 {
-  uint8_t dlci; /* Data link connection id */
-  uint8_t i_cl; /* Type frame for information and Convergece layer to use */
-  uint8_t p; /* Priority */
-  uint8_t t; /* Value of acknowledgement timer */
-  uint16_t n; /* Maximum frame size */
-  uint8_t na; /* Maximum number of retransmissions */
-  uint8_t k; /* Initial credit value */
-}BT_PACK_END rfcomm_pn_msg_t;
+    uint8_t dlci; /* Data link connection id */
+    uint8_t i_cl; /* Type frame for information and Convergece layer to use */
+    uint8_t p; /* Priority */
+    uint8_t t; /* Value of acknowledgement timer */
+    uint16_t n; /* Maximum frame size */
+    uint8_t na; /* Maximum number of retransmissions */
+    uint8_t k; /* Initial credit value */
+} BT_PACK_END rfcomm_pn_msg_t;
 
-typedef struct  
+typedef struct
 {
-  uint8_t dlci; /* Data link connection id */
-  uint8_t rs232; /* RS232 control signals */
-}BT_PACK_END rfcomm_msc_msg_t;
+    uint8_t dlci; /* Data link connection id */
+    uint8_t rs232; /* RS232 control signals */
+} BT_PACK_END rfcomm_msc_msg_t;
 
-typedef struct  
+typedef struct
 {
-  uint8_t dlci; /* Data link connection id */
-  uint8_t br; /* Baud Rate */
-  uint8_t cfg; /* Data bits, Stop bits, Parity, Parity type */
-  uint8_t fc; /* Flow control */
-  uint8_t xon;
-  uint8_t xoff;
-  uint16_t mask;
-}BT_PACK_END rfcomm_rpn_msg_t;
+    uint8_t dlci; /* Data link connection id */
+    uint8_t br; /* Baud Rate */
+    uint8_t cfg; /* Data bits, Stop bits, Parity, Parity type */
+    uint8_t fc; /* Flow control */
+    uint8_t xon;
+    uint8_t xoff;
+    uint16_t mask;
+} BT_PACK_END rfcomm_rpn_msg_t;
 
 
 struct _rfcomm_pcb_t;
@@ -155,69 +161,69 @@ typedef err_t (* rfcomm_recv_cb)(void *arg, struct _rfcomm_pcb_t *pcb, struct bt
 /* The RFCOMM protocol control block */
 typedef struct  _rfcomm_pcb_t
 {
-  struct _rfcomm_pcb_t *next; /* For the linked list */
+    struct _rfcomm_pcb_t *next; /* For the linked list */
 
-  enum rfcomm_state_e state; /* RFCOMM state */
+    enum rfcomm_state_e state; /* RFCOMM state */
 
-  l2cap_pcb_t *l2cappcb; /* The L2CAP connection */
+    l2cap_pcb_t *l2cappcb; /* The L2CAP connection */
 
-  uint8_t cn; /* Channel number */
-  
-  uint8_t cl; /* Convergence layer */
-  uint8_t p; /* Connection priority */
-  uint16_t n; /* Maximum frame size */
-  uint8_t k; /* Number of local credits:The number of packets we can send */
+    uint8_t cn; /* Channel number */
 
-  uint8_t rk; /* Number of remote credits:The number of packets that the other party can send */
+    uint8_t cl; /* Convergence layer */
+    uint8_t p; /* Connection priority */
+    uint16_t n; /* Maximum frame size */
+    uint8_t k; /* Number of local credits:The number of packets we can send */
 
-  uint8_t rfcommcfg; /* Bit 1 indicates if we are the initiator of this connection
+    uint8_t rk; /* Number of remote credits:The number of packets that the other party can send */
+
+    uint8_t rfcommcfg; /* Bit 1 indicates if we are the initiator of this connection
 		   * Bit 2 indicates if the flow control bit is set so that we are allowed to send data
 		   * Bit 3 indicates if modem status has been configured for the incoming direction
 		   * Bit 4 indicates if modem status has been configured for the outgoing direction
 		   */
 
-  uint16_t to; /* Frame and cmd timeout */
-  
-  uint8_t uih_in_fcs; /* Frame check sequence for uih frames (P/F bit = 0) */
-  uint8_t uihpf_in_fcs; /* Frame check sequence for uih frames (P/F bit = 1) */
-  uint8_t uih_out_fcs; /* Frame check sequence for uih frames (P/F bit = 0) */
-  uint8_t uihpf_out_fcs; /* Frame check sequence for uih frames (P/F bit = 1) */
+    uint16_t to; /* Frame and cmd timeout */
 
-  uint8_t uih0_in_fcs; /* Frame check sequence for uih frames on the control channel (P/F bit = 0) */
-  uint8_t uih0_out_fcs; /* Frame check sequence for uih frames on the control channel (P/F bit = 0) */
+    uint8_t uih_in_fcs; /* Frame check sequence for uih frames (P/F bit = 0) */
+    uint8_t uihpf_in_fcs; /* Frame check sequence for uih frames (P/F bit = 1) */
+    uint8_t uih_out_fcs; /* Frame check sequence for uih frames (P/F bit = 0) */
+    uint8_t uihpf_out_fcs; /* Frame check sequence for uih frames (P/F bit = 1) */
+
+    uint8_t uih0_in_fcs; /* Frame check sequence for uih frames on the control channel (P/F bit = 0) */
+    uint8_t uih0_out_fcs; /* Frame check sequence for uih frames on the control channel (P/F bit = 0) */
 
 #if RFCOMM_FLOW_QUEUEING
-  struct bt_pbuf_t *buf;
+    struct bt_pbuf_t *buf;
 #endif
-  void *callback_arg;
-  
-  /* RFCOMM Frame commands and responses */
-  rfcomm_connected_cb connected;
-  rfcomm_accept_cb accept;
-  rfcomm_disconnected_cb disconnected;
+    void *callback_arg;
 
-  /* RFCOMM Multiplexer responses */
-  rfcomm_pn_rsp_cbs pn_rsp;
-  rfcomm_test_rsp_cb test_rsp;
-  rfcomm_msc_rsp_cb msc_rsp;
-  rfcomm_rpn_rsp_cb rpn_rsp;
+    /* RFCOMM Frame commands and responses */
+    rfcomm_connected_cb connected;
+    rfcomm_accept_cb accept;
+    rfcomm_disconnected_cb disconnected;
 
-	rfcomm_recv_cb recv;
-}rfcomm_pcb_t;
+    /* RFCOMM Multiplexer responses */
+    rfcomm_pn_rsp_cbs pn_rsp;
+    rfcomm_test_rsp_cb test_rsp;
+    rfcomm_msc_rsp_cb msc_rsp;
+    rfcomm_rpn_rsp_cb rpn_rsp;
+
+    rfcomm_recv_cb recv;
+} rfcomm_pcb_t;
 
 /* The server channel */
 typedef struct  _rfcomm_pcb_listen_t
 {
-  struct _rfcomm_pcb_listen_t *next; /* For the linked list */
+    struct _rfcomm_pcb_listen_t *next; /* For the linked list */
 
-  enum rfcomm_state_e state; /* RFCOMM state */
+    enum rfcomm_state_e state; /* RFCOMM state */
 
-  uint8_t cn; /* Channel number */
+    uint8_t cn; /* Channel number */
 
-  void *callback_arg;
+    void *callback_arg;
 
-  rfcomm_accept_cb accept;
-}rfcomm_pcb_listen_t;
+    rfcomm_accept_cb accept;
+} rfcomm_pcb_listen_t;
 
 
 

@@ -720,7 +720,7 @@ void bt_app_pbap_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("bt_app_pbap_disconnect status %d address:\n",status);
     bt_addr_dump(remote_addr->addr);
-    //memset(&connect_addr,0,sizeof(connect_addr));
+    memset(&connect_addr,0,sizeof(connect_addr));
 }
 
 void bt_app_pbap_query_repositories_size(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint16_t size)

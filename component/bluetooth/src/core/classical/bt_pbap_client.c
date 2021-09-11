@@ -233,22 +233,22 @@ err_t pbap_client_set_path(struct bd_addr_t *addr,uint8_t repositories,uint8_t t
         switch(type)
         {
         case PBAP_NONE_TYPE:
-            sprintf((char *)name_string_temp, "%s", pbap_telecom_repositories);
+            sprintf((char *)name_string_temp, "%s", pbap_sim_repositories);
             break;
         case PB_PHONEBOOK_TYPE:
-            sprintf((char *)name_string_temp, "%s/%s/%s", pbap_sim_repositories,pbap_telecom_repositories,pbap_pb_name);
+            sprintf((char *)name_string_temp, "%s/%s", pbap_sim_repositories,pbap_pb_name);
             break;
         case PB_INCOMING_BOOK_TYPE:
-            sprintf((char *)name_string_temp, "%s/%s/%s/%s", pbap_sim_repositories,pbap_telecom_repositories,pbap_ich_name,pbap_vcard_suffix);
+            sprintf((char *)name_string_temp, "%s/%s", pbap_sim_repositories,pbap_ich_name);
             break;
         case PB_OUTGOING_BOOK_TYPE:
-            sprintf((char *)name_string_temp, "%s/%s/%s/%s", pbap_sim_repositories,pbap_telecom_repositories,pbap_och_name,pbap_vcard_suffix);
+            sprintf((char *)name_string_temp, "%s/%s", pbap_sim_repositories,pbap_och_name);
             break;
         case PB_MISSING_BOOK_TYPE:
-            sprintf((char *)name_string_temp, "%s/%s/%s/%s", pbap_sim_repositories,pbap_telecom_repositories,pbap_mch_name,pbap_vcard_suffix);
+            sprintf((char *)name_string_temp, "%s/%s", pbap_sim_repositories,pbap_mch_name);
             break;
         case PB_COMBINE_BOOK_TYPE:
-            sprintf((char *)name_string_temp, "%s/%s/%s/%s", pbap_sim_repositories,pbap_telecom_repositories,pbap_cch_name,pbap_vcard_suffix);
+            sprintf((char *)name_string_temp, "%s/%s", pbap_sim_repositories,pbap_cch_name);
             break;
         default:
             break;
@@ -869,8 +869,9 @@ static err_t pbap_client_parse_get_phonebook_size_resp(struct pbap_pcb_t *pcb,ui
     }
     else
     {
-        /* TODO: error ´¦Àí */
         BT_PBAP_TRACE_DEBUG("PBAP_OPERATE_QUERY_PHONEBOOK_SIZE: err++++++++++++++\n");
+		if(pbap_client_cbs && pbap_client_cbs->pbap_query_repositories_size)
+			pbap_client_cbs->pbap_query_repositories_size(&pcb->remote_addr,pcb->query_repositories,pcb->query_type,0);
     }
     return BT_ERR_OK;
 }
