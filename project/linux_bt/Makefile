@@ -45,7 +45,7 @@ VPATH			:= $(SRCDIRS)
 
 #CFLAGS 	?= -g -Wall -Werror $(INCLUDE)
 CFLAGS 	?= -g -Wall $(INCLUDE)
-LDFLAGS ?= -lpthread
+LDFLAGS ?= -lpthread -lasound
 
 .PHONY:clean
 

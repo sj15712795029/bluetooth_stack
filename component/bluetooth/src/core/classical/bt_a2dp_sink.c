@@ -1,6 +1,6 @@
 
 #include "bt_a2dp_sink.h"
-
+#include "bt_a2dp_playback.h"
 
 #if PROFILE_A2DP_ENABLE
 
@@ -92,8 +92,8 @@ static const uint8_t sbc_snk_codec_caps[] =
    A2DP_SBC_BLOCK_LENGTH_16|A2DP_SBC_BLOCK_LENGTH_12|A2DP_SBC_BLOCK_LENGTH_8|A2DP_SBC_BLOCK_LENGTH_4|\
    A2DP_SBC_SUBBANDS_8|A2DP_SBC_SUBBANDS_4|A2DP_SBC_ALLOCATION_METHOD_LOUDNESS|A2DP_SBC_ALLOCATION_METHOD_SNR,
 
-   SBC_SNK_MIN_BITPOOL,
-   SBC_SNK_MAX_BITPOOL,
+   A2DP_SBC_SNK_MIN_BITPOOL,
+   A2DP_SBC_SNK_MAX_BITPOOL,
 };
 
 
@@ -281,6 +281,7 @@ static err_t a2dp_signal_start_ind(struct avdtp_pcb_t *avdtp_pcb)
         return BT_ERR_MEM;
     }
 
+	bt_a2dp_playback_open();
     if(a2dp_sink_cbs && a2dp_sink_cbs->a2dp_sink_stream_start)
         a2dp_sink_cbs->a2dp_sink_stream_start(&a2dp_pcb->remote_addr,BT_ERR_OK);
     return BT_ERR_OK;
@@ -297,6 +298,7 @@ static err_t a2dp_signal_suspend_ind(struct avdtp_pcb_t *avdtp_pcb)
         return BT_ERR_MEM;
     }
 
+	bt_a2dp_playback_close();
     if(a2dp_sink_cbs && a2dp_sink_cbs->a2dp_sink_stream_suspend)
         a2dp_sink_cbs->a2dp_sink_stream_suspend(&a2dp_pcb->remote_addr,BT_ERR_OK);
     return BT_ERR_OK;
@@ -353,20 +355,25 @@ static err_t a2dp_signal_abort_ind(struct avdtp_pcb_t *avdtp_pcb)
 
 static err_t a2dp_sink_get_sbc_context_setting(uint8_t *sbc_codec_info)
 {
+	uint32_t sample_rate,channel;
 	sbc_init(&sbc_context, 0);
         switch (sbc_codec_info[0] & 0xF0)
         {
         case A2DP_SBC_16000 :
             sbc_context.frequency = SBC_FREQ_16000;
+			sample_rate = 16000;
             break;
         case A2DP_SBC_32000 :
             sbc_context.frequency = SBC_FREQ_32000;
+			sample_rate = 32000;
             break;
         case A2DP_SBC_44100 :
             sbc_context.frequency= SBC_FREQ_44100;
+			sample_rate = 44100;
             break;
         case A2DP_SBC_48000 :
             sbc_context.frequency = SBC_FREQ_48000;
+			sample_rate = 48000;
             break;
         }
 
@@ -374,15 +381,19 @@ static err_t a2dp_sink_get_sbc_context_setting(uint8_t *sbc_codec_info)
         {
         case A2DP_SBC_MONO :
             sbc_context.mode = SBC_MODE_MONO;
+			channel = 1;
             break;
         case A2DP_SBC_DUAL_CHANNEL :
             sbc_context.mode = SBC_MODE_DUAL_CHANNEL;
+			channel = 2;
             break;
         case A2DP_SBC_STEREO :
             sbc_context.mode = SBC_MODE_STEREO;
+			channel = 2;
             break;
         case A2DP_SBC_JOINT_STEREO :
             sbc_context.mode = SBC_MODE_JOINT_STEREO;
+			channel = 2;
             break;
         }
 
@@ -423,7 +434,8 @@ static err_t a2dp_sink_get_sbc_context_setting(uint8_t *sbc_codec_info)
         }
 
         sbc_context.bitpool = sbc_codec_info[3];
-        
+
+		bt_a2dp_playback_init(sample_rate,channel);
 		return BT_ERR_OK;
 }
 
@@ -542,6 +554,7 @@ static err_t a2dp_sink_media_handle(struct avdtp_pcb_t *avdtp_pcb,struct bt_pbuf
         if (sbc_frame_size <= 0)
             break;
 
+		bt_a2dp_playback_write(pcm_data,pcm_data_len);
         BT_A2DP_INFO_TRACE_DEBUG("sbc_frame_size %d,pcm_data_len %d\n",sbc_frame_size,pcm_data_len);
         data += sbc_frame_size;
         data_len -= sbc_frame_size;

@@ -19,9 +19,9 @@
 #define BT_CLASSICAL_ENABLE 1
 #define BT_BLE_ENABLE 1
 /** BT_PBUF_TRANSPORT_H2 = 0x01,BT_PBUF_TRANSPORT_H4 = 0x02,BT_PBUF_TRANSPORT_H5 = 0x03,BT_PBUF_TRANSPORT_BCSP = 0x04,*/
-#define BT_ENABLE_SNOOP 1
+#define BT_ENABLE_SNOOP 0
 #define BT_TRANSPORT_TYPE 0x02
-#define BT_ENABLE_SSP 1
+#define BT_ENABLE_SSP 0
 #define BT_PAGE_TIMEOUT 0x4000 /* value*0.625ms */
 /* IO_CAP_DISPLAY_ONLY->0x00 IO_CAP_DISPLAY_YES_NO->0x01 IO_CAP_KEYBOARD_ONLY->0x02 IO_CAP_NOINPUT_OUTPUT->0x03 */
 #define BT_SSP_IOCAP_CONF 1
@@ -35,10 +35,10 @@
 #define BT_VENDOR_BCM43430A1_SUPPORT 0
 #define BT_VENDOR_BCM4345C5_SUPPORT 0
 #define PROFILE_DID_ENABLE 1
-#define PROFILE_HFP_HF_ENABLE 0
-#define PROFILE_SPP_ENABLE 1
+#define PROFILE_HFP_HF_ENABLE 1
+#define PROFILE_SPP_ENABLE 0
 #define PROFILE_PBAP_ENABLE 0
-#define PROFILE_A2DP_ENABLE 0
+#define PROFILE_A2DP_ENABLE 1
 #define PROFILE_AVRCP_ENABLE 0
 #define PROFILE_HID_ENABLE 0
 #if PROFILE_HID_ENABLE > 0
@@ -62,11 +62,11 @@
 			BT_TRACE_LEVEL_WARNING->2   BT_TRACE_LEVEL_DEBUG->3
 ******************************************************************************/
 #define BT_DEBUG printf
-#define BT_HEX_TRACE_LEVEL 3
+#define BT_HEX_TRACE_LEVEL 0
 #define BT_PBUF_TRACE_LEVEL 0
 #define BT_MEMORY_TRACE_LEVEL 0
 #define BT_SNOOP_TRACE_LEVEL 0
-#define BT_TRANSPORT_TRACE_LEVEL 3
+#define BT_TRANSPORT_TRACE_LEVEL 0
 #define BT_VENDOR_TRACE_LEVEL 0
 #define BT_HCI_TRACE_LEVEL 3
 #define BT_L2CAP_TRACE_LEVEL 3
@@ -180,8 +180,8 @@ typedef uintptr_t mem_ptr_t;
 
 
 /***********   A2DP profile config *******************************************************************************************/
-#define SBC_SNK_MIN_BITPOOL 2
-#define SBC_SNK_MAX_BITPOOL 53
+#define A2DP_SBC_SNK_MIN_BITPOOL 2
+#define A2DP_SBC_SNK_MAX_BITPOOL 53
 /******************************************************************************************************************************/
 
 /***********   OBEX profile config ********************************************************************************************/

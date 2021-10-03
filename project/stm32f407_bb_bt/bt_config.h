@@ -38,7 +38,7 @@
 #define PROFILE_HFP_ENABLE 0
 #define PROFILE_SPP_ENABLE 1
 #define PROFILE_PBAP_ENABLE 0
-#define PROFILE_A2DP_ENABLE 0
+#define PROFILE_A2DP_ENABLE 1
 #define PROFILE_AVRCP_ENABLE 0
 #define PROFILE_HID_ENABLE 0
 #if PROFILE_HID_ENABLE > 0
@@ -179,8 +179,8 @@ typedef uintptr_t mem_ptr_t;
 
 
 /***********   A2DP profile config *******************************************************************************************/
-#define SBC_SNK_MIN_BITPOOL 2
-#define SBC_SNK_MAX_BITPOOL 20
+#define A2DP_SBC_SNK_MIN_BITPOOL 2
+#define A2DP_SBC_SNK_MAX_BITPOOL 20
 /******************************************************************************************************************************/
 
 

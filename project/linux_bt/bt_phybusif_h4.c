@@ -22,7 +22,7 @@
 #include <unistd.h>
 #include "bt_snoop.h"
 
-#define PHYBUSIF_NAME "/dev/ttyUSB1"
+#define PHYBUSIF_NAME "/dev/ttyUSB0"
 
 struct phybusif_cb uart_if;
 

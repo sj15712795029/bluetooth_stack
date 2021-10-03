@@ -179,8 +179,8 @@ typedef uintptr_t mem_ptr_t;
 
 
 /***********   A2DP profile config *******************************************************************************************/
-#define SBC_SNK_MIN_BITPOOL 2
-#define SBC_SNK_MAX_BITPOOL 53
+#define A2DP_SBC_SNK_MIN_BITPOOL 2
+#define A2DP_SBC_SNK_MAX_BITPOOL 53
 /******************************************************************************************************************************/
 
 
