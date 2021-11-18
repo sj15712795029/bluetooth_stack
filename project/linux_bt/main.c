@@ -122,8 +122,6 @@ uint32_t last_sys_time = 0;
 #define BT_HFP_SET_BATT_LEVEL_CMD "HFP_BATT"
 #define BT_HFP_SET_BATT_LEVEL_DES "HFP Set batt level"
 
-
-
 #define BT_AVRCP_LIST_APP_ATTR_CMD "AVRCP_LIST_APP_ATTR"
 #define BT_AVRCP_LIST_APP_ATTR_DES "List application seeting attribute"
 #define BT_AVRCP_GET_SONG_INFO_CMD "AVRCP_GET_ID3"
@@ -143,7 +141,8 @@ uint32_t last_sys_time = 0;
 #define BT_PBAP_CONNECT_CMD "PBAP_CON"
 #define BT_PBAP_CONNECT_DES "Connect pbap profile"
 
-
+#define BT_GATTC_MTU_REQ_CMD "GATTC_MTU"
+#define BT_GATTC_MTU_REQ_DES "Gatt client exchange MTU"
 
 
 
@@ -213,6 +212,11 @@ cmd_desctiption_t cmd_usage[] =
 	{(uint8_t *)BT_PBAP_CONNECT_CMD,(uint8_t *)BT_PBAP_CONNECT_DES},
 #endif
 
+#if BT_BLE_ENABLE > 0
+	{(uint8_t *)BT_GATTC_MTU_REQ_CMD,(uint8_t *)BT_GATTC_MTU_REQ_DES},
+#endif
+
+
 };
 
 
@@ -230,14 +234,14 @@ void show_usage()
             HW_DEBUG("\033[40;33m|%s|\033[0m\n",cmd_usage[index].cmd);
         else
         {
-        	if(hw_strlen(cmd_usage[index].cmd) < 8)
-				HW_DEBUG("|\t\t\033[40;31m%s\033[0m\t\t\t\t -> \033[40;36m%s\033[0m\n",cmd_usage[index].cmd,cmd_usage[index].description);
-			else if((hw_strlen(cmd_usage[index].cmd) >= 8) && (hw_strlen(cmd_usage[index].cmd) < 16))
-				HW_DEBUG("|\t\t\033[40;31m%s\033[0m\t\t\t -> \033[40;36m%s\033[0m\n",cmd_usage[index].cmd,cmd_usage[index].description);
-			else if((hw_strlen(cmd_usage[index].cmd) >= 16) && (hw_strlen(cmd_usage[index].cmd) < 24))
-            	HW_DEBUG("|\t\t\033[40;31m%s\033[0m\t\t -> \033[40;36m%s\033[0m\n",cmd_usage[index].cmd,cmd_usage[index].description);
+        	if(hw_strlen((char *)cmd_usage[index].cmd) < 8)
+				HW_DEBUG("|\t\033[40;31m%s\033[0m\t\t\t\t -> \033[40;36m%s\033[0m\n",cmd_usage[index].cmd,cmd_usage[index].description);
+			else if((hw_strlen((char *)cmd_usage[index].cmd) >= 8) && (hw_strlen((char *)cmd_usage[index].cmd) < 16))
+				HW_DEBUG("|\t\033[40;31m%s\033[0m\t\t\t -> \033[40;36m%s\033[0m\n",cmd_usage[index].cmd,cmd_usage[index].description);
+			else if((hw_strlen((char *)cmd_usage[index].cmd) >= 16) && (hw_strlen((char *)cmd_usage[index].cmd) < 24))
+            	HW_DEBUG("|\t\033[40;31m%s\033[0m\t\t -> \033[40;36m%s\033[0m\n",cmd_usage[index].cmd,cmd_usage[index].description);
 			else
-				HW_DEBUG("|\t\t\033[40;31m%s\033[0m\t -> \033[40;36m%s\033[0m\n",cmd_usage[index].cmd,cmd_usage[index].description);
+				HW_DEBUG("|\t\033[40;31m%s\033[0m\t -> \033[40;36m%s\033[0m\n",cmd_usage[index].cmd,cmd_usage[index].description);
         }
 
     }
@@ -249,7 +253,6 @@ struct bd_addr_t connect_addr;
 
 void bt_app_init_result(uint8_t status,uint16_t profile_mask)
 {
-    uint8_t profile_mask_buf[8] = {0};
     printf("bt_app_init_result(%d) profile_mask(0x%x)\n",status,profile_mask);
 
 }
@@ -327,7 +330,7 @@ void bt_app_le_inquiry_status(uint8_t status)
     printf("bt_app_le_inquiry_status %d\n",status);
 }
 
-const uint8_t adv_data[] =
+uint8_t adv_data[] =
 {
     0x08, BT_DT_COMPLETE_LOCAL_NAME, 'B', 'T', '_', 'D', 'E', 'M', 'O',
 };
@@ -757,6 +760,62 @@ static bt_app_pbap_cb_t bt_app_pbap_cb =
 #endif
 
 
+#if BT_BLE_ENABLE > 0
+void bt_app_gatt_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("bt_app_gatt_connect_set_up,address is :\n");
+    bt_addr_dump(remote_addr->addr);
+
+	connect_addr.addr[5] = remote_addr->addr[5];
+    connect_addr.addr[4] = remote_addr->addr[4];
+    connect_addr.addr[3] = remote_addr->addr[3];
+    connect_addr.addr[2] = remote_addr->addr[2];
+    connect_addr.addr[1] = remote_addr->addr[1];
+    connect_addr.addr[0] = remote_addr->addr[0];
+
+}
+void bt_app_gatt_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("bt_app_gatt_connect_realease,address is :\n");
+    bt_addr_dump(remote_addr->addr);
+}
+
+void bt_app_gattc_mtu_value(struct bd_addr_t *remote_addr,uint16_t mtu)
+{
+	printf("bt_app_gattc_mtu_value,mtu(%d) address is :\n",mtu);
+    bt_addr_dump(remote_addr->addr);
+}
+
+
+bt_gatt_client_cbs_t bt_app_gattc_wrapper_cb =
+{
+    bt_app_gattc_mtu_value,
+};
+
+
+void bt_app_gatts_mtu_value(struct bd_addr_t *remote_addr,uint16_t mtu)
+{
+	printf("bt_app_gatts_mtu_value,mtu(%d) address is :\n",mtu);
+    bt_addr_dump(remote_addr->addr);
+}
+
+
+bt_gatt_server_cbs_t bt_app_gatts_wrapper_cb =
+{
+  bt_app_gatts_mtu_value,
+};
+
+
+
+static bt_gatt_cbs_t bt_app_gatt_wrapper_cb =
+{
+	bt_app_gatt_connect_set_up,
+	bt_app_gatt_connect_realease,
+    &bt_app_gattc_wrapper_cb,
+    &bt_app_gatts_wrapper_cb,
+};
+#endif
+
 
 static bt_app_cb_t bt_app_cb =
 {
@@ -798,6 +857,11 @@ static bt_app_cb_t bt_app_cb =
 	NULL,
 #endif
 
+#if BT_BLE_ENABLE > 0
+    &bt_app_gatt_wrapper_cb,
+#else
+	NULL,
+#endif
 
 };
 
@@ -849,7 +913,7 @@ uint8_t shell_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate ble cancel inquiry\n");
         bt_le_stop_inquiry();
-        return 0;
+        return HW_ERR_OK;
     }
 
     if(hw_strncmp(BT_LE_ADV_ENABLE_CMD,(const char*)shell_string,hw_strlen(BT_LE_ADV_ENABLE_CMD)) == 0)
@@ -863,7 +927,7 @@ uint8_t shell_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate ble stop advertising\n");
         bt_le_set_adv_disable();
-        return 0;
+        return HW_ERR_OK;
     }
 #endif
 
@@ -1105,7 +1169,7 @@ uint8_t shell_parse(uint8_t *shell_string)
     if(hw_strncmp(BT_HFP_CALLOUT_PN_CMD,(const char*)shell_string,hw_strlen(BT_HFP_CALLOUT_PN_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate call out number 10086\n");
-        bt_hfp_hf_callout_by_number(&connect_addr,"10086");
+        bt_hfp_hf_callout_by_number(&connect_addr,(uint8_t *)"10086");
         return HW_ERR_OK;
     }
 
@@ -1351,11 +1415,11 @@ uint8_t shell_parse(uint8_t *shell_string)
 #endif
 
 #if BT_BLE_ENABLE > 0
-		if(hw_strncmp("GATTC_MTU_REQ",(const char*)shell_string,hw_strlen("GATTC_MTU_REQ")) == 0)
+		if(hw_strncmp(BT_GATTC_MTU_REQ_CMD,(const char*)shell_string,hw_strlen(BT_GATTC_MTU_REQ_CMD)) == 0)
 		{
 
 			HW_DEBUG("SHELL:GATTC_MTU_REQ\n");
-			gatt_client_exchange_mtu(GATT_BLE_MTU_SIZE);
+			bt_gatt_client_exchange_mtu(&connect_addr,GATT_BLE_MTU_SIZE);
 
 			return HW_ERR_OK;
 		}

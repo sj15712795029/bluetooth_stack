@@ -880,6 +880,8 @@ static err_t _hci_le_meta_evt_process(uint8_t *payload,uint16_t payload_len)
             link->conhdl = con_handle;
             HCI_REG(&(hci_active_links), link);
             link->state = OPEN;
+
+			le_connect_handler(bdaddr);
         }
         break;
     }

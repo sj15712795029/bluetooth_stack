@@ -21,6 +21,8 @@
 #include "bt_spp.h"
 #include "bt_pbap_client.h"
 #include "bt_hid_device.h"
+#include "bt_att.h"
+#include "bt_gatt.h"
 
 
 struct bt_memp_t
@@ -65,6 +67,12 @@ static const uint16_t memp_sizes[MEMP_BT_MAX] =
 #if PROFILE_HID_ENABLE
     sizeof(struct hid_device_pcb_t),
 #endif
+#if BT_BLE_ENABLE
+	sizeof(att_pcb_t),
+	sizeof(gatt_pcb_t),
+#endif
+
+
     PBUF_POOL_BUFSIZE,
 };
 
@@ -103,6 +111,11 @@ static const uint16_t memp_num[MEMP_BT_MAX] =
 #if PROFILE_HID_ENABLE
     MEMP_NUM_HID,
 #endif
+#if BT_BLE_ENABLE
+	MEMP_NUM_ATT,
+	MEMP_NUM_GATT,
+#endif
+
     MEMP_NUM_BT_PBUF,
 };
 
@@ -187,6 +200,15 @@ static uint8_t memp_memory[(MEMP_NUM_HCI_PCB *
                             MEM_ALIGN_SIZE(sizeof(struct hid_device_pcb_t) +
                                     sizeof(struct bt_memp_t)) +
 #endif
+#if BT_BLE_ENABLE
+							MEMP_NUM_ATT *
+							MEM_ALIGN_SIZE(sizeof(att_pcb_t) +
+									sizeof(struct bt_memp_t)) +
+							MEMP_NUM_GATT *
+							MEM_ALIGN_SIZE(sizeof(gatt_pcb_t) +
+									sizeof(struct bt_memp_t)) +
+#endif
+
                             MEMP_NUM_BT_PBUF *
                             MEM_ALIGN_SIZE(0x500))];
 

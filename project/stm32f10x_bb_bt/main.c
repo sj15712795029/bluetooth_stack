@@ -690,6 +690,61 @@ static bt_app_pbap_cb_t bt_app_pbap_cb =
 
 #endif
 
+#if BT_BLE_ENABLE > 0
+void bt_app_gatt_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("bt_app_gatt_connect_set_up,address is :\n");
+    bt_addr_dump(remote_addr->addr);
+
+	connect_addr.addr[5] = remote_addr->addr[5];
+    connect_addr.addr[4] = remote_addr->addr[4];
+    connect_addr.addr[3] = remote_addr->addr[3];
+    connect_addr.addr[2] = remote_addr->addr[2];
+    connect_addr.addr[1] = remote_addr->addr[1];
+    connect_addr.addr[0] = remote_addr->addr[0];
+
+}
+void bt_app_gatt_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("bt_app_gatt_connect_realease,address is :\n");
+    bt_addr_dump(remote_addr->addr);
+}
+
+void bt_app_gattc_mtu_value(struct bd_addr_t *remote_addr,uint16_t mtu)
+{
+	printf("bt_app_gattc_mtu_value,mtu(%d) address is :\n",mtu);
+    bt_addr_dump(remote_addr->addr);
+}
+
+
+bt_gatt_client_cbs_t bt_app_gattc_wrapper_cb =
+{
+    bt_app_gattc_mtu_value,
+};
+
+
+void bt_app_gatts_mtu_value(struct bd_addr_t *remote_addr,uint16_t mtu)
+{
+	printf("bt_app_gatts_mtu_value,mtu(%d) address is :\n",mtu);
+    bt_addr_dump(remote_addr->addr);
+}
+
+
+bt_gatt_server_cbs_t bt_app_gatts_wrapper_cb =
+{
+  bt_app_gatts_mtu_value,
+};
+
+
+
+static bt_gatt_cbs_t bt_app_gatt_wrapper_cb =
+{
+	bt_app_gatt_connect_set_up,
+	bt_app_gatt_connect_realease,
+    &bt_app_gattc_wrapper_cb,
+    &bt_app_gatts_wrapper_cb,
+};
+#endif
 
 static bt_app_cb_t bt_app_cb =
 {
@@ -731,6 +786,11 @@ static bt_app_cb_t bt_app_cb =
 	NULL,
 #endif
 
+#if BT_BLE_ENABLE > 0
+    &bt_app_gatt_wrapper_cb,
+#else
+	NULL,
+#endif
 
 };
 

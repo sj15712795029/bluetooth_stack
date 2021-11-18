@@ -165,6 +165,34 @@
 #define GATT_CLIENT_OP_EX_MTU 1
 #define GATT_CLIENT_OP_DISCOVERY 2
 
+typedef struct _gatt_pcb_t
+{
+    struct _gatt_pcb_t *next; /* For the linked list */
+	struct bd_addr_t remote_addr;
+    att_pcb_t *att_pcb;
+}gatt_pcb_t;
+
+
+typedef struct
+{
+    void (*gatt_mtu_value)(struct bd_addr_t *remote_addr,uint16_t mtu);
+} gatt_client_cbs_t;
+
+
+typedef struct
+{
+    void (*gatt_mtu_value)(struct bd_addr_t *remote_addr,uint16_t mtu);
+} gatt_server_cbs_t;
+
+typedef struct
+{
+	void (*gatt_connect_set_up)(struct bd_addr_t *remote_addr,uint8_t status);
+    void (*gatt_connect_realease)(struct bd_addr_t *remote_addr,uint8_t status);
+	gatt_client_cbs_t *gatt_client_cbs;
+	gatt_server_cbs_t *gatt_server_cbs;
+}gatt_cbs_t;
+
+
 typedef struct
 {
     void (*gatt_db_read)(struct bd_addr_t *remote_addr,uint16_t handle,uint8_t *value,uint8_t *value_len,uint8_t *err_code);
@@ -209,7 +237,7 @@ typedef struct
 
 
 /* Gatt commmon API */
-err_t gatt_init(void);
+err_t gatt_init(gatt_cbs_t *cbs);
 
 /* Gatt server API */
 err_t gatt_server_init(void);
@@ -221,7 +249,7 @@ err_t gatt_server_indication(uint16_t handle,uint8_t *value,uint8_t value_length
 
 /* Gatt client API */
 err_t gatt_client_init(void);
-err_t gatt_client_exchange_mtu(uint16_t mtu);
+err_t gatt_client_exchange_mtu(struct bd_addr_t *remote_addr,uint16_t mtu);
 err_t gatt_client_discovery_pri_service(uint16_t start_handle,uint16_t end_handle);
 err_t gatt_client_discovery_pri_service_uuid(uint16_t start_handle,uint16_t end_handle,uint16_t uuid);
 err_t gatt_client_find_include(uint16_t start_handle,uint16_t end_handle);

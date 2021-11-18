@@ -18,7 +18,7 @@
 
 #define BT_SNOOP_PATH "./"
 
-int32_t bt_snoop_file = -1;
+int bt_snoop_file = -1;
 
 
 /* Android btsnoop packet format */
@@ -50,11 +50,11 @@ err_t bt_snoop_init(void)
     p = gmtime(&t);
     uint8_t bt_snoop_name[64] = {0};
 
-    sprintf(bt_snoop_name,"%sbtsnoop_%04d_%02d_%02d_%02d_%02d_%02d.log",BT_SNOOP_PATH,1900 + p->tm_year,1 + p->tm_mon, \
+    sprintf((char *)bt_snoop_name,"%sbtsnoop_%04d_%02d_%02d_%02d_%02d_%02d.log",BT_SNOOP_PATH,1900 + p->tm_year,1 + p->tm_mon, \
             p->tm_mday,8 + p->tm_hour,p->tm_min,p->tm_sec);/* time zone hour+8 */
 
 
-    bt_snoop_file = open(bt_snoop_name, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    bt_snoop_file = open((char *)bt_snoop_name, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     if(bt_snoop_file <0)
     {
         BT_SNOOP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_snoop_init open fail\n",__FILE__,__FUNCTION__,__LINE__);

@@ -84,13 +84,22 @@
 #define ATT_READ_TYPE_REQ_HDR_LEN 5
 #define ATT_READ_REQ_PACK_LEN 3
 
+typedef struct _att_pcb_t
+{
+    struct _att_pcb_t *next; /* For the linked list */
+	struct bd_addr_t remote_addr;
+    l2cap_pcb_t*l2cappcb;
+
+}att_pcb_t;
+
 
 typedef struct
 {
-    void (*att_connect_set_up)(struct bd_addr_t *remote_addr,uint8_t status);
-    void (*att_connect_realease)(struct bd_addr_t *remote_addr,uint8_t status);
-    void (*att_data_recv)(struct bd_addr_t *remote_addr,struct bt_pbuf_t *p);
+    void (*att_connect_set_up)(att_pcb_t *att_pcb,uint8_t status);
+    void (*att_connect_realease)(att_pcb_t *att_pcb,uint8_t status);
+    void (*att_data_recv)(att_pcb_t *att_pcb,struct bt_pbuf_t *p);
 } att_cbs_t;
+
 
 /* ATT common API */
 err_t att_init(void);
@@ -134,7 +143,7 @@ err_t att_indication(uint16_t handle,uint8_t *att_value,uint8_t att_value_len);
 
 
 /* ATT client API */
-err_t att_mtu_req(uint16_t client_mtu);
+err_t att_mtu_req(att_pcb_t *att_pcb,uint16_t client_mtu);
 err_t att_parse_mtu_rsp(struct bt_pbuf_t *p,uint16_t *server_mtu);
 err_t att_parse_mtu_rsp(struct bt_pbuf_t *p,uint16_t *server_mtu);
 err_t att_parse_read_type_rsp(struct bt_pbuf_t *p,uint8_t *each_len,uint8_t *data_num,uint8_t **data_list);

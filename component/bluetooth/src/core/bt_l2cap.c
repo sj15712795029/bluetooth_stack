@@ -1910,6 +1910,8 @@ void lp_connect_cfm(struct bd_addr_t *bdaddr, uint8_t encrypt_mode, err_t err)
 void lp_connect_ind(struct bd_addr_t *bdaddr)
 {
     BT_L2CAP_TRACE_DEBUG("lp_connect_ind\n");
+
+	
 }
 
 void lp_disconnect_ind(struct bd_addr_t *bdaddr)
@@ -1932,6 +1934,20 @@ void lp_disconnect_ind(struct bd_addr_t *bdaddr)
     }
 }
 
+void le_connect_handler(struct bd_addr_t *bdaddr)
+{
+	l2cap_pcb_t *pcb;
+	for(pcb = l2cap_active_pcbs; pcb != NULL; pcb = pcb->next)
+    {
+        if(pcb->fixed_cid == L2CAP_ATT_CID)
+        {
+        	pcb->state = L2CAP_OPEN;
+			bd_addr_set(&(pcb->remote_bdaddr),bdaddr);
+			L2CA_ACTION_CONN_IND(pcb, BT_ERR_OK);
+            break;
+        }
+    }
+}
 
 
 static uint8_t _l2cap_next_sigid(void)
@@ -1995,7 +2011,7 @@ err_t l2cap_fixed_channel_register_recv(uint16_t cid,
     l2cappcb->l2ca_connect_ind = l2ca_connect_ind;
     l2cappcb->l2ca_disconnect_ind = l2ca_disconnect_ind;
     l2cappcb->l2ca_recv = l2ca_recv;
-    l2cappcb->state = L2CAP_OPEN;
+    l2cappcb->state = L2CAP_CLOSED;
     L2CAP_REG(&l2cap_active_pcbs, l2cappcb);
 
     return BT_ERR_OK;

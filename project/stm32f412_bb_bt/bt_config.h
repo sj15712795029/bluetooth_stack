@@ -113,6 +113,8 @@
 #define MEMP_NUM_SPP 7
 #define MEMP_NUM_PBAP 7
 #define MEMP_NUM_HID 7
+#define MEMP_NUM_ATT 7
+#define MEMP_NUM_GATT 7
 #define MEMP_NUM_BT_PBUF 3
 #define MEM_ALIGNMENT 4
 #define MEM_LIBC_MALLOC 1

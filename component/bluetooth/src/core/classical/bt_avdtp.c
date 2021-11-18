@@ -108,7 +108,7 @@ static err_t avdtp_handle_discovery(struct avdtp_pcb_t *avdtp_pcb,uint8_t transa
     uint8_t cmd_resp_pos = 0;
 
     struct bt_pbuf_t *p,*q;
-    err_t ret;
+    err_t ret = BT_ERR_OK;
     BT_UNUSED_ARG(ret);
 
     if((p = bt_pbuf_alloc(BT_PBUF_RAW, AVDTP_SIG_HDR_SIZE, BT_PBUF_RAM)) == NULL)
@@ -153,7 +153,7 @@ static err_t avdtp_handle_get_capabilities(struct avdtp_pcb_t *avdtp_pcb,uint8_t
     uint8_t *cmd_resp;
     uint8_t cmd_resp_pos = 0;
     struct bt_pbuf_t *p,*q;
-    err_t ret;
+    err_t ret = BT_ERR_OK;
     BT_UNUSED_ARG(ret);
 
     if((p = bt_pbuf_alloc(BT_PBUF_RAW, AVDTP_SIG_HDR_SIZE, BT_PBUF_RAM)) == NULL)
@@ -221,7 +221,7 @@ static err_t avdtp_handle_get_all_capabilities(struct avdtp_pcb_t *avdtp_pcb,uin
     uint8_t *cmd_resp;
     uint8_t cmd_resp_pos = 0;
     struct bt_pbuf_t *p,*q;
-    err_t ret;
+    err_t ret = BT_ERR_OK;
     BT_UNUSED_ARG(ret);
 
     if((p = bt_pbuf_alloc(BT_PBUF_RAW, AVDTP_SIG_HDR_SIZE, BT_PBUF_RAM)) == NULL)
@@ -315,7 +315,7 @@ static err_t avdtp_handle_set_configuration(struct avdtp_pcb_t *avdtp_pcb,uint8_
     uint8_t cmd_resp_pos = 0;
     struct bt_pbuf_t *p;
 
-    err_t ret;
+    err_t ret = BT_ERR_OK;
     BT_UNUSED_ARG(ret);
 
     if((p = bt_pbuf_alloc(BT_PBUF_RAW, AVDTP_SIG_HDR_SIZE, BT_PBUF_RAM)) == NULL)
@@ -339,7 +339,7 @@ static err_t avdtp_handle_open(struct avdtp_pcb_t *avdtp_pcb,uint8_t transaction
     uint8_t *cmd_resp;
     uint8_t cmd_resp_pos = 0;
     struct bt_pbuf_t *p;
-    err_t ret;
+    err_t ret = BT_ERR_OK;
     BT_UNUSED_ARG(ret);
     if((p = bt_pbuf_alloc(BT_PBUF_RAW, AVDTP_SIG_HDR_SIZE, BT_PBUF_RAM)) == NULL)
     {
@@ -363,7 +363,7 @@ static err_t avdtp_handle_start(struct avdtp_pcb_t *avdtp_pcb,uint8_t transactio
     uint8_t *cmd_resp;
     uint8_t cmd_resp_pos = 0;
     struct bt_pbuf_t *p;
-    err_t ret;
+    err_t ret = BT_ERR_OK;
     BT_UNUSED_ARG(ret);
     if((p = bt_pbuf_alloc(BT_PBUF_RAW, AVDTP_SIG_HDR_SIZE, BT_PBUF_RAM)) == NULL)
     {
@@ -387,7 +387,7 @@ static err_t avdtp_handle_suspend(struct avdtp_pcb_t *avdtp_pcb,uint8_t transact
     uint8_t *cmd_resp;
     uint8_t cmd_resp_pos = 0;
     struct bt_pbuf_t *p;
-    err_t ret;
+    err_t ret = BT_ERR_OK;
     BT_UNUSED_ARG(ret);
     if((p = bt_pbuf_alloc(BT_PBUF_RAW,AVDTP_SIG_HDR_SIZE, BT_PBUF_RAM)) == NULL)
     {
@@ -411,7 +411,7 @@ static err_t avdtp_handle_close(struct avdtp_pcb_t *avdtp_pcb,uint8_t transactio
     uint8_t *cmd_resp;
     uint8_t cmd_resp_pos = 0;
     struct bt_pbuf_t *p;
-    err_t ret;
+    err_t ret = BT_ERR_OK;
     BT_UNUSED_ARG(ret);
     if((p = bt_pbuf_alloc(BT_PBUF_RAW,AVDTP_SIG_HDR_SIZE, BT_PBUF_RAM)) == NULL)
     {
@@ -434,7 +434,7 @@ static err_t avdtp_handle_abort(struct avdtp_pcb_t *avdtp_pcb,uint8_t transactio
     uint8_t *cmd_resp;
     uint8_t cmd_resp_pos = 0;
     struct bt_pbuf_t *p;
-    err_t ret;
+    err_t ret = BT_ERR_OK;
     BT_UNUSED_ARG(ret);
     if((p = bt_pbuf_alloc(BT_PBUF_RAW,AVDTP_SIG_HDR_SIZE, BT_PBUF_RAM)) == NULL)
     {

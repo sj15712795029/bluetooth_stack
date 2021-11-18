@@ -173,9 +173,9 @@ void bt_hex_dump(uint8_t *data,uint32_t len)
 
 void bt_addr_dump(uint8_t *addr)
 {
-	uint8_t addr_buff[32];
-	sprintf((char*)addr_buff,"BT ADDR:%02x:%02x:%02x:%02x:%02x:%02x\n",addr[0],addr[1],addr[2],addr[3],addr[5],addr[5]);
-	BT_HEX_TRACE_DEBUG((char*)addr_buff);
+	uint8_t addr_buff[32] = {0};
+	sprintf((char*)addr_buff,"BT ADDR:%02x:%02x:%02x:%02x:%02x:%02x\n",addr[0],addr[1],addr[2],addr[3],addr[4],addr[5]);
+	BT_HEX_TRACE_DEBUG("%s",(char*)addr_buff);
 }
 
 

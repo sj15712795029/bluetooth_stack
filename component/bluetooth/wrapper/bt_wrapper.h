@@ -38,7 +38,6 @@
 #endif
 
 #if BT_BLE_ENABLE > 0
-#include "bt_att.h"
 #include "bt_gatt.h"
 #if PROFILE_BAS_ENABLE > 0
 #include "bt_bas.h"
@@ -172,6 +171,24 @@ typedef struct
 }bt_app_pbap_cb_t;
 
 
+typedef struct
+{
+    void (*bt_gatt_mtu_value)(struct bd_addr_t *remote_addr,uint16_t mtu);
+} bt_gatt_client_cbs_t;
+
+typedef struct
+{
+    void (*bt_gatt_mtu_value)(struct bd_addr_t *remote_addr,uint16_t mtu);
+} bt_gatt_server_cbs_t;
+
+typedef struct
+{
+	void (*bt_gatt_connect_set_up)(struct bd_addr_t *remote_addr,uint8_t status);
+    void (*bt_gatt_connect_realease)(struct bd_addr_t *remote_addr,uint8_t status);
+	bt_gatt_client_cbs_t *gatt_client_cbs;
+	bt_gatt_server_cbs_t *gatt_server_cbs;
+}bt_gatt_cbs_t;
+
 
 typedef struct
 {
@@ -182,6 +199,7 @@ typedef struct
 	bt_app_avrcp_cb_t *app_avrcp_cb;
 	bt_app_hid_cb_t *app_hid_cb;
 	bt_app_pbap_cb_t *app_pbap_cb;
+	bt_gatt_cbs_t *app_gatt_cb;
 }bt_app_cb_t;
 
 
@@ -264,6 +282,9 @@ uint8_t bt_pbap_client_download_vcard_entry(struct bd_addr_t *addr,uint8_t repos
 uint8_t bt_pbap_client_download_abort(struct bd_addr_t *addr);
 #endif
 
+#if BT_BLE_ENABLE
+uint8_t bt_gatt_client_exchange_mtu(struct bd_addr_t *remote_addr,uint16_t mtu);
+#endif
 
 
 #endif

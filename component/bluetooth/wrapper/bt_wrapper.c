@@ -21,29 +21,32 @@ static uint8_t *bt_le_adv_get_data(bt_le_adv_parse_t *bt_adv_le_parse);
 #endif
 
 
+
+
+#if PROFILE_HID_ENABLE > 0
 #if HID_DEVICE_MOUSE_ENABLE
-static uint8_t hid_device_descriptor[] = 
+static uint8_t hid_device_descriptor[] =
 {
 
-	0x05,0x01,	/*USAGE_PAGE (Generic Desktop)*/
-	0x09,0x02,	/*USAGE (Mouse)*/
-	0xa1,0x01,	/*COLLECTION (Application)*/
-	0x09,0x01,	 /*USAGE (Pointer)*/
-	0xa1,0x00,	 /*COLLECTION (Physical)*/
+    0x05,0x01,	/*USAGE_PAGE (Generic Desktop)*/
+    0x09,0x02,	/*USAGE (Mouse)*/
+    0xa1,0x01,	/*COLLECTION (Application)*/
+    0x09,0x01,	 /*USAGE (Pointer)*/
+    0xa1,0x00,	 /*COLLECTION (Physical)*/
 
-	0x05,0x09,  /*USAGE_PAGE (Button)*/
-	0x19,0x01,  /*USAGE_MINIMUM (Button 1)*/
-	0x29,0x03,  /*USAGE_MAXIMUM (Button 3)*/
-	0x15,0x00,  /*LOGICAL_MINIMUM (0)*/
-	0x25,0x01,  /*LOGICAL_MAXIMUM (1)*/
-	0x95,0x03,  /*REPORT_COUNT (3)*/
-	0x75,0x01,  /*REPORT_SIZE (1)*/
-	0x81,0x02,  /*INPUT (Data,Var,Abs)*/
-	0x95,0x01,  /*REPORT_COUNT (1)*/
-	0x75,0x05,  /*REPORT_SIZE (5)*/
-	0x81,0x03,  /*INPUT (Cnst,Var,Abs)*/
+    0x05,0x09,  /*USAGE_PAGE (Button)*/
+    0x19,0x01,  /*USAGE_MINIMUM (Button 1)*/
+    0x29,0x03,  /*USAGE_MAXIMUM (Button 3)*/
+    0x15,0x00,  /*LOGICAL_MINIMUM (0)*/
+    0x25,0x01,  /*LOGICAL_MAXIMUM (1)*/
+    0x95,0x03,  /*REPORT_COUNT (3)*/
+    0x75,0x01,  /*REPORT_SIZE (1)*/
+    0x81,0x02,  /*INPUT (Data,Var,Abs)*/
+    0x95,0x01,  /*REPORT_COUNT (1)*/
+    0x75,0x05,  /*REPORT_SIZE (5)*/
+    0x81,0x03,  /*INPUT (Cnst,Var,Abs)*/
 
-	0x05, 0x01, /*USAGE_PAGE (Generic Desktop)*/
+    0x05, 0x01, /*USAGE_PAGE (Generic Desktop)*/
     0x09, 0x30, /*USAGE (X)*/
     0x09, 0x31, /*USAGE (Y)*/
     0x15, 0x81, /*LOGICAL_MINIMUM (-127)*/
@@ -51,9 +54,9 @@ static uint8_t hid_device_descriptor[] =
     0x75, 0x08, /*REPORT_SIZE (8)*/
     0x95, 0x02, /*REPORT_COUNT (2)*/
     0x81, 0x06, /*INPUT (Data,Var,Rel)*/
-	
-	0xc0,       /*END_COLLECTION*/
-	0xc0,        /*END_COLLECTION*/
+
+    0xc0,       /*END_COLLECTION*/
+    0xc0,        /*END_COLLECTION*/
 };
 #endif
 
@@ -64,7 +67,8 @@ static uint8_t hid_device_descriptor[] =
 #define KEY_DELETE   0x7f
 #define KEY_TAB         '\t'
 
-static uint8_t keyboard_key_map [] = {
+static uint8_t keyboard_key_map [] =
+{
     KEY_UNSUPPORT, KEY_UNSUPPORT, KEY_UNSUPPORT, KEY_UNSUPPORT,             /*   0-3 */
     'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',                   /*  4-13 */
     'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',                   /* 14-23 */
@@ -81,14 +85,15 @@ static uint8_t keyboard_key_map [] = {
     KEY_UNSUPPORT, KEY_UNSUPPORT, KEY_UNSUPPORT, KEY_UNSUPPORT,             /* 81-84 */
     '*', '-', '+', '\n', '1', '2', '3', '4', '5',                       /* 85-97 */
     '6', '7', '8', '9', '0', '.', 0xa7,                                 /* 97-100 */
-}; 
+};
 
-static uint8_t hid_device_descriptor[] = {
+static uint8_t hid_device_descriptor[] =
+{
 
     0x05, 0x01,              /* Usage Page (Generic Desktop) */
     0x09, 0x06,              /* Usage (Keyboard) */
     0xa1, 0x01,              /* Collection (Application) */
-    
+
     /* Modifier byte */
     0x75, 0x01,              /*   Report Size (1) */
     0x95, 0x08,              /*   Report Count (8) */
@@ -98,12 +103,12 @@ static uint8_t hid_device_descriptor[] = {
     0x15, 0x00,              /*   Logical Minimum (0) */
     0x25, 0x01,              /*   Logical Maximum (1) */
     0x81, 0x02,              /*   Input (Data, Variable, Absolute) */
-    
+
     /* Reserved byte */
     0x75, 0x01,              /*   Report Size (1) */
     0x95, 0x08,              /*   Report Count (8) */
     0x81, 0x03,              /*   Input (Constant, Variable, Absolute) */
-    
+
     /* LED report + padding */
     0x95, 0x05,              /*   Report Count (5) */
     0x75, 0x01,              /*   Report Size (1) */
@@ -114,7 +119,7 @@ static uint8_t hid_device_descriptor[] = {
     0x95, 0x01,              /*   Report Count (1) */
     0x75, 0x03,              /*   Report Size (3) */
     0x91, 0x03,              /*   Output (Constant, Variable, Absolute) */
-    
+
     /* Keycodes */
     0x95, 0x06,              /*   Report Count (6) */
     0x75, 0x08,              /*   Report Size (8) */
@@ -124,10 +129,10 @@ static uint8_t hid_device_descriptor[] = {
     0x19, 0x00,              /*   Usage Minimum (Reserved (no event indicated)) */
     0x29, 0xff,              /*   Usage Maxium (Reserved) */
     0x81, 0x00,              /*   Input (Data, Array) */
-    
+
     0xc0,                    /* End collection   */
 };
-
+#endif
 #endif
 
 static err_t bt_ass_eir_data(void)
@@ -162,7 +167,7 @@ static err_t bt_ass_eir_data(void)
     len += 2;
 #endif
 #if PROFILE_HID_ENABLE
-	len += 2;
+    len += 2;
 #endif
 
     eir_data[data_pos++] = len;
@@ -188,8 +193,8 @@ static err_t bt_ass_eir_data(void)
     eir_data[data_pos++] = (BT_SERVICE_CLASS_AV_REMOTE_CONTROL>>8) & 0xff;
 #endif
 #if PROFILE_HID_ENABLE
-	eir_data[data_pos++] = BT_SERVICE_CLASS_HUMAN_INTERFACE_DEVICE_SERVICE & 0xff;
-	eir_data[data_pos++] = (BT_SERVICE_CLASS_HUMAN_INTERFACE_DEVICE_SERVICE>>8) & 0xff;
+    eir_data[data_pos++] = BT_SERVICE_CLASS_HUMAN_INTERFACE_DEVICE_SERVICE & 0xff;
+    eir_data[data_pos++] = (BT_SERVICE_CLASS_HUMAN_INTERFACE_DEVICE_SERVICE>>8) & 0xff;
 #endif
 
 
@@ -219,7 +224,7 @@ static err_t bt_get_remote_name_complete(struct bd_addr_t *bdaddr,uint8_t * name
 static err_t  link_key_req(void *arg,struct bd_addr_t *bdaddr)
 {
     printf("link key request,address is :");
-	bt_addr_dump(bdaddr->addr);
+    bt_addr_dump(bdaddr->addr);
     if(bd_addr_cmp(&(link_key_instance.remote_addr),bdaddr))
     {
         hci_link_key_request_reply(bdaddr,(uint8_t *)&(link_key_instance.link_key));
@@ -234,7 +239,7 @@ static err_t  link_key_req(void *arg,struct bd_addr_t *bdaddr)
 static err_t  link_key_not(void *arg, struct bd_addr_t *bdaddr, uint8_t *key,uint8_t key_type)
 {
     printf("link key notification,address is :");
-	bt_addr_dump(bdaddr->addr);
+    bt_addr_dump(bdaddr->addr);
     printf("link key notification,linkey is :");
     bt_hex_dump(key,16);
     printf("link key notification,key type is :%d\n",key_type);
@@ -255,16 +260,16 @@ err_t bt_stack_worked(void *arg)
     {
         bt_wrapper_cb->app_common_cb->bt_init_result(BT_INIT_SUCCESS,bt_profile_mask);
     }
-	
+
 
     return 0;
 }
 
 err_t bt_hardware_error(uint8_t reson)
 {
-	printf("bt_hardware_error\r\n");
+    printf("bt_hardware_error\r\n");
 
-	if(bt_wrapper_cb && bt_wrapper_cb->app_common_cb && bt_wrapper_cb->app_common_cb->bt_hardware_error)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_common_cb && bt_wrapper_cb->app_common_cb->bt_hardware_error)
     {
         bt_wrapper_cb->app_common_cb->bt_hardware_error(reson);
     }
@@ -277,7 +282,7 @@ err_t bt_hardware_error(uint8_t reson)
 void spp_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("WRAPPER << PROFILE:spp_connect_set_up,address is :\n");
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
 
     if(bt_wrapper_cb && bt_wrapper_cb->app_spp_cb && bt_wrapper_cb->app_spp_cb->bt_spp_connect)
     {
@@ -287,7 +292,7 @@ void spp_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
 void spp_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("WRAPPER << PROFILE:spp_connect_realease,address is :\n");
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
 
     if(bt_wrapper_cb && bt_wrapper_cb->app_spp_cb && bt_wrapper_cb->app_spp_cb->bt_spp_disconnect)
     {
@@ -297,7 +302,7 @@ void spp_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
 void spp_data_ind(struct bd_addr_t *remote_addr,uint8_t *data,uint16_t data_len)
 {
     printf("WRAPPER << PROFILE:spp_data_ind,address is :\n");
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
     printf("data len %d,data is:\n",data_len);
     bt_hex_dump(data,data_len);
 
@@ -320,7 +325,7 @@ static spp_cbs_t spp_wrapper_cb =
 void hfp_hf_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("WRAPPER << PROFILE:hfp_hf_connect_set_up,address is :\n");
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
 
     if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_connect)
     {
@@ -330,7 +335,7 @@ void hfp_hf_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
 void hfp_hf_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("WRAPPER << PROFILE:hfp_hf_connect_realease,address is :\n");
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
 
     if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_disconnect)
     {
@@ -340,7 +345,7 @@ void hfp_hf_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
 void hfp_hf_sco_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("WRAPPER << PROFILE:hfp_hf_sco_connect_set_up,address is :\n");
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
 
     bt_sco_connected = 1;
     if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_sco_connect)
@@ -351,7 +356,7 @@ void hfp_hf_sco_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
 void hfp_hf_sco_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("WRAPPER << PROFILE:hfp_hf_sco_connect_realease,address is :\n");
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
 
     bt_sco_connected = 0;
     if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_sco_disconnect)
@@ -362,7 +367,7 @@ void hfp_hf_sco_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
 void hfp_hf_call_status(struct bd_addr_t *remote_addr,uint8_t value)
 {
     printf("WRAPPER << PROFILE:hfp_hf_call_status,value %d,address is :\n",value);
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
     switch(value)
     {
     case HFP_CALL_NO_INPORCESS:
@@ -385,7 +390,7 @@ void hfp_hf_call_status(struct bd_addr_t *remote_addr,uint8_t value)
 void hfp_hf_call_setup_status(struct bd_addr_t *remote_addr,uint8_t value)
 {
     printf("WRAPPER << PROFILE:hfp_hf_call_setup_status,value %d,address is :\n",value);
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
     switch(value)
     {
     case HFP_CALL_NO_CALL:
@@ -420,7 +425,7 @@ void hfp_hf_call_setup_status(struct bd_addr_t *remote_addr,uint8_t value)
 void hfp_hf_call_held_status(struct bd_addr_t *remote_addr,uint8_t value)
 {
     printf("WRAPPER << PROFILE:hfp_hf_call_held_status,value %d,address is :\n",value);
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
     switch(value)
     {
     case HFP_CALL_NO_CALL_HELD:
@@ -439,7 +444,7 @@ void hfp_hf_call_held_status(struct bd_addr_t *remote_addr,uint8_t value)
 void hfp_hf_signal_status(struct bd_addr_t *remote_addr,uint8_t value)
 {
     printf("WRAPPER << PROFILE:hfp_hf_signal_status,value %d,address is :\n",value);
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
 
     if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_signal_strength_ind)
     {
@@ -449,7 +454,7 @@ void hfp_hf_signal_status(struct bd_addr_t *remote_addr,uint8_t value)
 void hfp_hf_battchg_status(struct bd_addr_t *remote_addr,uint8_t value)
 {
     printf("WRAPPER << PROFILE:hfp_hf_battchg_status,value %d,address is :\n",value);
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
 
     if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_batt_level_ind)
     {
@@ -459,12 +464,12 @@ void hfp_hf_battchg_status(struct bd_addr_t *remote_addr,uint8_t value)
 void hfp_hf_server_status(struct bd_addr_t *remote_addr,uint8_t value)
 {
     printf("WRAPPER << PROFILE:hfp_hf_server_status:%d,address is :\n",value);
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
 }
 void hfp_hf_roam_status(struct bd_addr_t *remote_addr,uint8_t value)
 {
     printf("WRAPPER << PROFILE:hfp_hf_roam_status, value %d,address is :\n",value);
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
 
     if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_roam_status_ind)
     {
@@ -474,7 +479,7 @@ void hfp_hf_roam_status(struct bd_addr_t *remote_addr,uint8_t value)
 void hfp_hf_network(struct bd_addr_t *remote_addr,uint8_t mode,uint8_t format,uint8_t *operator,uint8_t operator_len)
 {
     printf("WRAPPER << PROFILE:hfp_hf_network,address is :\n");
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
     printf("mode %d,format %d,operator %s,operator_len %d\n",mode,format,operator,operator_len);
 
     if(bt_wrapper_cb && bt_wrapper_cb->app_hfp_cb && bt_wrapper_cb->app_hfp_cb->bt_hfp_operator)
@@ -485,13 +490,13 @@ void hfp_hf_network(struct bd_addr_t *remote_addr,uint8_t mode,uint8_t format,ui
 void hfp_hf_ring(struct bd_addr_t *remote_addr)
 {
     printf("WRAPPER << PROFILE:hfp_hf_ring,address is :\n");
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
 }
 
 void hfp_hf_clip(struct bd_addr_t *remote_addr,uint8_t *number,uint8_t number_len,uint8_t type)
 {
     printf("WRAPPER << PROFILE:hfp_hf_clip, type %d,address is :\n",type);
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
     printf("number len %d,number is:\n",number_len);
     bt_hex_dump(number,number_len);
 }
@@ -499,7 +504,7 @@ void hfp_hf_clip(struct bd_addr_t *remote_addr,uint8_t *number,uint8_t number_le
 void hfp_hf_call_waiting(struct bd_addr_t *remote_addr,uint8_t *number,uint8_t number_len,uint8_t type)
 {
     printf("WRAPPER << PROFILE:hfp_hf_call_waiting, type %d,address is :\n",type);
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
     printf("number len %d,number is:\n",number_len);
     bt_hex_dump(number,number_len);
 }
@@ -507,32 +512,32 @@ void hfp_hf_call_waiting(struct bd_addr_t *remote_addr,uint8_t *number,uint8_t n
 void hfp_hf_voice_recognition(struct bd_addr_t *remote_addr,uint8_t value)
 {
     printf("WRAPPER << PROFILE:hfp_hf_voice_recognition, value %d,address is :\n",value);
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
 }
 
 void hfp_hf_spk_volume(struct bd_addr_t *remote_addr,uint8_t value)
 {
     printf("WRAPPER << PROFILE:hfp_hf_spk_volume,value %d,address is :\n",value);
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
 }
 
 void hfp_hf_mic_volume(struct bd_addr_t *remote_addr,uint8_t value)
 {
     printf("WRAPPER << PROFILE:hfp_hf_mic_volume,value %d,address is :\n",value);
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
 }
 
 void hfp_hf_hold_status(struct bd_addr_t *remote_addr,uint8_t value)
 {
     printf("WRAPPER << PROFILE:hfp_hf_hold_status,value %d,address is :\n",value);
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
 }
 
 void hfp_hf_local_number(struct bd_addr_t *remote_addr,uint8_t *number,uint8_t number_len,uint8_t type,uint8_t service)
 {
     uint8_t lpn_buffer[16] = {0};
     printf("WRAPPER << PROFILE:hfp_hf_local_number, type %d,service %d address is :\n",type,service);
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
     printf("number len %d,number is:\n",number_len);
     bt_hex_dump(number,number_len);
 
@@ -641,8 +646,8 @@ static hfp_hf_cbs_t hfp_hf_wrapper_cb =
 void a2dp_sink_signal_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("WRAPPER << PROFILE:a2dp_sink_signal_connect_set_up, address is :\n");
-	bt_addr_dump(remote_addr->addr);
-	if(bt_wrapper_cb && bt_wrapper_cb->app_a2dp_cb && bt_wrapper_cb->app_a2dp_cb->bt_a2dp_signal_connect)
+    bt_addr_dump(remote_addr->addr);
+    if(bt_wrapper_cb && bt_wrapper_cb->app_a2dp_cb && bt_wrapper_cb->app_a2dp_cb->bt_a2dp_signal_connect)
     {
         bt_wrapper_cb->app_a2dp_cb->bt_a2dp_signal_connect(remote_addr,status);
     }
@@ -651,7 +656,7 @@ void a2dp_sink_signal_connect_realease(struct bd_addr_t *remote_addr,uint8_t sta
 {
     printf("WRAPPER << PROFILE:a2dp_sink_signal_connect_realease, address is :\n");
     bt_addr_dump(remote_addr->addr);
-	if(bt_wrapper_cb && bt_wrapper_cb->app_a2dp_cb && bt_wrapper_cb->app_a2dp_cb->bt_a2dp_signal_disconnect)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_a2dp_cb && bt_wrapper_cb->app_a2dp_cb->bt_a2dp_signal_disconnect)
     {
         bt_wrapper_cb->app_a2dp_cb->bt_a2dp_signal_disconnect(remote_addr,status);
     }
@@ -660,16 +665,16 @@ void a2dp_sink_stream_connect_set_up(struct bd_addr_t *remote_addr,uint8_t statu
 {
     printf("WRAPPER << PROFILE:a2dp_sink_stream_connect_set_up, address is :\n");
     bt_addr_dump(remote_addr->addr);
-	if(bt_wrapper_cb && bt_wrapper_cb->app_a2dp_cb && bt_wrapper_cb->app_a2dp_cb->bt_a2dp_stream_connect)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_a2dp_cb && bt_wrapper_cb->app_a2dp_cb->bt_a2dp_stream_connect)
     {
         bt_wrapper_cb->app_a2dp_cb->bt_a2dp_stream_connect(remote_addr,status);
     }
 }
 void a2dp_sink_stream_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
 {
-	printf("WRAPPER << PROFILE:a2dp_sink_stream_connect_realease, address is :\n");
+    printf("WRAPPER << PROFILE:a2dp_sink_stream_connect_realease, address is :\n");
     bt_addr_dump(remote_addr->addr);
-	if(bt_wrapper_cb && bt_wrapper_cb->app_a2dp_cb && bt_wrapper_cb->app_a2dp_cb->bt_a2dp_stream_disconnect)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_a2dp_cb && bt_wrapper_cb->app_a2dp_cb->bt_a2dp_stream_disconnect)
     {
         bt_wrapper_cb->app_a2dp_cb->bt_a2dp_stream_disconnect(remote_addr,status);
     }
@@ -679,7 +684,7 @@ void a2dp_sink_stream_start(struct bd_addr_t *remote_addr,uint8_t value)
     printf("WRAPPER << PROFILE:a2dp_sink_stream_start, address is :\n");
     bt_addr_dump(remote_addr->addr);
 
-	if(bt_wrapper_cb && bt_wrapper_cb->app_a2dp_cb && bt_wrapper_cb->app_a2dp_cb->bt_a2dp_start)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_a2dp_cb && bt_wrapper_cb->app_a2dp_cb->bt_a2dp_start)
     {
         bt_wrapper_cb->app_a2dp_cb->bt_a2dp_start(remote_addr,value);
     }
@@ -690,7 +695,7 @@ void a2dp_sink_stream_realease(struct bd_addr_t *remote_addr,uint8_t value)
     printf("WRAPPER << PROFILE:a2dp_sink_stream_realease, address is :\n");
     bt_addr_dump(remote_addr->addr);
 
-	if(bt_wrapper_cb && bt_wrapper_cb->app_a2dp_cb && bt_wrapper_cb->app_a2dp_cb->bt_a2dp_relase)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_a2dp_cb && bt_wrapper_cb->app_a2dp_cb->bt_a2dp_relase)
     {
         bt_wrapper_cb->app_a2dp_cb->bt_a2dp_relase(remote_addr,value);
     }
@@ -701,7 +706,7 @@ void a2dp_sink_stream_suspend(struct bd_addr_t *remote_addr,uint8_t value)
     printf("WRAPPER << PROFILE:a2dp_sink_stream_suspend, address is :\n");
     bt_addr_dump(remote_addr->addr);
 
-	if(bt_wrapper_cb && bt_wrapper_cb->app_a2dp_cb && bt_wrapper_cb->app_a2dp_cb->bt_a2dp_suspend)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_a2dp_cb && bt_wrapper_cb->app_a2dp_cb->bt_a2dp_suspend)
     {
         bt_wrapper_cb->app_a2dp_cb->bt_a2dp_suspend(remote_addr,value);
     }
@@ -711,7 +716,7 @@ void a2dp_sink_stream_abort(struct bd_addr_t *remote_addr,uint8_t value)
     printf("WRAPPER << PROFILE:a2dp_sink_stream_abort, address is :\n");
     bt_addr_dump(remote_addr->addr);
 
-	if(bt_wrapper_cb && bt_wrapper_cb->app_a2dp_cb && bt_wrapper_cb->app_a2dp_cb->bt_a2dp_abort)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_a2dp_cb && bt_wrapper_cb->app_a2dp_cb->bt_a2dp_abort)
     {
         bt_wrapper_cb->app_a2dp_cb->bt_a2dp_abort(remote_addr,value);
     }
@@ -738,8 +743,8 @@ static a2dp_sink_cbs_t a2dp_sink_wrapper_cb =
 void avrcp_av_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("WRAPPER << PROFILE:avrcp_av_connect_set_up, address is :\n");
-	bt_addr_dump(remote_addr->addr);
-	if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_ctl_connect)
+    bt_addr_dump(remote_addr->addr);
+    if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_ctl_connect)
     {
         bt_wrapper_cb->app_avrcp_cb->bt_avrcp_ctl_connect(remote_addr,status);
     }
@@ -748,7 +753,7 @@ void avrcp_av_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("WRAPPER << PROFILE:avrcp_av_connect_realease, address is :\n");
     bt_addr_dump(remote_addr->addr);
-	if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_ctl_disconnect)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_ctl_disconnect)
     {
         bt_wrapper_cb->app_avrcp_cb->bt_avrcp_ctl_disconnect(remote_addr,status);
     }
@@ -756,9 +761,9 @@ void avrcp_av_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
 
 void avrcp_support_capabilities(struct bd_addr_t *remote_addr,uint16_t support_cap_mask)
 {
-	printf("WRAPPER << PROFILE:avrcp_support_capabilities mask(0x%x), address is :\n",support_cap_mask);
+    printf("WRAPPER << PROFILE:avrcp_support_capabilities mask(0x%x), address is :\n",support_cap_mask);
     bt_addr_dump(remote_addr->addr);
-	if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_support_capabilities)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_support_capabilities)
     {
         bt_wrapper_cb->app_avrcp_cb->bt_avrcp_support_capabilities(remote_addr,support_cap_mask);
     }
@@ -766,9 +771,9 @@ void avrcp_support_capabilities(struct bd_addr_t *remote_addr,uint16_t support_c
 
 void avrcp_app_setting_attr(struct bd_addr_t *remote_addr,uint16_t setting_attr_mask)
 {
-	printf("WRAPPER << PROFILE:avrcp_app_setting_attr mask(0x%x), address is :\n",setting_attr_mask);
+    printf("WRAPPER << PROFILE:avrcp_app_setting_attr mask(0x%x), address is :\n",setting_attr_mask);
     bt_addr_dump(remote_addr->addr);
-	if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_app_setting_attr)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_app_setting_attr)
     {
         bt_wrapper_cb->app_avrcp_cb->bt_avrcp_app_setting_attr(remote_addr,setting_attr_mask);
     }
@@ -776,9 +781,9 @@ void avrcp_app_setting_attr(struct bd_addr_t *remote_addr,uint16_t setting_attr_
 
 void avrcp_play_status_update(struct bd_addr_t *remote_addr,uint8_t play_status)
 {
-	printf("WRAPPER << PROFILE:avrcp_play_status_update play status(%d), address is :\n",play_status);
+    printf("WRAPPER << PROFILE:avrcp_play_status_update play status(%d), address is :\n",play_status);
     bt_addr_dump(remote_addr->addr);
-	if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_play_status_update)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_play_status_update)
     {
         bt_wrapper_cb->app_avrcp_cb->bt_avrcp_play_status_update(remote_addr,play_status);
     }
@@ -786,9 +791,9 @@ void avrcp_play_status_update(struct bd_addr_t *remote_addr,uint8_t play_status)
 
 void avrcp_track_change_update(struct bd_addr_t *remote_addr)
 {
-	printf("WRAPPER << PROFILE:avrcp_track_change_update\n");
+    printf("WRAPPER << PROFILE:avrcp_track_change_update\n");
     bt_addr_dump(remote_addr->addr);
-	if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_track_change_update)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_track_change_update)
     {
         bt_wrapper_cb->app_avrcp_cb->bt_avrcp_track_change_update(remote_addr);
     }
@@ -796,9 +801,9 @@ void avrcp_track_change_update(struct bd_addr_t *remote_addr)
 
 void avrcp_playpos_change_update(struct bd_addr_t *remote_addr,uint32_t millisecond)
 {
-	printf("WRAPPER << PROFILE:avrcp_playpos_change_update ms(%d)\n",millisecond);
+    printf("WRAPPER << PROFILE:avrcp_playpos_change_update ms(%d)\n",millisecond);
     bt_addr_dump(remote_addr->addr);
-	if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_playpos_change_update)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_playpos_change_update)
     {
         bt_wrapper_cb->app_avrcp_cb->bt_avrcp_playpos_change_update(remote_addr,millisecond);
     }
@@ -806,9 +811,9 @@ void avrcp_playpos_change_update(struct bd_addr_t *remote_addr,uint32_t millisec
 
 void avrcp_battary_change_update(struct bd_addr_t *remote_addr,uint32_t battary_status)
 {
-	printf("WRAPPER << PROFILE:avrcp_battary_change_update battary_status(%d)\n",battary_status);
+    printf("WRAPPER << PROFILE:avrcp_battary_change_update battary_status(%d)\n",battary_status);
     bt_addr_dump(remote_addr->addr);
-	if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_battary_change_update)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_battary_change_update)
     {
         bt_wrapper_cb->app_avrcp_cb->bt_avrcp_battary_change_update(remote_addr,battary_status);
     }
@@ -816,9 +821,9 @@ void avrcp_battary_change_update(struct bd_addr_t *remote_addr,uint32_t battary_
 
 void avrcp_volume_change_update(struct bd_addr_t *remote_addr,uint8_t volume)
 {
-	printf("WRAPPER << PROFILE:avrcp_volume_change_update volume(%d)\n",volume);
+    printf("WRAPPER << PROFILE:avrcp_volume_change_update volume(%d)\n",volume);
     bt_addr_dump(remote_addr->addr);
-	if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_volume_change_update)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_volume_change_update)
     {
         bt_wrapper_cb->app_avrcp_cb->bt_avrcp_volume_change_update(remote_addr,volume);
     }
@@ -826,12 +831,12 @@ void avrcp_volume_change_update(struct bd_addr_t *remote_addr,uint8_t volume)
 
 void avrcp_element_attr_update(struct bd_addr_t *remote_addr,now_playing_info_t* now_playing_info)
 {
-	printf("WRAPPER << PROFILE:avrcp_element_attr_update\n");
+    printf("WRAPPER << PROFILE:avrcp_element_attr_update\n");
     bt_addr_dump(remote_addr->addr);
-	if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_element_attr_update)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_avrcp_cb && bt_wrapper_cb->app_avrcp_cb->bt_avrcp_element_attr_update)
     {
         bt_wrapper_cb->app_avrcp_cb->bt_avrcp_element_attr_update(remote_addr,now_playing_info->now_playing_title,now_playing_info->now_playing_artist,
-			now_playing_info->now_playing_album,now_playing_info->current_index,now_playing_info->totol_count,now_playing_info->totol_milliseconds);
+                now_playing_info->now_playing_album,now_playing_info->current_index,now_playing_info->totol_count,now_playing_info->totol_milliseconds);
     }
 }
 
@@ -863,7 +868,7 @@ void pbap_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
     printf("WRAPPER << PROFILE:pbap_connect_set_up,address is :\n");
     bt_addr_dump(remote_addr->addr);
 
-	if(bt_wrapper_cb && bt_wrapper_cb->app_pbap_cb && bt_wrapper_cb->app_pbap_cb->bt_pbap_connect)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_pbap_cb && bt_wrapper_cb->app_pbap_cb->bt_pbap_connect)
     {
         bt_wrapper_cb->app_pbap_cb->bt_pbap_connect(remote_addr,status);
     }
@@ -873,7 +878,7 @@ void pbap_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
     printf("WRAPPER << PROFILE:pbap_connect_realease,address is :\n");
     bt_addr_dump(remote_addr->addr);
 
-	if(bt_wrapper_cb && bt_wrapper_cb->app_pbap_cb && bt_wrapper_cb->app_pbap_cb->bt_pbap_disconnect)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_pbap_cb && bt_wrapper_cb->app_pbap_cb->bt_pbap_disconnect)
     {
         bt_wrapper_cb->app_pbap_cb->bt_pbap_disconnect(remote_addr,status);
     }
@@ -881,11 +886,11 @@ void pbap_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
 
 void pbap_query_repositories_size(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint16_t size)
 {
-	printf("WRAPPER << PROFILE:pbap_query_repositories_size,address is :\n");
+    printf("WRAPPER << PROFILE:pbap_query_repositories_size,address is :\n");
     bt_addr_dump(remote_addr->addr);
-	printf("repositories(%d) type(%d) size(%d)\n",repositories,type,size);
+    printf("repositories(%d) type(%d) size(%d)\n",repositories,type,size);
 
-	if(bt_wrapper_cb && bt_wrapper_cb->app_pbap_cb && bt_wrapper_cb->app_pbap_cb->bt_pbap_query_repositories_size)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_pbap_cb && bt_wrapper_cb->app_pbap_cb->bt_pbap_query_repositories_size)
     {
         bt_wrapper_cb->app_pbap_cb->bt_pbap_query_repositories_size(remote_addr,repositories,type,size);
     }
@@ -893,32 +898,32 @@ void pbap_query_repositories_size(struct bd_addr_t *remote_addr,uint8_t reposito
 
 void pbap_download_phonebook_status(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint8_t status)
 {
-	printf("WRAPPER << PROFILE:pbap_download_phonebook_status,address is :\n");
+    printf("WRAPPER << PROFILE:pbap_download_phonebook_status,address is :\n");
     bt_addr_dump(remote_addr->addr);
-	printf("repositories(%d) type(%d) status(%d)\n",repositories,type,status);
+    printf("repositories(%d) type(%d) status(%d)\n",repositories,type,status);
 
-	if(bt_wrapper_cb && bt_wrapper_cb->app_pbap_cb && bt_wrapper_cb->app_pbap_cb->bt_pbap_download_pb_status)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_pbap_cb && bt_wrapper_cb->app_pbap_cb->bt_pbap_download_pb_status)
     {
         bt_wrapper_cb->app_pbap_cb->bt_pbap_download_pb_status(remote_addr,repositories,type,status);
-    }	
+    }
 }
 
 void pbap_download_phonebook_data(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint8_t *data,uint16_t data_len)
 {
-	printf("WRAPPER << PROFILE:pbap_download_phonebook_data,address is :\n");
+    printf("WRAPPER << PROFILE:pbap_download_phonebook_data,address is :\n");
     bt_addr_dump(remote_addr->addr);
-	printf("repositories(%d) type(%d) data_len(%d)\n",repositories,type,data_len);
+    printf("repositories(%d) type(%d) data_len(%d)\n",repositories,type,data_len);
 
-	//bt_hex_dump(data,data_len);
+    //bt_hex_dump(data,data_len);
 }
 
 void pbap_download_vcardlist_status(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint8_t status)
 {
-	printf("WRAPPER << PROFILE:pbap_download_vcardlist_status,address is :\n");
+    printf("WRAPPER << PROFILE:pbap_download_vcardlist_status,address is :\n");
     bt_addr_dump(remote_addr->addr);
-	printf("repositories(%d) type(%d) status(%d)\n",repositories,type,status);
+    printf("repositories(%d) type(%d) status(%d)\n",repositories,type,status);
 
-	if(bt_wrapper_cb && bt_wrapper_cb->app_pbap_cb && bt_wrapper_cb->app_pbap_cb->bt_pbap_download_vcardlist_status)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_pbap_cb && bt_wrapper_cb->app_pbap_cb->bt_pbap_download_vcardlist_status)
     {
         bt_wrapper_cb->app_pbap_cb->bt_pbap_download_vcardlist_status(remote_addr,repositories,type,status);
     }
@@ -926,20 +931,20 @@ void pbap_download_vcardlist_status(struct bd_addr_t *remote_addr,uint8_t reposi
 
 void pbap_download_vcardlist_data(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint8_t *data,uint16_t data_len)
 {
-	printf("WRAPPER << PROFILE:pbap_download_vcardlist_data,address is :\n");
+    printf("WRAPPER << PROFILE:pbap_download_vcardlist_data,address is :\n");
     bt_addr_dump(remote_addr->addr);
-	printf("repositories(%d) type(%d) data_len(%d)\n",repositories,type,data_len);
+    printf("repositories(%d) type(%d) data_len(%d)\n",repositories,type,data_len);
 
-	bt_hex_dump(data,data_len);
+    bt_hex_dump(data,data_len);
 }
 
 void pbap_download_vcardentry_data(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint16_t entry_number,uint8_t *data,uint16_t data_len)
 {
-	printf("WRAPPER << PROFILE:pbap_download_vcardentry_data,address is :\n");
+    printf("WRAPPER << PROFILE:pbap_download_vcardentry_data,address is :\n");
     bt_addr_dump(remote_addr->addr);
-	printf("repositories(%d) type(%d) entry_number(%d) data_len(%d)\n",repositories,type,entry_number,data_len);
+    printf("repositories(%d) type(%d) entry_number(%d) data_len(%d)\n",repositories,type,entry_number,data_len);
 
-	bt_hex_dump(data,data_len);
+    bt_hex_dump(data,data_len);
 }
 
 static pbap_client_cbs_t pbap_client_wrapper_cb =
@@ -960,7 +965,7 @@ static pbap_client_cbs_t pbap_client_wrapper_cb =
 void hid_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("WRAPPER << PROFILE:hid_connect_set_up,address is :\n");
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
 
     if(bt_wrapper_cb && bt_wrapper_cb->app_hid_cb && bt_wrapper_cb->app_hid_cb->bt_hid_connect)
     {
@@ -970,7 +975,7 @@ void hid_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
 void hid_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("WRAPPER << PROFILE:hid_connect_realease,address is :\n");
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
 
     if(bt_wrapper_cb && bt_wrapper_cb->app_hid_cb && bt_wrapper_cb->app_hid_cb->bt_hid_disconnect)
     {
@@ -980,7 +985,7 @@ void hid_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
 void hid_interrupt_data_ind(struct bd_addr_t *remote_addr,uint8_t *data,uint16_t data_len)
 {
     printf("WRAPPER << PROFILE:hid_interrupt_data_ind,address is :\n");
-	bt_addr_dump(remote_addr->addr);
+    bt_addr_dump(remote_addr->addr);
     printf("data len %d,data is:\n",data_len);
     bt_hex_dump(data,data_len);
 
@@ -998,6 +1003,74 @@ static hid_cbs_t hid_wrapper_cb =
 };
 
 #endif
+
+
+void gatt_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("WRAPPER << PROFILE:gattc_connect_set_up,address is :\n");
+    bt_addr_dump(remote_addr->addr);
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_gatt_cb && bt_wrapper_cb->app_gatt_cb->bt_gatt_connect_set_up)
+    {
+        bt_wrapper_cb->app_gatt_cb->bt_gatt_connect_set_up(remote_addr,status);
+    }
+
+}
+void gatt_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("WRAPPER << PROFILE:gattc_connect_realease,address is :\n");
+    bt_addr_dump(remote_addr->addr);
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_gatt_cb && bt_wrapper_cb->app_gatt_cb->bt_gatt_connect_realease)
+    {
+        bt_wrapper_cb->app_gatt_cb->bt_gatt_connect_realease(remote_addr,status);
+    }
+}
+
+void gattc_mtu_value(struct bd_addr_t *remote_addr,uint16_t mtu)
+{
+	printf("WRAPPER << PROFILE:gattc_mtu_value,mtu(%d) address is :\n",mtu);
+    bt_addr_dump(remote_addr->addr);
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_gatt_cb && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs->bt_gatt_mtu_value)
+    {
+        bt_wrapper_cb->app_gatt_cb->gatt_client_cbs->bt_gatt_mtu_value(remote_addr,mtu);
+    }
+}
+
+
+
+gatt_client_cbs_t gattc_wrapper_cb =
+{
+    gattc_mtu_value,
+};
+
+void gatts_mtu_value(struct bd_addr_t *remote_addr,uint16_t mtu)
+{
+	printf("WRAPPER << PROFILE:gatts_mtu_value,mtu(%d) address is :\n",mtu);
+    bt_addr_dump(remote_addr->addr);
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_gatt_cb && bt_wrapper_cb->app_gatt_cb->gatt_server_cbs && bt_wrapper_cb->app_gatt_cb->gatt_server_cbs->bt_gatt_mtu_value)
+    {
+        bt_wrapper_cb->app_gatt_cb->gatt_server_cbs->bt_gatt_mtu_value(remote_addr,mtu);
+    }
+}
+
+
+gatt_server_cbs_t gatts_wrapper_cb =
+{
+  gatts_mtu_value,
+};
+
+
+
+static gatt_cbs_t gatt_wrapper_cb =
+{
+	gatt_connect_set_up,
+	gatt_connect_realease,
+    &gattc_wrapper_cb,
+    &gatts_wrapper_cb,
+};
 
 
 
@@ -1023,7 +1096,7 @@ uint8_t bt_start(bt_app_cb_t *app_cb)
     hci_register_link_key_req(link_key_req);
     hci_register_link_key_not(link_key_not);
     hci_register_bt_working(bt_stack_worked);
-	hci_register_hardware_error(bt_hardware_error);
+    hci_register_hardware_error(bt_hardware_error);
 
     l2cap_init();
     sdp_init();
@@ -1056,26 +1129,23 @@ uint8_t bt_start(bt_app_cb_t *app_cb)
 #endif
 
 #if PROFILE_HID_ENABLE > 0
-	hid_device_init(&hid_wrapper_cb);
-	hid_device_sdp_init(hid_device_descriptor,sizeof(hid_device_descriptor));
-	bt_profile_mask |= BT_PROFILE_HID_DEVICE_MASK;
+    hid_device_init(&hid_wrapper_cb);
+    hid_device_sdp_init(hid_device_descriptor,sizeof(hid_device_descriptor));
+    bt_profile_mask |= BT_PROFILE_HID_DEVICE_MASK;
 #endif
 
 #if BT_BLE_ENABLE > 0
-	att_init();
-	gatt_init();
-	gatt_server_init();
+    gatt_init(&gatt_wrapper_cb);
+    gatt_server_init();
 #if PROFILE_BAS_ENABLE > 0
-	bas_init(100);
+    bas_init(100);
 #endif
 
 #endif
-
 
     phybusif_reset(&uart_if);
     hci_reset();
 
-    phybusif_reset(&uart_if);
     return 0;
 }
 
@@ -1317,8 +1387,8 @@ uint8_t bt_hfp_hf_set_voice_recognition(struct bd_addr_t *addr,uint8_t enable)
 
 uint8_t bt_hfp_hf_send_batt_level(struct bd_addr_t *addr,uint8_t batt_level)
 {
-	hfp_hf_transfer_hf_indicator_value(addr,HFP_BATT_LEVEL_IND,batt_level);
-	return 0;
+    hfp_hf_transfer_hf_indicator_value(addr,HFP_BATT_LEVEL_IND,batt_level);
+    return 0;
 }
 
 
@@ -1353,27 +1423,27 @@ uint8_t bt_hfp_hf_get_pid(struct bd_addr_t *addr)
 
 uint8_t bt_avrcp_controller_get_play_status(struct bd_addr_t *remote_addr)
 {
-	avrcp_controller_get_play_status(remote_addr);
-	return 0;
+    avrcp_controller_get_play_status(remote_addr);
+    return 0;
 }
 
 uint8_t bt_avrcp_controller_list_app_setting_attr(struct bd_addr_t *remote_addr)
 {
-	avrcp_controller_list_app_setting_attr(remote_addr);
+    avrcp_controller_list_app_setting_attr(remote_addr);
     return 0;
 }
 
 uint8_t bt_avrcp_controller_get_element_attributes(struct bd_addr_t *remote_addr)
 {
-	avrcp_controller_get_element_attributes(remote_addr);
-	return 0;
+    avrcp_controller_get_element_attributes(remote_addr);
+    return 0;
 }
 
 uint8_t bt_avrcp_controller_control(struct bd_addr_t *remote_addr,uint8_t control_id)
 {
-	avrcp_controller_control(remote_addr,control_id);
+    avrcp_controller_control(remote_addr,control_id);
 
-	return 0;
+    return 0;
 }
 
 
@@ -1383,24 +1453,24 @@ uint8_t bt_avrcp_controller_control(struct bd_addr_t *remote_addr,uint8_t contro
 
 uint8_t bt_hid_interupt_report(struct bd_addr_t *remote_addr,uint8_t *report,uint8_t report_size)
 {
-	hid_device_interupt_report(remote_addr,report,report_size);
+    hid_device_interupt_report(remote_addr,report,report_size);
 
-	return 0;
+    return 0;
 }
 
 uint8_t bt_hid_find_keycode(uint8_t *keycode,uint8_t find_char)
 {
-	uint8_t index = 0;
-	for(index = 0; index < sizeof(keyboard_key_map); index++)
-	{
-		if(keyboard_key_map[index] == find_char)
-		{
-			*keycode = index;
-			break;
-		}
-	}
-	
-	return 0;
+    uint8_t index = 0;
+    for(index = 0; index < sizeof(keyboard_key_map); index++)
+    {
+        if(keyboard_key_map[index] == find_char)
+        {
+            *keycode = index;
+            break;
+        }
+    }
+
+    return 0;
 }
 
 
@@ -1410,50 +1480,60 @@ uint8_t bt_hid_find_keycode(uint8_t *keycode,uint8_t find_char)
 /************************* PBAP client API ***********************/
 uint8_t bt_pbap_client_connect(struct bd_addr_t *remote_addr)
 {
-	pbap_client_connect(remote_addr);
-	return 0;
+    pbap_client_connect(remote_addr);
+    return 0;
 }
 uint8_t bt_pbap_client_disconnect(struct bd_addr_t *remote_addr)
 {
-	pbap_client_disconnect(remote_addr);
-	return 0;
+    pbap_client_disconnect(remote_addr);
+    return 0;
 }
 
 uint8_t bt_pbap_client_query_phonebook_size(struct bd_addr_t *addr,uint8_t repositories,uint8_t type)
 {
-	pbap_client_query_phonebook_size(addr,repositories,type);
-	return 0;
+    pbap_client_query_phonebook_size(addr,repositories,type);
+    return 0;
 }
 uint8_t bt_pbap_client_download_phonebook(struct bd_addr_t *addr,uint8_t repositories,uint8_t type)
 {
-	pbap_client_download_phonebook(addr,repositories,type);
-	return 0;
+    pbap_client_download_phonebook(addr,repositories,type);
+    return 0;
 }
 
 uint8_t bt_pbap_client_set_path(struct bd_addr_t *addr,uint8_t repositories,uint8_t type)
 {
-	pbap_client_set_path(addr,repositories,type);
-	return 0;
+    pbap_client_set_path(addr,repositories,type);
+    return 0;
 }
 
 uint8_t bt_pbap_client_download_vcard_list(struct bd_addr_t *addr,uint8_t repositories,uint8_t type)
 {
-	pbap_client_download_vcard_list(addr,repositories,type);
-	return 0;
+    pbap_client_download_vcard_list(addr,repositories,type);
+    return 0;
 }
 
 uint8_t bt_pbap_client_download_vcard_entry(struct bd_addr_t *addr,uint8_t repositories,uint8_t type,uint16_t entry_number)
 {
-	pbap_client_download_vcard_entry(addr,repositories,type,entry_number);
-	return 0;
+    pbap_client_download_vcard_entry(addr,repositories,type,entry_number);
+    return 0;
 }
 
 uint8_t bt_pbap_client_download_abort(struct bd_addr_t *addr)
 {
-	pbap_client_download_abort(addr);
-	return 0;
+    pbap_client_download_abort(addr);
+    return 0;
 }
 
+#endif
+
+
+#if BT_BLE_ENABLE
+uint8_t bt_gatt_client_exchange_mtu(struct bd_addr_t *remote_addr,uint16_t mtu)
+{
+	gatt_client_exchange_mtu(remote_addr,mtu);
+	
+	return 0;
+}
 #endif
 
 
@@ -1546,7 +1626,7 @@ static uint8_t *bt_le_adv_get_data(bt_le_adv_parse_t *bt_adv_le_parse)
 static err_t bt_get_remote_name_complete(struct bd_addr_t *bdaddr,uint8_t * name)
 {
     printf("---------bt_address:\n");
-	bt_addr_dump(bdaddr->addr);
+    bt_addr_dump(bdaddr->addr);
     printf("---------bt_name:\n");
     bt_hex_dump(name,248);
     return BT_ERR_OK;

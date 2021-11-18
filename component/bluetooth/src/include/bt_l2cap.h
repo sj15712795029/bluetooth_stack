@@ -371,6 +371,7 @@ void lp_connect_cfm(struct bd_addr_t *bdaddr, uint8_t encrypt_mode, err_t err);
 void lp_connect_ind(struct bd_addr_t *bdaddr);
 void lp_disconnect_ind(struct bd_addr_t *bdaddr);
 
+void le_connect_handler(struct bd_addr_t *bdaddr);
 
 
 

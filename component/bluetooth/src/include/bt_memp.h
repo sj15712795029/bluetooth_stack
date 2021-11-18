@@ -47,6 +47,12 @@ typedef enum
 #if PROFILE_HID_ENABLE
     MEMP_HID_PCB,
 #endif
+
+#if BT_BLE_ENABLE
+    MEMP_ATT_PCB,
+    MEMP_GATT_PCB,
+#endif
+
     MEMP_BT_PBUF_POOL,
     MEMP_BT_MAX
 } bt_memp_t;
