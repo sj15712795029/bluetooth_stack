@@ -696,7 +696,7 @@ void bt_app_gatt_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
     printf("bt_app_gatt_connect_set_up,address is :\n");
     bt_addr_dump(remote_addr->addr);
 
-	connect_addr.addr[5] = remote_addr->addr[5];
+    connect_addr.addr[5] = remote_addr->addr[5];
     connect_addr.addr[4] = remote_addr->addr[4];
     connect_addr.addr[3] = remote_addr->addr[3];
     connect_addr.addr[2] = remote_addr->addr[2];
@@ -712,7 +712,25 @@ void bt_app_gatt_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
 
 void bt_app_gattc_mtu_value(struct bd_addr_t *remote_addr,uint16_t mtu)
 {
-	printf("bt_app_gattc_mtu_value,mtu(%d) address is :\n",mtu);
+    printf("bt_app_gattc_mtu_value,mtu(%d) address is :\n",mtu);
+    bt_addr_dump(remote_addr->addr);
+}
+
+void bt_app_gattc_discovery_primary_service(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle,uint16_t uuid16,uint8_t *uuid128)
+{
+    printf("bt_app_gattc_discovery_primary_service,start_handle(%d) end_handle(%d) uuid16(0x%x) address is :\n",start_handle,end_handle,uuid16);
+    bt_addr_dump(remote_addr->addr);
+}
+
+void bt_app_gattc_discovery_uuid_primary_service(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle)
+{
+    printf("bt_app_gattc_discovery_uuid_primary_service,start_handle(%d) end_handle(%d) address is :\n",start_handle,end_handle);
+    bt_addr_dump(remote_addr->addr);
+}
+
+void bt_app_gattc_discovery_char(struct bd_addr_t *remote_addr,uint16_t attribute_handle,uint16_t char_value_handle,uint8_t properties,uint16_t uuid16,uint8_t *uuid128)
+{
+    printf("bt_app_gattc_discovery_char,attribute_handle(%d) char_value_handle(%d) properties(0x%x) uuid16(0x%x) address is :\n",attribute_handle,char_value_handle,properties,uuid16);
     bt_addr_dump(remote_addr->addr);
 }
 
@@ -720,27 +738,30 @@ void bt_app_gattc_mtu_value(struct bd_addr_t *remote_addr,uint16_t mtu)
 bt_gatt_client_cbs_t bt_app_gattc_wrapper_cb =
 {
     bt_app_gattc_mtu_value,
+    bt_app_gattc_discovery_primary_service,
+    bt_app_gattc_discovery_uuid_primary_service,
+    bt_app_gattc_discovery_char,
 };
 
 
 void bt_app_gatts_mtu_value(struct bd_addr_t *remote_addr,uint16_t mtu)
 {
-	printf("bt_app_gatts_mtu_value,mtu(%d) address is :\n",mtu);
+    printf("bt_app_gatts_mtu_value,mtu(%d) address is :\n",mtu);
     bt_addr_dump(remote_addr->addr);
 }
 
 
 bt_gatt_server_cbs_t bt_app_gatts_wrapper_cb =
 {
-  bt_app_gatts_mtu_value,
+    bt_app_gatts_mtu_value,
 };
 
 
 
 static bt_gatt_cbs_t bt_app_gatt_wrapper_cb =
 {
-	bt_app_gatt_connect_set_up,
-	bt_app_gatt_connect_realease,
+    bt_app_gatt_connect_set_up,
+    bt_app_gatt_connect_realease,
     &bt_app_gattc_wrapper_cb,
     &bt_app_gatts_wrapper_cb,
 };

@@ -163,7 +163,10 @@
 
 #define GATT_CLIENT_OP_NONE 0
 #define GATT_CLIENT_OP_EX_MTU 1
-#define GATT_CLIENT_OP_DISCOVERY 2
+#define GATT_CLIENT_OP_PRIMARY_DISCOVERY 2
+#define GATT_CLIENT_OP_RELATIONSHIP_DISCOVERY 3
+#define GATT_CLIENT_OP_CHAR_DISCOVERY 4
+
 
 typedef struct _gatt_pcb_t
 {
@@ -176,6 +179,9 @@ typedef struct _gatt_pcb_t
 typedef struct
 {
     void (*gatt_mtu_value)(struct bd_addr_t *remote_addr,uint16_t mtu);
+	void (*gattc_discovery_primary_service)(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle,uint16_t uuid16,uint8_t *uuid128);
+	void (*gattc_discovery_uuid_primary_service)(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle);
+	void (*gattc_discovery_char)(struct bd_addr_t *remote_addr,uint16_t attribute_handle,uint16_t char_value_handle,uint8_t properties,uint16_t uuid16,uint8_t *uuid128);
 } gatt_client_cbs_t;
 
 
@@ -250,10 +256,10 @@ err_t gatt_server_indication(uint16_t handle,uint8_t *value,uint8_t value_length
 /* Gatt client API */
 err_t gatt_client_init(void);
 err_t gatt_client_exchange_mtu(struct bd_addr_t *remote_addr,uint16_t mtu);
-err_t gatt_client_discovery_pri_service(uint16_t start_handle,uint16_t end_handle);
-err_t gatt_client_discovery_pri_service_uuid(uint16_t start_handle,uint16_t end_handle,uint16_t uuid);
-err_t gatt_client_find_include(uint16_t start_handle,uint16_t end_handle);
-err_t gatt_client_find_characteristics(uint16_t start_handle,uint16_t end_handle);
+err_t gatt_client_discovery_pri_service(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle);
+err_t gatt_client_discovery_pri_service_uuid(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle,uint16_t uuid16,uint8_t *uuid128);
+err_t gatt_client_find_include(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle);
+err_t gatt_client_discovery_characteristics(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle);
 err_t gatt_client_find_characteristics_uuid(uint16_t start_handle,uint16_t end_handle,uint16_t uuid);
 
 

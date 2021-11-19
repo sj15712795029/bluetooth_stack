@@ -65,14 +65,14 @@ gatt_server_service_t gatt_service[] =
 };
 
 
-static err_t gatts_handle_mtu_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+static err_t gatts_handle_mtu_req(gatt_pcb_t *gatt_pcb, struct bt_pbuf_t *p);
 static err_t gatts_handle_find_info_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
 static err_t gatts_handle_find_info_value_type_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
 static err_t gatts_handle_read_type_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
 static err_t gatts_handle_read_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
 static err_t gatts_handle_read_blob_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
 static err_t gatts_handle_read_multi_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
-static err_t gatts_handle_read_group_type_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+static err_t gatts_handle_read_group_type_req(gatt_pcb_t *gatt_pcb, struct bt_pbuf_t *p);
 static err_t gatts_handle_write_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
 static err_t gatts_handle_write_cmd(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
 static err_t gatts_handle_sig_write_cmd(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
@@ -82,10 +82,10 @@ static err_t gatts_handle_value_cfm(struct bd_addr_t *bdaddr, struct bt_pbuf_t *
 
 
 
-static err_t gatt_handle_mtu_rsp(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
-static err_t gatt_handle_read_type_rsp(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
-static err_t gatt_handle_read_group_type_rsp(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
-static err_t gatt_handle_find_type_value_rsp(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p);
+static err_t gattc_handle_mtu_rsp(gatt_pcb_t *gatt_pcb, struct bt_pbuf_t *p);
+static err_t gattc_handle_read_type_rsp(gatt_pcb_t *gatt_pcb, struct bt_pbuf_t *p);
+static err_t gattc_handle_read_group_type_rsp(gatt_pcb_t *gatt_pcb, struct bt_pbuf_t *p);
+static err_t gattc_handle_find_type_value_rsp(gatt_pcb_t *gatt_pcb, struct bt_pbuf_t *p);
 
 
 static gatt_pcb_t *gatt_pcb_new(att_pcb_t *att_pcb)
@@ -179,6 +179,12 @@ void att_gatt_data_recv(att_pcb_t *att_pcb,struct bt_pbuf_t *p)
     bd_addr_debug_print(&att_pcb->remote_addr);
     bt_hex_dump(p->payload,p->len);
 
+    gatt_pcb_t *gatt_pcb = gatt_get_active_pcb(&att_pcb->remote_addr);
+    if(!gatt_pcb)
+    {
+        BT_GATT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] att_gatt_data_recv\n",__FILE__,__FUNCTION__,__LINE__);
+        return;
+    }
 
     switch(opcode)
     {
@@ -190,13 +196,13 @@ void att_gatt_data_recv(att_pcb_t *att_pcb,struct bt_pbuf_t *p)
     case ATT_REQ_MTU:
     {
         BT_GATT_TRACE_DEBUG("ATT_REQ_MTU\n");
-        gatts_handle_mtu_req(&att_pcb->remote_addr,p);
+        gatts_handle_mtu_req(gatt_pcb,p);
         break;
     }
     case ATT_RSP_MTU:
     {
         BT_GATT_TRACE_DEBUG("ATT_RSP_MTU\n");
-        gatt_handle_mtu_rsp(&att_pcb->remote_addr,p);
+        gattc_handle_mtu_rsp(gatt_pcb,p);
         break;
     }
     case ATT_REQ_FIND_INFO:
@@ -219,7 +225,7 @@ void att_gatt_data_recv(att_pcb_t *att_pcb,struct bt_pbuf_t *p)
     case ATT_RSP_FIND_TYPE_VALUE:
     {
         BT_GATT_TRACE_DEBUG("ATT_RSP_FIND_TYPE_VALUE\n");
-        gatt_handle_find_type_value_rsp(&att_pcb->remote_addr,p);
+        gattc_handle_find_type_value_rsp(gatt_pcb,p);
         break;
     }
     case ATT_REQ_READ_BY_TYPE:
@@ -231,7 +237,7 @@ void att_gatt_data_recv(att_pcb_t *att_pcb,struct bt_pbuf_t *p)
     case ATT_RSP_READ_BY_TYPE:
     {
         BT_GATT_TRACE_DEBUG("ATT_RSP_READ_BY_TYPE\n");
-        gatt_handle_read_type_rsp(&att_pcb->remote_addr,p);
+        gattc_handle_read_type_rsp(gatt_pcb,p);
         break;
     }
     case ATT_REQ_READ:
@@ -271,13 +277,13 @@ void att_gatt_data_recv(att_pcb_t *att_pcb,struct bt_pbuf_t *p)
     case ATT_REQ_READ_BY_GRP_TYPE:
     {
         BT_GATT_TRACE_DEBUG("ATT_REQ_READ_BY_GRP_TYPE\n");
-        gatts_handle_read_group_type_req(&att_pcb->remote_addr,p);
+        gatts_handle_read_group_type_req(gatt_pcb,p);
         break;
     }
     case ATT_RSP_READ_BY_GRP_TYPE:
     {
         BT_GATT_TRACE_DEBUG("ATT_RSP_READ_BY_GRP_TYPE\n");
-        gatt_handle_read_group_type_rsp(&att_pcb->remote_addr,p);
+        gattc_handle_read_group_type_rsp(gatt_pcb,p);
         break;
     }
     case ATT_REQ_WRITE:
@@ -414,7 +420,7 @@ err_t gatt_server_indication(uint16_t handle,uint8_t *value,uint8_t value_length
 }
 
 
-static err_t gatts_handle_mtu_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+static err_t gatts_handle_mtu_req(gatt_pcb_t *gatt_pcb, struct bt_pbuf_t *p)
 {
     uint16_t mtu;
 
@@ -424,20 +430,22 @@ static err_t gatts_handle_mtu_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
     gatt_server_manager.client_mtu = gatt_server_manager.server_mtu = mtu;
     att_mtu_rsp(gatt_server_manager.server_mtu);
 
-	if(gatt_cbs && gatt_cbs->gatt_server_cbs && gatt_cbs->gatt_server_cbs->gatt_mtu_value)
-    	gatt_cbs->gatt_server_cbs->gatt_mtu_value(bdaddr,mtu);
+    if(gatt_cbs && gatt_cbs->gatt_server_cbs && gatt_cbs->gatt_server_cbs->gatt_mtu_value)
+        gatt_cbs->gatt_server_cbs->gatt_mtu_value(&gatt_pcb->remote_addr,mtu);
 
     return BT_ERR_OK;
 }
 
-static err_t gatt_handle_mtu_rsp(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+static err_t gattc_handle_mtu_rsp(gatt_pcb_t *gatt_pcb, struct bt_pbuf_t *p)
 {
     uint16_t mtu;
     att_parse_mtu_rsp(p,&mtu);
-    BT_GATT_TRACE_DEBUG("gatt_handle_mtu_rsp handle(%d)\n",mtu);
+    BT_GATT_TRACE_DEBUG("gattc_handle_mtu_rsp handle(%d)\n",mtu);
 
-	if(gatt_cbs && gatt_cbs->gatt_client_cbs && gatt_cbs->gatt_client_cbs->gatt_mtu_value)
-    	gatt_cbs->gatt_client_cbs->gatt_mtu_value(bdaddr,mtu);
+    gatt_client_manager.server_mtu = mtu;
+    gatt_client_manager.last_opcode = GATT_CLIENT_OP_NONE;
+    if(gatt_cbs && gatt_cbs->gatt_client_cbs && gatt_cbs->gatt_client_cbs->gatt_mtu_value)
+        gatt_cbs->gatt_client_cbs->gatt_mtu_value(&gatt_pcb->remote_addr,mtu);
 
     return BT_ERR_OK;
 }
@@ -735,7 +743,7 @@ static err_t gatts_handle_read_type_req(struct bd_addr_t *bdaddr, struct bt_pbuf
     return BT_ERR_OK;
 }
 
-static err_t gatts_handle_read_group_type_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+static err_t gatts_handle_read_group_type_req(gatt_pcb_t *gatt_pcb, struct bt_pbuf_t *p)
 {
     uint8_t index = 0;
     uint16_t start_handle;
@@ -784,20 +792,54 @@ static err_t gatts_handle_read_group_type_req(struct bd_addr_t *bdaddr, struct b
 }
 
 
-static err_t gatt_handle_read_type_rsp(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+static err_t gattc_handle_read_type_rsp(gatt_pcb_t *gatt_pcb,struct bt_pbuf_t *p)
 {
+	uint8_t index = 0;
     uint8_t each_len;
     uint8_t data_num;
     uint8_t *data_list;
-    att_parse_read_type_rsp(p,&each_len,&data_num,&data_list);
+	uint16_t attribute_handle;
+	uint8_t uuid_type;
+	uint8_t char_properies;
+	uint16_t char_value_handle;
+	uint16_t uuid16 = 0;
+    uint8_t uuid128[16];
+	
+    att_parse_read_type_rsp(p,&each_len,&data_num,&data_list,&uuid_type);
 
-    BT_GATT_TRACE_DEBUG("gatt_handle_read_type_rsp each_len(%d) data_num(%d)\n",each_len,data_num);
+    BT_GATT_TRACE_DEBUG("gattc_handle_read_type_rsp each_len(%d) data_num(%d)\n",each_len,data_num);
+
+	for(index = 0; index < data_num; index++)
+    {
+        attribute_handle = bt_le_read_16(data_list,index*each_len);
+		char_properies = *(data_list+index*each_len+2);
+		char_value_handle = bt_le_read_16(data_list,index*each_len+3);
+
+        if(uuid_type == ATT_UUID16_FORMAT)
+        {
+            uuid16 = bt_le_read_16(data_list,index*each_len+5);
+            BT_GATT_TRACE_DEBUG("attribute_handle(%d) char_properies(0x%x) char_value_handle(%d) uuid16(0x%x)\n",attribute_handle,char_properies,char_value_handle,uuid16);
+
+            if(gatt_cbs && gatt_cbs->gatt_client_cbs && gatt_cbs->gatt_client_cbs->gattc_discovery_char)
+                gatt_cbs->gatt_client_cbs->gattc_discovery_char(&gatt_pcb->remote_addr,attribute_handle,char_value_handle,char_properies,uuid16,NULL);
+        }
+        else if(uuid_type == ATT_UUID128_FORMAT)
+        {
+            memcpy(uuid128,data_list + index*each_len+5,16);
+            BT_GATT_TRACE_DEBUG("attribute_handle(%d) char_properies(0x%x) char_value_handle(%d)\n",attribute_handle,char_properies,char_value_handle);
+
+            if(gatt_cbs && gatt_cbs->gatt_client_cbs && gatt_cbs->gatt_client_cbs->gattc_discovery_char)
+                gatt_cbs->gatt_client_cbs->gattc_discovery_char(&gatt_pcb->remote_addr,attribute_handle,char_value_handle,char_properies,uuid16,uuid128);
+        }
+
+
+    }
 
     return BT_ERR_OK;
 }
 
 
-static err_t gatt_handle_read_group_type_rsp(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+static err_t gattc_handle_read_group_type_rsp(gatt_pcb_t *gatt_pcb, struct bt_pbuf_t *p)
 {
     uint8_t index;
     uint8_t each_len;
@@ -806,25 +848,42 @@ static err_t gatt_handle_read_group_type_rsp(struct bd_addr_t *bdaddr, struct bt
     uint8_t uuid_type;
     uint16_t start_handle;
     uint16_t end_handle;
-    uint16_t uuid;
+    uint16_t uuid16 = 0;;
+    uint8_t uuid128[16];
     att_parse_read_group_type_rsp(p,&each_len,&data_num,&data_list,&uuid_type);
 
-    BT_GATT_TRACE_DEBUG("gatt_handle_read_group_type_rsp each_len(%d) data_num(%d) uuid_type(%d)\n",each_len,data_num,uuid_type);
+    BT_GATT_TRACE_DEBUG("gattc_handle_read_group_type_rsp each_len(%d) data_num(%d) uuid_type(%d)\n",each_len,data_num,uuid_type);
 
     for(index = 0; index < data_num; index++)
     {
         start_handle = bt_le_read_16(data_list,index*each_len);
         end_handle = bt_le_read_16(data_list,index*each_len+2);
-        uuid = bt_le_read_16(data_list,index*each_len+4);
-        BT_GATT_TRACE_DEBUG("s_handle(0x%x) e_handle(0x%x) uuid(0x%x)\n",start_handle,end_handle,uuid);
-        /* TODO */
+
+        if(uuid_type == ATT_UUID16_FORMAT)
+        {
+            uuid16 = bt_le_read_16(data_list,index*each_len+4);
+            BT_GATT_TRACE_DEBUG("s_handle(0x%x) e_handle(0x%x) uuid(0x%x)\n",start_handle,end_handle,uuid16);
+
+            if(gatt_cbs && gatt_cbs->gatt_client_cbs && gatt_cbs->gatt_client_cbs->gattc_discovery_primary_service)
+                gatt_cbs->gatt_client_cbs->gattc_discovery_primary_service(&gatt_pcb->remote_addr,start_handle,end_handle,uuid16,NULL);
+        }
+        else if(uuid_type == ATT_UUID128_FORMAT)
+        {
+            memcpy(uuid128,data_list + index*each_len+4,16);
+            BT_GATT_TRACE_DEBUG("s_handle(0x%x) e_handle(0x%x)\n",start_handle,end_handle);
+
+            if(gatt_cbs && gatt_cbs->gatt_client_cbs && gatt_cbs->gatt_client_cbs->gattc_discovery_primary_service)
+                gatt_cbs->gatt_client_cbs->gattc_discovery_primary_service(&gatt_pcb->remote_addr,start_handle,end_handle,uuid16,uuid128);
+        }
+
+
     }
 
     return BT_ERR_OK;
 }
 
 
-static err_t gatt_handle_find_type_value_rsp(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
+static err_t gattc_handle_find_type_value_rsp(gatt_pcb_t *gatt_pcb, struct bt_pbuf_t *p)
 {
     uint8_t index = 0;
     uint8_t info_num;
@@ -833,14 +892,16 @@ static err_t gatt_handle_find_type_value_rsp(struct bd_addr_t *bdaddr, struct bt
     uint16_t end_handle;
     att_parse_find_type_value_rsp(p,&info_num,&info_list);
 
-    BT_GATT_TRACE_DEBUG("gatt_handle_find_type_value_rsp info_num(%d)\n",info_num);
+    BT_GATT_TRACE_DEBUG("gattc_handle_find_type_value_rsp info_num(%d)\n",info_num);
 
     for(index = 0; index < info_num; index++)
     {
         start_handle = bt_le_read_16(info_list,index*4);
         end_handle = bt_le_read_16(info_list,index*4+2);
-        BT_GATT_TRACE_DEBUG("s_handle(0x%x) e_handle(0x%x)\n",start_handle,end_handle);
-        /* TODO */
+        BT_GATT_TRACE_DEBUG("s_handle(%d) e_handle(%d)\n",start_handle,end_handle);
+
+        if(gatt_cbs && gatt_cbs->gatt_client_cbs && gatt_cbs->gatt_client_cbs->gattc_discovery_uuid_primary_service)
+            gatt_cbs->gatt_client_cbs->gattc_discovery_uuid_primary_service(&gatt_pcb->remote_addr,start_handle,end_handle);
     }
 
     return BT_ERR_OK;
@@ -860,50 +921,97 @@ err_t gatt_client_init(void)
 
 err_t gatt_client_exchange_mtu(struct bd_addr_t *remote_addr,uint16_t mtu)
 {
-	gatt_pcb_t *gatt_pcb = gatt_get_active_pcb(remote_addr);
+    gatt_pcb_t *gatt_pcb = gatt_get_active_pcb(remote_addr);
     if(gatt_pcb)
     {
+        gatt_client_manager.last_opcode = GATT_CLIENT_OP_EX_MTU;
+        gatt_client_manager.client_mtu = mtu;
         att_mtu_req(gatt_pcb->att_pcb,mtu);
     }
     else
     {
-        BT_GATT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] gatt_client_exchange_mtu fail\n",__FILE__,__FUNCTION__,__LINE__);
+        BT_GATT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] fail\n",__FILE__,__FUNCTION__,__LINE__);
         return BT_ERR_CONN;
     }
 
-    
-    return BT_ERR_OK;
-}
-
-err_t gatt_client_discovery_pri_service(uint16_t start_handle,uint16_t end_handle)
-{
-    gatt_client_manager.last_opcode = GATT_CLIENT_OP_DISCOVERY;
-    att_read_group_type_req(start_handle,end_handle,GATT_UUID_PRI_SERVICE);
 
     return BT_ERR_OK;
 }
 
-err_t gatt_client_discovery_pri_service_uuid(uint16_t start_handle,uint16_t end_handle,uint16_t uuid)
+err_t gatt_client_discovery_pri_service(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle)
 {
-    uint8_t uuid_array[] = {BT_LE_U16_TO_ARRAY(uuid)};
-    gatt_client_manager.last_opcode = GATT_CLIENT_OP_DISCOVERY;
-    att_find_type_value_req(start_handle,end_handle,GATT_UUID_PRI_SERVICE,uuid_array,sizeof(uuid_array));
+    gatt_pcb_t *gatt_pcb = gatt_get_active_pcb(remote_addr);
+    if(gatt_pcb)
+    {
+        gatt_client_manager.last_opcode = GATT_CLIENT_OP_PRIMARY_DISCOVERY;
+        att_read_group_type_req(start_handle,end_handle,GATT_UUID_PRI_SERVICE,NULL);
+    }
+    else
+    {
+        BT_GATT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] fail\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_CONN;
+    }
 
     return BT_ERR_OK;
 }
 
-err_t gatt_client_find_include(uint16_t start_handle,uint16_t end_handle)
+
+err_t gatt_client_discovery_pri_service_uuid(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle,uint16_t uuid16,uint8_t *uuid128)
 {
-    uint8_t uuid_array[] = {BT_LE_U16_TO_ARRAY(GATT_UUID_INCLUDE_SERVICE)};
-    att_read_type_req(start_handle,end_handle,uuid_array,sizeof(uuid_array));
+    gatt_pcb_t *gatt_pcb = gatt_get_active_pcb(remote_addr);
+    if(gatt_pcb)
+    {
+        gatt_client_manager.last_opcode = GATT_CLIENT_OP_PRIMARY_DISCOVERY;
+
+        if(uuid128)
+            att_find_type_value_req(start_handle,end_handle,GATT_UUID_PRI_SERVICE,uuid128,16);
+        else
+        {
+            uint8_t uuid_array[] = {BT_LE_U16_TO_ARRAY(uuid16)};
+            att_find_type_value_req(start_handle,end_handle,GATT_UUID_PRI_SERVICE,uuid_array,sizeof(uuid_array));
+        }
+    }
+    else
+    {
+        BT_GATT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] fail\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_CONN;
+    }
 
     return BT_ERR_OK;
 }
 
-err_t gatt_client_find_characteristics(uint16_t start_handle,uint16_t end_handle)
+err_t gatt_client_find_include(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle)
 {
-    uint8_t uuid_array[] = {BT_LE_U16_TO_ARRAY(GATT_UUID_CHAR_DECLARE)};
-    att_read_type_req(start_handle,end_handle,uuid_array,sizeof(uuid_array));
+    gatt_pcb_t *gatt_pcb = gatt_get_active_pcb(remote_addr);
+    if(gatt_pcb)
+    {
+        gatt_client_manager.last_opcode = GATT_CLIENT_OP_RELATIONSHIP_DISCOVERY;
+        uint8_t uuid_array[] = {BT_LE_U16_TO_ARRAY(GATT_UUID_INCLUDE_SERVICE)};
+        att_read_type_req(start_handle,end_handle,uuid_array,sizeof(uuid_array));
+    }
+    else
+    {
+        BT_GATT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] fail\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_CONN;
+    }
+
+    return BT_ERR_OK;
+}
+
+err_t gatt_client_discovery_characteristics(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle)
+{
+    gatt_pcb_t *gatt_pcb = gatt_get_active_pcb(remote_addr);
+    if(gatt_pcb)
+    {
+        uint8_t uuid_array[] = {BT_LE_U16_TO_ARRAY(GATT_UUID_CHAR_DECLARE)};
+		gatt_client_manager.last_opcode = GATT_CLIENT_OP_CHAR_DISCOVERY;
+        att_read_type_req(start_handle,end_handle,uuid_array,sizeof(uuid_array));
+    }
+    else
+    {
+        BT_GATT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] fail\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_CONN;
+    }
 
     return BT_ERR_OK;
 }

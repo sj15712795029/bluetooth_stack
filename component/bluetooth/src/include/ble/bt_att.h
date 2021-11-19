@@ -79,7 +79,8 @@
 #define ATT_WRITE_RSP_PACK_LEN 1
 #define ATT_SEND_NOTIFICATION_HDR_LEN 3
 #define ATT_SEND_INDICATION_HDR_LEN 3
-#define ATT_READ_GROUP_TYPE_REQ_HDR_LEN 7
+#define ATT_READ_GROUP_UUID16_TYPE_REQ_HDR_LEN 7
+#define ATT_READ_GROUP_UUID128_TYPE_REQ_HDR_LEN 21
 #define ATT_FIND_TYPE_VALUE_REQ_HDR_LEN 7
 #define ATT_READ_TYPE_REQ_HDR_LEN 5
 #define ATT_READ_REQ_PACK_LEN 3
@@ -146,13 +147,13 @@ err_t att_indication(uint16_t handle,uint8_t *att_value,uint8_t att_value_len);
 err_t att_mtu_req(att_pcb_t *att_pcb,uint16_t client_mtu);
 err_t att_parse_mtu_rsp(struct bt_pbuf_t *p,uint16_t *server_mtu);
 err_t att_parse_mtu_rsp(struct bt_pbuf_t *p,uint16_t *server_mtu);
-err_t att_parse_read_type_rsp(struct bt_pbuf_t *p,uint8_t *each_len,uint8_t *data_num,uint8_t **data_list);
+err_t att_parse_read_type_rsp(struct bt_pbuf_t *p,uint8_t *each_len,uint8_t *data_num,uint8_t **data_list,uint8_t *uuid_type);
 err_t att_parse_read_group_type_rsp(struct bt_pbuf_t *p,uint8_t *each_len,uint8_t *data_num,uint8_t **data_list,uint8_t *uuid_type);
 err_t att_parse_find_type_value_rsp(struct bt_pbuf_t *p,uint8_t *info_num,uint8_t **info_list);
 err_t att_find_type_value_req(uint16_t start_handle,uint16_t end_handle,uint16_t uuid,uint8_t *value,uint8_t value_len);
 err_t att_read_type_req(uint16_t start_handle,uint16_t end_handle,uint8_t *value,uint8_t value_len);
 err_t att_read_req(uint16_t handle);
-err_t att_read_group_type_req(uint16_t start_handle,uint16_t end_handle,uint16_t uuid);
+err_t att_read_group_type_req(uint16_t start_handle,uint16_t end_handle,uint16_t uuid16,uint8_t *uuid128);
 
 
 

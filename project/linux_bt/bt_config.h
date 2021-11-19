@@ -62,16 +62,16 @@
 			BT_TRACE_LEVEL_WARNING->2   BT_TRACE_LEVEL_DEBUG->3
 ******************************************************************************/
 #define BT_DEBUG printf
-#define BT_HEX_TRACE_LEVEL 0
+#define BT_HEX_TRACE_LEVEL 1
 #define BT_PBUF_TRACE_LEVEL 0
 #define BT_MEMORY_TRACE_LEVEL 0
 #define BT_SNOOP_TRACE_LEVEL 0
 #define BT_TRANSPORT_TRACE_LEVEL 0
 #define BT_VENDOR_TRACE_LEVEL 0
-#define BT_HCI_TRACE_LEVEL 3
-#define BT_L2CAP_TRACE_LEVEL 3
+#define BT_HCI_TRACE_LEVEL 0
+#define BT_L2CAP_TRACE_LEVEL 0
 #define BT_SDP_TRACE_LEVEL 0
-#define BT_RFCOMM_TRACE_LEVEL 3
+#define BT_RFCOMM_TRACE_LEVEL 0
 #define BT_HFP_TRACE_LEVEL 0
 #define BT_HSP_TRACE_LEVEL 0
 #define BT_OBEX_TRACE_LEVEL 0

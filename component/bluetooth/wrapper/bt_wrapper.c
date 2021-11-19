@@ -1038,11 +1038,48 @@ void gattc_mtu_value(struct bd_addr_t *remote_addr,uint16_t mtu)
     }
 }
 
+void gattc_discovery_primary_service(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle,uint16_t uuid16,uint8_t *uuid128)
+{
+	printf("WRAPPER << PROFILE:gattc_discovery_primary_service,start_handle(%d) end_handle(%d) uuid16(%d) address is :\n",start_handle,end_handle,uuid16);
+    bt_addr_dump(remote_addr->addr);
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_gatt_cb && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs->bt_gattc_discovery_primary_service)
+    {
+        bt_wrapper_cb->app_gatt_cb->gatt_client_cbs->bt_gattc_discovery_primary_service(remote_addr,start_handle,end_handle,uuid16,uuid128);
+    }
+}
+
+
+void gattc_discovery_uuid_primary_service(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle)
+{
+	printf("WRAPPER << PROFILE:gattc_discovery_uuid_primary_service,start_handle(%d) end_handle(%d) address is :\n",start_handle,end_handle);
+    bt_addr_dump(remote_addr->addr);
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_gatt_cb && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs->bt_gattc_discovery_uuid_primary_service)
+    {
+        bt_wrapper_cb->app_gatt_cb->gatt_client_cbs->bt_gattc_discovery_uuid_primary_service(remote_addr,start_handle,end_handle);
+    }
+}
+
+
+void gattc_discovery_char(struct bd_addr_t *remote_addr,uint16_t attribute_handle,uint16_t char_value_handle,uint8_t properties,uint16_t uuid16,uint8_t *uuid128)
+{
+	printf("WRAPPER << PROFILE:gattc_discovery_char,attribute_handle(%d) char_value_handle(%d) properties(0x%x) uuid16(0x%x) address is :\n",attribute_handle,char_value_handle,properties,uuid16);
+    bt_addr_dump(remote_addr->addr);
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_gatt_cb && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs->bt_gattc_discovery_char)
+    {
+        bt_wrapper_cb->app_gatt_cb->gatt_client_cbs->bt_gattc_discovery_char(remote_addr,attribute_handle,char_value_handle,properties,uuid16,uuid128);
+    }
+}
 
 
 gatt_client_cbs_t gattc_wrapper_cb =
 {
     gattc_mtu_value,
+	gattc_discovery_primary_service,
+	gattc_discovery_uuid_primary_service,
+	gattc_discovery_char,
 };
 
 void gatts_mtu_value(struct bd_addr_t *remote_addr,uint16_t mtu)
@@ -1534,7 +1571,38 @@ uint8_t bt_gatt_client_exchange_mtu(struct bd_addr_t *remote_addr,uint16_t mtu)
 	
 	return 0;
 }
+
+uint8_t bt_gatt_client_discovery_pri_service(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle)
+{
+	gatt_client_discovery_pri_service(remote_addr,start_handle,end_handle);
+	
+	return 0;
+}
+
+uint8_t bt_gatt_client_discovery_pri_service_uuid(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle,uint16_t uuid16,uint8_t *uuid128)
+{
+	gatt_client_discovery_pri_service_uuid(remote_addr,start_handle,end_handle,uuid16,uuid128);
+
+	return 0;
+}
+
+uint8_t bt_gatt_client_find_include(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle)
+{
+	gatt_client_find_include(remote_addr,start_handle,end_handle);
+
+	return 0;
+}
+
+uint8_t bt_gatt_client_discovery_characteristics(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle)
+{
+	gatt_client_discovery_characteristics(remote_addr,start_handle,end_handle);
+
+	return 0;
+}
+
+
 #endif
+
 
 
 

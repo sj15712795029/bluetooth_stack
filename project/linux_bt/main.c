@@ -55,6 +55,12 @@ uint32_t last_sys_time = 0;
 
 #define BT_SPLIT_NAME "---------------------------------------------------------------------------------------------------"
 
+#define APP_LOG_COLOR_YELLOW "\033[40;33m"
+#define APP_LOG_COLOR_RED "\033[40;31m"
+#define APP_LOG_COLOR_BLUE "\033[40;36m"
+#define APP_LOG_COLOR_RESET "\033[0m"
+
+
 #define BT_START_CMD "BT_START"
 #define BT_START_DES "Start bluetooth stack"
 #define BT_STOP_CMD "BT_STOP"
@@ -143,6 +149,14 @@ uint32_t last_sys_time = 0;
 
 #define BT_GATTC_MTU_REQ_CMD "GATTC_MTU"
 #define BT_GATTC_MTU_REQ_DES "Gatt client exchange MTU"
+#define BT_GATTC_PRIMARY_DISCOVERY_REQ_CMD "GATTC_DIS_P"
+#define BT_GATTC_PRIMARY_DISCOVERY_REQ_DES "Gatt client discovery all primary services"
+#define BT_GATTC_PRIMARY_UUID_DISCOVERY_REQ_CMD "GATTC_DIS_UUID"
+#define BT_GATTC_PRIMARY_UUID_DISCOVERY_REQ_DES "Gatt client discovery primary services by UUID"
+#define BT_GATTC_RELATIONSHIP_DISCOVERY_REQ_CMD "GATTC_DIS_FINCLUDE"
+#define BT_GATTC_RELATIONSHIP_UUID_DISCOVERY_REQ_DES "Gatt client discovery relationship"
+#define BT_GATTC_CHAR_DISCOVERY_REQ_CMD "GATTC_DIS_CHAR"
+#define BT_GATTC_CHAR_DISCOVERY_REQ_DES "Gatt client discovery all characteristics"
 
 
 
@@ -194,11 +208,11 @@ cmd_desctiption_t cmd_usage[] =
     {(uint8_t *)BT_HFP_GET_MANU_ID_CMD,(uint8_t *)BT_HFP_GET_MANU_ID_DES},
     {(uint8_t *)BT_HFP_GET_MODULE_ID_CMD,(uint8_t *)BT_HFP_GET_MODULE_ID_DES},
     {(uint8_t *)BT_HFP_SET_BATT_LEVEL_CMD,(uint8_t *)BT_HFP_SET_BATT_LEVEL_DES},
-	{(uint8_t *)BT_HFP_GET_OP_NAME_CMD,(uint8_t *)BT_HFP_GET_OP_NAME_DES},
+    {(uint8_t *)BT_HFP_GET_OP_NAME_CMD,(uint8_t *)BT_HFP_GET_OP_NAME_DES},
     {(uint8_t *)BT_SPLIT_NAME,NULL},
 #endif
 #if PROFILE_AVRCP_ENABLE > 0
-	{(uint8_t *)BT_AVRCP_LIST_APP_ATTR_CMD,(uint8_t *)BT_AVRCP_LIST_APP_ATTR_DES},
+    {(uint8_t *)BT_AVRCP_LIST_APP_ATTR_CMD,(uint8_t *)BT_AVRCP_LIST_APP_ATTR_DES},
     {(uint8_t *)BT_AVRCP_GET_SONG_INFO_CMD,(uint8_t *)BT_AVRCP_GET_SONG_INFO_DES},
     {(uint8_t *)BT_AVRCP_CONTROL_PLAY_CMD,(uint8_t *)BT_AVRCP_CONTROL_PLAY_DES},
     {(uint8_t *)BT_AVRCP_CONTROL_PAUSE_CMD,(uint8_t *)BT_AVRCP_CONTROL_PAUSE_DES},
@@ -209,11 +223,15 @@ cmd_desctiption_t cmd_usage[] =
     {(uint8_t *)BT_SPLIT_NAME,NULL},
 #endif
 #if PROFILE_PBAP_ENABLE > 0
-	{(uint8_t *)BT_PBAP_CONNECT_CMD,(uint8_t *)BT_PBAP_CONNECT_DES},
+    {(uint8_t *)BT_PBAP_CONNECT_CMD,(uint8_t *)BT_PBAP_CONNECT_DES},
 #endif
 
 #if BT_BLE_ENABLE > 0
-	{(uint8_t *)BT_GATTC_MTU_REQ_CMD,(uint8_t *)BT_GATTC_MTU_REQ_DES},
+    {(uint8_t *)BT_GATTC_MTU_REQ_CMD,(uint8_t *)BT_GATTC_MTU_REQ_DES},
+    {(uint8_t *)BT_GATTC_PRIMARY_DISCOVERY_REQ_CMD,(uint8_t *)BT_GATTC_PRIMARY_DISCOVERY_REQ_DES},
+    {(uint8_t *)BT_GATTC_PRIMARY_UUID_DISCOVERY_REQ_CMD,(uint8_t *)BT_GATTC_PRIMARY_UUID_DISCOVERY_REQ_DES},
+    {(uint8_t *)BT_GATTC_RELATIONSHIP_DISCOVERY_REQ_CMD,(uint8_t *)BT_GATTC_RELATIONSHIP_UUID_DISCOVERY_REQ_DES},
+    {(uint8_t *)BT_GATTC_CHAR_DISCOVERY_REQ_CMD,(uint8_t *)BT_GATTC_CHAR_DISCOVERY_REQ_DES},
 #endif
 
 
@@ -224,28 +242,28 @@ cmd_desctiption_t cmd_usage[] =
 
 void show_usage()
 {
-	uint32_t index = 0;
+    uint32_t index = 0;
 
-    printf("\033[40;33m %s \r\033[0m\n",BT_HAVE_FUN);
-    printf("\033[40;33m----------------------------------------------------------------------------------------------------|\033[0m\n");
+    printf(APP_LOG_COLOR_YELLOW"%s\n"APP_LOG_COLOR_RESET,BT_HAVE_FUN);
+    printf(APP_LOG_COLOR_YELLOW"----------------------------------------------------------------------------------------------------|"APP_LOG_COLOR_RESET"\n");
     for(index = 0; index < sizeof(cmd_usage)/sizeof(cmd_desctiption_t); index++)
     {
         if(cmd_usage[index].cmd[0] == '-')
-            HW_DEBUG("\033[40;33m|%s|\033[0m\n",cmd_usage[index].cmd);
+            HW_DEBUG(APP_LOG_COLOR_YELLOW"|%s|" APP_LOG_COLOR_RESET "\n",cmd_usage[index].cmd);
         else
         {
-        	if(hw_strlen((char *)cmd_usage[index].cmd) < 8)
-				HW_DEBUG("|\t\033[40;31m%s\033[0m\t\t\t\t -> \033[40;36m%s\033[0m\n",cmd_usage[index].cmd,cmd_usage[index].description);
-			else if((hw_strlen((char *)cmd_usage[index].cmd) >= 8) && (hw_strlen((char *)cmd_usage[index].cmd) < 16))
-				HW_DEBUG("|\t\033[40;31m%s\033[0m\t\t\t -> \033[40;36m%s\033[0m\n",cmd_usage[index].cmd,cmd_usage[index].description);
-			else if((hw_strlen((char *)cmd_usage[index].cmd) >= 16) && (hw_strlen((char *)cmd_usage[index].cmd) < 24))
-            	HW_DEBUG("|\t\033[40;31m%s\033[0m\t\t -> \033[40;36m%s\033[0m\n",cmd_usage[index].cmd,cmd_usage[index].description);
-			else
-				HW_DEBUG("|\t\033[40;31m%s\033[0m\t -> \033[40;36m%s\033[0m\n",cmd_usage[index].cmd,cmd_usage[index].description);
+            if(hw_strlen((char *)cmd_usage[index].cmd) < 8)
+                HW_DEBUG("|\t"APP_LOG_COLOR_RED"%s"APP_LOG_COLOR_RESET"\t\t\t\t ->    "APP_LOG_COLOR_BLUE"%s"APP_LOG_COLOR_RESET"\n",cmd_usage[index].cmd,cmd_usage[index].description);
+            else if((hw_strlen((char *)cmd_usage[index].cmd) >= 8) && (hw_strlen((char *)cmd_usage[index].cmd) < 16))
+                HW_DEBUG("|\t"APP_LOG_COLOR_RED"%s"APP_LOG_COLOR_RESET"\t\t\t ->    "APP_LOG_COLOR_BLUE"%s"APP_LOG_COLOR_RESET"\n",cmd_usage[index].cmd,cmd_usage[index].description);
+            else if((hw_strlen((char *)cmd_usage[index].cmd) >= 16) && (hw_strlen((char *)cmd_usage[index].cmd) < 24))
+                HW_DEBUG("|\t"APP_LOG_COLOR_RED"%s"APP_LOG_COLOR_RESET"\t\t ->    "APP_LOG_COLOR_BLUE"%s"APP_LOG_COLOR_RESET"\n",cmd_usage[index].cmd,cmd_usage[index].description);
+            else
+                HW_DEBUG("|\t"APP_LOG_COLOR_RED"%s"APP_LOG_COLOR_RESET"\t ->    "APP_LOG_COLOR_BLUE"%s"APP_LOG_COLOR_RESET"\n",cmd_usage[index].cmd,cmd_usage[index].description);
         }
 
     }
-    printf("\033[40;33m----------------------------------------------------------------------------------------------------|\033[0m\n");
+    printf(APP_LOG_COLOR_YELLOW"----------------------------------------------------------------------------------------------------|"APP_LOG_COLOR_RESET"\n");
 }
 
 struct bd_addr_t connect_addr;
@@ -253,28 +271,36 @@ struct bd_addr_t connect_addr;
 
 void bt_app_init_result(uint8_t status,uint16_t profile_mask)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_init_result(%d) profile_mask(0x%x)\n",status,profile_mask);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 
 }
 
 void bt_app_inquiry_status(uint8_t status)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_inquiry_status %d\n",status);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 void bt_app_inquiry_result(struct bd_addr_t *address,uint8_t dev_type,uint8_t *name)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("-----------inquiry result ----------\n");
     printf("address:0x%x:0x%x:0x%x:0x%x:0x%x:0x%x\n",address->addr[0],address->addr[1],address->addr[2],\
            address->addr[3],address->addr[4],address->addr[5]);
     printf("type %d\n",dev_type);
     printf("name %s\n",name);
     printf("----------------------- ----------\n");
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 void bt_app_hardware_error(uint8_t reason)
 {
-	printf("bt_app_hardware_error reason %d\n",reason);
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
+    printf("bt_app_hardware_error reason %d\n",reason);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 
@@ -282,6 +308,7 @@ void bt_app_hardware_error(uint8_t reason)
 #if BT_BLE_ENABLE > 0
 void bt_app_le_inquiry_result(struct bd_addr_t *address,int8_t rssi,uint8_t adv_type,uint8_t adv_size,uint8_t *adv_data)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     bt_le_adv_parse_t bt_le_adv_parse = {0};
     printf("-----------le inquiry result ----------\n");
     printf("address:0x%x:0x%x:0x%x:0x%x:0x%x:0x%x\n",address->addr[0],address->addr[1],address->addr[2],\
@@ -322,12 +349,15 @@ void bt_app_le_inquiry_result(struct bd_addr_t *address,int8_t rssi,uint8_t adv_
         }
     }
     printf("----------------------- ----------\n");
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 
 void bt_app_le_inquiry_status(uint8_t status)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_le_inquiry_status %d\n",status);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 uint8_t adv_data[] =
@@ -355,6 +385,7 @@ static bt_app_common_cb_t bt_app_common_cb =
 #if PROFILE_HFP_HF_ENABLE > 0
 void bt_app_hfp_connect(struct bd_addr_t *remote_addr,uint8_t status)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_hfp_connect status %d address:\n",status);
     bt_addr_dump(remote_addr->addr);
     connect_addr.addr[5] = remote_addr->addr[5];
@@ -363,95 +394,122 @@ void bt_app_hfp_connect(struct bd_addr_t *remote_addr,uint8_t status)
     connect_addr.addr[2] = remote_addr->addr[2];
     connect_addr.addr[1] = remote_addr->addr[1];
     connect_addr.addr[0] = remote_addr->addr[0];
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 void bt_app_hfp_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_hfp_disconnect status %d address:\n",status);
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 
 }
 
 void bt_app_hfp_sco_connect(struct bd_addr_t *remote_addr,uint8_t status)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_hfp_sco_connect status %d address:\n",status);
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 
 }
 
 void bt_app_hfp_sco_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_hfp_sco_disconnect status %d address:\n",status);
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 
 }
 
 
 void bt_app_hfp_signal_strength_ind(struct bd_addr_t *remote_addr,uint8_t value)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_hfp_signal_strength_ind value %d address:\n",value);
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 
 }
 
 void bt_app_hfp_roam_status_ind(struct bd_addr_t *remote_addr,uint8_t value)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_hfp_roam_status_ind value %d address:\n",value);
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 
 }
 
 void bt_app_hfp_batt_level_ind(struct bd_addr_t *remote_addr,uint8_t value)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_hfp_batt_level_ind value %d address:\n",value);
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 
 }
 
 void bt_app_hfp_operator(struct bd_addr_t *remote_addr,uint8_t *operator)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_hfp_operator operator %s address:\n",operator);
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 
 }
 
 void bt_app_hfp_call_status(struct bd_addr_t *remote_addr,uint8_t value)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_hfp_call_status value %d address:\n",value);
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 void bt_app_hfp_call_setup(struct bd_addr_t *remote_addr,uint8_t value)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_hfp_call_setup value %d address:\n",value);
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 
 }
 
 void bt_app_hfp_local_pn(struct bd_addr_t *remote_addr,uint8_t *local_pn)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_hfp_local_pn %s address:\n",local_pn);
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 
 }
 
 void bt_app_hfp_call_pn(struct bd_addr_t *remote_addr,uint8_t *phone_number)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_hfp_call_pn %s address:\n",phone_number);
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 void bt_app_hfp_manu_id(struct bd_addr_t *remote_addr,uint8_t *mid)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_hfp_manu_id %s address:\n",mid);
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 
 }
 
 void bt_app_hfp_module_id(struct bd_addr_t *remote_addr,uint8_t *mid)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_hfp_module_id %s address:\n",mid);
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 
 }
 
@@ -478,49 +536,65 @@ static bt_app_hfp_cb_t bt_app_hfp_cb =
 #if PROFILE_A2DP_ENABLE > 0
 void bt_app_a2dp_signal_connect(struct bd_addr_t *remote_addr,uint8_t status)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_a2dp_signal_connect:\n");
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 void bt_app_a2dp_signal_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_a2dp_signal_disconnect:\n");
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 
 }
 void bt_app_a2dp_stream_connect(struct bd_addr_t *remote_addr,uint8_t status)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_a2dp_stream_connect:\n");
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 
 }
 void bt_app_a2dp_stream_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_a2dp_stream_disconnect:\n");
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 
 }
 void bt_app_a2dp_start(struct bd_addr_t *remote_addr,uint8_t value)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_a2dp_start address:\n");
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 
 }
 void bt_app_a2dp_relase(struct bd_addr_t *remote_addr,uint8_t value)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_a2dp_relase:\n");
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 
 }
 void bt_app_a2dp_suspend(struct bd_addr_t *remote_addr,uint8_t value)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_a2dp_suspend:\n");
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 
 }
 void bt_app_a2dp_abort(struct bd_addr_t *remote_addr,uint8_t value)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_a2dp_abort:\n");
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 
 }
 
@@ -540,80 +614,100 @@ static bt_app_a2dp_cb_t bt_app_a2dp_cb =
 #if PROFILE_AVRCP_ENABLE > 0
 void bt_app_avrcp_ctl_connect(struct bd_addr_t *remote_addr,uint8_t status)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_avrcp_av_connect:\n");
     bt_addr_dump(remote_addr->addr);
 
-	connect_addr.addr[5] = remote_addr->addr[5];
+    connect_addr.addr[5] = remote_addr->addr[5];
     connect_addr.addr[4] = remote_addr->addr[4];
     connect_addr.addr[3] = remote_addr->addr[3];
     connect_addr.addr[2] = remote_addr->addr[2];
     connect_addr.addr[1] = remote_addr->addr[1];
     connect_addr.addr[0] = remote_addr->addr[0];
-	
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
+
 }
 void bt_app_avrcp_ctl_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_avrcp_av_disconnect:\n");
     bt_addr_dump(remote_addr->addr);
 
-	memset(&connect_addr,0,sizeof(connect_addr));
+    memset(&connect_addr,0,sizeof(connect_addr));
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 
 }
 
 void bt_app_avrcp_support_capabilities(struct bd_addr_t *remote_addr,uint16_t support_cap_mask)
 {
-	printf("bt_app_avrcp_support_capabilities: mask(0x%x)\n",support_cap_mask);
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
+    printf("bt_app_avrcp_support_capabilities: mask(0x%x)\n",support_cap_mask);
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 void bt_app_avrcp_app_setting_attr(struct bd_addr_t *remote_addr,uint16_t setting_attr_mask)
 {
-	printf("bt_app_avrcp_app_setting_attr: mask(0x%x)\n",setting_attr_mask);
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
+    printf("bt_app_avrcp_app_setting_attr: mask(0x%x)\n",setting_attr_mask);
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 void bt_app_avrcp_play_status_update(struct bd_addr_t *remote_addr,uint8_t play_status)
 {
-	printf("bt_app_avrcp_play_status_update: play status update(%d)\n",play_status);
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
+    printf("bt_app_avrcp_play_status_update: play status update(%d)\n",play_status);
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 void bt_app_avrcp_track_change_update(struct bd_addr_t *remote_addr)
 {
-	printf("bt_app_avrcp_track_change_update\n");
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
+    printf("bt_app_avrcp_track_change_update\n");
     bt_addr_dump(remote_addr->addr);
-	bt_avrcp_controller_get_element_attributes(remote_addr);
+    bt_avrcp_controller_get_element_attributes(remote_addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 void bt_app_avrcp_playpos_change_update(struct bd_addr_t *remote_addr,uint32_t millisecond)
 {
-	printf("bt_app_avrcp_playpos_change_update ms(%d)\n",millisecond);
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
+    printf("bt_app_avrcp_playpos_change_update ms(%d)\n",millisecond);
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 void bt_app_avrcp_battary_change_update(struct bd_addr_t *remote_addr,uint32_t battary_status)
 {
-	printf("bt_app_avrcp_battary_change_update battary_status(%d)\n",battary_status);
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
+    printf("bt_app_avrcp_battary_change_update battary_status(%d)\n",battary_status);
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 void bt_app_avrcp_volume_change_update(struct bd_addr_t *remote_addr,uint32_t volume)
 {
-	printf("bt_app_avrcp_volume_change_update volume(%d)\n",volume);
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
+    printf("bt_app_avrcp_volume_change_update volume(%d)\n",volume);
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 void bt_app_avrcp_element_attr_update(struct bd_addr_t *remote_addr,uint8_t *title,uint8_t *artist,uint8_t *album,uint32_t current_index,uint32_t totol_count,uint32_t total_milliseconds)
 {
-	printf("bt_app_avrcp_element_attr_update\n");
-	bt_addr_dump(remote_addr->addr);
-	
-	printf("title(%s)\n",title);
-	printf("artist(%s)\n",artist);
-	printf("album(%s)\n",album);
-	printf("current_index(%d/%d)\n",current_index,totol_count);
-	printf("total_milliseconds(%d)\n",total_milliseconds);
-    
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
+    printf("bt_app_avrcp_element_attr_update\n");
+    bt_addr_dump(remote_addr->addr);
+
+    printf("title(%s)\n",title);
+    printf("artist(%s)\n",artist);
+    printf("album(%s)\n",album);
+    printf("current_index(%d/%d)\n",current_index,totol_count);
+    printf("total_milliseconds(%d)\n",total_milliseconds);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
+
 }
 
 static bt_app_avrcp_cb_t bt_app_avrcp_cb =
@@ -637,6 +731,7 @@ static bt_app_avrcp_cb_t bt_app_avrcp_cb =
 #if PROFILE_SPP_ENABLE > 0
 void bt_app_spp_connect(struct bd_addr_t *remote_addr,uint8_t status)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_spp_connect status %d address:\n",status);
     bt_addr_dump(remote_addr->addr);
     connect_addr.addr[5] = remote_addr->addr[5];
@@ -645,21 +740,28 @@ void bt_app_spp_connect(struct bd_addr_t *remote_addr,uint8_t status)
     connect_addr.addr[2] = remote_addr->addr[2];
     connect_addr.addr[1] = remote_addr->addr[1];
     connect_addr.addr[0] = remote_addr->addr[0];
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 void bt_app_spp_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
+
     printf("bt_app_spp_disconnect status %d address:\n",status);
     bt_addr_dump(remote_addr->addr);
     memset(&connect_addr,0,sizeof(connect_addr));
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 void bt_app_spp_recv_data(struct bd_addr_t *remote_addr,uint8_t *data,uint16_t data_len)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
+
     printf("bt_app_spp_recv_data len %d address:\n",data_len);
     bt_addr_dump(remote_addr->addr);
     printf("data is :");
     bt_hex_dump(data,data_len);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 static bt_app_spp_cb_t bt_app_spp_cb =
@@ -673,6 +775,7 @@ static bt_app_spp_cb_t bt_app_spp_cb =
 #if PROFILE_HID_ENABLE > 0
 void bt_app_hid_connect(struct bd_addr_t *remote_addr,uint8_t status)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_hid_connect status %d address:\n",status);
     bt_addr_dump(remote_addr->addr);
     connect_addr.addr[5] = remote_addr->addr[5];
@@ -681,21 +784,26 @@ void bt_app_hid_connect(struct bd_addr_t *remote_addr,uint8_t status)
     connect_addr.addr[2] = remote_addr->addr[2];
     connect_addr.addr[1] = remote_addr->addr[1];
     connect_addr.addr[0] = remote_addr->addr[0];
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 void bt_app_hid_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_hid_disconnect status %d address:\n",status);
     bt_addr_dump(remote_addr->addr);
     memset(&connect_addr,0,sizeof(connect_addr));
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 void bt_app_hid_interrupt_recv_data(struct bd_addr_t *remote_addr,uint8_t *data,uint16_t data_len)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_hid_interrupt_recv_data len %d address:\n",data_len);
     bt_addr_dump(remote_addr->addr);
     printf("data is :");
     bt_hex_dump(data,data_len);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 static bt_app_hid_cb_t bt_app_hid_cb =
@@ -709,6 +817,7 @@ static bt_app_hid_cb_t bt_app_hid_cb =
 #if PROFILE_PBAP_ENABLE > 0
 void bt_app_pbap_connect(struct bd_addr_t *remote_addr,uint8_t status)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_pbap_connect status %d address:\n",status);
     bt_addr_dump(remote_addr->addr);
     connect_addr.addr[5] = remote_addr->addr[5];
@@ -717,34 +826,43 @@ void bt_app_pbap_connect(struct bd_addr_t *remote_addr,uint8_t status)
     connect_addr.addr[2] = remote_addr->addr[2];
     connect_addr.addr[1] = remote_addr->addr[1];
     connect_addr.addr[0] = remote_addr->addr[0];
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 void bt_app_pbap_disconnect(struct bd_addr_t *remote_addr,uint8_t status)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_pbap_disconnect status %d address:\n",status);
     bt_addr_dump(remote_addr->addr);
     memset(&connect_addr,0,sizeof(connect_addr));
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 void bt_app_pbap_query_repositories_size(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint16_t size)
 {
-	printf("bt_app_pbap_query_repositories_size,address is :\n");
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
+    printf("bt_app_pbap_query_repositories_size,address is :\n");
     bt_addr_dump(remote_addr->addr);
-	printf("repositories(%d) type(%d) size(%d)\n",repositories,type,size);
+    printf("repositories(%d) type(%d) size(%d)\n",repositories,type,size);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 void bt_app_pbap_download_pb_status(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint8_t status)
 {
-	printf("bt_app_pbap_download_pb_status,address is :\n");
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
+    printf("bt_app_pbap_download_pb_status,address is :\n");
     bt_addr_dump(remote_addr->addr);
-	printf("repositories(%d) type(%d) status(%d)\n",repositories,type,status);
+    printf("repositories(%d) type(%d) status(%d)\n",repositories,type,status);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 void bt_app_pbap_download_vcardlist_status(struct bd_addr_t *remote_addr,uint8_t repositories,uint8_t type,uint8_t status)
 {
-	printf("bt_app_pbap_download_vcardlist_status,address is :\n");
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
+    printf("bt_app_pbap_download_vcardlist_status,address is :\n");
     bt_addr_dump(remote_addr->addr);
-	printf("repositories(%d) type(%d) status(%d)\n",repositories,type,status);
+    printf("repositories(%d) type(%d) status(%d)\n",repositories,type,status);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 
@@ -754,7 +872,7 @@ static bt_app_pbap_cb_t bt_app_pbap_cb =
     bt_app_pbap_disconnect,
     bt_app_pbap_query_repositories_size,
     bt_app_pbap_download_pb_status,
-    bt_app_pbap_download_vcardlist_status,   
+    bt_app_pbap_download_vcardlist_status,
 };
 
 #endif
@@ -763,54 +881,89 @@ static bt_app_pbap_cb_t bt_app_pbap_cb =
 #if BT_BLE_ENABLE > 0
 void bt_app_gatt_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_gatt_connect_set_up,address is :\n");
     bt_addr_dump(remote_addr->addr);
 
-	connect_addr.addr[5] = remote_addr->addr[5];
+    connect_addr.addr[5] = remote_addr->addr[5];
     connect_addr.addr[4] = remote_addr->addr[4];
     connect_addr.addr[3] = remote_addr->addr[3];
     connect_addr.addr[2] = remote_addr->addr[2];
     connect_addr.addr[1] = remote_addr->addr[1];
     connect_addr.addr[0] = remote_addr->addr[0];
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 
 }
 void bt_app_gatt_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
 {
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_gatt_connect_realease,address is :\n");
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 void bt_app_gattc_mtu_value(struct bd_addr_t *remote_addr,uint16_t mtu)
 {
-	printf("bt_app_gattc_mtu_value,mtu(%d) address is :\n",mtu);
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
+    printf("bt_app_gattc_mtu_value,mtu(%d) address is :\n",mtu);
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
+}
+
+void bt_app_gattc_discovery_primary_service(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle,uint16_t uuid16,uint8_t *uuid128)
+{
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
+    printf("bt_app_gattc_discovery_primary_service,start_handle(%d) end_handle(%d) uuid16(0x%x) address is :\n",start_handle,end_handle,uuid16);
+    bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
+}
+
+void bt_app_gattc_discovery_uuid_primary_service(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle)
+{
+	printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
+    printf("bt_app_gattc_discovery_uuid_primary_service,start_handle(%d) end_handle(%d) address is :\n",start_handle,end_handle);
+    bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
+}
+
+void bt_app_gattc_discovery_char(struct bd_addr_t *remote_addr,uint16_t attribute_handle,uint16_t char_value_handle,uint8_t properties,uint16_t uuid16,uint8_t *uuid128)
+{
+	printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
+    printf("bt_app_gattc_discovery_char,attribute_handle(%d) char_value_handle(%d) properties(0x%x) uuid16(0x%x) address is :\n",attribute_handle,char_value_handle,properties,uuid16);
+    bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 
 bt_gatt_client_cbs_t bt_app_gattc_wrapper_cb =
 {
     bt_app_gattc_mtu_value,
+    bt_app_gattc_discovery_primary_service,
+    bt_app_gattc_discovery_uuid_primary_service,
+    bt_app_gattc_discovery_char,
 };
 
 
 void bt_app_gatts_mtu_value(struct bd_addr_t *remote_addr,uint16_t mtu)
 {
-	printf("bt_app_gatts_mtu_value,mtu(%d) address is :\n",mtu);
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
+    printf("bt_app_gatts_mtu_value,mtu(%d) address is :\n",mtu);
     bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
 
 bt_gatt_server_cbs_t bt_app_gatts_wrapper_cb =
 {
-  bt_app_gatts_mtu_value,
+    bt_app_gatts_mtu_value,
 };
 
 
 
 static bt_gatt_cbs_t bt_app_gatt_wrapper_cb =
 {
-	bt_app_gatt_connect_set_up,
-	bt_app_gatt_connect_realease,
+    bt_app_gatt_connect_set_up,
+    bt_app_gatt_connect_realease,
     &bt_app_gattc_wrapper_cb,
     &bt_app_gatts_wrapper_cb,
 };
@@ -819,48 +972,48 @@ static bt_gatt_cbs_t bt_app_gatt_wrapper_cb =
 
 static bt_app_cb_t bt_app_cb =
 {
-    &bt_app_common_cb,		
-		
+    &bt_app_common_cb,
+
 #if PROFILE_SPP_ENABLE > 0
     &bt_app_spp_cb,
 #else
-	NULL,
+    NULL,
 #endif
 
 #if PROFILE_HFP_HF_ENABLE > 0
     &bt_app_hfp_cb,
 #else
-	NULL,
+    NULL,
 #endif
 
 #if PROFILE_A2DP_ENABLE > 0
     &bt_app_a2dp_cb,
 #else
-	NULL,
+    NULL,
 #endif
 
 #if PROFILE_AVRCP_ENABLE > 0
     &bt_app_avrcp_cb,
 #else
-	NULL,
+    NULL,
 #endif
 
 #if PROFILE_HID_ENABLE > 0
     &bt_app_hid_cb,
 #else
-	NULL,
+    NULL,
 #endif
 
 #if PROFILE_PBAP_ENABLE > 0
     &bt_app_pbap_cb,
 #else
-	NULL,
+    NULL,
 #endif
 
 #if BT_BLE_ENABLE > 0
     &bt_app_gatt_wrapper_cb,
 #else
-	NULL,
+    NULL,
 #endif
 
 };
@@ -872,7 +1025,7 @@ uint8_t spp_buf[2048];
 uint8_t shell_parse(uint8_t *shell_string)
 {
 
-	
+
     if(hw_strcmp(BT_START_CMD,(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate bt start\n");
@@ -939,23 +1092,23 @@ uint8_t shell_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-	if(hw_strncmp("SPP_TEST1",(const char*)shell_string,hw_strlen("SPP_TEST1")) == 0)
+    if(hw_strncmp("SPP_TEST1",(const char*)shell_string,hw_strlen("SPP_TEST1")) == 0)
     {
-    	uint16_t index = 0;
-		for(index = 0; index < sizeof(spp_buf);index++)
-			spp_buf[index] = index%0xff;
+        uint16_t index = 0;
+        for(index = 0; index < sizeof(spp_buf); index++)
+            spp_buf[index] = index%0xff;
         HW_DEBUG("SHELL:operate bt spp send1 len\n");
         spp_send_data(&connect_addr,(uint8_t *)spp_buf,990);
         return HW_ERR_OK;
     }
 
-	if(hw_strncmp("SPP_TEST2",(const char*)shell_string,hw_strlen("SPP_TEST2")) == 0)
+    if(hw_strncmp("SPP_TEST2",(const char*)shell_string,hw_strlen("SPP_TEST2")) == 0)
     {
-    	uint16_t index = 0;
-		for(index = 0; index < sizeof(spp_buf);index++)
-			spp_buf[index] = index%0xff;
+        uint16_t index = 0;
+        for(index = 0; index < sizeof(spp_buf); index++)
+            spp_buf[index] = index%0xff;
         HW_DEBUG("SHELL:operate bt spp send2 len\n");
-		
+
         spp_send_data(&connect_addr,(uint8_t *)spp_buf+1,990);
         return HW_ERR_OK;
     }
@@ -963,7 +1116,7 @@ uint8_t shell_parse(uint8_t *shell_string)
     if(hw_strncmp(BT_SPP_CON_CMD,(const char*)shell_string,hw_strlen(BT_SPP_CON_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate spp CON\n");
-		
+
         spp_connect(&connect_addr);
         return HW_ERR_OK;
     }
@@ -1082,7 +1235,7 @@ uint8_t shell_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-	if(hw_strncmp("PBAP_SPC",(const char*)shell_string,hw_strlen("PBAP_SPC")) == 0)
+    if(hw_strncmp("PBAP_SPC",(const char*)shell_string,hw_strlen("PBAP_SPC")) == 0)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_SPC\n");
 
@@ -1098,7 +1251,7 @@ uint8_t shell_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-	if(hw_strncmp("PBAP_DVC",(const char*)shell_string,hw_strlen("PBAP_DVC")) == 0)
+    if(hw_strncmp("PBAP_DVC",(const char*)shell_string,hw_strlen("PBAP_DVC")) == 0)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_DVC\n");
 
@@ -1108,26 +1261,26 @@ uint8_t shell_parse(uint8_t *shell_string)
 
     if(hw_strncmp("PBAP_DVE",(const char*)shell_string,hw_strlen("PBAP_DVE")) == 0)
     {
-    	static uint16_t dn_entry_number = 1;
+        static uint16_t dn_entry_number = 1;
         HW_DEBUG("SHELL:operate PBAP PBAP_DVE\n");
 
         bt_pbap_client_download_vcard_entry(&connect_addr,PB_LOCAL_REPOSITORY,PB_PHONEBOOK_TYPE,dn_entry_number++);
         return HW_ERR_OK;
     }
 
-	if(hw_strncmp("PBAP_ABORT",(const char*)shell_string,hw_strlen("PBAP_ABORT")) == 0)
+    if(hw_strncmp("PBAP_ABORT",(const char*)shell_string,hw_strlen("PBAP_ABORT")) == 0)
     {
         HW_DEBUG("SHELL:operate PBAP PBAP_ABORT\n");
 
         bt_pbap_client_download_abort(&connect_addr);
         return HW_ERR_OK;
     }
-	
+
 #endif
 
 
 #if PROFILE_HFP_HF_ENABLE > 0
-	if(hw_strncmp(BT_HFP_CON_CMD,(const char*)shell_string,hw_strlen(BT_HFP_CON_CMD)) == 0)
+    if(hw_strncmp(BT_HFP_CON_CMD,(const char*)shell_string,hw_strlen(BT_HFP_CON_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate HFP CON\n");
 
@@ -1260,226 +1413,226 @@ uint8_t shell_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-	if(hw_strncmp(BT_HFP_SET_BATT_LEVEL_CMD,(const char*)shell_string,hw_strlen(BT_HFP_SET_BATT_LEVEL_CMD)) == 0)
+    if(hw_strncmp(BT_HFP_SET_BATT_LEVEL_CMD,(const char*)shell_string,hw_strlen(BT_HFP_SET_BATT_LEVEL_CMD)) == 0)
     {
         HW_DEBUG("SHELL:operate set batt level\n");
         bt_hfp_hf_send_batt_level(&connect_addr,60);
         return HW_ERR_OK;
     }
 
-	
-	if(hw_strncmp(BT_HFP_GET_OP_NAME_CMD,(const char*)shell_string,hw_strlen(BT_HFP_GET_OP_NAME_CMD)) == 0)
-	{
-		HW_DEBUG("SHELL:operate get ag operator name\n");
-		bt_hfp_hf_get_operator(&connect_addr);
-		return HW_ERR_OK;
-	}
+
+    if(hw_strncmp(BT_HFP_GET_OP_NAME_CMD,(const char*)shell_string,hw_strlen(BT_HFP_GET_OP_NAME_CMD)) == 0)
+    {
+        HW_DEBUG("SHELL:operate get ag operator name\n");
+        bt_hfp_hf_get_operator(&connect_addr);
+        return HW_ERR_OK;
+    }
 
 #endif
 
 #if PROFILE_AVRCP_ENABLE > 0
-	if(hw_strncmp("AVRCP_LIST_APP_ATTR",(const char*)shell_string,hw_strlen("AVRCP_LIST_APP_ATTR")) == 0)
+    if(hw_strncmp("AVRCP_LIST_APP_ATTR",(const char*)shell_string,hw_strlen("AVRCP_LIST_APP_ATTR")) == 0)
     {
         HW_DEBUG("SHELL:AVRCP_LIST_APP_ATTR\n");
         bt_avrcp_controller_list_app_setting_attr(&connect_addr);
         return HW_ERR_OK;
     }
 
-	if(hw_strncmp("AVRCP_PLAY_STATUS",(const char*)shell_string,hw_strlen("AVRCP_PLAY_STATUS")) == 0)
+    if(hw_strncmp("AVRCP_PLAY_STATUS",(const char*)shell_string,hw_strlen("AVRCP_PLAY_STATUS")) == 0)
     {
         HW_DEBUG("SHELL:AVRCP_PLAY_STATUS\n");
         bt_avrcp_controller_get_play_status(&connect_addr);
         return HW_ERR_OK;
     }
 
-	if(hw_strncmp("AVRCP_GET_ID3",(const char*)shell_string,hw_strlen("AVRCP_GET_ID3")) == 0)
+    if(hw_strncmp("AVRCP_GET_ID3",(const char*)shell_string,hw_strlen("AVRCP_GET_ID3")) == 0)
     {
         HW_DEBUG("SHELL:AVRCP_GET_ID3\n");
         bt_avrcp_controller_get_element_attributes(&connect_addr);
         return HW_ERR_OK;
     }
 
-	if(hw_strncmp("AVRCP_PLAY",(const char*)shell_string,hw_strlen("AVRCP_PLAY")) == 0)
+    if(hw_strncmp("AVRCP_PLAY",(const char*)shell_string,hw_strlen("AVRCP_PLAY")) == 0)
     {
         HW_DEBUG("SHELL:AVRCP_PLAY\n");
         bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_PLAY);
         return HW_ERR_OK;
     }
 
-	if(hw_strncmp("AVRCP_PAUSE",(const char*)shell_string,hw_strlen("AVRCP_PAUSE")) == 0)
+    if(hw_strncmp("AVRCP_PAUSE",(const char*)shell_string,hw_strlen("AVRCP_PAUSE")) == 0)
     {
         HW_DEBUG("SHELL:AVRCP_PLAY\n");
-		bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_PAUSE);
+        bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_PAUSE);
         return HW_ERR_OK;
     }
 
-	if(hw_strncmp("AVRCP_PREV",(const char*)shell_string,hw_strlen("AVRCP_PREV")) == 0)
+    if(hw_strncmp("AVRCP_PREV",(const char*)shell_string,hw_strlen("AVRCP_PREV")) == 0)
     {
         HW_DEBUG("SHELL:AVRCP_PREV\n");
-		bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_BACKWARD);
+        bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_BACKWARD);
         return HW_ERR_OK;
     }
 
-	if(hw_strncmp("AVRCP_NEXT",(const char*)shell_string,hw_strlen("AVRCP_NEXT")) == 0)
+    if(hw_strncmp("AVRCP_NEXT",(const char*)shell_string,hw_strlen("AVRCP_NEXT")) == 0)
     {
         HW_DEBUG("SHELL:AVRCP_NEXT\n");
-		bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_FORWARD);
+        bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_FORWARD);
         return HW_ERR_OK;
     }
 
-	if(hw_strncmp("AVRCP_FAST_BACKWARD",(const char*)shell_string,hw_strlen("AVRCP_FAST_BACKWARD")) == 0)
+    if(hw_strncmp("AVRCP_FAST_BACKWARD",(const char*)shell_string,hw_strlen("AVRCP_FAST_BACKWARD")) == 0)
     {
         HW_DEBUG("SHELL:AVRCP_FAST_BACKWARD\n");
-		bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_FAST_BACKWARD);
+        bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_FAST_BACKWARD);
         return HW_ERR_OK;
     }
 
-	if(hw_strncmp("AVRCP_FAST_FORWARD",(const char*)shell_string,hw_strlen("AVRCP_FAST_FORWARD")) == 0)
+    if(hw_strncmp("AVRCP_FAST_FORWARD",(const char*)shell_string,hw_strlen("AVRCP_FAST_FORWARD")) == 0)
     {
         HW_DEBUG("SHELL:AVRCP_FAST_FORWARD\n");
-		bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_FAST_FORWARD);
+        bt_avrcp_controller_control(&connect_addr,AVRCP_CONTROL_ID_FAST_FORWARD);
         return HW_ERR_OK;
     }
 
 #endif
 
 #if PROFILE_HID_ENABLE > 0
-		if(hw_strncmp("HID_MOUSE_L",(const char*)shell_string,hw_strlen("HID_MOUSE_L")) == 0)
-		{
-			uint8_t report[3] = {0,-20,0};
-			HW_DEBUG("SHELL:HID_MOUSE_L\n");
-			
-			bt_hid_interupt_report(&connect_addr,report,sizeof(report));
-			return HW_ERR_OK;
-		}
-	
-		if(hw_strncmp("HID_MOUSE_R",(const char*)shell_string,hw_strlen("HID_MOUSE_R")) == 0)
-		{
-			uint8_t report[3] = {0,20,0};
-			HW_DEBUG("SHELL:HID_MOUSE_R\n");
-			
-			bt_hid_interupt_report(&connect_addr,report,sizeof(report));
-			return HW_ERR_OK;
-		}
-		
-		if(hw_strncmp("HID_MOUSE_U",(const char*)shell_string,hw_strlen("HID_MOUSE_U")) == 0)
-		{
-			uint8_t report[3] = {0,0,-20};
-			HW_DEBUG("SHELL:HID_MOUSE_U\n");
-			
-			bt_hid_interupt_report(&connect_addr,report,sizeof(report));
-			return HW_ERR_OK;
-		}
-	
-		if(hw_strncmp("HID_MOUSE_D",(const char*)shell_string,hw_strlen("HID_MOUSE_D")) == 0)
-		{
-			uint8_t report[3] = {0,0,20};
-			HW_DEBUG("SHELL:HID_MOUSE_D\n");
-			
-			bt_hid_interupt_report(&connect_addr,report,sizeof(report));
-			return HW_ERR_OK;
-		}
-	
-		if(hw_strncmp("HID_MOUSE_L_CLICK",(const char*)shell_string,hw_strlen("HID_MOUSE_L_CLICK")) == 0)
-		{
-			uint8_t report[3] = {1,0,0};
-			HW_DEBUG("SHELL:HID_MOUSE_L_CLICK\n");
-			
-			bt_hid_interupt_report(&connect_addr,report,sizeof(report));
-			return HW_ERR_OK;
-		}
-	
-		if(hw_strncmp("HID_MOUSE_R_CLICK",(const char*)shell_string,hw_strlen("HID_MOUSE_R_CLICK")) == 0)
-		{
-			uint8_t report[3] = {2,0,0};
-			HW_DEBUG("SHELL:HID_MOUSE_R_CLICK\n");
-			
-			bt_hid_interupt_report(&connect_addr,report,sizeof(report));
-			return HW_ERR_OK;
-		}
+    if(hw_strncmp("HID_MOUSE_L",(const char*)shell_string,hw_strlen("HID_MOUSE_L")) == 0)
+    {
+        uint8_t report[3] = {0,-20,0};
+        HW_DEBUG("SHELL:HID_MOUSE_L\n");
 
-		if(hw_strncmp("HID_KEYBOARD_INPUT",(const char*)shell_string,hw_strlen("HID_KEYBOARD_INPUT")) == 0)
-		{
-			uint8_t keycode = 0xff;
-			uint8_t report[9] = {0};
+        bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+        return HW_ERR_OK;
+    }
 
-			HW_DEBUG("SHELL:HID_KEYBOARD_INPUT\n");
-			bt_hid_find_keycode(&keycode,'a');
-			HW_DEBUG("KEY INDEX %d\n",keycode);
-			report[3] = keycode;
-			
-			bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+    if(hw_strncmp("HID_MOUSE_R",(const char*)shell_string,hw_strlen("HID_MOUSE_R")) == 0)
+    {
+        uint8_t report[3] = {0,20,0};
+        HW_DEBUG("SHELL:HID_MOUSE_R\n");
 
-			return HW_ERR_OK;
-		}
+        bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+        return HW_ERR_OK;
+    }
+
+    if(hw_strncmp("HID_MOUSE_U",(const char*)shell_string,hw_strlen("HID_MOUSE_U")) == 0)
+    {
+        uint8_t report[3] = {0,0,-20};
+        HW_DEBUG("SHELL:HID_MOUSE_U\n");
+
+        bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+        return HW_ERR_OK;
+    }
+
+    if(hw_strncmp("HID_MOUSE_D",(const char*)shell_string,hw_strlen("HID_MOUSE_D")) == 0)
+    {
+        uint8_t report[3] = {0,0,20};
+        HW_DEBUG("SHELL:HID_MOUSE_D\n");
+
+        bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+        return HW_ERR_OK;
+    }
+
+    if(hw_strncmp("HID_MOUSE_L_CLICK",(const char*)shell_string,hw_strlen("HID_MOUSE_L_CLICK")) == 0)
+    {
+        uint8_t report[3] = {1,0,0};
+        HW_DEBUG("SHELL:HID_MOUSE_L_CLICK\n");
+
+        bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+        return HW_ERR_OK;
+    }
+
+    if(hw_strncmp("HID_MOUSE_R_CLICK",(const char*)shell_string,hw_strlen("HID_MOUSE_R_CLICK")) == 0)
+    {
+        uint8_t report[3] = {2,0,0};
+        HW_DEBUG("SHELL:HID_MOUSE_R_CLICK\n");
+
+        bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+        return HW_ERR_OK;
+    }
+
+    if(hw_strncmp("HID_KEYBOARD_INPUT",(const char*)shell_string,hw_strlen("HID_KEYBOARD_INPUT")) == 0)
+    {
+        uint8_t keycode = 0xff;
+        uint8_t report[9] = {0};
+
+        HW_DEBUG("SHELL:HID_KEYBOARD_INPUT\n");
+        bt_hid_find_keycode(&keycode,'a');
+        HW_DEBUG("KEY INDEX %d\n",keycode);
+        report[3] = keycode;
+
+        bt_hid_interupt_report(&connect_addr,report,sizeof(report));
+
+        return HW_ERR_OK;
+    }
 #endif
 
 #if BT_BLE_ENABLE > 0
-		if(hw_strncmp(BT_GATTC_MTU_REQ_CMD,(const char*)shell_string,hw_strlen(BT_GATTC_MTU_REQ_CMD)) == 0)
-		{
+    if(hw_strncmp(BT_GATTC_MTU_REQ_CMD,(const char*)shell_string,hw_strlen(BT_GATTC_MTU_REQ_CMD)) == 0)
+    {
 
-			HW_DEBUG("SHELL:GATTC_MTU_REQ\n");
-			bt_gatt_client_exchange_mtu(&connect_addr,GATT_BLE_MTU_SIZE);
+        HW_DEBUG("SHELL:BT_GATTC_MTU_REQ_CMD\n");
+        bt_gatt_client_exchange_mtu(&connect_addr,GATT_BLE_MTU_SIZE);
 
-			return HW_ERR_OK;
-		}
+        return HW_ERR_OK;
+    }
 
-		if(hw_strncmp("GATTC_DIS_P",(const char*)shell_string,hw_strlen("GATTC_DIS_P")) == 0)
-		{
+    if(hw_strncmp(BT_GATTC_PRIMARY_DISCOVERY_REQ_CMD,(const char*)shell_string,hw_strlen(BT_GATTC_PRIMARY_DISCOVERY_REQ_CMD)) == 0)
+    {
 
-			HW_DEBUG("SHELL:GATTC_DIS_P\n");
-			gatt_client_discovery_pri_service(1,0xffff);
+        HW_DEBUG("SHELL:BT_GATTC_PRIMARY_DISCOVERY_REQ_CMD\n");
+        bt_gatt_client_discovery_pri_service(&connect_addr,1,0xffff);
 
-			return HW_ERR_OK;
-		}
+        return HW_ERR_OK;
+    }
 
-		if(hw_strncmp("GATTC_DIS_FTV",(const char*)shell_string,hw_strlen("GATTC_DIS_FTV")) == 0)
-		{
+    if(hw_strncmp(BT_GATTC_PRIMARY_UUID_DISCOVERY_REQ_CMD,(const char*)shell_string,hw_strlen(BT_GATTC_PRIMARY_UUID_DISCOVERY_REQ_CMD)) == 0)
+    {
 
-			HW_DEBUG("SHELL:GATTC_DIS_FTV\n");
-			gatt_client_discovery_pri_service_uuid(1,0xffff,BT_UUID_SERVCLASS_HEART_RATE);
+        HW_DEBUG("SHELL:BT_GATTC_PRIMARY_UUID_DISCOVERY_REQ_CMD\n");
+        bt_gatt_client_discovery_pri_service_uuid(&connect_addr,1,0xffff,BT_UUID_SERVCLASS_GAP_SERVER,NULL);
 
-			return HW_ERR_OK;
-		}
+        return HW_ERR_OK;
+    }
 
-		if(hw_strncmp("GATTC_DIS_FINCLUDE",(const char*)shell_string,hw_strlen("GATTC_DIS_FINCLUDE")) == 0)
-		{
+    if(hw_strncmp(BT_GATTC_RELATIONSHIP_DISCOVERY_REQ_CMD,(const char*)shell_string,hw_strlen(BT_GATTC_RELATIONSHIP_DISCOVERY_REQ_CMD)) == 0)
+    {
 
-			HW_DEBUG("SHELL:GATTC_DIS_FINCLUDE\n");
-			gatt_client_find_include(1,0xffff);
+        HW_DEBUG("SHELL:BT_GATTC_RELATIONSHIP_DISCOVERY_REQ_CMD\n");
+        bt_gatt_client_find_include(&connect_addr,1,0xffff);
 
-			return HW_ERR_OK;
-		}
+        return HW_ERR_OK;
+    }
 
-		if(hw_strncmp("GATTC_DIS_FCHARA",(const char*)shell_string,hw_strlen("GATTC_DIS_FCHARA")) == 0)
-		{
+    if(hw_strncmp(BT_GATTC_CHAR_DISCOVERY_REQ_CMD,(const char*)shell_string,hw_strlen(BT_GATTC_CHAR_DISCOVERY_REQ_CMD)) == 0)
+    {
 
-			HW_DEBUG("SHELL:GATTC_DIS_FCHARA\n");
-			gatt_client_find_characteristics(1,0xffff);
+        HW_DEBUG("SHELL:BT_GATTC_CHAR_DISCOVERY_REQ_CMD\n");
+        bt_gatt_client_discovery_characteristics(&connect_addr,1,0xffff);
 
-			return HW_ERR_OK;
-		}
+        return HW_ERR_OK;
+    }
 
-		if(hw_strncmp("GATTC_READ2",(const char*)shell_string,hw_strlen("GATTC_READ2")) == 0)
-		{
+    if(hw_strncmp("GATTC_READ2",(const char*)shell_string,hw_strlen("GATTC_READ2")) == 0)
+    {
 
-			HW_DEBUG("SHELL:GATTC_READ2\n");
-			att_read_req(2);
+        HW_DEBUG("SHELL:GATTC_READ2\n");
+        att_read_req(2);
 
-			return HW_ERR_OK;
-		}
-			
-		
+        return HW_ERR_OK;
+    }
+
+
 #if PROFILE_BAS_ENABLE > 0
-		if(hw_strncmp("BAS_LEVEL_UPDATE",(const char*)shell_string,hw_strlen("BAS_LEVEL_UPDATE")) == 0)
-		{
-			static uint8_t bat_level = 100;
+    if(hw_strncmp("BAS_LEVEL_UPDATE",(const char*)shell_string,hw_strlen("BAS_LEVEL_UPDATE")) == 0)
+    {
+        static uint8_t bat_level = 100;
 
-			HW_DEBUG("SHELL:BAS_LEVEL_UPDATE\n");
-			bas_batt_level_notification(bat_level==0?bat_level=100:bat_level--);
+        HW_DEBUG("SHELL:BAS_LEVEL_UPDATE\n");
+        bas_batt_level_notification(bat_level==0?bat_level=100:bat_level--);
 
-			return HW_ERR_OK;
-		}
+        return HW_ERR_OK;
+    }
 #endif
 
 
