@@ -1038,14 +1038,15 @@ void gattc_mtu_value(struct bd_addr_t *remote_addr,uint16_t mtu)
     }
 }
 
-void gattc_discovery_primary_service(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle,uint16_t uuid16,uint8_t *uuid128)
+void gattc_discovery_primary_service(struct bd_addr_t *remote_addr,gatt_client_pri_service_t *pri_service,uint16_t count)
 {
-	printf("WRAPPER << PROFILE:gattc_discovery_primary_service,start_handle(%d) end_handle(%d) uuid16(%d) address is :\n",start_handle,end_handle,uuid16);
+	printf("WRAPPER << PROFILE:gattc_discovery_primary_service,count(%d) address is :\n",count);
     bt_addr_dump(remote_addr->addr);
+	
 
 	if(bt_wrapper_cb && bt_wrapper_cb->app_gatt_cb && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs->bt_gattc_discovery_primary_service)
     {
-        bt_wrapper_cb->app_gatt_cb->gatt_client_cbs->bt_gattc_discovery_primary_service(remote_addr,start_handle,end_handle,uuid16,uuid128);
+        bt_wrapper_cb->app_gatt_cb->gatt_client_cbs->bt_gattc_discovery_primary_service(remote_addr,pri_service,count);
     }
 }
 
@@ -1565,6 +1566,7 @@ uint8_t bt_pbap_client_download_abort(struct bd_addr_t *addr)
 
 
 #if BT_BLE_ENABLE
+
 uint8_t bt_gatt_client_exchange_mtu(struct bd_addr_t *remote_addr,uint16_t mtu)
 {
 	gatt_client_exchange_mtu(remote_addr,mtu);
@@ -1596,6 +1598,20 @@ uint8_t bt_gatt_client_find_include(struct bd_addr_t *remote_addr,uint16_t start
 uint8_t bt_gatt_client_discovery_characteristics(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle)
 {
 	gatt_client_discovery_characteristics(remote_addr,start_handle,end_handle);
+
+	return 0;
+}
+
+uint8_t bt_gatt_client_discovery_char_des(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle)
+{
+	gatt_client_discovery_char_des(remote_addr,start_handle,end_handle);
+
+	return 0;
+}
+
+uint8_t bt_gatt_client_read_char_value(struct bd_addr_t *remote_addr,uint16_t handle)
+{
+	gatt_client_read_char_value(remote_addr,handle);
 
 	return 0;
 }

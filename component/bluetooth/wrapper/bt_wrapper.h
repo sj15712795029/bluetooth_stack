@@ -174,7 +174,7 @@ typedef struct
 typedef struct
 {
     void (*bt_gatt_mtu_value)(struct bd_addr_t *remote_addr,uint16_t mtu);
-	void (*bt_gattc_discovery_primary_service)(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle,uint16_t uuid16,uint8_t *uuid128);
+	void (*bt_gattc_discovery_primary_service)(struct bd_addr_t *remote_addr,gatt_client_pri_service_t *pri_service,uint16_t count);
 	void (*bt_gattc_discovery_uuid_primary_service)(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle);
 	void (*bt_gattc_discovery_char)(struct bd_addr_t *remote_addr,uint16_t attribute_handle,uint16_t char_value_handle,uint8_t properties,uint16_t uuid16,uint8_t *uuid128);
 } bt_gatt_client_cbs_t;
@@ -291,6 +291,8 @@ uint8_t bt_gatt_client_discovery_pri_service(struct bd_addr_t *remote_addr,uint1
 uint8_t bt_gatt_client_discovery_pri_service_uuid(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle,uint16_t uuid16,uint8_t *uuid128);
 uint8_t bt_gatt_client_find_include(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle);
 uint8_t bt_gatt_client_discovery_characteristics(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle);
+uint8_t bt_gatt_client_discovery_char_des(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle);
+uint8_t bt_gatt_client_read_char_value(struct bd_addr_t *remote_addr,uint16_t handle);
 
 
 #endif

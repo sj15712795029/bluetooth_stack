@@ -157,7 +157,10 @@ uint32_t last_sys_time = 0;
 #define BT_GATTC_RELATIONSHIP_UUID_DISCOVERY_REQ_DES "Gatt client discovery relationship"
 #define BT_GATTC_CHAR_DISCOVERY_REQ_CMD "GATTC_DIS_CHAR"
 #define BT_GATTC_CHAR_DISCOVERY_REQ_DES "Gatt client discovery all characteristics"
-
+#define BT_GATTC_CHARD_DISCOVERY_REQ_CMD "GATTC_DIS_CDES"
+#define BT_GATTC_CHARD_DISCOVERY_REQ_DES "Gatt client discovery all characteristics descriptors"
+#define BT_GATTC_CHAR_READ_VALUE_CMD "GATTC_RCHAR"
+#define BT_GATTC_CHAR_READ_VALUE_DES "Gatt client read characteristics value"
 
 
 typedef struct
@@ -232,6 +235,8 @@ cmd_desctiption_t cmd_usage[] =
     {(uint8_t *)BT_GATTC_PRIMARY_UUID_DISCOVERY_REQ_CMD,(uint8_t *)BT_GATTC_PRIMARY_UUID_DISCOVERY_REQ_DES},
     {(uint8_t *)BT_GATTC_RELATIONSHIP_DISCOVERY_REQ_CMD,(uint8_t *)BT_GATTC_RELATIONSHIP_UUID_DISCOVERY_REQ_DES},
     {(uint8_t *)BT_GATTC_CHAR_DISCOVERY_REQ_CMD,(uint8_t *)BT_GATTC_CHAR_DISCOVERY_REQ_DES},
+    {(uint8_t *)BT_GATTC_CHARD_DISCOVERY_REQ_CMD,(uint8_t *)BT_GATTC_CHARD_DISCOVERY_REQ_DES},
+    {(uint8_t *)BT_GATTC_CHAR_READ_VALUE_CMD,(uint8_t *)BT_GATTC_CHAR_READ_VALUE_DES},
 #endif
 
 
@@ -910,11 +915,26 @@ void bt_app_gattc_mtu_value(struct bd_addr_t *remote_addr,uint16_t mtu)
     printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
-void bt_app_gattc_discovery_primary_service(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle,uint16_t uuid16,uint8_t *uuid128)
+void bt_app_gattc_discovery_primary_service(struct bd_addr_t *remote_addr,gatt_client_pri_service_t *pri_service,uint16_t count)
 {
+	uint8_t index = 0;
+	uint16_t start_handle;
     printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
-    printf("bt_app_gattc_discovery_primary_service,start_handle(%d) end_handle(%d) uuid16(0x%x) address is :\n",start_handle,end_handle,uuid16);
+    printf("bt_app_gattc_discovery_primary_service,count(0x%x) address is :\n",count);
     bt_addr_dump(remote_addr->addr);
+	for(index = 0; index < count; index++)
+	{
+		start_handle = pri_service[index].end_handle+1;
+		if(pri_service[index].uuid.len == LEN_UUID_16)
+			printf("primary service[%d] start_handle(%d) end_handle(%d) uuid16(0x%x)\n",index,pri_service[index].start_handle,pri_service[index].end_handle,pri_service[index].uuid.uu.uuid16);
+		else
+		{
+			printf("primary service[%d] start_handle(%d) end_handle(%d)\n",index,pri_service[index].start_handle,pri_service[index].end_handle);
+			bt_uuid128_dump(pri_service[index].uuid.uu.uuid128);
+		}
+	}
+
+	bt_gatt_client_discovery_pri_service(&connect_addr,start_handle,0xffff);
     printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
@@ -1568,6 +1588,7 @@ uint8_t shell_parse(uint8_t *shell_string)
 #endif
 
 #if BT_BLE_ENABLE > 0
+
     if(hw_strncmp(BT_GATTC_MTU_REQ_CMD,(const char*)shell_string,hw_strlen(BT_GATTC_MTU_REQ_CMD)) == 0)
     {
 
@@ -1613,11 +1634,23 @@ uint8_t shell_parse(uint8_t *shell_string)
         return HW_ERR_OK;
     }
 
-    if(hw_strncmp("GATTC_READ2",(const char*)shell_string,hw_strlen("GATTC_READ2")) == 0)
+	if(hw_strncmp(BT_GATTC_CHARD_DISCOVERY_REQ_CMD,(const char*)shell_string,hw_strlen(BT_GATTC_CHARD_DISCOVERY_REQ_CMD)) == 0)
     {
 
-        HW_DEBUG("SHELL:GATTC_READ2\n");
-        att_read_req(2);
+        HW_DEBUG("SHELL:BT_GATTC_CHAR_DISCOVERY_REQ_CMD\n");
+        bt_gatt_client_discovery_char_des(&connect_addr,1,0xffff);
+
+        return HW_ERR_OK;
+    }
+
+    if(hw_strncmp(BT_GATTC_CHAR_READ_VALUE_CMD,(const char*)shell_string,hw_strlen(BT_GATTC_CHAR_READ_VALUE_CMD)) == 0)
+    {
+		uint16_t handle;
+        printf("Input GATT handle\n");
+        scanf("%hd",(uint16_t *)&handle);
+		
+        HW_DEBUG("SHELL:BT_GATTC_CHAR_READ_VALUE_CMD\n");	
+        bt_gatt_client_read_char_value(&connect_addr,handle);
 
         return HW_ERR_OK;
     }

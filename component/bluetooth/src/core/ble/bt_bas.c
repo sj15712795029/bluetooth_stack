@@ -23,7 +23,7 @@ gatt_server_service_t bas_service[] =
 
 /* Test */
 uint8_t uuid_test[16] = {1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2};
-uint8_t gatt_test_characteristic[] = {GATT_CHAR_PROP_BIT_WRITE|GATT_CHAR_PROP_BIT_READ|GATT_CHAR_PROP_BIT_NOTIFY,
+uint8_t gatt_test_characteristic[] = {GATT_CHAR_PROP_BIT_AUTH,
 	BT_LE_U16_TO_ARRAY(0x0b),BT_LE_U16_TO_ARRAY(GATT_UUID_BATTERY_LEVEL)};
 uint8_t uuid_type[16] = {3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4};
 uint8_t test_value[10];

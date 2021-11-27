@@ -166,6 +166,8 @@
 #define GATT_CLIENT_OP_PRIMARY_DISCOVERY 2
 #define GATT_CLIENT_OP_RELATIONSHIP_DISCOVERY 3
 #define GATT_CLIENT_OP_CHAR_DISCOVERY 4
+#define GATT_CLIENT_OP_READ_CHAR_VALUE 5
+
 
 
 typedef struct _gatt_pcb_t
@@ -175,11 +177,18 @@ typedef struct _gatt_pcb_t
     att_pcb_t *att_pcb;
 }gatt_pcb_t;
 
+typedef struct
+{
+	uint16_t start_handle;
+	uint16_t end_handle;
+	bt_uuid_t uuid;
+}gatt_client_pri_service_t;
+
 
 typedef struct
 {
     void (*gatt_mtu_value)(struct bd_addr_t *remote_addr,uint16_t mtu);
-	void (*gattc_discovery_primary_service)(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle,uint16_t uuid16,uint8_t *uuid128);
+	void (*gattc_discovery_primary_service)(struct bd_addr_t *remote_addr,gatt_client_pri_service_t *pri_service,uint16_t count);
 	void (*gattc_discovery_uuid_primary_service)(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle);
 	void (*gattc_discovery_char)(struct bd_addr_t *remote_addr,uint16_t attribute_handle,uint16_t char_value_handle,uint8_t properties,uint16_t uuid16,uint8_t *uuid128);
 } gatt_client_cbs_t;
@@ -242,6 +251,7 @@ typedef struct
 }gatt_client_manager_t;
 
 
+
 /* Gatt commmon API */
 err_t gatt_init(gatt_cbs_t *cbs);
 
@@ -261,6 +271,8 @@ err_t gatt_client_discovery_pri_service_uuid(struct bd_addr_t *remote_addr,uint1
 err_t gatt_client_find_include(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle);
 err_t gatt_client_discovery_characteristics(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle);
 err_t gatt_client_find_characteristics_uuid(uint16_t start_handle,uint16_t end_handle,uint16_t uuid);
+err_t gatt_client_discovery_char_des(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle);
+err_t gatt_client_read_char_value(struct bd_addr_t *remote_addr,uint16_t handle);
 
 
 

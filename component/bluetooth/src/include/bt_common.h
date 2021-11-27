@@ -104,6 +104,21 @@ struct bd_addr_t {
 };
 
 
+#define MAX_UUID_SIZE              16
+typedef struct {
+#define LEN_UUID_16     2
+#define LEN_UUID_32     4
+#define LEN_UUID_128    16
+    uint16_t len;
+    union {
+        uint16_t      uuid16;
+        uint32_t      uuid32;
+        uint8_t       uuid128[MAX_UUID_SIZE];
+    } uu;
+
+} bt_uuid_t;
+
+
 
 #define BD_ADDR(bdaddr, a, b, c, d, e, f) do{ \
                                         bdaddr->addr[0] = a; \

@@ -604,6 +604,29 @@ err_t att_mtu_req(att_pcb_t *att_pcb,uint16_t client_mtu)
     return BT_ERR_OK;
 }
 
+
+err_t att_find_info_req(uint16_t start_handle,uint16_t end_handle)
+{
+	struct bt_pbuf_t *send_pbuf;
+    if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_FIND_INFO_REQ_LEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_ATT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+
+        return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
+    }
+
+    ((uint8_t *)send_pbuf->payload)[0] = ATT_REQ_FIND_INFO;
+    bt_le_store_16((uint8_t *)send_pbuf->payload,1,start_handle);
+    bt_le_store_16((uint8_t *)send_pbuf->payload,3,end_handle);
+
+
+    att_send_data(send_pbuf);
+    bt_pbuf_free(send_pbuf);
+
+    return BT_ERR_OK;
+}
+
+
 err_t att_parse_mtu_rsp(struct bt_pbuf_t *p,uint16_t *server_mtu)
 {
     uint8_t *data = p->payload;

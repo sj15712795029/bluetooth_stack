@@ -178,6 +178,34 @@ void bt_addr_dump(uint8_t *addr)
 	BT_HEX_TRACE_DEBUG("%s",(char*)addr_buff);
 }
 
+void bt_uuid128_dump(uint8_t *uuid128) {
+  uint8_t uuid_buf[64] = {0};
+  uint8_t *uuid_ptr = uuid_buf;
+
+  for (int i = 0; i < 4; i++) {
+    uuid_ptr += sprintf((char *)uuid_ptr, "%02x", uuid128[i]);
+  }
+  uuid_ptr += sprintf((char *)uuid_ptr, "-");
+  for (int i = 4; i < 6; i++) {
+    uuid_ptr += sprintf((char *)uuid_ptr, "%02x", uuid128[i]);
+  }
+  uuid_ptr += sprintf((char *)uuid_ptr, "-");
+  for (int i = 6; i < 8; i++) {
+    uuid_ptr += sprintf((char *)uuid_ptr, "%02x", uuid128[i]);
+  }
+  uuid_ptr += sprintf((char *)uuid_ptr, "-");
+  for (int i = 8; i < 10; i++) {
+    uuid_ptr += sprintf((char *)uuid_ptr, "%02x", uuid128[i]);
+  }
+  uuid_ptr += sprintf((char *)uuid_ptr, "-");
+  for (int i = 10; i < 16; i++) {
+    uuid_ptr += sprintf((char *)uuid_ptr, "%02x", uuid128[i]);
+  }
+
+  BT_HEX_TRACE_DEBUG("UUID128(%s)\n",(char*)uuid_buf);
+}
+
+
 
 uint8_t bt_parse_cod(uint8_t cod[3],uint16_t *device_service,uint16_t * device_major,uint16_t *device_minor)
 {
