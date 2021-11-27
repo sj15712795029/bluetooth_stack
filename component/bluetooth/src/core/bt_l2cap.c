@@ -1333,6 +1333,9 @@ void l2cap_acl_input(struct bt_pbuf_t *p, struct bd_addr_t *bdaddr)
     case L2CAP_ATT_CID:
         _l2cap_fixed_cid_process(L2CAP_ATT_CID,p,bdaddr);
         break;
+	case L2CAP_SM_CID:
+		_l2cap_fixed_cid_process(L2CAP_SM_CID,p,bdaddr);
+		break;
     default:
         _l2cap_dynamic_cid_process(inseg->pcb,inseg->p,inseg->l2caphdr,bdaddr);
         break;
@@ -1944,7 +1947,13 @@ void le_connect_handler(struct bd_addr_t *bdaddr)
         	pcb->state = L2CAP_OPEN;
 			bd_addr_set(&(pcb->remote_bdaddr),bdaddr);
 			L2CA_ACTION_CONN_IND(pcb, BT_ERR_OK);
-            break;
+        }
+
+		if(pcb->fixed_cid == L2CAP_SM_CID)
+        {
+        	pcb->state = L2CAP_OPEN;
+			bd_addr_set(&(pcb->remote_bdaddr),bdaddr);
+			L2CA_ACTION_CONN_IND(pcb, BT_ERR_OK);
         }
     }
 }

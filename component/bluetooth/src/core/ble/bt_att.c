@@ -136,19 +136,15 @@ err_t l2cap_att_input(void *arg, l2cap_pcb_t *l2cap_pcb, struct bt_pbuf_t *p, er
 }
 
 
-err_t att_init(void)
+err_t att_init(att_cbs_t *cb)
 {
+	att_cbs = cb;
+
     l2cap_fixed_channel_register_recv(L2CAP_ATT_CID,l2cap_att_connect,l2cap_att_disconnect,l2cap_att_input);
 
     return BT_ERR_OK;
 }
 
-err_t att_register_cb(att_cbs_t *cb)
-{
-    att_cbs = cb;
-
-    return BT_ERR_OK;
-}
 
 err_t att_err_rsp(uint8_t req_op,uint16_t handle,uint8_t err_code)
 {

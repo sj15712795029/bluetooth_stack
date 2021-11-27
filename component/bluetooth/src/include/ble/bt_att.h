@@ -104,8 +104,7 @@ typedef struct
 
 
 /* ATT common API */
-err_t att_init(void);
-err_t att_register_cb(att_cbs_t *cb);
+err_t att_init(att_cbs_t *cb);
 
 
 /* ATT server API */

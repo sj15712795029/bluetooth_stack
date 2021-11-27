@@ -38,7 +38,7 @@ gatt_server_service_t test_service[] =
 	{0x0c,GATT_UUID_CHAR_CLIENT_CONFIG,NULL,
 		gatt_bas_chara_client_conf,sizeof(gatt_bas_chara_client_conf),GATT_PERM_READ|GATT_PERM_WRITE},
 	{0x0d,0,uuid_type,
-		test_value,sizeof(test_value),GATT_PERM_READ|GATT_PERM_WRITE},
+		test_value,sizeof(test_value),GATT_PERM_READ_ENC_MITM|GATT_PERM_WRITE},
 };
 
 void gatt_bas_read(struct bd_addr_t *remote_addr,uint16_t handle,uint8_t *value,uint8_t *value_len,uint8_t *err_code)
@@ -72,6 +72,32 @@ static gatt_pri_service_cbs_t gatt_bas_service_cbs =
 };
 
 
+
+void gatt_test_read(struct bd_addr_t *remote_addr,uint16_t handle,uint8_t *value,uint8_t *value_len,uint8_t *err_code)
+{
+	BT_BAS_TRACE_DEBUG("gatt_test_read handle(%d)\n",handle);
+
+	// TODO: test smp,Delete it later
+	*err_code = ATT_INSUF_AUTHENTICATION;
+}
+
+void gatt_test_write(struct bd_addr_t *remote_addr,uint16_t handle,uint8_t *value,uint8_t value_len,uint8_t *err_code)
+{
+	BT_BAS_TRACE_DEBUG("gatt_test_write handle(%d) value_len(%d)\n",handle,value_len);
+	bt_hex_dump(value,value_len);
+
+
+	*err_code = ATT_SUCCESS;
+}
+
+static gatt_pri_service_cbs_t gatt_test_service_cbs =
+{
+    gatt_test_read,
+    gatt_test_write,
+};
+
+
+
 err_t bas_init(uint8_t bat_level)
 {
 	bas_manager.bat_level = bat_level;
@@ -81,7 +107,7 @@ err_t bas_init(uint8_t bat_level)
 
 	/* Test */
 	gatt_server_add_pri_service((gatt_server_service_t *)&test_service,0x09,0x0d,
-		sizeof(test_service)/sizeof(gatt_server_service_t),0,uuid_test,NULL);
+		sizeof(test_service)/sizeof(gatt_server_service_t),0,uuid_test,&gatt_test_service_cbs);
 	return BT_ERR_OK;
 }
 

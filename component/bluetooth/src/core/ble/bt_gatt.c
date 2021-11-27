@@ -368,8 +368,7 @@ err_t gatt_init(gatt_cbs_t *cbs)
     BT_GATT_TRACE_DEBUG("gatt_init\n");
 
     gatt_cbs = cbs;
-    att_init();
-    att_register_cb(&att_gatt_cb);
+    att_init(&att_gatt_cb);
 
     return BT_ERR_OK;
 }
@@ -496,7 +495,10 @@ static err_t gatts_handle_read_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p
         }
     }
 
-    att_read_rsp(rsp_buf,rsp_buf_len);
+	if(err_code == ATT_SUCCESS)
+    	att_read_rsp(rsp_buf,rsp_buf_len);
+	else
+		att_err_rsp(ATT_REQ_READ,handle,err_code);
 
     return BT_ERR_OK;
 }

@@ -429,6 +429,25 @@
   }
 
 
+#define BT_SMP_TRACE_ERROR(fmt,...)                                      \
+  {                                                                \
+    if (BT_SMP_TRACE_LEVEL >= BT_TRACE_LEVEL_ERROR)               \
+      BT_DEBUG(LOG_COLOR_BLUE"[ SMP ] "LOG_COLOR_RESET LOG_COLOR_RED fmt LOG_COLOR_RESET,##__VA_ARGS__); \
+  }
+
+#define BT_SMP_TRACE_WARNING(fmt,...)                                      \
+  {                                                                \
+    if (BT_SMP_TRACE_LEVEL >= BT_TRACE_LEVEL_WARNING)               \
+      BT_DEBUG(LOG_COLOR_BLUE"[ SMP ] "LOG_COLOR_RESET LOG_COLOR_YELLOW fmt LOG_COLOR_RESET,##__VA_ARGS__); \
+  }
+
+#define BT_SMP_TRACE_DEBUG(fmt,...)                                      \
+  {                                                                \
+    if (BT_SMP_TRACE_LEVEL >= BT_TRACE_LEVEL_DEBUG)               \
+      BT_DEBUG(LOG_COLOR_BLUE"[ SMP ] "LOG_COLOR_RESET fmt,##__VA_ARGS__); \
+  }
+
+
 
 #define BT_ATT_TRACE_ERROR(fmt,...)                                      \
   {                                                                \

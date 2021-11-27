@@ -1174,6 +1174,7 @@ uint8_t bt_start(bt_app_cb_t *app_cb)
 
 #if BT_BLE_ENABLE > 0
     gatt_init(&gatt_wrapper_cb);
+	smp_init(NULL);
     gatt_server_init();
 #if PROFILE_BAS_ENABLE > 0
     bas_init(100);
