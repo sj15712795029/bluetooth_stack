@@ -37,15 +37,15 @@ def write_data_to_text_file(filename, list_data,data_num_per_line):
     f_output.close()
 
 def main():
-    print "----------------------------------------------\n"
-    print "File must include \" \",for exampel,\"fw.bin\""
-    print "----------------------------------------------\n"
+    print ("----------------------------------------------\n")
+    print ("Wireless Link covery bin to array tool runing...\"")
+    print ("----------------------------------------------\n")
     input_f = input("Please input source bin file_name:")
-    print "Binary input file:",input_f;
+    print ("Binary input file:",input_f);
     output_f = input("Please input dest C file name:")
-    print "C output file:",output_f;
+    print ("C output file:",output_f);
     data_num_per_line = input("Please input a num whitch indicates how many data for one line:")
-    print "data_num_per_line:",data_num_per_line;
+    print ("data_num_per_line:",data_num_per_line);
     read_data_from_binary_file(input_f, list_data)
     write_data_to_text_file(output_f, list_data,data_num_per_line )
 

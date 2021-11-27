@@ -1,32 +1,33 @@
 # Bluetooth stack introduce
 This is a protocol stack that includes traditional Bluetooth and low-power Bluetooth. It belongs to the ultra-lightweight Bluetooth protocol stack and is used by people who learn the Bluetooth protocol stack<br>I have also built a development environment based on this part as an additional income. I hope you can give me your support.If there is insufficient support, I hope you can correct it。
 
-|     |  CSR8311 | BCM43430A(AP6212A) | BCM4345C5(AP6256) |
-|  ----  | ----  | ---- | ---- |
-| STM32F103  | √    [**Buy (click on me)**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.18.5aeb41f9OvIVgA&id=622836061708) | ×   Not Yet | ×    Not Yet |
-| STM32F407  | √    [**Buy (click on me)**](https://item.taobao.com/item.htm?spm=a1z10.5-c-s.w4002-22329603914.20.6d987dbeJT61MT&id=633998293320) | ×    Not Yet | ×    Not Yet |
-| STM32F412  | √    [**Buy (click on me)**](https://item.taobao.com/item.htm?spm=a1z10.5-c-s.w4002-22329603914.17.6d987dbeJT61MT&id=628752502770) | ×    Not Yet | ×    Not Yet |
-| Linux | √    [**Buy (click on me)**](https://item.taobao.com/item.htm?spm=a1z10.5-c-s.w4002-22329603914.14.6d987dbeJT61MT&id=622837949775) | √    Not Yet | √    Not Yet |
-## Source directory structure
-| Root folder | Sub folder                      | Instructions                           |
-| ----------- | ------------------------------- | -------------------------------------- |
-| board       | stm32f10x                       | STM32F103 BSP                          |
-|             | stm32f407                       | STM32F407 BSP                          |
-|             | stm32f412                       | STM32F412 BSP                          |
-| bsp         | cortex-m3                       | Cortex M3 Driver(The standard library) |
-|             | cortex-m4                       | Cortex M4 Driver(The HAL library)      |
-| component   | bluetooth                       | Bluetooth stack source code            |
-|             | cjson                           | json source code                       |
-|             | fs                              | file system source code                |
-|             | memory_manager                  | memoey manager source code             |
-|             | ringbuffer                      | Ring buffer source code                |
-| mcu_bt_tool |                                 | PC app source code                     |
-| project     | stm32f10x_bb_bt                 | STM32F103 bare board bluetooth project |
-|             | stm32f10x_bb_bt                 | STM32F407 bare board bluetooth project |
-|             | stm32f412_bb_bt                 | STM32F412 bare board bluetooth project |
-|             | linux_bt                        | Linux bluetooth project                |
-| python_tool | convert_binayr_file_to_array.py |                                        |
-|             | corvert_opcode_to_ogf_ocf.py    |                                        |
+|     |  CSR8311 | CYW54591 | BCM43430A<br />(AP6212A) | BCM4345C5<br />(AP6256) |
+|  ----  | ----  | ---- | ---- | ---- |
+| STM32F103  | √ | × | × | × |
+| STM32F407  | √ | × | × | × |
+| STM32F412  | √ | × | × | × |
+| Linux | √ | √ | √ | √ |
+| Purchase page | [**Buy (click on me)**](https://item.taobao.com/item.htm?spm=a1z10.5-c-s.w4002-22329603914.14.6d987dbeJT61MT&id=622837949775) | Not Yet | Not Yet | Not Yet |
+|## Source directory structure|||||
+| Root folder | Sub folder                      |                            | Instructions                           ||
+| ----------- | ------------------------------- |  | -------------------------------------- ||
+| board       | stm32f10x                       |                           | STM32F103 BSP                          ||
+|             | stm32f407                       |                           | STM32F407 BSP                          ||
+|             | stm32f412                       |                           | STM32F412 BSP                          ||
+| bsp         | cortex-m3                       |  | Cortex M3 Driver(The standard library) ||
+|             | cortex-m4                       |       | Cortex M4 Driver(The HAL library)      ||
+| component   | bluetooth                       |             | Bluetooth stack source code            ||
+|             | cjson                           |                        | json source code                       ||
+|             | fs                              |                 | file system source code                ||
+|             | memory_manager                  |              | memoey manager source code             ||
+|             | ringbuffer                      |                 | Ring buffer source code                ||
+| mcu_bt_tool |                                 |                      | PC app source code                     ||
+| project     | stm32f10x_bb_bt                 |  | STM32F103 bare board bluetooth project ||
+|             | stm32f10x_bb_bt                 |  | STM32F407 bare board bluetooth project ||
+|             | stm32f412_bb_bt                 |  | STM32F412 bare board bluetooth project ||
+|             | linux_bt                        |                 | Linux bluetooth project                ||
+| python_tool | convert_binayr_file_to_array.py |                                        |                                        ||
+|             | corvert_opcode_to_ogf_ocf.py    |                                        |                                        ||
 
 ## Use of source code
 
@@ -53,5 +54,4 @@ Make linux_bt under project, create bt_demo and run it directly<br>
 
 ## Bluetooth protocol stack architecture:
 ![](https://img-blog.csdnimg.cn/20200720164649531.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1hpYW9YaWFvUGVuZ0Jv,size_16,color_FFFFFF,t_70)
-
 

@@ -174,6 +174,9 @@ err_t hci_init(void)
     _hci_set_chip_name((uint8_t *)VENDOR_BCM4345C5_NAME);
 #endif
 
+#if BT_VENDOR_CYW54591_SUPPORT > 0
+		_hci_set_chip_name((uint8_t *)VENDOR_CYW54591_NAME);
+#endif
 
 
     return BT_ERR_OK;

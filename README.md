@@ -2,32 +2,33 @@
 这是一个包含传统蓝牙跟低功耗蓝牙的协议栈，属于超轻量级蓝牙协议栈，用作学习蓝牙协议栈的人使用
 <br>我根据此部分也搭建了一个开发环境，来作为额外收入，希望大家多多支持。有不足支持也希望大家指正。
 
-|     |  CSR8311 | BCM43430A(AP6212A) | BCM4345C5(AP6256) |
-|  ----  | ----  | ---- | ---- |
-| STM32F103  | √    [**购买开发板连接(点击我)**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.18.5aeb41f9OvIVgA&id=622836061708) | ×   暂未上线 | ×    暂未上线 |
-| STM32F407  | √    [**购买开发板连接(点击我)**](https://item.taobao.com/item.htm?spm=a1z10.5-c-s.w4002-22329603914.20.6d987dbeJT61MT&id=633998293320) | ×    暂未上线 | ×    暂未上线 |
-| STM32F412  | √    [**购买开发板连接(点击我)**](https://item.taobao.com/item.htm?spm=a1z10.5-c-s.w4002-22329603914.17.6d987dbeJT61MT&id=628752502770) | ×    暂未上线 | ×    暂未上线 |
-| Linux | √    [**购买模组连接(点击我)**](https://item.taobao.com/item.htm?spm=a1z10.5-c-s.w4002-22329603914.14.6d987dbeJT61MT&id=622837949775) | √    暂未上线 | √    暂未上线 |
-## 源码目录结构
-| 目录文件夹  | 子目录文件夹                    | 说明                                                   |
-| ----------- | ------------------------------- | ------------------------------------------------------ |
-| board       | stm32f10x                       | STM32F103板载外设驱动                                  |
-|             | stm32f407                       | STM32F407板载外设驱动                                  |
-|             | stm32f412                       | STM32F412板载外设驱动                                  |
-| bsp         | cortex-m3                       | Cortex M3 Driver库（M3默认用标准库）                   |
-|             | cortex-m4                       | Cortex M4 Driver库（M3默认用HAL库）                    |
-| component   | bluetooth                       | 蓝牙协议栈源码                                         |
-|             | cjson                           | json源码（目前用于跟上位机交互）                       |
-|             | fs                              | file system文件系统，目前用于管理spi flash             |
-|             | memory_manager                  | 内存管理，目前用于管理STM32F407的SRAM                  |
-|             | ringbuffer                      | 环形数组，用于蓝牙接收串口数据                         |
-| mcu_bt_tool |                                 | PC上位机，用于控制STM32开发板，以及接受STM32的状态回传 |
-| project     | stm32f10x_bb_bt                 | STM32F103裸机(BB:bare board)蓝牙工程                   |
-|             | stm32f407_bb_bt                 | STM32F407裸机(BB:bare board)蓝牙工程                   |
-|             | stm32f412_bb_bt                 | STM32F412裸机(BB:bare board)蓝牙工程                   |
-|             | linux_bt                        | Linux 蓝牙工程                                         |
-| python_tool | convert_binayr_file_to_array.py | 把二进制文档转换为数据的python工具                     |
-|             | corvert_opcode_to_ogf_ocf.py    | 把HCI opcode转换为OGF,OCF                              |
+|     |  CSR8311 | CYW54591 | BCM43430A<br />(AP6212A) | BCM4345C5<br />(AP6256) |
+|  ----  | ----  | ---- | ---- |  ----  |
+| STM32F103  | √ | × | × | × |
+| STM32F407  | √ | × | × | × |
+| STM32F412  | √ | × | × | × |
+| Linux | √ | √ | √ | √ |
+| 购买连接： | [**购买开发板连接(点击我)**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.18.5aeb41f9OvIVgA&id=622836061708) | 暂未上线 | 暂未上线 | 暂未上线 |
+|## 源码目录结构|||||
+| 目录文件夹  | 子目录文件夹                    |                                                    | 说明                                                   ||
+| ----------- | ------------------------------- |  | ------------------------------------------------------ ||
+| board       | stm32f10x                       |                                   | STM32F103板载外设驱动                                  ||
+|             | stm32f407                       |                                   | STM32F407板载外设驱动                                  ||
+|             | stm32f412                       |                                   | STM32F412板载外设驱动                                  ||
+| bsp         | cortex-m3                       |                    | Cortex M3 Driver库（M3默认用标准库）                   ||
+|             | cortex-m4                       |                     | Cortex M4 Driver库（M3默认用HAL库）                    ||
+| component   | bluetooth                       |                                          | 蓝牙协议栈源码                                         ||
+|             | cjson                           |                        | json源码（目前用于跟上位机交互）                       ||
+|             | fs                              |              | file system文件系统，目前用于管理spi flash             ||
+|             | memory_manager                  |                   | 内存管理，目前用于管理STM32F407的SRAM                  ||
+|             | ringbuffer                      |                          | 环形数组，用于蓝牙接收串口数据                         ||
+| mcu_bt_tool |                                 |  | PC上位机，用于控制STM32开发板，以及接受STM32的状态回传 ||
+| project     | stm32f10x_bb_bt                 |                    | STM32F103裸机(BB:bare board)蓝牙工程                   ||
+|             | stm32f407_bb_bt                 |                    | STM32F407裸机(BB:bare board)蓝牙工程                   ||
+|             | stm32f412_bb_bt                 |                    | STM32F412裸机(BB:bare board)蓝牙工程                   ||
+|             | linux_bt                        |                                          | Linux 蓝牙工程                                         ||
+| python_tool | convert_binayr_file_to_array.py |                      | 把二进制文档转换为数据的python工具                     ||
+|             | corvert_opcode_to_ogf_ocf.py    |                               | 把HCI opcode转换为OGF,OCF                              ||
 
 ## 工程使用方式
 
