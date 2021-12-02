@@ -23,6 +23,7 @@
 #include "bt_hid_device.h"
 #include "bt_att.h"
 #include "bt_gatt.h"
+#include "bt_smp.h"
 
 
 struct bt_memp_t
@@ -68,6 +69,7 @@ static const uint16_t memp_sizes[MEMP_BT_MAX] =
     sizeof(struct hid_device_pcb_t),
 #endif
 #if BT_BLE_ENABLE
+	sizeof(smp_pcb_t),
 	sizeof(att_pcb_t),
 	sizeof(gatt_pcb_t),
 #endif
@@ -112,6 +114,7 @@ static const uint16_t memp_num[MEMP_BT_MAX] =
     MEMP_NUM_HID,
 #endif
 #if BT_BLE_ENABLE
+	MEMP_NUM_SMP,
 	MEMP_NUM_ATT,
 	MEMP_NUM_GATT,
 #endif
@@ -201,6 +204,9 @@ static uint8_t memp_memory[(MEMP_NUM_HCI_PCB *
                                     sizeof(struct bt_memp_t)) +
 #endif
 #if BT_BLE_ENABLE
+							MEMP_NUM_SMP *
+							MEM_ALIGN_SIZE(sizeof(smp_pcb_t) +
+									sizeof(struct bt_memp_t)) +
 							MEMP_NUM_ATT *
 							MEM_ALIGN_SIZE(sizeof(att_pcb_t) +
 									sizeof(struct bt_memp_t)) +

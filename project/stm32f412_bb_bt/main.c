@@ -195,7 +195,7 @@ static bt_app_common_cb_t bt_app_common_cb =
 };
 
 
-#if PROFILE_HFP_ENABLE > 0
+#if PROFILE_HFP_HF_ENABLE > 0
 void bt_app_hfp_connect(struct bd_addr_t *remote_addr,uint8_t status)
 {
     uint8_t addr_buf[32] = {0};
@@ -776,7 +776,7 @@ static bt_app_cb_t bt_app_cb =
 	NULL,
 #endif
 
-#if PROFILE_HFP_ENABLE > 0
+#if PROFILE_HFP_HF_ENABLE > 0
     &bt_app_hfp_cb,
 #else
 	NULL,
@@ -919,7 +919,7 @@ cmd_desctiption_t cmd_usage[] =
     {(uint8_t *)BT_SPP_SEND_CMD,(uint8_t *)BT_SPP_SEND_DES},
     {(uint8_t *)BT_SPP_DISCON_CMD,(uint8_t *)BT_SPP_DISCON_DES},
 #endif
-#if PROFILE_HFP_ENABLE > 0
+#if PROFILE_HFP_HF_ENABLE > 0
     {(uint8_t *)BT_HFP_CON_CMD,(uint8_t *)BT_HFP_CON_DES},
     {(uint8_t *)BT_HFP_DISCON_CMD,(uint8_t *)BT_HFP_DISCON_DES},
     {(uint8_t *)BT_HFP_AUDIO_TRANSFER_CMD,(uint8_t *)BT_HFP_AUDIO_TRANSFER_DES},
@@ -1006,7 +1006,7 @@ uint8_t shell_json_parse(uint8_t *operate_value,
     }
 #endif
 
-#if PROFILE_HFP_ENABLE > 0
+#if PROFILE_HFP_HF_ENABLE > 0
 	if(hw_strcmp("HFP_NET_N",(const char*)operate_value) == 0)
     {
         HW_DEBUG("SHELL:operate hfp get operate\n");
@@ -1505,7 +1505,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
 #endif
 
 
-#if PROFILE_HFP_ENABLE > 0
+#if PROFILE_HFP_HF_ENABLE > 0
     if(hw_strcmp("HFP_CON",(const char*)shell_string) == 0)
     {
         HW_DEBUG("SHELL:operate HFP CON\n");

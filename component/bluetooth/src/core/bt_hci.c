@@ -178,6 +178,11 @@ err_t hci_init(void)
 		_hci_set_chip_name((uint8_t *)VENDOR_CYW54591_NAME);
 #endif
 
+#if BT_VENDOR_CYW43438_SUPPORT > 0
+			_hci_set_chip_name((uint8_t *)VENDOR_CYW43438_NAME);
+#endif
+
+
 
     return BT_ERR_OK;
 }
@@ -271,6 +276,11 @@ void hci_register_write_policy_complete(wlp_complete_fun_cb wlp_complete)
     hci_pcb->wlp_complete = wlp_complete;
 }
 
+
+uint8_t hci_get_version(void)
+{
+	return hci_pcb->hci_version;
+}
 
 
 static void _hci_vendor_init_done(uint8_t vendor_status)
@@ -963,7 +973,8 @@ static err_t _hci_init_cmd_compl_process(uint8_t *payload,uint16_t payload_len)
         BT_HCI_TRACE_DEBUG("DEBUG:LMP version:0x%x\n",lmp_version);
         BT_HCI_TRACE_DEBUG("DEBUG:LMP reversion:0x%x\n",lmp_subversion);
         BT_HCI_TRACE_DEBUG("DEBUG:manufacturer_name:0x%x\n",manufacturer_name);
-
+		hci_pcb->hci_version = hci_version;
+		
         hci_read_buffer_size();
         break;
     }

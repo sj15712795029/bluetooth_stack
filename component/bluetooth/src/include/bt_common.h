@@ -375,6 +375,11 @@ typedef struct {
 #define BT_COD_TYPE_UNKNOW 0x00
 #define BT_COD_TYPE_HEADSET 0x01
 
+#ifndef CASE_RETURN_STR
+#define CASE_RETURN_STR(const) case const: return #const;
+#endif
+
+
 uint16_t bt_le_read_16(const uint8_t * buffer, int pos);
 uint32_t bt_le_read_24(const uint8_t * buffer, int pos);
 uint32_t bt_le_read_32(const uint8_t * buffer, int pos);

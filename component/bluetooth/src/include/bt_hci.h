@@ -550,7 +550,7 @@
 
 /* Command packet length (including ACL header)*/
 #define HCI_INQUIRY_PLEN 8
-#define  HCI_CANCEL_INQUIRY_PLEN 3
+#define HCI_CANCEL_INQUIRY_PLEN 3
 #define HCI_PERIDIC_INQUIRY 12
 #define HCI_CANCEL_PERIDIC_INQYIRY 3
 #define HCI_CREATE_CONN_PLEN 16
@@ -672,6 +672,19 @@
 // Use IO capabilities to determine authentication procedure.
 #define SSP_IO_AUTHREQ_MITM_PROTECTION_REQUIRED_GENERAL_BONDING 0x05
 
+
+#define HCI_PROTO_VERSION     0x01      /* Version for BT spec 1.1          */
+#define HCI_PROTO_VERSION_1_2 0x02      /* Version for BT spec 1.2          */
+#define HCI_PROTO_VERSION_2_0 0x03      /* Version for BT spec 2.0          */
+#define HCI_PROTO_VERSION_2_1 0x04      /* Version for BT spec 2.1 [Lisbon] */
+#define HCI_PROTO_VERSION_3_0 0x05      /* Version for BT spec 3.0          */
+#define HCI_PROTO_VERSION_4_0 0x06      /* Version for BT spec 4.0          */
+#define HCI_PROTO_VERSION_4_1 0x07      /* Version for BT spec 4.1          */
+#define HCI_PROTO_VERSION_4_2 0x08      /* Version for BT spec 4.2          */
+#define HCI_PROTO_VERSION_5_0 0x09      /* Version for BT spec 5.0          */
+#define HCI_PROTO_VERSION_5_1 0x0a      /* Version for BT spec 5.1          */
+#define HCI_PROTO_VERSION_5_2 0x0b      /* Version for BT spec 5.2          */
+#define HCI_PROTO_VERSION_5_3 0x0c      /* Version for BT spec 5.3          */
 
 
 /* LE META SUBEVENT */
@@ -820,6 +833,7 @@ typedef struct
     uint32_t class_of_device;
     const uint8_t *local_name;
     uint8_t *pincode;
+	uint8_t hci_version;
     /* Host to host controller flow control */
     uint8_t numcmd; /* Number of command packets that the host controller (Bluetooth module)can buffer */
     uint16_t acl_maxsize; /* Maximum length of the data portion of each HCI ACL data packet that the Host Controller is able to accept */
@@ -868,6 +882,7 @@ void hci_register_link_key_not(link_key_not_fun_cb link_key_not);
 void hci_register_write_policy_complete(wlp_complete_fun_cb wlp_complete);
 void hci_register_connection_complete(conn_complete_fun_cb conn_complete);
 void hci_register_hardware_error(hardware_error_fun_cb hardware_error);
+uint8_t hci_get_version(void);
 err_t hci_acl_write(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p, uint16_t len, uint8_t pb);
 uint8_t hci_is_connected(struct bd_addr_t *bdaddr);
 uint16_t hci_pdu_maxsize(void);

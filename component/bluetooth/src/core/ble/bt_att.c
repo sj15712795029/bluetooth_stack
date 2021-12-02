@@ -75,7 +75,7 @@ err_t l2cap_att_connect(void *arg, l2cap_pcb_t *l2cap_pcb, err_t err)
 
     if((att_pcb = att_pcb_new(l2cap_pcb)) == NULL)
     {
-        BT_ATT_TRACE_DEBUG("l2cap_att_connect: Could not alloc rfcomm pcb\n");
+        BT_ATT_TRACE_DEBUG("l2cap_att_connect: Could not alloc att pcb\n");
 
         return BT_ERR_MEM;
     }

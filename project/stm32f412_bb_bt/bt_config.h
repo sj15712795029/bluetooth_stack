@@ -34,8 +34,11 @@
 #define BT_VENDOR_CSR8X11_SUPPORT 1
 #define BT_VENDOR_BCM43430A1_SUPPORT 0
 #define BT_VENDOR_BCM4345C5_SUPPORT 0
+#define BT_VENDOR_CYW43438_SUPPORT 0
+#define BT_VENDOR_CYW54591_SUPPORT 0
+
 #define PROFILE_DID_ENABLE 1
-#define PROFILE_HFP_ENABLE 0
+#define PROFILE_HFP_HF_ENABLE 0
 #define PROFILE_SPP_ENABLE 0
 #define PROFILE_PBAP_ENABLE 0
 #define PROFILE_A2DP_ENABLE 1
@@ -83,6 +86,7 @@
 #define BT_A2DP_TRACE_LEVEL 3
 #define BT_AVRCP_TRACE_LEVEL 3
 #define BT_HID_TRACE_LEVEL 3
+#define BT_SMP_TRACE_LEVEL 3
 #define BT_ATT_TRACE_LEVEL 3
 #define BT_GATT_TRACE_LEVEL 3
 #define BT_BAS_TRACE_LEVEL 3
@@ -113,6 +117,7 @@
 #define MEMP_NUM_SPP 7
 #define MEMP_NUM_PBAP 7
 #define MEMP_NUM_HID 7
+#define MEMP_NUM_SMP 7
 #define MEMP_NUM_ATT 7
 #define MEMP_NUM_GATT 7
 #define MEMP_NUM_BT_PBUF 3
@@ -228,6 +233,13 @@ typedef uintptr_t mem_ptr_t;
 #define GATT_BAS_CLIENT_CHARA_CONF_HANDLE 0x0008
 /******************************************************************************************************************************/
 
+
+/***********   SMP protocol config ********************************************************************************************/
+#define SMP_MAX_ENC_KEY_SIZE 16
+/* SMP_IO_CAP_DISPLAY_ONLY->0 SMP_IO_CAP_DISPLAY_YESNO->1 SMP_IO_CAP_KEYBORAD_ONLY->2 SMP_IO_CAP_NOIO->3 SMP_IO_CAP_KBDISP->4 */
+#define SMP_IO_CAP_CONF 4
+#define SMP_OOB_PRESENT_CONF 0
+/******************************************************************************************************************************/
 
 #endif
 

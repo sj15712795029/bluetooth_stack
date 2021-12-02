@@ -46,13 +46,49 @@
 #define SMP_XTRANS_DERIVE_NOT_ALLOW 0x0E
 #define SMP_KEY_REJECTED 0x0F
 
+/* IO capability */
+#define SMP_IO_CAP_DISPLAY_ONLY 0
+#define SMP_IO_CAP_DISPLAY_YESNO  1
+#define SMP_IO_CAP_KEYBORAD_ONLY 2
+#define SMP_IO_CAP_NOIO 3
+#define SMP_IO_CAP_KBDISP 4
+
+/* OOB data flag */
+#define SMP_OOB_NONE 0
+#define SMP_OOB_PRESENT 1
+
+/* AuthReq */
+#define SMP_NO_BONDING (0 << 0)
+#define SMP_BONDING (1 << 0)
+#define SMP_AUTH_MIMT_BIT (1 << 2)
+#define SMP_SC_SUPPORT_BIT (1 << 3)
+#define SMP_KP_SUPPORT_BIT (1 << 4)
+#define SMP_H7_SUPPORT_BIT (1 << 5)
+
+#define SMP_PAIR_REQ_PACK_LEN 7
+#define SMP_PAIR_RSP_PACK_LEN 7
+
+
 typedef struct _smp_pcb_t
 {
     struct _smp_pcb_t *next; /* For the linked list */
-	struct bd_addr_t remote_addr;
+    struct bd_addr_t remote_addr;
     l2cap_pcb_t*l2cappcb;
 
-}smp_pcb_t;
+    uint8_t remote_io_cap;
+    uint8_t remote_oob_flag;
+    uint8_t remote_auth_req;
+    uint8_t remote_enc_size;
+    uint8_t remote_i_key;
+    uint8_t remote_r_key;
+
+    uint8_t local_io_cap;
+    uint8_t local_oob_flag;
+    uint8_t local_auth_req;
+    uint8_t local_enc_size;
+    uint8_t local_i_key;
+    uint8_t local_r_key;
+} smp_pcb_t;
 
 
 typedef struct
@@ -63,6 +99,7 @@ typedef struct
 
 
 err_t smp_init(smp_cbs_t *cb);
+err_t smp_send_pair_rsp(smp_pcb_t *smp_pcb);
 
 
 #endif

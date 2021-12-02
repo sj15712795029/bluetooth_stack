@@ -49,6 +49,7 @@ typedef enum
 #endif
 
 #if BT_BLE_ENABLE
+	MEMP_SMP_PCB,
     MEMP_ATT_PCB,
     MEMP_GATT_PCB,
 #endif

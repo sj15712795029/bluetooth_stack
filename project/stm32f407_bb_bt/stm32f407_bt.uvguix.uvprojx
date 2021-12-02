@@ -696,6 +696,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\component\bluetooth\src\core\ble\bt_gatt.c</FilePath>
             </File>
+            <File>
+              <FileName>bt_smp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\src\core\ble\bt_smp.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

@@ -1,33 +1,40 @@
 # Bluetooth stack introduce
 This is a protocol stack that includes traditional Bluetooth and low-power Bluetooth. It belongs to the ultra-lightweight Bluetooth protocol stack and is used by people who learn the Bluetooth protocol stack<br>I have also built a development environment based on this part as an additional income. I hope you can give me your support.If there is insufficient support, I hope you can correct it。
 
-|     |  CSR8311 | CYW54591 | BCM43430A<br />(AP6212A) | BCM4345C5<br />(AP6256) |
-|  ----  | ----  | ---- | ---- | ---- |
-| STM32F103  | √ | × | × | × |
-| STM32F407  | √ | × | × | × |
-| STM32F412  | √ | × | × | × |
-| Linux | √ | √ | √ | √ |
-| Purchase page | [**Buy (click on me)**](https://item.taobao.com/item.htm?spm=a1z10.5-c-s.w4002-22329603914.14.6d987dbeJT61MT&id=622837949775) | Not Yet | Not Yet | Not Yet |
-|## Source directory structure|||||
-| Root folder | Sub folder                      |                            | Instructions                           ||
-| ----------- | ------------------------------- |  | -------------------------------------- ||
-| board       | stm32f10x                       |                           | STM32F103 BSP                          ||
-|             | stm32f407                       |                           | STM32F407 BSP                          ||
-|             | stm32f412                       |                           | STM32F412 BSP                          ||
-| bsp         | cortex-m3                       |  | Cortex M3 Driver(The standard library) ||
-|             | cortex-m4                       |       | Cortex M4 Driver(The HAL library)      ||
-| component   | bluetooth                       |             | Bluetooth stack source code            ||
-|             | cjson                           |                        | json source code                       ||
-|             | fs                              |                 | file system source code                ||
-|             | memory_manager                  |              | memoey manager source code             ||
-|             | ringbuffer                      |                 | Ring buffer source code                ||
-| mcu_bt_tool |                                 |                      | PC app source code                     ||
-| project     | stm32f10x_bb_bt                 |  | STM32F103 bare board bluetooth project ||
-|             | stm32f10x_bb_bt                 |  | STM32F407 bare board bluetooth project ||
-|             | stm32f412_bb_bt                 |  | STM32F412 bare board bluetooth project ||
-|             | linux_bt                        |                 | Linux bluetooth project                ||
-| python_tool | convert_binayr_file_to_array.py |                                        |                                        ||
-|             | corvert_opcode_to_ogf_ocf.py    |                                        |                                        ||
+这是一个包含传统蓝牙跟低功耗蓝牙的协议栈，属于超轻量级蓝牙协议栈，用作学习蓝牙协议栈的人使用
+<br>
+
+|               | CSR8311                                                      | CYW54591 | BCM43430A<br />(AP6212A) | BCM4345C5<br />(AP6256) |
+| ------------- | ------------------------------------------------------------ | -------- | ------------------------ | ----------------------- |
+| STM32F103     | √                                                            | ×        | ×                        | ×                       |
+| STM32F407     | √                                                            | ×        | ×                        | ×                       |
+| STM32F412     | √                                                            | ×        | ×                        | ×                       |
+| Linux         | √                                                            | √        | √                        | √                       |
+| Purchase page | [**Buy (click on me)**](https://item.taobao.com/item.htm?spm=a1z10.5-c-s.w4002-22329603914.14.6d987dbeJT61MT&id=622837949775) | 暂未上线 | 暂未上线                 | 暂未上线                |
+
+
+
+## 源码目录结构
+
+| 目录文件夹  | 子目录文件夹                    | 说明                                   |
+| ----------- | ------------------------------- | -------------------------------------- |
+| board       | stm32f10x                       | STM32F103 BSP                          |
+|             | stm32f407                       | STM32F407 BSP                          |
+|             | stm32f412                       | STM32F412 BSP                          |
+| bsp         | cortex-m3                       | Cortex M3 Driver(The standard library) |
+|             | cortex-m4                       | Cortex M4 Driver(The HAL library)      |
+| component   | bluetooth                       | Bluetooth stack source code            |
+|             | cjson                           | json source code                       |
+|             | fs                              | file system source code                |
+|             | memory_manager                  | memoey manager source code             |
+|             | ringbuffer                      | Ring buffer source code                |
+| mcu_bt_tool |                                 | PC app source code                     |
+| project     | stm32f10x_bb_bt                 | STM32F103 bare board bluetooth project |
+|             | stm32f407_bb_bt                 | STM32F407 bare board bluetooth project |
+|             | stm32f412_bb_bt                 | STM32F412 bare board bluetooth project |
+|             | linux_bt                        | Linux bluetooth project                |
+| python_tool | convert_binayr_file_to_array.py |                                        |
+|             | corvert_opcode_to_ogf_ocf.py    |                                        |
 
 ## Use of source code
 
