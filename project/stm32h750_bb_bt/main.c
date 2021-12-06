@@ -10,7 +10,7 @@ uint32_t last_sys_time = 0;
 
 #define CONF_BSP_TICKS_PER_SEC 100
 
-#if 1
+
 struct bd_addr_t connect_addr;
 
 uint8_t uart_send_json(uint8_t *func,uint8_t *operate,uint8_t *status,uint8_t *para1,uint8_t *para2,uint8_t *para3,uint8_t *para4,uint8_t *para5)
@@ -1815,20 +1815,20 @@ uint8_t shell_parse(uint8_t *shell_string)
 void bt_reset_chip(void)
 {
     GPIO_InitTypeDef GPIO_InitStruct = {0};
-    __HAL_RCC_GPIOF_CLK_ENABLE();
+    __HAL_RCC_GPIOC_CLK_ENABLE();
 
     /*Configure GPIO pins : bt reset */
-    GPIO_InitStruct.Pin = GPIO_PIN_10;
+    GPIO_InitStruct.Pin = GPIO_PIN_5;
     GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-    HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET);
     hw_delay_ms(200);
-    HAL_GPIO_WritePin(GPIOF, GPIO_PIN_10, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET);
 }
-#endif
+
 
 
 void board_init()
@@ -1839,11 +1839,13 @@ void board_init()
     system_clock_config();
 
     utimer_init();
-    hw_uart_debug_init(115200);
-    hw_systick_init(CONF_BSP_TICKS_PER_SEC);
-
-    //bt_reset_chip();
-
+	hw_systick_init(CONF_BSP_TICKS_PER_SEC);
+    hw_uart_debug_init(115200); 
+	hw_led_init();
+	hw_button_init();
+	hw_24c02_init();
+	
+    bt_reset_chip();
 
 }
 
@@ -1867,18 +1869,15 @@ int main()
     while(1)
     {
 
-#if 1
         phybusif_input(&uart_if);
 
         if(sys_time - last_sys_time > 1000)
         {
-            //printf("bt stack running\n");
             last_sys_time = sys_time;
             l2cap_tmr();
             rfcomm_tmr();
 
         }
-#endif
     }
 
 }

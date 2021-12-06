@@ -93,6 +93,7 @@ void hw_fsmc_init(void);
 void hw_hex_dump(uint8_t *data,int len);
 void hw_delay_ms(uint32_t cms);
 void hw_delay_us(uint32_t cus);
+void hw_loop_wait(uint32_t loop_count);
 void Error_Handler(void);
 
 #endif

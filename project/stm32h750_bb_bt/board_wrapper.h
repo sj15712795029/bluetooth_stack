@@ -4,5 +4,8 @@
 #include "hw_misc.h"
 #include "hw_uart.h"
 #include "hw_systick.h"
+#include "hw_led.h"
+#include "hw_button.h"
+#include "hw_24c02.h"
 
 #endif

@@ -64,6 +64,13 @@ void hw_delay_us(uint32_t cus)
     while(cus--);
 }
 
+void hw_loop_wait(uint32_t loop_count)
+{
+	uint32_t loop = loop_count*50;
+	while(loop--);
+}
+
+
 void system_clock_config(void)
 {
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};

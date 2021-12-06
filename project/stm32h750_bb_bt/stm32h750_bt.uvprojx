@@ -531,6 +531,31 @@
               <FileType>1</FileType>
               <FilePath>..\..\board\stm32h750\hw_uart.c</FilePath>
             </File>
+            <File>
+              <FileName>hw_led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\board\stm32h750\hw_led.c</FilePath>
+            </File>
+            <File>
+              <FileName>hw_button.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\board\stm32h750\hw_button.c</FilePath>
+            </File>
+            <File>
+              <FileName>hw_exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\board\stm32h750\hw_exti.c</FilePath>
+            </File>
+            <File>
+              <FileName>hw_24c02.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\board\stm32h750\hw_24c02.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_iic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\board\stm32h750\bsp_iic.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
