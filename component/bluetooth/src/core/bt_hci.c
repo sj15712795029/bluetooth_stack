@@ -282,6 +282,12 @@ uint8_t hci_get_version(void)
 	return hci_pcb->hci_version;
 }
 
+uint8_t *hci_get_local_addr(void)
+{
+	return hci_pcb->local_bd_addr.addr;
+}
+
+
 
 static void _hci_vendor_init_done(uint8_t vendor_status)
 {
@@ -890,6 +896,7 @@ static err_t _hci_le_meta_evt_process(uint8_t *payload,uint16_t payload_len)
             }
             bd_addr_set(&(link->bdaddr), bdaddr);
             bt_hex_dump((uint8_t *)&(link->bdaddr),6);
+			link->role = HCI_ROLE_SLAVE;
             link->conhdl = con_handle;
             HCI_REG(&(hci_active_links), link);
             link->state = OPEN;

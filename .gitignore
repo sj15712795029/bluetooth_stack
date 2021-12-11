@@ -1,7 +1,12 @@
 *.orig
 *.lst
 *.map
+*.png
+*.jpg
+*.ico
 project/linux_bt/SI/*
+project/linux_bt/btsnoop*
+project/linux_bt/bt_demo
 project/stm32f10x_bb_bt/SI*
 project/stm32f407_bb_bt/SI*
 project/stm32f412_bb_bt/SI*

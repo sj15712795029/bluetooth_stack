@@ -171,63 +171,120 @@ void bt_hex_dump(uint8_t *data,uint32_t len)
     }
 }
 
+uint8_t* bt_hex_string(const void* buf, uint16_t len)
+{
+    static const char hex[] = "0123456789abcdef";
+    static char str[129];
+    const uint8_t* b = buf;
+    uint16_t i;
+
+    //      len = MIN(len, (sizeof(str) - 1) / 2);
+    if (len > (((sizeof(str) - 1)) / 2))
+    {
+        len = (((sizeof(str) - 1)) / 2);
+    }
+
+    for (i = 0; i < len; i++)
+    {
+        str[i * 2] = hex[b[i] >> 4];
+        str[i * 2 + 1] = hex[b[i] & 0xf];
+    }
+
+    str[i * 2] = '\0';
+
+    return str;
+}
+
+
 void bt_addr_dump(uint8_t *addr)
 {
-	uint8_t addr_buff[32] = {0};
-	sprintf((char*)addr_buff,"BT ADDR(%02x:%02x:%02x:%02x:%02x:%02x)\n",addr[0],addr[1],addr[2],addr[3],addr[4],addr[5]);
-	BT_HEX_TRACE_DEBUG("%s",(char*)addr_buff);
+    uint8_t addr_buff[32] = {0};
+    sprintf((char*)addr_buff,"BT ADDR(%02x:%02x:%02x:%02x:%02x:%02x)\n",addr[0],addr[1],addr[2],addr[3],addr[4],addr[5]);
+    BT_HEX_TRACE_DEBUG("%s",(char*)addr_buff);
 }
 
-void bt_uuid128_dump(uint8_t *uuid128) {
-  uint8_t uuid_buf[64] = {0};
-  uint8_t *uuid_ptr = uuid_buf;
+void bt_uuid128_dump(uint8_t *uuid128)
+{
+    uint8_t uuid_buf[64] = {0};
+    uint8_t *uuid_ptr = uuid_buf;
 
-  for (int i = 0; i < 4; i++) {
-    uuid_ptr += sprintf((char *)uuid_ptr, "%02x", uuid128[i]);
-  }
-  uuid_ptr += sprintf((char *)uuid_ptr, "-");
-  for (int i = 4; i < 6; i++) {
-    uuid_ptr += sprintf((char *)uuid_ptr, "%02x", uuid128[i]);
-  }
-  uuid_ptr += sprintf((char *)uuid_ptr, "-");
-  for (int i = 6; i < 8; i++) {
-    uuid_ptr += sprintf((char *)uuid_ptr, "%02x", uuid128[i]);
-  }
-  uuid_ptr += sprintf((char *)uuid_ptr, "-");
-  for (int i = 8; i < 10; i++) {
-    uuid_ptr += sprintf((char *)uuid_ptr, "%02x", uuid128[i]);
-  }
-  uuid_ptr += sprintf((char *)uuid_ptr, "-");
-  for (int i = 10; i < 16; i++) {
-    uuid_ptr += sprintf((char *)uuid_ptr, "%02x", uuid128[i]);
-  }
+    for (int i = 0; i < 4; i++)
+    {
+        uuid_ptr += sprintf((char *)uuid_ptr, "%02x", uuid128[i]);
+    }
+    uuid_ptr += sprintf((char *)uuid_ptr, "-");
+    for (int i = 4; i < 6; i++)
+    {
+        uuid_ptr += sprintf((char *)uuid_ptr, "%02x", uuid128[i]);
+    }
+    uuid_ptr += sprintf((char *)uuid_ptr, "-");
+    for (int i = 6; i < 8; i++)
+    {
+        uuid_ptr += sprintf((char *)uuid_ptr, "%02x", uuid128[i]);
+    }
+    uuid_ptr += sprintf((char *)uuid_ptr, "-");
+    for (int i = 8; i < 10; i++)
+    {
+        uuid_ptr += sprintf((char *)uuid_ptr, "%02x", uuid128[i]);
+    }
+    uuid_ptr += sprintf((char *)uuid_ptr, "-");
+    for (int i = 10; i < 16; i++)
+    {
+        uuid_ptr += sprintf((char *)uuid_ptr, "%02x", uuid128[i]);
+    }
 
-  BT_HEX_TRACE_DEBUG("UUID128(%s)\n",(char*)uuid_buf);
+    BT_HEX_TRACE_DEBUG("UUID128(%s)\n",(char*)uuid_buf);
 }
 
+void bt_memcpy_swap(void *dst, const void *src, uint16_t length)
+{
+	uint8_t *pdst = (uint8_t *)dst;
+	const uint8_t *psrc = (const uint8_t *)src;
+
+	psrc += length - 1;
+
+	for (; length > 0; length--) {
+		*pdst++ = *psrc--;
+	}
+}
+
+void bt_mem_swap(void *buf, uint16_t length)
+{
+	uint16_t i;
+
+	for (i = 0; i < (length/2); i++) {
+		uint8_t tmp = ((uint8_t *)buf)[i];
+
+		((uint8_t *)buf)[i] = ((uint8_t *)buf)[length - 1 - i];
+		((uint8_t *)buf)[length - 1 - i] = tmp;
+	}
+}
 
 
 uint8_t bt_parse_cod(uint8_t cod[3],uint16_t *device_service,uint16_t * device_major,uint16_t *device_minor)
 {
-	uint8_t device_type = BT_COD_TYPE_UNKNOW;
-	BT_COD_SERVICE_CLASS(*device_service,cod);
-	BT_COD_MAJOR_CLASS(*device_major,cod);
-	BT_COD_MINOR_CLASS(*device_minor,cod);
+    uint8_t device_type = BT_COD_TYPE_UNKNOW;
+    BT_COD_SERVICE_CLASS(*device_service,cod);
+    BT_COD_MAJOR_CLASS(*device_major,cod);
+    BT_COD_MINOR_CLASS(*device_minor,cod);
 
-	if(*device_major == BT_COD_MAJOR_AUDIO)
-	{
-		switch(*device_minor)
-		{
-			case BT_COD_MINOR_CONFM_HEADSET:
-				device_type = BT_COD_TYPE_HEADSET;
-				break;
-			default:
-				break;
-		}
-	}
+    if(*device_major == BT_COD_MAJOR_AUDIO)
+    {
+        switch(*device_minor)
+        {
+        case BT_COD_MINOR_CONFM_HEADSET:
+            device_type = BT_COD_TYPE_HEADSET;
+            break;
+        default:
+            break;
+        }
+    }
 
-	return device_type;
-	
+    return device_type;
+
 }
+
+
+
 
 

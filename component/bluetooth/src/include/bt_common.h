@@ -396,7 +396,11 @@ void bt_be_store_64(uint8_t *buffer,uint16_t pos,uint64_t value);
 uint32_t bt_atoi_spec_size(const uint8_t *str,uint8_t size);
 uint32_t bt_atoi(const uint8_t *str);
 void bt_hex_dump(uint8_t *data,uint32_t len);
+uint8_t* bt_hex_string(const void* buf, uint16_t len);
 void bt_addr_dump(uint8_t *addr);
 uint8_t bt_parse_cod(uint8_t cod[3],uint16_t *device_service,uint16_t * device_major,uint16_t *device_minor);
+void bt_memcpy_swap(void *dst, const void *src, uint16_t length);
+void bt_mem_swap(void *buf, uint16_t length);
+
 #endif
 

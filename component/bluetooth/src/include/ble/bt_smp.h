@@ -65,8 +65,17 @@
 #define SMP_KP_SUPPORT_BIT (1 << 4)
 #define SMP_H7_SUPPORT_BIT (1 << 5)
 
+#define SMP_DIST_ENC_KEY	0x01
+#define SMP_DIST_ID_KEY	0x02
+#define SMP_DIST_SIGN	0x04
+#define SMP_DIST_LINK_KEY	0x08
+
+
 #define SMP_PAIR_REQ_PACK_LEN 7
 #define SMP_PAIR_RSP_PACK_LEN 7
+#define SMP_PAIR_CONFIRM_PACK_LEN 17
+#define SMP_PAIR_RANDOM_PACK_LEN 17
+#define SMP_PAIR_FAIL_PACK_LEN 2
 
 
 typedef struct _smp_pcb_t
@@ -74,6 +83,16 @@ typedef struct _smp_pcb_t
     struct _smp_pcb_t *next; /* For the linked list */
     struct bd_addr_t remote_addr;
     l2cap_pcb_t*l2cappcb;
+
+	uint8_t pair_req_buf[SMP_PAIR_REQ_PACK_LEN];
+	uint8_t pair_rsp_buf[SMP_PAIR_RSP_PACK_LEN];
+	uint8_t use_sc;
+
+	uint8_t local_random[16];
+	uint8_t remote_random[16];
+	uint8_t remote_confirm[16];
+
+	uint8_t stk[16];
 
     uint8_t remote_io_cap;
     uint8_t remote_oob_flag;
@@ -99,7 +118,6 @@ typedef struct
 
 
 err_t smp_init(smp_cbs_t *cb);
-err_t smp_send_pair_rsp(smp_pcb_t *smp_pcb);
 
 
 #endif

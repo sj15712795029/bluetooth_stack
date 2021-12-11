@@ -883,6 +883,7 @@ void hci_register_write_policy_complete(wlp_complete_fun_cb wlp_complete);
 void hci_register_connection_complete(conn_complete_fun_cb conn_complete);
 void hci_register_hardware_error(hardware_error_fun_cb hardware_error);
 uint8_t hci_get_version(void);
+uint8_t *hci_get_local_addr(void);
 err_t hci_acl_write(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p, uint16_t len, uint8_t pb);
 uint8_t hci_is_connected(struct bd_addr_t *bdaddr);
 uint16_t hci_pdu_maxsize(void);

@@ -1,4 +1,5 @@
 #include "bt_smp.h"
+#include "bt_smp_key.h"
 
 smp_cbs_t *smp_cbs;
 
@@ -22,10 +23,47 @@ smp_pcb_t *smp_tmp_pcb;
                             npcb->next = NULL; \
                             } while(0)
 
-							   
+
+enum
+{
+    JUST_WORKS,
+    JUST_CFM,
+    REQ_PASSKEY,
+    CFM_PASSKEY,
+    REQ_OOB,
+    DSP_PASSKEY,
+    OVERLAP,
+};
+
+static const uint8_t gen_method[5][5] =
+{
+    { JUST_WORKS,  JUST_CFM,    REQ_PASSKEY, JUST_WORKS, REQ_PASSKEY },
+    { JUST_WORKS,  JUST_CFM,    REQ_PASSKEY, JUST_WORKS, REQ_PASSKEY },
+    { CFM_PASSKEY, CFM_PASSKEY, REQ_PASSKEY, JUST_WORKS, CFM_PASSKEY },
+    { JUST_WORKS,  JUST_CFM,    JUST_WORKS,	JUST_WORKS, JUST_CFM	},
+    { CFM_PASSKEY, CFM_PASSKEY, REQ_PASSKEY, JUST_WORKS, OVERLAP 	},
+};
+
+static const uint8_t sc_method[5][5] =
+{
+    { JUST_WORKS,  JUST_CFM,    REQ_PASSKEY, JUST_WORKS, REQ_PASSKEY },
+    { JUST_WORKS,  CFM_PASSKEY, REQ_PASSKEY, JUST_WORKS, CFM_PASSKEY },
+    { DSP_PASSKEY, DSP_PASSKEY, REQ_PASSKEY, JUST_WORKS, DSP_PASSKEY },
+    { JUST_WORKS,  JUST_CFM,    JUST_WORKS,	JUST_WORKS, JUST_CFM	},
+    { DSP_PASSKEY, CFM_PASSKEY, REQ_PASSKEY, JUST_WORKS, CFM_PASSKEY },
+};
+
+
+static void smp_c1_test(void);
 
 static err_t smp_send_data(smp_pcb_t *smp_pcb,struct bt_pbuf_t *p);
+static err_t smp_send_pair_rsp(smp_pcb_t *smp_pcb);
+static err_t smp_send_pair_confirm(smp_pcb_t *smp_pcb,uint8_t confirm[16]);
+static err_t smp_send_pair_fail(smp_pcb_t *smp_pcb,uint8_t reason);
+static err_t smp_send_pair_random(smp_pcb_t *smp_pcb,uint8_t random[16]);
 static err_t smp_handle_pairing_req(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p);
+static err_t smp_handle_pairing_confirm(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p);
+static err_t smp_handle_pairing_random(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p);
 
 char* dump_smp_code(uint8_t smp_code)
 {
@@ -143,8 +181,10 @@ err_t l2cap_smp_input(void *arg, l2cap_pcb_t *l2cap_pcb, struct bt_pbuf_t *p, er
         case SMP_OPCODE_PAIRING_RSP:
             break;
         case SMP_OPCODE_CONFIRM:
+            smp_handle_pairing_confirm(smp_pcb,p);
             break;
         case SMP_OPCODE_RAND:
+            smp_handle_pairing_random(smp_pcb,p);
             break;
         case SMP_OPCODE_PAIRING_FAILED:
             break;
@@ -190,7 +230,7 @@ err_t smp_init(smp_cbs_t *cb)
 
 }
 
-err_t smp_send_pair_rsp(smp_pcb_t *smp_pcb)
+static err_t smp_send_pair_rsp(smp_pcb_t *smp_pcb)
 {
     struct bt_pbuf_t *send_pbuf;
     if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, SMP_PAIR_RSP_PACK_LEN, BT_PBUF_RAM)) == NULL)
@@ -208,10 +248,69 @@ err_t smp_send_pair_rsp(smp_pcb_t *smp_pcb)
     ((uint8_t *)send_pbuf->payload)[5] = smp_pcb->local_i_key;
     ((uint8_t *)send_pbuf->payload)[6] = smp_pcb->local_r_key;
 
+    memcpy(smp_pcb->pair_rsp_buf,send_pbuf->payload,SMP_PAIR_RSP_PACK_LEN);
     smp_send_data(smp_pcb,send_pbuf);
     bt_pbuf_free(send_pbuf);
 
-	return BT_ERR_OK;
+    return BT_ERR_OK;
+}
+
+
+static err_t smp_send_pair_confirm(smp_pcb_t *smp_pcb,uint8_t confirm[16])
+{
+    struct bt_pbuf_t *send_pbuf;
+    if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, SMP_PAIR_CONFIRM_PACK_LEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_SMP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+
+        return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
+    }
+
+    ((uint8_t *)send_pbuf->payload)[0] = SMP_OPCODE_CONFIRM;
+    memcpy(((uint8_t *)send_pbuf->payload)+1,confirm,16);
+
+    smp_send_data(smp_pcb,send_pbuf);
+    bt_pbuf_free(send_pbuf);
+
+    return BT_ERR_OK;
+}
+
+static err_t smp_send_pair_random(smp_pcb_t *smp_pcb,uint8_t random[16])
+{
+    struct bt_pbuf_t *send_pbuf;
+    if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, SMP_PAIR_RANDOM_PACK_LEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_SMP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+
+        return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
+    }
+
+    ((uint8_t *)send_pbuf->payload)[0] = SMP_OPCODE_RAND;
+    memcpy(((uint8_t *)send_pbuf->payload)+1,random,16);
+
+    smp_send_data(smp_pcb,send_pbuf);
+    bt_pbuf_free(send_pbuf);
+
+    return BT_ERR_OK;
+}
+
+static err_t smp_send_pair_fail(smp_pcb_t *smp_pcb,uint8_t reason)
+{
+	struct bt_pbuf_t *send_pbuf;
+    if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, SMP_PAIR_FAIL_PACK_LEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_SMP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+
+        return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
+    }
+
+    ((uint8_t *)send_pbuf->payload)[0] = SMP_OPCODE_PAIRING_FAILED;
+	((uint8_t *)send_pbuf->payload)[1] = reason;
+
+    smp_send_data(smp_pcb,send_pbuf);
+    bt_pbuf_free(send_pbuf);
+
+    return BT_ERR_OK;
 }
 
 
@@ -233,6 +332,7 @@ static err_t smp_handle_pairing_req(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p)
 
     BT_SMP_TRACE_DEBUG("hci_get_version(0x%x)\n",hci_version);
 
+    memcpy(smp_pcb->pair_req_buf,p->payload,SMP_PAIR_REQ_PACK_LEN);
     smp_pcb->remote_io_cap = ((uint8_t *)p->payload)[1];
     smp_pcb->remote_oob_flag = ((uint8_t *)p->payload)[2];
     smp_pcb->remote_auth_req = ((uint8_t *)p->payload)[3];
@@ -254,10 +354,21 @@ static err_t smp_handle_pairing_req(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p)
     smp_pcb->local_r_key = smp_pcb->remote_r_key;
 
     smp_pcb->local_auth_req |= SMP_BONDING;
-	smp_pcb->local_auth_req |= SMP_AUTH_MIMT_BIT;
+    //smp_pcb->local_auth_req |= SMP_AUTH_MIMT_BIT;
     if(hci_version >= HCI_PROTO_VERSION_4_2)
     {
         smp_pcb->local_auth_req |= SMP_SC_SUPPORT_BIT;
+
+        if((smp_pcb->remote_auth_req & SMP_SC_SUPPORT_BIT) == SMP_SC_SUPPORT_BIT)
+        {
+            BT_SMP_TRACE_DEBUG("both support sc\n");
+            smp_pcb->use_sc = 1;
+        }
+        else
+        {
+            BT_SMP_TRACE_DEBUG("remote can not support sc\n");
+            smp_pcb->use_sc = 0;
+        }
         if(hci_version >= HCI_PROTO_VERSION_5_0)
             smp_pcb->local_auth_req |= SMP_H7_SUPPORT_BIT;
     }
@@ -267,9 +378,95 @@ static err_t smp_handle_pairing_req(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p)
         smp_pcb->local_auth_req &= ~SMP_H7_SUPPORT_BIT;
     }
 
-	smp_send_pair_rsp(smp_pcb);
+    smp_send_pair_rsp(smp_pcb);
 
     return BT_ERR_OK;
+}
+
+static err_t smp_handle_pairing_confirm(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p)
+{
+	uint8_t tk[16] = {0}; // TODO: TK is not all zero
+    uint8_t rsp[16]; 
+    BT_SMP_TRACE_DEBUG("smp_handle_pairing_confirm\n");
+
+	memcpy(smp_pcb->remote_confirm,((uint8_t *)p->payload)+1,16);
+    
+	/* Generate legency pairing random */
+	*(uint32_t *)(smp_pcb->local_random) = rand();
+	*(uint32_t *)(smp_pcb->local_random+4) = rand();
+	*(uint32_t *)(smp_pcb->local_random+8) = rand();
+	*(uint32_t *)(smp_pcb->local_random+12) = rand();
+
+	smp_c1(tk, smp_pcb->local_random, smp_pcb->pair_req_buf,smp_pcb->pair_rsp_buf,
+       &smp_pcb->remote_addr,1, hci_get_local_addr(),0, rsp);
+	
+    smp_send_pair_confirm(smp_pcb,rsp);
+
+    return BT_ERR_OK;
+}
+
+static err_t smp_handle_pairing_random(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p)
+{
+	uint8_t tk[16] = {0}; // TODO: TK is not all zero
+	uint8_t stk[16] = {0};
+    uint8_t confirm[16];
+	uint8_t *remote_random = ((uint8_t *)p->payload)+1;
+    BT_SMP_TRACE_DEBUG("smp_handle_pairing_random\n");
+
+	memcpy(smp_pcb->remote_random,remote_random,16);
+	smp_c1(tk, remote_random, smp_pcb->pair_req_buf,smp_pcb->pair_rsp_buf,
+       &smp_pcb->remote_addr,1, hci_get_local_addr(),0, confirm);
+
+    if(memcmp(confirm,smp_pcb->remote_confirm,16))
+    {
+    	BT_SMP_TRACE_DEBUG("pairing confirm check fail\n");
+		smp_send_pair_fail(smp_pcb,SMP_CONFIRM_VALUE_ERR);
+		return BT_ERR_VAL;
+    }
+	else
+	{
+		BT_SMP_TRACE_DEBUG("pairing confirm check pass\n");
+	}
+
+    smp_send_pair_random(smp_pcb,smp_pcb->local_random);
+
+	smp_s1(tk, remote_random, smp_pcb->local_random, smp_pcb->stk);
+	bt_hex_string(smp_pcb->stk,16);
+
+    return BT_ERR_OK;
+}
+
+
+
+static void smp_c1_test(void)
+{
+	/* Confirm Value	1AFA6675:F2324666:4F6CAA84:68B1ED92 */
+	/* Random Value	7CF7ED7D:681EB48D:A11EA4DE:505A90F5 */
+    uint8_t confirm[16];
+    uint8_t tk[16] = {0};
+
+    uint8_t request_cmd[7] = {0x01,0x04,0x00,0x05,0x10,0x07,0x07};
+    uint8_t response_cmd[7] = {0x02,0x03,0x00,0x01,0x10,0x07,0x07};
+
+    uint8_t local_random[16] = {0xf5,0x90,0x5a,0x50,0xde,0xa4,0x1e,0xa1,\
+                                0x8d,0xb4,0x1e,0x68,0x7d,0xed,0xf7,0x7c
+                               };
+	uint8_t ra[6] = {0x98,0x1a,0x20,0x86,0x1d,0x00};
+	uint8_t rat = 0;
+	uint8_t ia[6] = {0x52,0x24,0x6c,0xf0,0x03,0x6a};
+	uint8_t iat = 1;
+
+    BT_SMP_TRACE_DEBUG("request_cmd: %s\n", bt_hex_string(request_cmd, 7));
+    BT_SMP_TRACE_DEBUG("response_cmd: %s\n", bt_hex_string(response_cmd, 7));
+    BT_SMP_TRACE_DEBUG("local_random: %s\n", bt_hex_string(local_random, 16));
+    BT_SMP_TRACE_DEBUG("ia: %s\n", bt_hex_string(ia, 6));
+    BT_SMP_TRACE_DEBUG("ra: %s\n", bt_hex_string(ra, 6));
+    BT_SMP_TRACE_DEBUG("==================================================\n");
+    smp_c1(tk, &local_random, request_cmd, response_cmd,
+           ia,iat, ra,rat, confirm);
+
+    BT_SMP_TRACE_DEBUG("\n==================================================\n");
+    BT_SMP_TRACE_DEBUG("data %s\n", bt_hex_string(confirm, 16));
 }
 
 
