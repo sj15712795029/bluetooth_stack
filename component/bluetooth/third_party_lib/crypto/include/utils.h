@@ -89,7 +89,7 @@ extern void _set_secure(void *to, uint8_t val, unsigned int len);
 static inline void _set_secure(void *to, uint8_t val, unsigned int len) {
   (void)memset(to, val, len);
 #ifdef __GNUC__
-  __asm__ __volatile__("" ::"g"(to) : "memory");
+   __asm__ __volatile__("" ::"g"(to) : "memory");
 #endif /* __GNUC__ */
 }
 #endif /* TINYCRYPT_ARCH_HAS_SET_SECURE */

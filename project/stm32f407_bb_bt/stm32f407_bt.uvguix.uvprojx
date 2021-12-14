@@ -16,8 +16,8 @@
         <TargetCommonOption>
           <Device>STM32F407ZGTx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.11.0</PackID>
-          <PackURL>http://www.keil.com/pack</PackURL>
+          <PackID>Keil.STM32F4xx_DFP.2.15.0</PackID>
+          <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IRAM2(0x10000000,0x00010000) IROM(0x08000000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -184,6 +184,7 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>2</RvdsVP>
+            <RvdsMve>0</RvdsMve>
             <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -324,7 +325,7 @@
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
             <uC99>1</uC99>
-            <uGnu>1</uGnu>
+            <uGnu>0</uGnu>
             <useXO>0</useXO>
             <v6Lang>1</v6Lang>
             <v6LangP>1</v6LangP>
@@ -337,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F407xx</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\bsp\cortex-m4\core;..\..\bsp\cortex-m4\inc;..\..\bsp\cortex-m4\inc\Legacy;..\..\board;..\..\board\stm32f407;..\..\component\fs;..\..\component\fs\fatfs13\source;..\..\component\bluetooth\src\include;..\..\component\bluetooth\src\include\classical;..\..\component\bluetooth\third_party_lib\sbc\sbc;..\..\component\bluetooth\vendor;..\..\component\bluetooth\wrapper;..\..\component\ringbuffer;..\..\component\cjson;..\stm32f407_bb_bt;..\..\component\memory_manager;..\..\component\bluetooth\src\include\ble</IncludePath>
+              <IncludePath>..\..\bsp\cortex-m4\core;..\..\bsp\cortex-m4\inc;..\..\bsp\cortex-m4\inc\Legacy;..\..\board;..\..\board\stm32f407;..\..\component\fs;..\..\component\fs\fatfs13\source;..\..\component\bluetooth\src\include;..\..\component\bluetooth\src\include\classical;..\..\component\bluetooth\third_party_lib\sbc\sbc;..\..\component\bluetooth\vendor;..\..\component\bluetooth\wrapper;..\..\component\ringbuffer;..\..\component\cjson;..\stm32f407_bb_bt;..\..\component\memory_manager;..\..\component\bluetooth\src\include\ble;..\..\component\bluetooth\third_party_lib\crypto\include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -700,6 +701,86 @@
               <FileName>bt_smp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\component\bluetooth\src\core\ble\bt_smp.c</FilePath>
+            </File>
+            <File>
+              <FileName>bt_smp_key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\src\core\ble\bt_smp_key.c</FilePath>
+            </File>
+            <File>
+              <FileName>aes_decrypt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\third_party_lib\crypto\source\aes_decrypt.c</FilePath>
+            </File>
+            <File>
+              <FileName>aes_encrypt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\third_party_lib\crypto\source\aes_encrypt.c</FilePath>
+            </File>
+            <File>
+              <FileName>cbc_mode.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\third_party_lib\crypto\source\cbc_mode.c</FilePath>
+            </File>
+            <File>
+              <FileName>ccm_mode.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\third_party_lib\crypto\source\ccm_mode.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmac_mode.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\third_party_lib\crypto\source\cmac_mode.c</FilePath>
+            </File>
+            <File>
+              <FileName>ctr_mode.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\third_party_lib\crypto\source\ctr_mode.c</FilePath>
+            </File>
+            <File>
+              <FileName>ctr_prng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\third_party_lib\crypto\source\ctr_prng.c</FilePath>
+            </File>
+            <File>
+              <FileName>ecc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\third_party_lib\crypto\source\ecc.c</FilePath>
+            </File>
+            <File>
+              <FileName>ecc_dh.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\third_party_lib\crypto\source\ecc_dh.c</FilePath>
+            </File>
+            <File>
+              <FileName>ecc_dsa.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\third_party_lib\crypto\source\ecc_dsa.c</FilePath>
+            </File>
+            <File>
+              <FileName>ecc_platform_specific.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\third_party_lib\crypto\source\ecc_platform_specific.c</FilePath>
+            </File>
+            <File>
+              <FileName>hmac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\third_party_lib\crypto\source\hmac.c</FilePath>
+            </File>
+            <File>
+              <FileName>hmac_prng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\third_party_lib\crypto\source\hmac_prng.c</FilePath>
+            </File>
+            <File>
+              <FileName>sha256.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\third_party_lib\crypto\source\sha256.c</FilePath>
+            </File>
+            <File>
+              <FileName>utils.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\component\bluetooth\third_party_lib\crypto\source\utils.c</FilePath>
             </File>
           </Files>
         </Group>

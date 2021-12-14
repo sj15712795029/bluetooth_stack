@@ -398,7 +398,7 @@ static err_t smp_handle_pairing_confirm(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p)
 	*(uint32_t *)(smp_pcb->local_random+12) = rand();
 
 	smp_c1(tk, smp_pcb->local_random, smp_pcb->pair_req_buf,smp_pcb->pair_rsp_buf,
-       &smp_pcb->remote_addr,1, hci_get_local_addr(),0, rsp);
+       (uint8_t *)&smp_pcb->remote_addr,1, hci_get_local_addr(),0, rsp);
 	
     smp_send_pair_confirm(smp_pcb,rsp);
 
@@ -415,7 +415,7 @@ static err_t smp_handle_pairing_random(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p)
 
 	memcpy(smp_pcb->remote_random,remote_random,16);
 	smp_c1(tk, remote_random, smp_pcb->pair_req_buf,smp_pcb->pair_rsp_buf,
-       &smp_pcb->remote_addr,1, hci_get_local_addr(),0, confirm);
+       (uint8_t *)&smp_pcb->remote_addr,1, hci_get_local_addr(),0, confirm);
 
     if(memcmp(confirm,smp_pcb->remote_confirm,16))
     {
@@ -462,7 +462,7 @@ static void smp_c1_test(void)
     BT_SMP_TRACE_DEBUG("ia: %s\n", bt_hex_string(ia, 6));
     BT_SMP_TRACE_DEBUG("ra: %s\n", bt_hex_string(ra, 6));
     BT_SMP_TRACE_DEBUG("==================================================\n");
-    smp_c1(tk, &local_random, request_cmd, response_cmd,
+    smp_c1(tk, (uint8_t *)&local_random, request_cmd, response_cmd,
            ia,iat, ra,rat, confirm);
 
     BT_SMP_TRACE_DEBUG("\n==================================================\n");

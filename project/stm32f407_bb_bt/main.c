@@ -1787,8 +1787,7 @@ uint8_t shell_at_cmd_parse(uint8_t *shell_string)
 uint8_t shell_parse(uint8_t *shell_string)
 {
     uint8_t result = HW_ERR_OK;
-
-
+	
     cJSON* parse_json = cJSON_Parse((const char *)shell_string);
     uint8_t* func_value = (uint8_t*)((cJSON *)cJSON_GetObjectItem(parse_json,"FUNC"))->valuestring;
     uint8_t* operate_value = (uint8_t*)((cJSON *)cJSON_GetObjectItem(parse_json,"OPERATE"))->valuestring;
