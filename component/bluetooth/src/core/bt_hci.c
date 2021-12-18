@@ -82,6 +82,12 @@ static hci_pcb_t *hci_pcb = NULL;
 #define HCI_EVENT_HARDWARE_ERROR(pcb,reson) \
  							if((pcb)->hardware_error != NULL) \
  							((pcb)->hardware_error((reson)))
+#define HCI_EVENT_LTK_REQ(pcb,bdaddr,random,ediv) \
+ 							if((pcb)->ltk_req != NULL) \
+ 							((pcb)->ltk_req((bdaddr),(random),(ediv)))
+#define HCI_EVENT_ENC_CHANGE(pcb,bdaddr,enc) \
+							if((pcb)->enc_change != NULL) \
+							((pcb)->enc_change((bdaddr),(enc)))
 
 
 
@@ -269,6 +275,17 @@ void hci_register_hardware_error(hardware_error_fun_cb hardware_error)
 {
 	hci_pcb->hardware_error = hardware_error;
 }
+
+void hci_register_ltk_req(ltk_request_fun_cb ltk_req)
+{
+	hci_pcb->ltk_req = ltk_req;
+}
+
+void hci_register_enc_change(enc_change_fun_cb enc_change)
+{
+	hci_pcb->enc_change = enc_change;
+}
+
 
 
 void hci_register_write_policy_complete(wlp_complete_fun_cb wlp_complete)
@@ -625,7 +642,14 @@ static err_t _hci_remote_name_req_evt_process(uint8_t *payload,uint16_t payload_
 
 static err_t _hci_encryption_change_evt_process(uint8_t *payload,uint16_t payload_len)
 {
+	uint16_t con_handle = bt_le_read_16(payload,1);
+	uint8_t enc = payload[3];
     BT_HCI_TRACE_DEBUG("hci_event_input: Encryption changed. Status = 0x%x, Encryption enable = 0x%x\n", payload[0], payload[3]);
+
+	hci_link_t * link = _hci_get_link_by_handle(con_handle);
+
+	HCI_EVENT_ENC_CHANGE(hci_pcb,&link->bdaddr,enc);
+
     return BT_ERR_OK;
 }
 
@@ -920,6 +944,19 @@ static err_t _hci_le_meta_evt_process(uint8_t *payload,uint16_t payload_len)
 
         break;
     }
+	case HCI_SUBEVENT_LE_LONG_TERM_KEY_REQUEST:
+	{
+		uint8_t random[8];
+		uint16_t ediv;
+		uint16_t con_handle = bt_le_read_16(payload,1);
+		memcpy(random,payload+3,sizeof(random));
+		ediv = bt_le_read_16(payload,11);
+
+		hci_link_t * link = _hci_get_link_by_handle(con_handle);
+
+		HCI_EVENT_LTK_REQ(hci_pcb,&link->bdaddr,random,ediv);
+		break;
+	}
 
     default:
         break;
@@ -3323,6 +3360,37 @@ err_t hci_le_set_adv_enable(uint8_t enable)
     p = hci_cmd_ass(p, HCI_LE_SET_ADV_ENABLE, HCI_LE, HCI_SET_LE_ADV_ENABLE_PLEN);
     offset += 3;
     ((uint8_t *)p->payload)[offset] = enable;
+
+    phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
+    bt_pbuf_free(p);
+
+    return BT_ERR_OK;
+}
+
+
+err_t hci_le_ltk_req_reply(struct bd_addr_t *bdaddr,uint16_t *ltk)
+{
+	struct bt_pbuf_t *p;
+    uint8_t offset = 0;
+	hci_link_t *link = _hci_get_link_by_addr(bdaddr);
+    if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_LTK_REQ_REPLY_PLEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_MEM;
+    }
+
+	if(!link)
+	{
+		BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] link is not exit\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_CONN;
+	}
+    /* Assembling command packet */
+    p = hci_cmd_ass(p, HCI_LE_LTK_REQ_REPLY, HCI_LE, HCI_LTK_REQ_REPLY_PLEN);
+    offset += 3;
+    bt_le_store_16((uint8_t *)p->payload,offset,link->conhdl);
+	offset += 2;
+
+	memcpy(((uint8_t *)p->payload)+offset, ltk, 16);
 
     phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
     bt_pbuf_free(p);

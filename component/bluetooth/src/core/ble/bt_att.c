@@ -235,7 +235,7 @@ err_t att_find_info_rsp(uint8_t uuid_format,uint8_t *info_data,uint8_t info_len)
     return BT_ERR_OK;
 }
 
-err_t att_find_info_value_type_rsp(uint8_t uuid_format,uint16_t found_handle,uint16_t end_group_handle)
+err_t att_find_info_value_type_rsp(uint16_t found_handle,uint16_t end_group_handle)
 {
     struct bt_pbuf_t *send_pbuf;
     if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, ATT_FIND_INFO_VALUE_TYPE_RSP_PACK_LEN, BT_PBUF_RAM)) == NULL)

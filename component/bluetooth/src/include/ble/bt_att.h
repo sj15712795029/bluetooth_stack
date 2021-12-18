@@ -111,7 +111,7 @@ err_t att_init(att_cbs_t *cb);
 err_t att_err_rsp(uint8_t req_op,uint16_t handle,uint8_t err_code);
 err_t att_mtu_rsp(uint16_t server_mtu);
 err_t att_find_info_rsp(uint8_t uuid_format,uint8_t *info_data,uint8_t info_len);
-err_t att_find_info_value_type_rsp(uint8_t uuid_format,uint16_t found_handle,uint16_t end_group_handle);
+err_t att_find_info_value_type_rsp(uint16_t found_handle,uint16_t end_group_handle);
 err_t att_read_type_rsp(uint8_t *data_list,uint8_t data_list_len);
 err_t att_read_rsp(uint8_t *att_value,uint8_t att_value_len);
 err_t att_read_blob_rsp(uint8_t *att_value,uint8_t att_value_len);

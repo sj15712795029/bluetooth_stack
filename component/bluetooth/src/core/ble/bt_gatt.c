@@ -668,18 +668,53 @@ static err_t gatts_handle_find_info_req(struct bd_addr_t *bdaddr, struct bt_pbuf
 
 static err_t gatts_handle_find_info_value_type_req(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p)
 {
-
+	uint8_t index;
     uint16_t start_handle;
     uint16_t end_handle;
+	uint16_t found_handle = 0;
+    uint16_t group_end_handle = 0;
     uint16_t att_type;
     uint8_t req_buf_len = 0;
+	uint16_t uuid16;
+	uint8_t uuid128[16];
     uint8_t req_buf[GATT_BLE_MTU_SIZE] = {0};
 
-
     att_parse_find_info_type_value_req(p,&start_handle,&end_handle,&att_type,req_buf,&req_buf_len);
+	BT_GATT_TRACE_DEBUG("start_handle(%d) end_handle(%d) att_type(0x%x) req_buf_len(%d)\n",start_handle,end_handle,att_type,req_buf_len);
+	if(req_buf_len == 2)
+	{
+		uuid16 = bt_le_read_16(req_buf,0);
+		BT_GATT_TRACE_DEBUG("UUID16(0x%x)\n",uuid16);
+	}
+	else
+	{
+		BT_GATT_TRACE_DEBUG("UUID128:\n");
+		bt_uuid128_dump(req_buf);
+		memcpy(uuid128,req_buf,16);
+	}
 
-    /* TODO:×ö´¦Àí */
-    //att_find_info_value_type_rsp
+	for(index = 0; index < gatt_server_manager.gatt_server_pri_service_count; index++)
+	{
+		if((gatt_server_pri_service[index].pri_uuid == uuid16) || (memcmp(uuid128,gatt_server_pri_service[index].pri_uuid128,16) == 0))
+		{
+			if(start_handle <= gatt_server_pri_service[index].end_handle)
+			{
+				found_handle = gatt_server_pri_service[index].start_handle;
+				group_end_handle = gatt_server_pri_service[index].end_handle;
+			}
+		}
+	}
+
+	if(found_handle || group_end_handle)
+	{
+		BT_GATT_TRACE_DEBUG("found\n");
+    	att_find_info_value_type_rsp(found_handle,group_end_handle);
+	}
+	else
+	{
+		BT_GATT_TRACE_WARNING("NOT found\n");
+		att_err_rsp(ATT_REQ_FIND_TYPE_VALUE,start_handle,ATT_NOT_FOUND);
+	}
 
     return BT_ERR_OK;
 }

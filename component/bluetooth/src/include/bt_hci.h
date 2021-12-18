@@ -441,6 +441,7 @@
 #define HCI_LE_SET_SCAN_PARAM 0x0b
 #define HCI_LE_SET_SCAN 0x0c
 #define HCI_LE_CREATE_CON 0x0d
+#define HCI_LE_LTK_REQ_REPLY 0x1a
 
 
 /* Possible event codes */
@@ -618,6 +619,7 @@
 #define HCI_SET_LE_ADV_PARAM_PLEN 18
 #define HCI_SET_LE_ADV_DATA_PLEN 35
 #define HCI_SET_LE_ADV_ENABLE_PLEN 4
+#define HCI_LTK_REQ_REPLY_PLEN 21
 
 
 
@@ -814,6 +816,8 @@ typedef err_t (*link_key_req_fun_cb)(void *arg,struct bd_addr_t *bdaddr);
 typedef err_t (* wlp_complete_fun_cb)(void *arg, struct bd_addr_t *bdaddr);
 typedef err_t (* conn_complete_fun_cb)(void *arg, struct bd_addr_t *bdaddr);
 typedef err_t (* hardware_error_fun_cb)(uint8_t reson);
+typedef err_t (* ltk_request_fun_cb)(struct bd_addr_t *bdaddr,uint8_t *random,uint16_t ediv);
+typedef err_t (* enc_change_fun_cb)(struct bd_addr_t *bdaddr,uint8_t enc);
 
 
 
@@ -864,6 +868,8 @@ typedef struct
 	conn_complete_fun_cb conn_complete;
 	cmd_complete_fun_cb cmd_complete;
 	hardware_error_fun_cb hardware_error;
+	ltk_request_fun_cb ltk_req;
+	enc_change_fun_cb enc_change;
 }hci_pcb_t;
 
 
@@ -882,6 +888,9 @@ void hci_register_link_key_not(link_key_not_fun_cb link_key_not);
 void hci_register_write_policy_complete(wlp_complete_fun_cb wlp_complete);
 void hci_register_connection_complete(conn_complete_fun_cb conn_complete);
 void hci_register_hardware_error(hardware_error_fun_cb hardware_error);
+void hci_register_ltk_req(ltk_request_fun_cb ltk_req);
+void hci_register_enc_change(enc_change_fun_cb enc_change);
+
 uint8_t hci_get_version(void);
 uint8_t *hci_get_local_addr(void);
 err_t hci_acl_write(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p, uint16_t len, uint8_t pb);
@@ -977,6 +986,9 @@ err_t hci_le_set_adv_param(uint16_t adv_int_min, uint16_t adv_int_max, uint8_t a
 err_t hci_le_set_adv_data(uint8_t adv_len,uint8_t *adv_data);
 err_t hci_le_set_adv_enable(uint8_t enable);
 err_t hci_le_create_connection(void);
+
+err_t hci_le_ltk_req_reply(struct bd_addr_t *bdaddr,uint16_t *ltk);
+
 #endif
 
 

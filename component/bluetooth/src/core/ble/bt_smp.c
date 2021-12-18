@@ -61,9 +61,14 @@ static err_t smp_send_pair_rsp(smp_pcb_t *smp_pcb);
 static err_t smp_send_pair_confirm(smp_pcb_t *smp_pcb,uint8_t confirm[16]);
 static err_t smp_send_pair_fail(smp_pcb_t *smp_pcb,uint8_t reason);
 static err_t smp_send_pair_random(smp_pcb_t *smp_pcb,uint8_t random[16]);
+static err_t smp_send_enc_info(smp_pcb_t *smp_pcb,uint8_t ltk[16]);
+static err_t smp_send_master_id(smp_pcb_t *smp_pcb,uint16_t ediv,uint8_t rand[8]);
+static err_t smp_send_id_info(smp_pcb_t *smp_pcb,uint8_t irk[16]);
+static err_t smp_send_id_addr_info(smp_pcb_t *smp_pcb,uint8_t addr_type,uint8_t addr[6]);
 static err_t smp_handle_pairing_req(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p);
 static err_t smp_handle_pairing_confirm(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p);
 static err_t smp_handle_pairing_random(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p);
+static err_t smp_distribution_key(smp_pcb_t *smp_pcb);
 
 char* dump_smp_code(uint8_t smp_code)
 {
@@ -219,11 +224,49 @@ err_t l2cap_smp_input(void *arg, l2cap_pcb_t *l2cap_pcb, struct bt_pbuf_t *p, er
     return BT_ERR_OK;
 }
 
+err_t smp_ltk_request_handle(struct bd_addr_t *bdaddr,uint8_t *random,uint16_t ediv)
+{
+	smp_pcb_t *smp_pcb = smp_get_active_pcb(bdaddr);
+	BT_SMP_TRACE_DEBUG("smp_ltk_request_handle\n");
+	bt_addr_dump(bdaddr);
+	BT_SMP_TRACE_DEBUG("random\n");
+	bt_hex_dump(random,8);
+	BT_SMP_TRACE_DEBUG("ediv:0x%x\n",ediv);
+
+	if(!smp_pcb)
+	{
+		BT_SMP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] smp_pcb is NULL\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_CONN;
+	}
+	hci_le_ltk_req_reply(bdaddr,smp_pcb->stk);
+
+	return BT_ERR_OK;
+}
+
+err_t smp_enc_change_handle(struct bd_addr_t *bdaddr,uint8_t enc)
+{
+	smp_pcb_t *smp_pcb = smp_get_active_pcb(bdaddr);
+	BT_SMP_TRACE_DEBUG("smp_enc_change_handle\n");
+	bt_addr_dump(bdaddr);
+	BT_SMP_TRACE_DEBUG("enc:%d\n",enc);
+
+	if(!smp_pcb)
+	{
+		BT_SMP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] smp_pcb is NULL\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_CONN;
+	}
+	
+	smp_distribution_key(smp_pcb);
+	return BT_ERR_OK;
+}
+
 
 err_t smp_init(smp_cbs_t *cb)
 {
     smp_cbs = cb;
 
+	hci_register_ltk_req(smp_ltk_request_handle);
+	hci_register_enc_change(smp_enc_change_handle);
     l2cap_fixed_channel_register_recv(L2CAP_SM_CID,l2cap_smp_connect,l2cap_smp_disconnect,l2cap_smp_input);
 
     return BT_ERR_OK;
@@ -294,6 +337,87 @@ static err_t smp_send_pair_random(smp_pcb_t *smp_pcb,uint8_t random[16])
     return BT_ERR_OK;
 }
 
+static err_t smp_send_enc_info(smp_pcb_t *smp_pcb,uint8_t ltk[16])
+{
+	struct bt_pbuf_t *send_pbuf;
+    if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, SMP_ENC_INFO_PACK_LEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_SMP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+
+        return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
+    }
+
+    ((uint8_t *)send_pbuf->payload)[0] = SMP_OPCODE_ENCRYPT_INFO;
+    memcpy(((uint8_t *)send_pbuf->payload)+1,ltk,16);
+
+    smp_send_data(smp_pcb,send_pbuf);
+    bt_pbuf_free(send_pbuf);
+
+    return BT_ERR_OK;
+}
+
+static err_t smp_send_master_id(smp_pcb_t *smp_pcb,uint16_t ediv,uint8_t rand[8])
+{
+	struct bt_pbuf_t *send_pbuf;
+    if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, SMP_MASTER_ID_PACK_LEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_SMP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+
+        return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
+    }
+
+    ((uint8_t *)send_pbuf->payload)[0] = SMP_OPCODE_MASTER_ID;
+	bt_le_store_16((uint8_t *)send_pbuf->payload,1,ediv);// TODO: big e or little e???????
+    memcpy(((uint8_t *)send_pbuf->payload)+3,rand,8);
+
+    smp_send_data(smp_pcb,send_pbuf);
+    bt_pbuf_free(send_pbuf);
+
+    return BT_ERR_OK;
+}
+
+static err_t smp_send_id_info(smp_pcb_t *smp_pcb,uint8_t irk[16])
+{
+	struct bt_pbuf_t *send_pbuf;
+    if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, SMP_ID_INFO_PACK_LEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_SMP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+
+        return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
+    }
+
+    ((uint8_t *)send_pbuf->payload)[0] = SMP_OPCODE_IDENTITY_INFO;
+    memcpy(((uint8_t *)send_pbuf->payload)+1,irk,16);
+
+    smp_send_data(smp_pcb,send_pbuf);
+    bt_pbuf_free(send_pbuf);
+
+    return BT_ERR_OK;
+}
+
+
+static err_t smp_send_id_addr_info(smp_pcb_t *smp_pcb,uint8_t addr_type,uint8_t addr[6])
+{
+	struct bt_pbuf_t *send_pbuf;
+    if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, SMP_ID_ADDR_INFO_PACK_LEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_SMP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+
+        return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
+    }
+
+    ((uint8_t *)send_pbuf->payload)[0] = SMP_OPCODE_ID_ADDR;
+	((uint8_t *)send_pbuf->payload)[1] = addr_type;
+    memcpy(((uint8_t *)send_pbuf->payload)+2,addr,6);
+
+    smp_send_data(smp_pcb,send_pbuf);
+    bt_pbuf_free(send_pbuf);
+
+    return BT_ERR_OK;
+}
+
+
+
 static err_t smp_send_pair_fail(smp_pcb_t *smp_pcb,uint8_t reason)
 {
 	struct bt_pbuf_t *send_pbuf;
@@ -350,8 +474,11 @@ static err_t smp_handle_pairing_req(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p)
     smp_pcb->local_io_cap = SMP_IO_CAP_CONF;
     smp_pcb->local_oob_flag = SMP_OOB_PRESENT_CONF;
     smp_pcb->local_enc_size = SMP_MAX_ENC_KEY_SIZE;
-    smp_pcb->local_i_key = smp_pcb->remote_i_key;
-    smp_pcb->local_r_key = smp_pcb->remote_r_key;
+    //smp_pcb->local_i_key = smp_pcb->remote_i_key;
+    //smp_pcb->local_r_key = smp_pcb->remote_r_key;
+
+	smp_pcb->local_i_key = 0x03;
+    smp_pcb->local_r_key = 0x03;
 
     smp_pcb->local_auth_req |= SMP_BONDING;
     //smp_pcb->local_auth_req |= SMP_AUTH_MIMT_BIT;
@@ -430,12 +557,42 @@ static err_t smp_handle_pairing_random(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p)
 
     smp_send_pair_random(smp_pcb,smp_pcb->local_random);
 
-	smp_s1(tk, remote_random, smp_pcb->local_random, smp_pcb->stk);
-	bt_hex_string(smp_pcb->stk,16);
+	smp_s1(tk,smp_pcb->local_random,remote_random, smp_pcb->stk);
+	BT_SMP_TRACE_DEBUG("STK:%s\n",bt_hex_string(smp_pcb->stk,16));
+	
 
     return BT_ERR_OK;
 }
 
+static err_t smp_distribution_key(smp_pcb_t *smp_pcb)
+{
+	uint8_t ltk[16] = {0}; 
+	uint16_t ediv;
+	uint8_t random[8] = {0};
+	uint8_t irk[16] = {0}; 
+	/* Generate ltk */
+	*(uint32_t *)(ltk) = rand();
+	*(uint32_t *)(ltk+4) = rand();
+	*(uint32_t *)(ltk+8) = rand();
+	*(uint32_t *)(ltk+12) = rand();
+
+	ediv = rand() & 0xffff;
+
+	*(uint32_t *)(random) = rand();
+	*(uint32_t *)(random+4) = rand();
+
+	*(uint32_t *)(irk) = rand();
+	*(uint32_t *)(irk+4) = rand();
+	*(uint32_t *)(irk+8) = rand();
+	*(uint32_t *)(irk+12) = rand();
+
+	smp_send_enc_info(smp_pcb,ltk);
+	smp_send_master_id(smp_pcb,ediv,random);
+	smp_send_id_info(smp_pcb,irk);
+	smp_send_id_addr_info(smp_pcb,0,hci_get_local_addr());
+
+	return BT_ERR_OK;
+}
 
 
 static void smp_c1_test(void)
@@ -467,6 +624,34 @@ static void smp_c1_test(void)
 
     BT_SMP_TRACE_DEBUG("\n==================================================\n");
     BT_SMP_TRACE_DEBUG("data %s\n", bt_hex_string(confirm, 16));
+}
+
+
+static int32_t smp_s1_test(void)
+{
+	/* 
+	TK(LSB ~ MSB):
+	[000]: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+	
+	R1(LSB ~ MSB):
+	[000]: 19 d7 14 88 d1 d8 16 52 2c 58 00 8d 94 19 da 6b
+	
+	R2(LSB ~ MSB):
+	[000]: ad 1a aa bb c9 d4 41 6d ce bb 13 8e 39 29 e4 23
+	
+	S1(LSB ~ MSB):
+	[000]: 97 3b a7 52 bc be e9 3e 33 4e 19 49 42 ff 1f 00
+	*/
+
+	uint8_t s1[16];
+    uint8_t tk[16] = {0};
+	uint8_t r1[16] = {0x19 ,0xd7 ,0x14 ,0x88 ,0xd1 ,0xd8 ,0x16 ,0x52 ,0x2c ,0x58 ,0x00 ,0x8d ,0x94 ,0x19 ,0xda ,0x6b};
+	uint8_t r2[16] = {0xad ,0x1a ,0xaa ,0xbb ,0xc9 ,0xd4 ,0x41 ,0x6d ,0xce ,0xbb ,0x13 ,0x8e ,0x39 ,0x29 ,0xe4 ,0x23};	
+
+	BT_SMP_TRACE_DEBUG("-------------------------------------------------\n");
+	smp_s1(tk,r1,r2,s1);
+    BT_SMP_TRACE_DEBUG("data %s\n", bt_hex_string(s1, 16));
+	BT_SMP_TRACE_DEBUG("-------------------------------------------------\n");
 }
 
 

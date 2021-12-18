@@ -65,17 +65,23 @@
 #define SMP_KP_SUPPORT_BIT (1 << 4)
 #define SMP_H7_SUPPORT_BIT (1 << 5)
 
-#define SMP_DIST_ENC_KEY	0x01
-#define SMP_DIST_ID_KEY	0x02
-#define SMP_DIST_SIGN	0x04
-#define SMP_DIST_LINK_KEY	0x08
 
+/* SMP key types */
+#define SMP_SEC_KEY_TYPE_ENC (1 << 0)    /* encryption key */
+#define SMP_SEC_KEY_TYPE_ID (1 << 1)    /* identity key */
+#define SMP_SEC_KEY_TYPE_CSRK (1 << 2)    /* slave CSRK */
+#define SMP_SEC_KEY_TYPE_LK (1 << 3)    /* BR/EDR link key */
 
 #define SMP_PAIR_REQ_PACK_LEN 7
 #define SMP_PAIR_RSP_PACK_LEN 7
 #define SMP_PAIR_CONFIRM_PACK_LEN 17
 #define SMP_PAIR_RANDOM_PACK_LEN 17
 #define SMP_PAIR_FAIL_PACK_LEN 2
+#define SMP_ENC_INFO_PACK_LEN 17
+#define SMP_MASTER_ID_PACK_LEN 11
+#define SMP_ID_INFO_PACK_LEN 17
+#define SMP_ID_ADDR_INFO_PACK_LEN 8
+
 
 
 typedef struct _smp_pcb_t
