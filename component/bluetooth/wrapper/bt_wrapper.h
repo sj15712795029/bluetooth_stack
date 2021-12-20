@@ -193,6 +193,14 @@ typedef struct
 	bt_gatt_server_cbs_t *gatt_server_cbs;
 }bt_gatt_cbs_t;
 
+typedef struct
+{
+	void (*bt_smp_connect_set_up)(struct bd_addr_t *remote_addr,uint8_t status);
+    void (*bt_smp_connect_realease)(struct bd_addr_t *remote_addr,uint8_t status);
+	void (*bt_smp_passkey_display)(struct bd_addr_t *remote_addr,uint32_t passkey);
+	void (*bt_smp_passkey_input)(struct bd_addr_t *remote_addr,uint32_t *passkey);
+}bt_smp_cbs_t;
+
 
 typedef struct
 {
@@ -204,6 +212,7 @@ typedef struct
 	bt_app_hid_cb_t *app_hid_cb;
 	bt_app_pbap_cb_t *app_pbap_cb;
 	bt_gatt_cbs_t *app_gatt_cb;
+	bt_smp_cbs_t *app_smp_cb;
 }bt_app_cb_t;
 
 

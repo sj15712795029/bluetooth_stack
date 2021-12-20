@@ -955,7 +955,7 @@ void bt_app_gattc_discovery_char(struct bd_addr_t *remote_addr,uint16_t attribut
 }
 
 
-bt_gatt_client_cbs_t bt_app_gattc_wrapper_cb =
+bt_gatt_client_cbs_t bt_app_gattc_cb =
 {
     bt_app_gattc_mtu_value,
     bt_app_gattc_discovery_primary_service,
@@ -973,20 +973,69 @@ void bt_app_gatts_mtu_value(struct bd_addr_t *remote_addr,uint16_t mtu)
 }
 
 
-bt_gatt_server_cbs_t bt_app_gatts_wrapper_cb =
+bt_gatt_server_cbs_t bt_app_gatts_cb =
 {
     bt_app_gatts_mtu_value,
 };
 
 
 
-static bt_gatt_cbs_t bt_app_gatt_wrapper_cb =
+static bt_gatt_cbs_t bt_app_gatt_cb =
 {
     bt_app_gatt_connect_set_up,
     bt_app_gatt_connect_realease,
-    &bt_app_gattc_wrapper_cb,
-    &bt_app_gatts_wrapper_cb,
+    &bt_app_gattc_cb,
+    &bt_app_gatts_cb,
 };
+
+
+void bt_app_smp_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
+    printf("bt_app_smp_connect_set_up,address is :\n");
+    bt_addr_dump(remote_addr->addr);
+
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
+
+}
+void bt_app_smp_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
+    printf("bt_app_smp_connect_realease,address is :\n");
+    bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
+}
+
+void bt_app_smp_passkey_display(struct bd_addr_t *remote_addr,uint32_t passkey)
+{
+    printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
+    printf("bt_app_smp_passkey_display passkey(%d),address is :\n",passkey);
+    bt_addr_dump(remote_addr->addr);
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
+}
+
+void bt_app_smp_passkey_input(struct bd_addr_t *remote_addr,uint32_t *passkey)
+{
+	printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
+    printf("bt_app_smp_passkey_input,address is :\n");
+    bt_addr_dump(remote_addr->addr);
+
+	printf("enter passkey\r\n");
+    scanf("%d",passkey);
+	
+    printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
+}
+
+
+static bt_smp_cbs_t bt_app_smp_cb =
+{
+    bt_app_smp_connect_set_up,
+    bt_app_smp_connect_realease,
+    bt_app_smp_passkey_display,
+    bt_app_smp_passkey_input
+};
+
+
 #endif
 
 
@@ -1031,8 +1080,10 @@ static bt_app_cb_t bt_app_cb =
 #endif
 
 #if BT_BLE_ENABLE > 0
-    &bt_app_gatt_wrapper_cb,
+    &bt_app_gatt_cb,
+    &bt_app_smp_cb,
 #else
+    NULL,
     NULL,
 #endif
 

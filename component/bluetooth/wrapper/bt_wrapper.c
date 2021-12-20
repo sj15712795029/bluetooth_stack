@@ -1005,6 +1005,7 @@ static hid_cbs_t hid_wrapper_cb =
 #endif
 
 
+#if BT_BLE_ENABLE > 0
 void gatt_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
 {
     printf("WRAPPER << PROFILE:gattc_connect_set_up,address is :\n");
@@ -1111,6 +1112,61 @@ static gatt_cbs_t gatt_wrapper_cb =
 };
 
 
+void sm_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("WRAPPER << PROFILE:sm_connect_set_up,address is :\n");
+    bt_addr_dump(remote_addr->addr);
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_smp_cb && bt_wrapper_cb->app_smp_cb->bt_smp_connect_set_up)
+    {
+        bt_wrapper_cb->app_smp_cb->bt_smp_connect_set_up(remote_addr,status);
+    }
+
+}
+void sm_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("WRAPPER << PROFILE:sm_connect_realease,address is :\n");
+    bt_addr_dump(remote_addr->addr);
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_smp_cb && bt_wrapper_cb->app_smp_cb->bt_smp_connect_realease)
+    {
+        bt_wrapper_cb->app_smp_cb->bt_smp_connect_realease(remote_addr,status);
+    }
+
+}
+
+void smp_passkey_display(struct bd_addr_t *remote_addr,uint32_t passkey)
+{
+	printf("WRAPPER << PROFILE:smp_passkey_display passkey(%d),address is :\n",passkey);
+    bt_addr_dump(remote_addr->addr);	
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_smp_cb && bt_wrapper_cb->app_smp_cb->bt_smp_passkey_display)
+    {
+        bt_wrapper_cb->app_smp_cb->bt_smp_passkey_display(remote_addr,passkey);
+    }
+}
+
+void smp_passkey_input(struct bd_addr_t *remote_addr,uint32_t *passkey)
+{
+	printf("WRAPPER << PROFILE:smp_passkey_input address is :\n");
+    bt_addr_dump(remote_addr->addr);	
+
+	if(bt_wrapper_cb && bt_wrapper_cb->app_smp_cb && bt_wrapper_cb->app_smp_cb->bt_smp_passkey_input)
+    {
+        bt_wrapper_cb->app_smp_cb->bt_smp_passkey_input(remote_addr,passkey);
+    }
+}
+
+
+static smp_cbs_t smp_wrapper_cb = 
+{
+	sm_connect_set_up,
+	sm_connect_realease,
+	smp_passkey_display,
+	smp_passkey_input,
+};
+#endif
+
 
 uint8_t bt_start(bt_app_cb_t *app_cb)
 {
@@ -1174,7 +1230,7 @@ uint8_t bt_start(bt_app_cb_t *app_cb)
 
 #if BT_BLE_ENABLE > 0
     gatt_init(&gatt_wrapper_cb);
-	smp_init(NULL);
+	smp_init(&smp_wrapper_cb);
     gatt_server_init();
 #if PROFILE_BAS_ENABLE > 0
     bas_init(100);

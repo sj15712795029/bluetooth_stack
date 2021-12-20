@@ -235,7 +235,7 @@ typedef uintptr_t mem_ptr_t;
 /***********   SMP protocol config ********************************************************************************************/
 #define SMP_MAX_ENC_KEY_SIZE 16
 /* SMP_IO_CAP_DISPLAY_ONLY->0 SMP_IO_CAP_DISPLAY_YESNO->1 SMP_IO_CAP_KEYBORAD_ONLY->2 SMP_IO_CAP_NOIO->3 SMP_IO_CAP_KBDISP->4 */
-#define SMP_IO_CAP_CONF 3
+#define SMP_IO_CAP_CONF 2
 #define SMP_OOB_PRESENT_CONF 0
 /******************************************************************************************************************************/
 

@@ -12,6 +12,7 @@
 
 #include "bt_common.h"
 #include "bt_l2cap.h"
+#include "bt_hci.h"
 
 /* SMP command code */
 #define SMP_OPCODE_PAIRING_REQ            0x01
@@ -45,6 +46,18 @@
 #define SMP_BR_PARING_IN_PROGR      0x0D
 #define SMP_XTRANS_DERIVE_NOT_ALLOW 0x0E
 #define SMP_KEY_REJECTED 0x0F
+
+#define SMP_MODEL_ENCRYPTION_ONLY  0   /* Legacy mode, Just Works model */
+#define SMP_MODEL_PASSKEY       1   /* Legacy mode, Passkey Entry model, this side inputs the key */
+#define SMP_MODEL_OOB           2   /* Legacy mode, OOB model */
+#define SMP_MODEL_KEY_NOTIF     3   /* Legacy mode, Passkey Entry model, this side displays the key */
+#define SMP_MODEL_SEC_CONN_JUSTWORKS  4  /* Secure Connections mode, Just Works model */
+#define SMP_MODEL_SEC_CONN_NUM_COMP   5  /* Secure Connections mode, Numeric Comparison model */
+#define SMP_MODEL_SEC_CONN_PASSKEY_ENT 6 /* Secure Connections mode, Passkey Entry model, this side inputs the key */
+#define SMP_MODEL_SEC_CONN_PASSKEY_DISP 7   /* Secure Connections mode, Passkey Entry model, this side displays the key */
+#define SMP_MODEL_SEC_CONN_OOB  8   /* Secure Connections mode, OOB model */
+#define SMP_MODEL_OUT_OF_RANGE  9
+
 
 /* IO capability */
 #define SMP_IO_CAP_DISPLAY_ONLY 0
@@ -93,11 +106,13 @@ typedef struct _smp_pcb_t
 	uint8_t pair_req_buf[SMP_PAIR_REQ_PACK_LEN];
 	uint8_t pair_rsp_buf[SMP_PAIR_RSP_PACK_LEN];
 	uint8_t use_sc;
+	uint8_t pairing_method;
 
 	uint8_t local_random[16];
 	uint8_t remote_random[16];
 	uint8_t remote_confirm[16];
 
+	uint8_t tk[16];
 	uint8_t stk[16];
 
     uint8_t remote_io_cap;
@@ -118,8 +133,10 @@ typedef struct _smp_pcb_t
 
 typedef struct
 {
-    void (*smp_connect_set_up)(smp_pcb_t *smp_pcb,uint8_t status);
-    void (*smp_connect_realease)(smp_pcb_t *smp_pcb,uint8_t status);
+    void (*smp_connect_set_up)(struct bd_addr_t *remote_addr,uint8_t status);
+    void (*smp_connect_realease)(struct bd_addr_t *remote_addr,uint8_t status);
+	void (*smp_passkey_display)(struct bd_addr_t *remote_addr,uint32_t passkey);
+	void (*smp_passkey_input)(struct bd_addr_t *remote_addr,uint32_t *passkey);
 } smp_cbs_t;
 
 

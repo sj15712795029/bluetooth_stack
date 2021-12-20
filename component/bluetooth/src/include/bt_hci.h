@@ -891,6 +891,7 @@ void hci_register_hardware_error(hardware_error_fun_cb hardware_error);
 void hci_register_ltk_req(ltk_request_fun_cb ltk_req);
 void hci_register_enc_change(enc_change_fun_cb enc_change);
 
+
 uint8_t hci_get_version(void);
 uint8_t *hci_get_local_addr(void);
 err_t hci_acl_write(struct bd_addr_t *bdaddr, struct bt_pbuf_t *p, uint16_t len, uint8_t pb);
@@ -987,7 +988,7 @@ err_t hci_le_set_adv_data(uint8_t adv_len,uint8_t *adv_data);
 err_t hci_le_set_adv_enable(uint8_t enable);
 err_t hci_le_create_connection(void);
 
-err_t hci_le_ltk_req_reply(struct bd_addr_t *bdaddr,uint16_t *ltk);
+err_t hci_le_ltk_req_reply(struct bd_addr_t *bdaddr,uint8_t *ltk);
 
 #endif
 

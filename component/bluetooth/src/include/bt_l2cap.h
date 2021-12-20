@@ -268,6 +268,8 @@ typedef struct _l2cap_pcb_t
 {
     struct _l2cap_pcb_t *next; /* For the linked list */
 
+	uint8_t conn_role;
+	
     enum l2cap_state_e state; /* L2CAP state */
 
     void *callback_arg;
@@ -370,8 +372,8 @@ void l2cap_acl_input(struct bt_pbuf_t *p, struct bd_addr_t *bdaddr);
 void lp_connect_cfm(struct bd_addr_t *bdaddr, uint8_t encrypt_mode, err_t err);
 void lp_connect_ind(struct bd_addr_t *bdaddr);
 void lp_disconnect_ind(struct bd_addr_t *bdaddr);
+void le_connect_handler(struct bd_addr_t *bdaddr,uint8_t conn_role);
 
-void le_connect_handler(struct bd_addr_t *bdaddr);
 
 
 

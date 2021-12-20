@@ -925,7 +925,7 @@ static err_t _hci_le_meta_evt_process(uint8_t *payload,uint16_t payload_len)
             HCI_REG(&(hci_active_links), link);
             link->state = OPEN;
 
-			le_connect_handler(bdaddr);
+			le_connect_handler(bdaddr,link->role);
         }
         break;
     }
@@ -3368,7 +3368,7 @@ err_t hci_le_set_adv_enable(uint8_t enable)
 }
 
 
-err_t hci_le_ltk_req_reply(struct bd_addr_t *bdaddr,uint16_t *ltk)
+err_t hci_le_ltk_req_reply(struct bd_addr_t *bdaddr,uint8_t *ltk)
 {
 	struct bt_pbuf_t *p;
     uint8_t offset = 0;

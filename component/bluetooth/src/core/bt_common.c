@@ -192,7 +192,7 @@ uint8_t* bt_hex_string(const void* buf, uint16_t len)
 
     str[i * 2] = '\0';
 
-    return str;
+    return ((uint8_t *)str);
 }
 
 

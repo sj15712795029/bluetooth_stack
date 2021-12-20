@@ -1937,7 +1937,7 @@ void lp_disconnect_ind(struct bd_addr_t *bdaddr)
     }
 }
 
-void le_connect_handler(struct bd_addr_t *bdaddr)
+void le_connect_handler(struct bd_addr_t *bdaddr,uint8_t conn_role)
 {
 	l2cap_pcb_t *pcb;
 	for(pcb = l2cap_active_pcbs; pcb != NULL; pcb = pcb->next)
@@ -1945,6 +1945,7 @@ void le_connect_handler(struct bd_addr_t *bdaddr)
         if(pcb->fixed_cid == L2CAP_ATT_CID)
         {
         	pcb->state = L2CAP_OPEN;
+			pcb->conn_role = conn_role;
 			bd_addr_set(&(pcb->remote_bdaddr),bdaddr);
 			L2CA_ACTION_CONN_IND(pcb, BT_ERR_OK);
         }
@@ -1952,6 +1953,7 @@ void le_connect_handler(struct bd_addr_t *bdaddr)
 		if(pcb->fixed_cid == L2CAP_SM_CID)
         {
         	pcb->state = L2CAP_OPEN;
+			pcb->conn_role = conn_role;
 			bd_addr_set(&(pcb->remote_bdaddr),bdaddr);
 			L2CA_ACTION_CONN_IND(pcb, BT_ERR_OK);
         }

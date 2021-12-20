@@ -671,10 +671,25 @@ void bt_app_gattc_mtu_value(struct bd_addr_t *remote_addr,uint16_t mtu)
     bt_addr_dump(remote_addr->addr);
 }
 
-void bt_app_gattc_discovery_primary_service(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle,uint16_t uuid16,uint8_t *uuid128)
+void bt_app_gattc_discovery_primary_service(struct bd_addr_t *remote_addr,gatt_client_pri_service_t *pri_service,uint16_t count)
 {
-    printf("bt_app_gattc_discovery_primary_service,start_handle(%d) end_handle(%d) uuid16(0x%x) address is :\n",start_handle,end_handle,uuid16);
+	uint8_t index = 0;
+	uint16_t start_handle;
+    printf("bt_app_gattc_discovery_primary_service,count(0x%x) address is :\n",count);
     bt_addr_dump(remote_addr->addr);
+	for(index = 0; index < count; index++)
+	{
+		start_handle = pri_service[index].end_handle+1;
+		if(pri_service[index].uuid.len == LEN_UUID_16)
+			printf("primary service[%d] start_handle(%d) end_handle(%d) uuid16(0x%x)\n",index,pri_service[index].start_handle,pri_service[index].end_handle,pri_service[index].uuid.uu.uuid16);
+		else
+		{
+			printf("primary service[%d] start_handle(%d) end_handle(%d)\n",index,pri_service[index].start_handle,pri_service[index].end_handle);
+			bt_uuid128_dump(pri_service[index].uuid.uu.uuid128);
+		}
+	}
+
+	bt_gatt_client_discovery_pri_service(&connect_addr,start_handle,0xffff);
 }
 
 void bt_app_gattc_discovery_uuid_primary_service(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle)
@@ -690,7 +705,7 @@ void bt_app_gattc_discovery_char(struct bd_addr_t *remote_addr,uint16_t attribut
 }
 
 
-bt_gatt_client_cbs_t bt_app_gattc_wrapper_cb =
+bt_gatt_client_cbs_t bt_app_gattc_cb =
 {
     bt_app_gattc_mtu_value,
     bt_app_gattc_discovery_primary_service,
@@ -706,20 +721,60 @@ void bt_app_gatts_mtu_value(struct bd_addr_t *remote_addr,uint16_t mtu)
 }
 
 
-bt_gatt_server_cbs_t bt_app_gatts_wrapper_cb =
+bt_gatt_server_cbs_t bt_app_gatts_cb =
 {
     bt_app_gatts_mtu_value,
 };
 
 
 
-static bt_gatt_cbs_t bt_app_gatt_wrapper_cb =
+static bt_gatt_cbs_t bt_app_gatt_cb =
 {
     bt_app_gatt_connect_set_up,
     bt_app_gatt_connect_realease,
-    &bt_app_gattc_wrapper_cb,
-    &bt_app_gatts_wrapper_cb,
+    &bt_app_gattc_cb,
+    &bt_app_gatts_cb,
 };
+
+void bt_app_smp_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("bt_app_smp_connect_set_up,address is :\n");
+    bt_addr_dump(remote_addr->addr);
+
+
+}
+void bt_app_smp_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
+{
+    printf("bt_app_smp_connect_realease,address is :\n");
+    bt_addr_dump(remote_addr->addr);
+}
+
+void bt_app_smp_passkey_display(struct bd_addr_t *remote_addr,uint32_t passkey)
+{
+    printf("bt_app_smp_passkey_display passkey(%d),address is :\n",passkey);
+    bt_addr_dump(remote_addr->addr);
+}
+
+void bt_app_smp_passkey_input(struct bd_addr_t *remote_addr,uint32_t *passkey)
+{
+    printf("bt_app_smp_passkey_input,address is :\n");
+    bt_addr_dump(remote_addr->addr);
+
+	printf("enter passkey\r\n");
+    scanf("%d",passkey);
+	
+}
+
+
+static bt_smp_cbs_t bt_app_smp_cb =
+{
+    bt_app_smp_connect_set_up,
+    bt_app_smp_connect_realease,
+    bt_app_smp_passkey_display,
+    bt_app_smp_passkey_input
+};
+
+
 #endif
 
 static bt_app_cb_t bt_app_cb =
@@ -763,8 +818,10 @@ static bt_app_cb_t bt_app_cb =
 #endif
 
 #if BT_BLE_ENABLE > 0
-    &bt_app_gatt_wrapper_cb,
+    &bt_app_gatt_cb,
+		&bt_app_smp_cb,
 #else
+	NULL,
 	NULL,
 #endif
 
