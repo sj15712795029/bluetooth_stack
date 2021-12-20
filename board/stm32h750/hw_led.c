@@ -19,16 +19,16 @@ uint8_t hw_led_init()
 {
     GPIO_InitTypeDef GPIO_InitStruct = {0};
 
-    LED1_PERIPH_CLK_ENABLE();
+    LED_PERIPH_CLK_ENABLE();
 
     /*Configure GPIO pins : LED1_Pin  */
-  GPIO_InitStruct.Pin = LED1_PIN;
+  GPIO_InitStruct.Pin = LED_PIN;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LED1_GPIO, &GPIO_InitStruct);
+  HAL_GPIO_Init(LED_GPIO, &GPIO_InitStruct);
 
-    LED1_OFF;
+    LED_OFF;
     return HW_ERR_OK;
 }
 

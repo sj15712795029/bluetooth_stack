@@ -1843,27 +1843,26 @@ uint8_t shell_parse(uint8_t *shell_string)
 {
     uint8_t result = HW_ERR_OK;
 
-
-    cJSON* parse_json = cJSON_Parse((const char *)shell_string);
-    uint8_t* func_value = (uint8_t*)((cJSON *)cJSON_GetObjectItem(parse_json,"FUNC"))->valuestring;
-    uint8_t* operate_value = (uint8_t*)((cJSON *)cJSON_GetObjectItem(parse_json,"OPERATE"))->valuestring;
-    uint8_t* para1 = (uint8_t*)((cJSON *)cJSON_GetObjectItem(parse_json,"PARAM1"))->valuestring;
-    uint8_t* para2 = (uint8_t*)((cJSON *)cJSON_GetObjectItem(parse_json,"PARAM2"))->valuestring;
-    uint8_t* para3 = (uint8_t*)((cJSON *)cJSON_GetObjectItem(parse_json,"PARAM3"))->valuestring;
-    uint8_t* para4 = (uint8_t*)((cJSON *)cJSON_GetObjectItem(parse_json,"PARAM4"))->valuestring;
-    uint8_t* para5 = (uint8_t*)((cJSON *)cJSON_GetObjectItem(parse_json,"PARAM5"))->valuestring;
-    uint8_t* para6 = (uint8_t*)((cJSON *)cJSON_GetObjectItem(parse_json,"PARAM6"))->valuestring;
-
-    if(hw_strcmp((const char *)func_value,"BT") == 0)
+    if(strchr((const char *)shell_string,'{') && strchr((const char *)shell_string,'}'))
     {
+    	cJSON* parse_json = cJSON_Parse((const char *)shell_string);
+    	uint8_t* func_value = (uint8_t*)((cJSON *)cJSON_GetObjectItem(parse_json,"FUNC"))->valuestring;
+	    uint8_t* operate_value = (uint8_t*)((cJSON *)cJSON_GetObjectItem(parse_json,"OPERATE"))->valuestring;
+	    uint8_t* para1 = (uint8_t*)((cJSON *)cJSON_GetObjectItem(parse_json,"PARAM1"))->valuestring;
+	    uint8_t* para2 = (uint8_t*)((cJSON *)cJSON_GetObjectItem(parse_json,"PARAM2"))->valuestring;
+	    uint8_t* para3 = (uint8_t*)((cJSON *)cJSON_GetObjectItem(parse_json,"PARAM3"))->valuestring;
+	    uint8_t* para4 = (uint8_t*)((cJSON *)cJSON_GetObjectItem(parse_json,"PARAM4"))->valuestring;
+	    uint8_t* para5 = (uint8_t*)((cJSON *)cJSON_GetObjectItem(parse_json,"PARAM5"))->valuestring;
+	    uint8_t* para6 = (uint8_t*)((cJSON *)cJSON_GetObjectItem(parse_json,"PARAM6"))->valuestring;
         result = shell_json_parse(operate_value,para1,para2,para3,para4,para5,para6);
+			cJSON_Delete(parse_json);
     }
     else
     {
         result = shell_at_cmd_parse(shell_string);
     }
 
-    cJSON_Delete(parse_json);
+    
     return result;
 
 }
@@ -1921,7 +1920,7 @@ extern struct phybusif_cb uart_if;
 int main()
 {
     board_init();
-
+	
     while(1)
     {
 

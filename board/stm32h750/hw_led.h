@@ -10,14 +10,14 @@
 
 #include "hw_misc.h"
 
-#define LED1_PERIPH_CLK_ENABLE __HAL_RCC_GPIOE_CLK_ENABLE
-#define LED1_GPIO GPIOE
-#define LED1_PIN GPIO_PIN_0
+#define LED_PERIPH_CLK_ENABLE __HAL_RCC_GPIOE_CLK_ENABLE
+#define LED_GPIO GPIOE
+#define LED_PIN GPIO_PIN_0
 
 
 /* Operate LED on/off */
-#define LED1_OFF	HAL_GPIO_WritePin(LED1_GPIO, LED1_PIN, GPIO_PIN_SET)
-#define LED1_ON		HAL_GPIO_WritePin(LED1_GPIO, LED1_PIN, GPIO_PIN_RESET)
+#define LED_OFF	HAL_GPIO_WritePin(LED_GPIO, LED_PIN, GPIO_PIN_SET)
+#define LED_ON		HAL_GPIO_WritePin(LED_GPIO, LED_PIN, GPIO_PIN_RESET)
 
 
 uint8_t hw_led_init(void);
