@@ -442,6 +442,8 @@
 #define HCI_LE_SET_SCAN 0x0c
 #define HCI_LE_CREATE_CON 0x0d
 #define HCI_LE_LTK_REQ_REPLY 0x1a
+#define HCI_LE_READ_LOCAL_P256_PUBLIC_KEY 0x25
+#define HCI_LE_GENERATE_DHKEY 0x26
 
 
 /* Possible event codes */
@@ -606,6 +608,7 @@
 #define HCI_H_BUF_SIZE_PLEN 6
 #define HCI_H_NUM_COMPL_PLEN 8
 #define HCI_R_LOCOL_VER_INFO_PLEN 3
+#define HCI_R_LOCAL_SUPPORT_CMD_PLEN 3
 #define HCI_R_BUF_SIZE_PLEN 3
 #define HCI_R_BD_ADDR_PLEN 3
 #define HCI_READ_RSSI_PLEN 5
@@ -620,6 +623,8 @@
 #define HCI_SET_LE_ADV_DATA_PLEN 35
 #define HCI_SET_LE_ADV_ENABLE_PLEN 4
 #define HCI_LTK_REQ_REPLY_PLEN 21
+#define HCI_READ_LOCAL_P256_PUBLIC_KEY_PLEN 3
+#define HCI_GENERATE_DHKEY_PLEN 67
 
 
 
@@ -818,6 +823,8 @@ typedef err_t (* conn_complete_fun_cb)(void *arg, struct bd_addr_t *bdaddr);
 typedef err_t (* hardware_error_fun_cb)(uint8_t reson);
 typedef err_t (* ltk_request_fun_cb)(struct bd_addr_t *bdaddr,uint8_t *random,uint16_t ediv);
 typedef err_t (* enc_change_fun_cb)(struct bd_addr_t *bdaddr,uint8_t enc);
+typedef err_t (* local_p256_public_key_fun_cb)(uint8_t *public_key);
+typedef err_t (* dhkey_complete_fun_cb)(uint8_t dhkey[32]);
 
 
 
@@ -870,6 +877,8 @@ typedef struct
 	hardware_error_fun_cb hardware_error;
 	ltk_request_fun_cb ltk_req;
 	enc_change_fun_cb enc_change;
+	local_p256_public_key_fun_cb public_key;
+	dhkey_complete_fun_cb dhkey_complete;
 }hci_pcb_t;
 
 
@@ -890,6 +899,8 @@ void hci_register_connection_complete(conn_complete_fun_cb conn_complete);
 void hci_register_hardware_error(hardware_error_fun_cb hardware_error);
 void hci_register_ltk_req(ltk_request_fun_cb ltk_req);
 void hci_register_enc_change(enc_change_fun_cb enc_change);
+void hci_register_public_key(local_p256_public_key_fun_cb public_key);
+void hci_register_dhkey_complete(dhkey_complete_fun_cb dhkey_complete);
 
 
 uint8_t hci_get_version(void);
@@ -965,6 +976,7 @@ err_t hci_write_ssp_mode(uint8_t ssp_mode);
 err_t hci_write_le_enable(uint8_t le_support,uint8_t simultaneous);
 /* OGF = 0x04 INFORMATIONAL PARAMETERS */
 err_t hci_read_local_version_info(void);
+err_t hci_read_local_support_cmd(void);
 err_t hci_read_buffer_size(void);
 err_t hci_read_bd_addr(rbd_complete_fun_cb rbd_complete);
 /* OGF = 0x05 STATUS PARAMETERS */
@@ -973,7 +985,7 @@ err_t hci_read_rssi(struct bd_addr_t *bdaddr);
 err_t hci_enable_dut_mode(void);
 /* OGF = 0x08 LE CONTROLLER COMMANDS */
 #if BT_BLE_ENABLE > 0
-err_t hci_le_set_event_mask(uint32_t mask_lo,uint32_t mask_hi);
+err_t hci_le_set_event_mask(uint8_t mask[8]);
 err_t hci_le_read_buffer_size(void);
 err_t hci_le_read_local_support_feature(void);
 err_t hci_le_set_random_address(struct bd_addr_t *bdaddr);
@@ -989,6 +1001,8 @@ err_t hci_le_set_adv_enable(uint8_t enable);
 err_t hci_le_create_connection(void);
 
 err_t hci_le_ltk_req_reply(struct bd_addr_t *bdaddr,uint8_t *ltk);
+err_t hci_le_read_p256_public_key(void);
+err_t hci_le_generate_dhkey(uint8_t *remote_public_key);
 
 #endif
 

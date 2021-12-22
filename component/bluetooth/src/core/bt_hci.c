@@ -88,6 +88,13 @@ static hci_pcb_t *hci_pcb = NULL;
 #define HCI_EVENT_ENC_CHANGE(pcb,bdaddr,enc) \
 							if((pcb)->enc_change != NULL) \
 							((pcb)->enc_change((bdaddr),(enc)))
+#define HCI_EVENT_PUBLIC_KEY(pcb,key) \
+							if((pcb)->public_key != NULL) \
+							((pcb)->public_key((key)))
+#define HCI_EVENT_DHKEY_COMPLETE(pcb,key) \
+							if((pcb)->dhkey_complete != NULL) \
+							((pcb)->dhkey_complete((key)))
+
 
 
 
@@ -286,6 +293,15 @@ void hci_register_enc_change(enc_change_fun_cb enc_change)
 	hci_pcb->enc_change = enc_change;
 }
 
+void hci_register_public_key(local_p256_public_key_fun_cb public_key)
+{
+	hci_pcb->public_key = public_key;
+}
+
+void hci_register_dhkey_complete(dhkey_complete_fun_cb dhkey_complete)
+{
+	hci_pcb->dhkey_complete = dhkey_complete;
+}
 
 
 void hci_register_write_policy_complete(wlp_complete_fun_cb wlp_complete)
@@ -957,7 +973,43 @@ static err_t _hci_le_meta_evt_process(uint8_t *payload,uint16_t payload_len)
 		HCI_EVENT_LTK_REQ(hci_pcb,&link->bdaddr,random,ediv);
 		break;
 	}
+	case HCI_SUBEVENT_LE_READ_LOCAL_P256_PUBLIC_KEY_COMPLETE:
+	{
+		uint8_t *public_key = payload+2;
+		HCI_EVENT_PUBLIC_KEY(hci_pcb,public_key);
+		break;
+	}
+	case HCI_SUBEVENT_LE_GENERATE_DHKEY_COMPLETE:
+	{
+		uint8_t *dhkey = payload+2;
+		HCI_EVENT_DHKEY_COMPLETE(hci_pcb,dhkey);
+		break;
+	}
+	case HCI_SUBEVENT_LE_ENHANCED_CONN_COMPLETE:
+	{
+		uint16_t con_handle = bt_le_read_16(payload,2);
+        hci_link_t * link = _hci_get_link_by_handle(con_handle);
+        struct bd_addr_t *bdaddr = (struct bd_addr_t *)(payload+6);
 
+        if(link == NULL)
+        {
+            if((link = _hci_new_link()) == NULL)
+            {
+                /* Could not allocate memory for link. Disconnect */
+                BT_HCI_TRACE_DEBUG("hci_event_input: Could not allocate memory for link. Disconnect\n");
+                break;
+            }
+            bd_addr_set(&(link->bdaddr), bdaddr);
+            bt_hex_dump((uint8_t *)&(link->bdaddr),6);
+			link->role = HCI_ROLE_SLAVE;
+            link->conhdl = con_handle;
+            HCI_REG(&(hci_active_links), link);
+            link->state = OPEN;
+
+			le_connect_handler(bdaddr,link->role);
+        }
+        break;
+	}
     default:
         break;
     }
@@ -1058,15 +1110,22 @@ static err_t _hci_init_cmd_compl_process(uint8_t *payload,uint16_t payload_len)
         break;
     }
     case HCI_OP_WRITE_PAGE_TOUT:
-    {
+    {		
         BT_HCI_TRACE_DEBUG("Init recv HCI_OP_WRITE_PAGE_TOUT\n");
+		hci_read_local_support_cmd();
+
+        break;
+    }
+	case HCI_OP_READ_LOCAL_SUPPORTED_CMDS:
+	{
+		BT_HCI_TRACE_DEBUG("Init recv HCI_OP_READ_LOCAL_SUPPORTED_CMDS\n");
 #if BT_BLE_ENABLE > 0
         hci_set_event_mask(0xffffffff,0x3FFFFFFF);
 #else
         hci_set_event_mask(0xffffffff, 0x1FFFFFFF); /* base 0x1FFFFFFF:Add LE Meta event(bit 61) */
 #endif
-        break;
-    }
+		break;
+	}
     case HCI_OP_SET_EVENT_MASK:
     {
         BT_HCI_TRACE_DEBUG("Init recv HCI_OP_SET_EVENT_MASK\n");
@@ -1100,8 +1159,9 @@ static err_t _hci_init_cmd_compl_process(uint8_t *payload,uint16_t payload_len)
 #if BT_BLE_ENABLE > 0
     case HCI_OP_WRITE_LE_SUPPORT:
     {
+		uint8_t event_mask[8] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,0}; 
         BT_HCI_TRACE_DEBUG("Init recv HCI_OP_WRITE_LE_SUPPORT\n");
-        hci_le_set_event_mask(0xff,0x0); /* some bt modem back invalid commmand para,do not care,skip it */
+        hci_le_set_event_mask(event_mask); /* some bt modem back invalid commmand para,do not care,skip it */
         break;
     }
     case HCI_OP_BLE_SET_EVENT_MASK:
@@ -3039,6 +3099,23 @@ err_t hci_read_local_version_info(void)
     return BT_ERR_OK;
 }
 
+err_t hci_read_local_support_cmd(void)
+{
+	struct bt_pbuf_t *p;
+    if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_R_LOCAL_SUPPORT_CMD_PLEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_MEM;
+    }
+    /* Assembling command packet */
+    p = hci_cmd_ass(p, HCI_READ_LOCAL_SUPPORT_CMD, HCI_INFO_PARAM, HCI_R_LOCAL_SUPPORT_CMD_PLEN);
+    /* Assembling cmd prameters */
+    phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
+    bt_pbuf_free(p);
+
+    return BT_ERR_OK;
+}
+
 
 err_t hci_read_buffer_size(void)
 {
@@ -3129,7 +3206,7 @@ err_t hci_enable_dut_mode(void)
 
 #if BT_BLE_ENABLE > 0
 
-err_t hci_le_set_event_mask(uint32_t mask_lo,uint32_t mask_hi)
+err_t hci_le_set_event_mask(uint8_t mask[8])
 {
     struct bt_pbuf_t *p;
     if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_SET_LE_EVENT_MASK_PLEN, BT_PBUF_RAM)) == NULL)
@@ -3142,8 +3219,7 @@ err_t hci_le_set_event_mask(uint32_t mask_lo,uint32_t mask_hi)
     /* Assembling command packet */
     p = hci_cmd_ass(p, HCI_LE_SET_EVT_MASK, HCI_LE, HCI_SET_LE_EVENT_MASK_PLEN);
     /* Assembling cmd prameters */
-    bt_le_store_32((uint8_t *)p->payload,3,mask_lo);
-    bt_le_store_32((uint8_t *)p->payload,7,mask_hi);
+    memcpy((uint8_t *)p->payload+3,mask,8);
     phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
     bt_pbuf_free(p);
 
@@ -3391,6 +3467,45 @@ err_t hci_le_ltk_req_reply(struct bd_addr_t *bdaddr,uint8_t *ltk)
 	offset += 2;
 
 	memcpy(((uint8_t *)p->payload)+offset, ltk, 16);
+
+    phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
+    bt_pbuf_free(p);
+
+    return BT_ERR_OK;
+}
+
+err_t hci_le_read_p256_public_key(void)
+{
+	struct bt_pbuf_t *p;
+
+    if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_READ_LOCAL_P256_PUBLIC_KEY_PLEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_MEM;
+    }
+
+    /* Assembling command packet */
+    p = hci_cmd_ass(p, HCI_LE_READ_LOCAL_P256_PUBLIC_KEY, HCI_LE, HCI_READ_LOCAL_P256_PUBLIC_KEY_PLEN);
+
+    phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
+    bt_pbuf_free(p);
+
+    return BT_ERR_OK;
+}
+
+err_t hci_le_generate_dhkey(uint8_t *remote_public_key)
+{
+	struct bt_pbuf_t *p;
+
+    if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_GENERATE_DHKEY_PLEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_MEM;
+    }
+
+    /* Assembling command packet */
+    p = hci_cmd_ass(p, HCI_LE_GENERATE_DHKEY, HCI_LE, HCI_GENERATE_DHKEY_PLEN);
+	memcpy(((uint8_t *)p->payload)+3, remote_public_key, 64);
 
     phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
     bt_pbuf_free(p);

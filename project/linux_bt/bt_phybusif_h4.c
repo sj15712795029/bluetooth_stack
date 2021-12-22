@@ -22,7 +22,7 @@
 #include <unistd.h>
 #include "bt_snoop.h"
 
-#define PHYBUSIF_NAME "/dev/ttyUSB0"
+#define PHYBUSIF_NAME "/dev/ttyUSB1"
 
 struct phybusif_cb uart_if;
 
@@ -277,7 +277,7 @@ void phybusif_output(struct bt_pbuf_t *p, uint16_t len,uint8_t packet_type)
     bt_pbuf_copy_partial(p, tx_buffer, p->tot_len, 0);
 
     BT_TRANSPORT_TRACE_DEBUG("BT TX LEN:totol len:%d, len:%d\n",p->tot_len,len);
-    bt_hex_dump(tx_buffer,len+1);
+    //bt_hex_dump(tx_buffer,len+1);
 
 #if BT_ENABLE_SNOOP > 0
     bt_snoop_write(packet_type,0,tx_buffer+1,len);

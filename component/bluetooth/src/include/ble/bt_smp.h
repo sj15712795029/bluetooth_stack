@@ -89,12 +89,13 @@
 #define SMP_PAIR_RSP_PACK_LEN 7
 #define SMP_PAIR_CONFIRM_PACK_LEN 17
 #define SMP_PAIR_RANDOM_PACK_LEN 17
+#define SMP_PAIR_PUBLIC_KEY_PLEN 65
+#define SMP_PAIR_DHKEY_CHECK 17
 #define SMP_PAIR_FAIL_PACK_LEN 2
 #define SMP_ENC_INFO_PACK_LEN 17
 #define SMP_MASTER_ID_PACK_LEN 11
 #define SMP_ID_INFO_PACK_LEN 17
 #define SMP_ID_ADDR_INFO_PACK_LEN 8
-
 
 
 typedef struct _smp_pcb_t
@@ -108,12 +109,24 @@ typedef struct _smp_pcb_t
 	uint8_t use_sc;
 	uint8_t pairing_method;
 
+	uint8_t sc_mackey[16];
+	uint8_t sc_tk[16];
+	uint8_t remote_dhkey_check[16];
+
+	uint8_t sc_na[16];
+	uint8_t sc_nb[16];
+	uint32_t sc_vb;
+
+	uint8_t sc_local_dhkey[32];
 	uint8_t local_random[16];
 	uint8_t remote_random[16];
 	uint8_t remote_confirm[16];
 
 	uint8_t tk[16];
 	uint8_t stk[16];
+
+	uint8_t local_sc_public_key[64];
+	uint8_t remote_sc_public_key[64];
 
     uint8_t remote_io_cap;
     uint8_t remote_oob_flag;

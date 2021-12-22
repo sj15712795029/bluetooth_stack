@@ -24,6 +24,9 @@ smp_pcb_t *smp_tmp_pcb;
                             } while(0)
 
 
+uint8_t sc_public_key[64] = {0};
+uint8_t sc_local_dhkey[32] = {0};
+
 static const uint8_t smp_legacy_pair_table[2][5][5] =
 {
     /* display only */	 /* Display Yes/No */	/* keyboard only */
@@ -104,10 +107,10 @@ static const uint8_t smp_sc_pair_table[2][5][5] =
     /* No InputOutput */  /* keyboard display */
 
     /* initiator */
-    /* model = tbl[peer_io_caps][loc_io_caps] */   
-    {   
-		/* Display Only */
-		{
+    /* model = tbl[peer_io_caps][loc_io_caps] */
+    {
+        /* Display Only */
+        {
             SMP_MODEL_SEC_CONN_JUSTWORKS, SMP_MODEL_SEC_CONN_JUSTWORKS, SMP_MODEL_SEC_CONN_PASSKEY_ENT,
             SMP_MODEL_SEC_CONN_JUSTWORKS, SMP_MODEL_SEC_CONN_PASSKEY_ENT
         },
@@ -138,10 +141,10 @@ static const uint8_t smp_sc_pair_table[2][5][5] =
     },
 
     /* responder */
-    /* model = tbl[loc_io_caps][peer_io_caps] */   
-    {   
-		/* Display Only */
-		{
+    /* model = tbl[loc_io_caps][peer_io_caps] */
+    {
+        /* Display Only */
+        {
             SMP_MODEL_SEC_CONN_JUSTWORKS, SMP_MODEL_SEC_CONN_JUSTWORKS, SMP_MODEL_SEC_CONN_PASSKEY_DISP,
             SMP_MODEL_SEC_CONN_JUSTWORKS, SMP_MODEL_SEC_CONN_PASSKEY_DISP
         },
@@ -180,6 +183,8 @@ static err_t smp_send_pair_rsp(smp_pcb_t *smp_pcb);
 static err_t smp_send_pair_confirm(smp_pcb_t *smp_pcb,uint8_t confirm[16]);
 static err_t smp_send_pair_fail(smp_pcb_t *smp_pcb,uint8_t reason);
 static err_t smp_send_pair_random(smp_pcb_t *smp_pcb,uint8_t random[16]);
+static err_t smp_send_pair_public_key(smp_pcb_t *smp_pcb,uint8_t *public_key);
+static err_t smp_send_pair_dhkey_check(smp_pcb_t *smp_pcb,uint8_t dhkey_check[16]);
 static err_t smp_send_enc_info(smp_pcb_t *smp_pcb,uint8_t ltk[16]);
 static err_t smp_send_master_id(smp_pcb_t *smp_pcb,uint16_t ediv,uint8_t rand[8]);
 static err_t smp_send_id_info(smp_pcb_t *smp_pcb,uint8_t irk[16]);
@@ -187,6 +192,8 @@ static err_t smp_send_id_addr_info(smp_pcb_t *smp_pcb,uint8_t addr_type,uint8_t 
 static err_t smp_handle_pairing_req(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p);
 static err_t smp_handle_pairing_confirm(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p);
 static err_t smp_handle_pairing_random(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p);
+static err_t smp_handle_pairing_public_key(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p);
+static err_t smp_handle_dhkey_check(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p);
 static err_t smp_distribution_key(smp_pcb_t *smp_pcb);
 static uint8_t smp_select_pairing_method(smp_pcb_t *smp_pcb);
 
@@ -268,7 +275,7 @@ err_t l2cap_smp_connect(void *arg, l2cap_pcb_t *l2cap_pcb, err_t err)
     bd_addr_set(&(smp_pcb->remote_addr),&(l2cap_pcb->remote_bdaddr));
     SMP_PCB_REG(&smp_active_pcbs, smp_pcb);
 
-	if(smp_cbs && smp_cbs->smp_connect_set_up)
+    if(smp_cbs && smp_cbs->smp_connect_set_up)
         smp_cbs->smp_connect_set_up(&smp_pcb->remote_addr,BT_ERR_OK);
 
     return BT_ERR_OK;
@@ -282,7 +289,7 @@ err_t l2cap_smp_disconnect(void *arg, l2cap_pcb_t *l2cap_pcb, err_t err)
     if(smp_pcb)
     {
         SMP_PCB_RMV(&smp_active_pcbs, smp_pcb);
-        smp_pcb_close(smp_pcb);      
+        smp_pcb_close(smp_pcb);
     }
     else
     {
@@ -290,10 +297,10 @@ err_t l2cap_smp_disconnect(void *arg, l2cap_pcb_t *l2cap_pcb, err_t err)
         return BT_ERR_CONN;
     }
 
-	if(smp_cbs && smp_cbs->smp_connect_realease)
+    if(smp_cbs && smp_cbs->smp_connect_realease)
         smp_cbs->smp_connect_realease(&smp_pcb->remote_addr,BT_ERR_OK);
-	
-	return BT_ERR_OK;
+
+    return BT_ERR_OK;
 }
 
 err_t l2cap_smp_input(void *arg, l2cap_pcb_t *l2cap_pcb, struct bt_pbuf_t *p, err_t err)
@@ -334,8 +341,10 @@ err_t l2cap_smp_input(void *arg, l2cap_pcb_t *l2cap_pcb, struct bt_pbuf_t *p, er
         case SMP_OPCODE_SEC_REQ:
             break;
         case SMP_OPCODE_PAIR_PUBLIC_KEY:
+            smp_handle_pairing_public_key(smp_pcb,p);
             break;
         case SMP_OPCODE_PAIR_DHKEY_CHECK:
+			smp_handle_dhkey_check(smp_pcb,p);
             break;
         case SMP_OPCODE_PAIR_KEYPR_NOTIF:
             break;
@@ -366,7 +375,11 @@ err_t smp_ltk_request_handle(struct bd_addr_t *bdaddr,uint8_t *random,uint16_t e
         BT_SMP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] smp_pcb is NULL\n",__FILE__,__FUNCTION__,__LINE__);
         return BT_ERR_CONN;
     }
-    hci_le_ltk_req_reply(bdaddr,smp_pcb->stk);
+
+	if(smp_pcb->use_sc)
+		hci_le_ltk_req_reply(bdaddr,smp_pcb->sc_tk);
+	else
+    	hci_le_ltk_req_reply(bdaddr,smp_pcb->stk);
 
     return BT_ERR_OK;
 }
@@ -388,6 +401,27 @@ err_t smp_enc_change_handle(struct bd_addr_t *bdaddr,uint8_t enc)
     return BT_ERR_OK;
 }
 
+err_t smp_local_p256_public_key_handle(uint8_t *public_key)
+{
+    BT_SMP_TRACE_DEBUG("smp_local_p256_public_key_handle public key:\n");
+    memcpy(sc_public_key,public_key,sizeof(sc_public_key));
+
+    bt_hex_dump(sc_public_key,64);
+
+    return BT_ERR_OK;
+}
+
+err_t smp_dhkey_complete_handle(uint8_t dhkey[32])
+{
+    BT_SMP_TRACE_DEBUG("smp_dhkey_complete_handle dhkey:\n");
+    memcpy(sc_local_dhkey,dhkey,sizeof(sc_local_dhkey));
+
+    bt_hex_dump(sc_local_dhkey,32);
+
+    return BT_ERR_OK;
+}
+
+
 
 err_t smp_init(smp_cbs_t *cb)
 {
@@ -395,6 +429,8 @@ err_t smp_init(smp_cbs_t *cb)
 
     hci_register_ltk_req(smp_ltk_request_handle);
     hci_register_enc_change(smp_enc_change_handle);
+    hci_register_public_key(smp_local_p256_public_key_handle);
+	hci_register_dhkey_complete(smp_dhkey_complete_handle);
     l2cap_fixed_channel_register_recv(L2CAP_SM_CID,l2cap_smp_connect,l2cap_smp_disconnect,l2cap_smp_input);
 
     return BT_ERR_OK;
@@ -464,6 +500,46 @@ static err_t smp_send_pair_random(smp_pcb_t *smp_pcb,uint8_t random[16])
 
     return BT_ERR_OK;
 }
+
+static err_t smp_send_pair_public_key(smp_pcb_t *smp_pcb,uint8_t *public_key)
+{
+    struct bt_pbuf_t *send_pbuf;
+    if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, SMP_PAIR_PUBLIC_KEY_PLEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_SMP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+
+        return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
+    }
+
+    ((uint8_t *)send_pbuf->payload)[0] = SMP_OPCODE_PAIR_PUBLIC_KEY;
+    memcpy(((uint8_t *)send_pbuf->payload)+1,public_key,64);
+
+    smp_send_data(smp_pcb,send_pbuf);
+    bt_pbuf_free(send_pbuf);
+
+    return BT_ERR_OK;
+}
+
+static err_t smp_send_pair_dhkey_check(smp_pcb_t *smp_pcb,uint8_t dhkey_check[16])
+{
+	struct bt_pbuf_t *send_pbuf;
+    if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, SMP_PAIR_DHKEY_CHECK, BT_PBUF_RAM)) == NULL)
+    {
+        BT_SMP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+
+        return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
+    }
+
+    ((uint8_t *)send_pbuf->payload)[0] = SMP_OPCODE_PAIR_DHKEY_CHECK;
+    memcpy(((uint8_t *)send_pbuf->payload)+1,dhkey_check,16);
+
+    smp_send_data(smp_pcb,send_pbuf);
+    bt_pbuf_free(send_pbuf);
+
+    return BT_ERR_OK;
+}
+
+
 
 static err_t smp_send_enc_info(smp_pcb_t *smp_pcb,uint8_t ltk[16])
 {
@@ -623,8 +699,8 @@ static err_t smp_handle_pairing_req(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p)
         smp_pcb->local_auth_req &= ~SMP_H7_SUPPORT_BIT;
     }
 
-	smp_pcb->pairing_method = smp_select_pairing_method(smp_pcb);
-	BT_SMP_TRACE_DEBUG("pairing_method(%d)\n",smp_pcb->pairing_method);
+    smp_pcb->pairing_method = smp_select_pairing_method(smp_pcb);
+    BT_SMP_TRACE_DEBUG("pairing_method(%d)\n",smp_pcb->pairing_method);
 
     smp_send_pair_rsp(smp_pcb);
 
@@ -644,41 +720,41 @@ static err_t smp_handle_pairing_confirm(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p)
     *(uint32_t *)(smp_pcb->local_random+8) = rand();
     *(uint32_t *)(smp_pcb->local_random+12) = rand();
 
-	bt_hex_dump(smp_pcb->tk,sizeof(smp_pcb->tk)); 
+    bt_hex_dump(smp_pcb->tk,sizeof(smp_pcb->tk));
 
 
-	switch(smp_pcb->pairing_method)
-	{
-		case SMP_MODEL_ENCRYPTION_ONLY:
-			memset(smp_pcb->tk,0,sizeof(smp_pcb->tk));
-			break;
-		case SMP_MODEL_PASSKEY:
-		{
-			uint32_t input_passkey;
+    switch(smp_pcb->pairing_method)
+    {
+    case SMP_MODEL_ENCRYPTION_ONLY:
+        memset(smp_pcb->tk,0,sizeof(smp_pcb->tk));
+        break;
+    case SMP_MODEL_PASSKEY:
+    {
+        uint32_t input_passkey;
 
-			if(smp_cbs && smp_cbs->smp_passkey_input)
-        		smp_cbs->smp_passkey_input(&smp_pcb->remote_addr,&input_passkey);
-			BT_SMP_TRACE_DEBUG("Input passkey:%d\n",input_passkey);
-			
-			bt_le_store_32(smp_pcb->tk,0,input_passkey);
-			break;
-		}
-		case SMP_MODEL_OOB:
-			break;
-		case SMP_MODEL_KEY_NOTIF:
-		{
-			uint32_t gen_passkey = rand() & 999999;
+        if(smp_cbs && smp_cbs->smp_passkey_input)
+            smp_cbs->smp_passkey_input(&smp_pcb->remote_addr,&input_passkey);
+        BT_SMP_TRACE_DEBUG("Input passkey:%d\n",input_passkey);
 
-			bt_le_store_32(smp_pcb->tk,0,gen_passkey);
-			
-			if(smp_cbs && smp_cbs->smp_passkey_display)
-        		smp_cbs->smp_passkey_display(&smp_pcb->remote_addr,gen_passkey);
-			break;
-		}
-		default:
-			break;
-	}
-			
+        bt_le_store_32(smp_pcb->tk,0,input_passkey);
+        break;
+    }
+    case SMP_MODEL_OOB:
+        break;
+    case SMP_MODEL_KEY_NOTIF:
+    {
+        uint32_t gen_passkey = rand() & 999999;
+
+        bt_le_store_32(smp_pcb->tk,0,gen_passkey);
+
+        if(smp_cbs && smp_cbs->smp_passkey_display)
+            smp_cbs->smp_passkey_display(&smp_pcb->remote_addr,gen_passkey);
+        break;
+    }
+    default:
+        break;
+    }
+
     smp_c1(smp_pcb->tk, smp_pcb->local_random, smp_pcb->pair_req_buf,smp_pcb->pair_rsp_buf,
            (uint8_t *)&smp_pcb->remote_addr,1, hci_get_local_addr(),0, rsp);
 
@@ -693,29 +769,118 @@ static err_t smp_handle_pairing_random(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p)
     uint8_t *remote_random = ((uint8_t *)p->payload)+1;
     BT_SMP_TRACE_DEBUG("smp_handle_pairing_random\n");
 
-    memcpy(smp_pcb->remote_random,remote_random,16);
-    smp_c1(smp_pcb->tk, remote_random, smp_pcb->pair_req_buf,smp_pcb->pair_rsp_buf,
-           (uint8_t *)&smp_pcb->remote_addr,1, hci_get_local_addr(),0, confirm);
-
-    if(memcmp(confirm,smp_pcb->remote_confirm,16))
+    if(smp_pcb->use_sc)
     {
-        BT_SMP_TRACE_ERROR("pairing confirm check fail\n");
-        smp_send_pair_fail(smp_pcb,SMP_CONFIRM_VALUE_ERR);
-        return BT_ERR_VAL;
+    	memcpy(smp_pcb->sc_na,remote_random,16);
+    	smp_send_pair_random(smp_pcb,smp_pcb->sc_nb);
+
+		smp_g2(smp_pcb->remote_sc_public_key,smp_pcb->local_sc_public_key,smp_pcb->sc_na,smp_pcb->sc_nb,&smp_pcb->sc_vb);
+
+		BT_SMP_TRACE_DEBUG("smp_pcb->sc_vb:%d\n",smp_pcb->sc_vb);
     }
     else
     {
-        BT_SMP_TRACE_DEBUG("pairing confirm check pass\n");
+        memcpy(smp_pcb->remote_random,remote_random,16);
+        smp_c1(smp_pcb->tk, remote_random, smp_pcb->pair_req_buf,smp_pcb->pair_rsp_buf,
+               (uint8_t *)&smp_pcb->remote_addr,1, hci_get_local_addr(),0, confirm);
+
+        if(memcmp(confirm,smp_pcb->remote_confirm,16))
+        {
+            BT_SMP_TRACE_ERROR("pairing confirm check fail\n");
+            smp_send_pair_fail(smp_pcb,SMP_CONFIRM_VALUE_ERR);
+            return BT_ERR_VAL;
+        }
+        else
+        {
+            BT_SMP_TRACE_DEBUG("pairing confirm check pass\n");
+        }
+
+        smp_send_pair_random(smp_pcb,smp_pcb->local_random);
+
+        smp_s1(smp_pcb->tk,smp_pcb->local_random,remote_random, smp_pcb->stk);
+        BT_SMP_TRACE_DEBUG("STK:%s\n",bt_hex_string(smp_pcb->stk,16));
     }
-
-    smp_send_pair_random(smp_pcb,smp_pcb->local_random);
-
-    smp_s1(smp_pcb->tk,smp_pcb->local_random,remote_random, smp_pcb->stk);
-    BT_SMP_TRACE_DEBUG("STK:%s\n",bt_hex_string(smp_pcb->stk,16));
-
 
     return BT_ERR_OK;
 }
+
+static err_t smp_handle_pairing_public_key(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p)
+{
+    uint8_t sc_cb[16] = {0};
+    *(uint32_t *)(smp_pcb->sc_nb) = rand();
+    *(uint32_t *)(smp_pcb->sc_nb+4) = rand();
+    *(uint32_t *)(smp_pcb->sc_nb+8) = rand();
+    *(uint32_t *)(smp_pcb->sc_nb+12) = rand();
+
+    BT_SMP_TRACE_DEBUG("smp_handle_pairing_public_key\n");
+    memcpy(smp_pcb->remote_sc_public_key,((uint8_t *)p->payload)+1,64);
+
+    bt_hex_dump(smp_pcb->remote_sc_public_key,64);
+
+	hci_le_generate_dhkey(smp_pcb->remote_sc_public_key);
+
+    memcpy(smp_pcb->local_sc_public_key,sc_public_key,64);
+    smp_send_pair_public_key(smp_pcb,smp_pcb->local_sc_public_key);
+
+    smp_f4(smp_pcb->local_sc_public_key,smp_pcb->remote_sc_public_key,smp_pcb->sc_nb,0,sc_cb);
+    smp_send_pair_confirm(smp_pcb,sc_cb);
+
+	return BT_ERR_OK;
+}
+
+static err_t smp_handle_dhkey_check(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p)
+{
+	uint8_t ra[16] = {0};
+	uint8_t rb[16] = {0};
+	uint8_t local_dhkey_check[16];
+	uint8_t calc_remote_dhkey_check[16];
+	BT_SMP_TRACE_DEBUG("smp_handle_dhkey_check\n");
+	memcpy(smp_pcb->remote_dhkey_check,((uint8_t *)p->payload)+1,16);
+
+	BT_SMP_TRACE_DEBUG("----- remote_dhkey_check -----\n");
+	bt_hex_dump(smp_pcb->remote_dhkey_check,16);
+	BT_SMP_TRACE_DEBUG("------------------------------\n");
+
+	memcpy(smp_pcb->sc_local_dhkey,sc_local_dhkey,sizeof(smp_pcb->sc_local_dhkey));
+
+	/* calculate LTK and mackey */
+	smp_f5(smp_pcb->sc_local_dhkey, smp_pcb->sc_na, smp_pcb->sc_nb,
+		   (uint8_t *)&smp_pcb->remote_addr,1,hci_get_local_addr(),0, 
+		   smp_pcb->sc_mackey,smp_pcb->sc_tk);
+
+	BT_SMP_TRACE_DEBUG("------ mackey ----------------\n");
+	bt_hex_dump(smp_pcb->sc_mackey,16);
+	BT_SMP_TRACE_DEBUG("------------------------------\n");
+
+	BT_SMP_TRACE_DEBUG("------- sc_tk ----------------\n");
+	bt_hex_dump(smp_pcb->sc_tk,16);
+	BT_SMP_TRACE_DEBUG("------------------------------\n");
+
+	/* calculate local DHKey check */
+	smp_f6(smp_pcb->sc_mackey, smp_pcb->sc_nb, smp_pcb->sc_na, ra, &smp_pcb->local_io_cap,
+		   hci_get_local_addr(),0,(uint8_t *)&smp_pcb->remote_addr,1,local_dhkey_check);
+	BT_SMP_TRACE_DEBUG("------ local_dhkey_check -----\n");
+	bt_hex_dump(local_dhkey_check,16);
+	BT_SMP_TRACE_DEBUG("------------------------------\n");
+
+	/* calculate remote DHKey check */
+	smp_f6(smp_pcb->sc_mackey, smp_pcb->sc_na, smp_pcb->sc_nb, rb, &smp_pcb->remote_io_cap,
+		   (uint8_t *)&smp_pcb->remote_addr,1,hci_get_local_addr(),0,calc_remote_dhkey_check);
+	BT_SMP_TRACE_DEBUG("--- calc_remote_dhkey_check --\n");
+	bt_hex_dump(calc_remote_dhkey_check,16);
+	BT_SMP_TRACE_DEBUG("------------------------------\n");
+
+	if(memcmp(smp_pcb->remote_dhkey_check,calc_remote_dhkey_check,16))
+	{
+		smp_send_pair_fail(smp_pcb,SMP_DHKEY_CHK_FAIL);
+		return BT_ERR_CLSD;
+	}
+
+	smp_send_pair_dhkey_check(smp_pcb,local_dhkey_check);
+	return BT_ERR_OK;
+	
+}
+
 
 static err_t smp_distribution_key(smp_pcb_t *smp_pcb)
 {
@@ -748,13 +913,14 @@ static err_t smp_distribution_key(smp_pcb_t *smp_pcb)
 }
 
 
+
 static uint8_t smp_select_pairing_method(smp_pcb_t *smp_pcb)
 {
     uint8_t pairing_method = SMP_MODEL_OUT_OF_RANGE;
     BT_SMP_TRACE_DEBUG("%s remote_io_cap(%d) local_io_cap(%d)\n",__FUNCTION__, smp_pcb->remote_io_cap, smp_pcb->local_io_cap);
     BT_SMP_TRACE_DEBUG("%s remote_oob_flag(%d) local_oob_flag(%d)\n",__FUNCTION__, smp_pcb->remote_oob_flag, smp_pcb->local_oob_flag);
     BT_SMP_TRACE_DEBUG("%s remote_auth_req(0x%02x) local_auth_req(0x%02x)\n",__FUNCTION__, smp_pcb->remote_auth_req, smp_pcb->local_auth_req);
- 
+
     if ((smp_pcb->remote_auth_req & SMP_SC_SUPPORT_BIT) && (smp_pcb->local_auth_req & SMP_SC_SUPPORT_BIT))
     {
         smp_pcb->use_sc = 1;
@@ -767,14 +933,14 @@ static uint8_t smp_select_pairing_method(smp_pcb_t *smp_pcb)
         /* base on Core5.3 page 1573:Table 2.7: Rules for using Out-of-Band and MITM flags for LE Secure Connections pairing */
         if (smp_pcb->remote_oob_flag == SMP_OOB_PRESENT || smp_pcb->local_oob_flag == SMP_OOB_PRESENT)
         {
-        	BT_SMP_TRACE_DEBUG("return pair method SMP_MODEL_SEC_CONN_OOB\n");
+            BT_SMP_TRACE_DEBUG("return pair method SMP_MODEL_SEC_CONN_OOB\n");
             return SMP_MODEL_SEC_CONN_OOB;
         }
 
         /* base on Core5.3 page 1573:Table 2.7: Rules for using Out-of-Band and MITM flags for LE Secure Connections pairing */
         if ((!(smp_pcb->remote_auth_req & SMP_AUTH_MIMT_BIT)) && (!(smp_pcb->local_auth_req & SMP_AUTH_MIMT_BIT)))
         {
-        	BT_SMP_TRACE_DEBUG("return pair method SMP_MODEL_SEC_CONN_JUSTWORKS\n");
+            BT_SMP_TRACE_DEBUG("return pair method SMP_MODEL_SEC_CONN_JUSTWORKS\n");
             return SMP_MODEL_SEC_CONN_JUSTWORKS;
         }
 
@@ -792,16 +958,16 @@ static uint8_t smp_select_pairing_method(smp_pcb_t *smp_pcb)
         /* base on Core5.3 page 1572:Table 2.6: Rules for using Out-of-Band and MITM flags for LE legacy pairing */
         if ((smp_pcb->remote_oob_flag == SMP_OOB_PRESENT) && (smp_pcb->local_oob_flag == SMP_OOB_PRESENT))
         {
-        	BT_SMP_TRACE_DEBUG("return pair method SMP_MODEL_OOB\n");
+            BT_SMP_TRACE_DEBUG("return pair method SMP_MODEL_OOB\n");
             return SMP_MODEL_OOB;
         }
 
         /* base on Core5.3 page 1572:Table 2.6: Rules for using Out-of-Band and MITM flags for LE legacy pairing */
         if ((!(smp_pcb->remote_auth_req & SMP_AUTH_MIMT_BIT)) && (!(smp_pcb->local_auth_req & SMP_AUTH_MIMT_BIT)))
         {
-        	BT_SMP_TRACE_DEBUG("return pair method SMP_MODEL_ENCRYPTION_ONLY\n");
+            BT_SMP_TRACE_DEBUG("return pair method SMP_MODEL_ENCRYPTION_ONLY\n");
             return SMP_MODEL_ENCRYPTION_ONLY;
-		}
+        }
 
         if (smp_pcb->l2cappcb->conn_role == HCI_ROLE_MASTER)
         {

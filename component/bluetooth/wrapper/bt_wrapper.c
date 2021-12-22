@@ -250,21 +250,6 @@ static err_t  link_key_not(void *arg, struct bd_addr_t *bdaddr, uint8_t *key,uin
     return 0;
 }
 
-err_t bt_stack_worked(void *arg)
-{
-    printf("bt_stack_worked\r\n");
-    bt_ass_eir_data();
-    hci_write_eir(eir_data);
-
-    if(bt_wrapper_cb && bt_wrapper_cb->app_common_cb && bt_wrapper_cb->app_common_cb->bt_init_result)
-    {
-        bt_wrapper_cb->app_common_cb->bt_init_result(BT_INIT_SUCCESS,bt_profile_mask);
-    }
-
-
-    return 0;
-}
-
 err_t bt_hardware_error(uint8_t reson)
 {
     printf("bt_hardware_error\r\n");
@@ -1168,8 +1153,11 @@ static smp_cbs_t smp_wrapper_cb =
 #endif
 
 
-uint8_t bt_start(bt_app_cb_t *app_cb)
+
+err_t bt_stack_worked(void *arg)
 {
+    printf("bt_stack_worked\r\n");
+
 #if PROFILE_HFP_HF_ENABLE
     uint16_t hf_feature = HFP_HFSF_EC_NR_FUNCTION |  HFP_HFSF_THREE_WAY_CALLING|
                           HFP_HFSF_CLI_PRESENTATION_CAPABILITY | HFP_HFSF_VOICE_RECOGNITION_FUNCTION |
@@ -1178,21 +1166,7 @@ uint8_t bt_start(bt_app_cb_t *app_cb)
                           HFP_HFSF_HF_INDICATORS |HFP_HFSF_ESCO_S4;
 #endif
 
-    bt_wrapper_cb = app_cb;
-    bt_mem_init();
-    bt_memp_init();
-    phybusif_open(BT_BAUDRATE_1);
-#if BT_ENABLE_SNOOP > 0
-    bt_snoop_init();
-#endif
-    /* blueooth stack init */
-    hci_init();
-    hci_register_link_key_req(link_key_req);
-    hci_register_link_key_not(link_key_not);
-    hci_register_bt_working(bt_stack_worked);
-    hci_register_hardware_error(bt_hardware_error);
-
-    l2cap_init();
+	l2cap_init();
     sdp_init();
     rfcomm_init();
     /* bluetooth classical profile init */
@@ -1205,7 +1179,6 @@ uint8_t bt_start(bt_app_cb_t *app_cb)
     bt_profile_mask |= BT_PROFILE_SPP_MASK;
 #endif
 #if PROFILE_HFP_HF_ENABLE
-    //hfp_hf_init(hf_feature,HFP_HF_SDP_UNSUPPORT_WBS,&hfp_hf_wrapper_cb);
     hfp_hf_init(hf_feature,HFP_HF_SDP_SUPPORT_WBS,&hfp_hf_wrapper_cb);
     bt_profile_mask |= BT_PROFILE_HFP_HF_MASK;
 #endif
@@ -1235,8 +1208,41 @@ uint8_t bt_start(bt_app_cb_t *app_cb)
 #if PROFILE_BAS_ENABLE > 0
     bas_init(100);
 #endif
-
 #endif
+
+	if(hci_get_version() >= HCI_PROTO_VERSION_4_2)
+		hci_le_read_p256_public_key();
+
+
+    bt_ass_eir_data();
+    hci_write_eir(eir_data);
+
+    if(bt_wrapper_cb && bt_wrapper_cb->app_common_cb && bt_wrapper_cb->app_common_cb->bt_init_result)
+    {
+        bt_wrapper_cb->app_common_cb->bt_init_result(BT_INIT_SUCCESS,bt_profile_mask);
+    }
+
+
+    return 0;
+}
+
+
+uint8_t bt_start(bt_app_cb_t *app_cb)
+{
+
+    bt_wrapper_cb = app_cb;
+    bt_mem_init();
+    bt_memp_init();
+    phybusif_open(BT_BAUDRATE_1);
+#if BT_ENABLE_SNOOP > 0
+    bt_snoop_init();
+#endif
+    /* blueooth stack init */
+    hci_init();
+    hci_register_link_key_req(link_key_req);
+    hci_register_link_key_not(link_key_not);
+    hci_register_bt_working(bt_stack_worked);
+    hci_register_hardware_error(bt_hardware_error);
 
     phybusif_reset(&uart_if);
     hci_reset();
