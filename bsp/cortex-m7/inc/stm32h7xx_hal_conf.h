@@ -1,4 +1,3 @@
-/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    stm32h7xx_hal_conf.h
@@ -7,16 +6,17 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2017 STMicroelectronics.
-  * All rights reserved.
+  * <h2><center>&copy; Copyright (c) 2017 STMicroelectronics.
+  * All rights reserved.</center></h2>
   *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
+  * This software component is licensed by ST under BSD 3-Clause license,
+  * the "License"; You may not use this file except in compliance with the
+  * License. You may obtain a copy of the License at:
+  *                        opensource.org/licenses/BSD-3-Clause
   *
   ******************************************************************************
   */
-/* USER CODE END Header */
+
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef STM32H7xx_HAL_CONF_H
 #define STM32H7xx_HAL_CONF_H
@@ -65,7 +65,6 @@
 /* #define HAL_LPTIM_MODULE_ENABLED   */
 /* #define HAL_LTDC_MODULE_ENABLED   */
 /* #define HAL_QSPI_MODULE_ENABLED   */
-/* #define HAL_RAMECC_MODULE_ENABLED   */
 /* #define HAL_RNG_MODULE_ENABLED   */
 /* #define HAL_RTC_MODULE_ENABLED   */
 /* #define HAL_SAI_MODULE_ENABLED   */
@@ -165,7 +164,7 @@
   * @brief This is the HAL system configuration section
   */
 #define  VDD_VALUE                    (3300UL) /*!< Value of VDD in mv */
-#define  TICK_INT_PRIORITY            (15UL) /*!< tick interrupt priority */
+#define  TICK_INT_PRIORITY            (0UL) /*!< tick interrupt priority */
 #define  USE_RTOS                     0
 #define  USE_SD_TRANSCEIVER           0U               /*!< use uSD Transceiver */
 #define  USE_SPI_CRC	              0U               /*!< use CRC in SPI */
@@ -508,3 +507,5 @@
 #endif
 
 #endif /* STM32H7xx_HAL_CONF_H */
+
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

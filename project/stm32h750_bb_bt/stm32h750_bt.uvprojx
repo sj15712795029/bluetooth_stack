@@ -493,16 +493,6 @@
               <FilePath>..\..\bsp\cortex-m7\src\stm32h7xx_hal_uart_ex.c</FilePath>
             </File>
             <File>
-              <FileName>stm32h7xx_hal_usart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\bsp\cortex-m7\src\stm32h7xx_hal_usart.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32h7xx_hal_usart_ex.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\bsp\cortex-m7\src\stm32h7xx_hal_usart_ex.c</FilePath>
-            </File>
-            <File>
               <FileName>stm32h7xx_hal_tim.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\bsp\cortex-m7\src\stm32h7xx_hal_tim.c</FilePath>
