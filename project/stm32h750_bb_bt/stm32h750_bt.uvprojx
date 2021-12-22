@@ -336,7 +336,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define></Define>
+              <Define>USE_HAL_DRIVER,STM32H750xx</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\bsp\cortex-m7\core;..\..\bsp\cortex-m7\inc;..\..\bsp\cortex-m7\inc\Legacy;..\..\board\stm32h750;..\..\component\ringbuffer;..\..\component\cjson;..\..\component\bluetooth\src\include;..\..\component\bluetooth\src\include\ble;..\..\component\bluetooth\src\include\classical;..\..\component\bluetooth\third_party_lib\sbc\sbc;..\..\component\bluetooth\vendor;..\..\component\bluetooth\wrapper;..\stm32h750_bb_bt;..\..\component\bluetooth\third_party_lib\crypto\include</IncludePath>
             </VariousControls>

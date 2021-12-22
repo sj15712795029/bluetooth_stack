@@ -1920,7 +1920,14 @@ extern struct phybusif_cb uart_if;
 int main()
 {
     board_init();
-	
+
+	phybusif_open(115200);
+	uint8_t send_buf[32] = "hello\n" ;
+	while(1)
+	{
+		uart_bt_send(send_buf,strlen(send_buf));
+		hw_delay_ms(1000);
+	}
     while(1)
     {
 
