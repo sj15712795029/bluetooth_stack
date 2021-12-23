@@ -147,6 +147,8 @@ uint32_t last_sys_time = 0;
 #define BT_PBAP_CONNECT_CMD "PBAP_CON"
 #define BT_PBAP_CONNECT_DES "Connect pbap profile"
 
+#define BT_SMP_SEC_REQ_CMD "SMP_SEC_REQ"
+#define BT_SMP_SEC_REQ_DES "Smp security request"
 #define BT_GATTC_MTU_REQ_CMD "GATTC_MTU"
 #define BT_GATTC_MTU_REQ_DES "Gatt client exchange MTU"
 #define BT_GATTC_PRIMARY_DISCOVERY_REQ_CMD "GATTC_DIS_P"
@@ -230,6 +232,7 @@ cmd_desctiption_t cmd_usage[] =
 #endif
 
 #if BT_BLE_ENABLE > 0
+	{(uint8_t *)BT_SMP_SEC_REQ_CMD,(uint8_t *)BT_SMP_SEC_REQ_DES},
     {(uint8_t *)BT_GATTC_MTU_REQ_CMD,(uint8_t *)BT_GATTC_MTU_REQ_DES},
     {(uint8_t *)BT_GATTC_PRIMARY_DISCOVERY_REQ_CMD,(uint8_t *)BT_GATTC_PRIMARY_DISCOVERY_REQ_DES},
     {(uint8_t *)BT_GATTC_PRIMARY_UUID_DISCOVERY_REQ_CMD,(uint8_t *)BT_GATTC_PRIMARY_UUID_DISCOVERY_REQ_DES},
@@ -994,7 +997,12 @@ void bt_app_smp_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
     printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     printf("bt_app_smp_connect_set_up,address is :\n");
     bt_addr_dump(remote_addr->addr);
-
+	connect_addr.addr[5] = remote_addr->addr[5];
+    connect_addr.addr[4] = remote_addr->addr[4];
+    connect_addr.addr[3] = remote_addr->addr[3];
+    connect_addr.addr[2] = remote_addr->addr[2];
+    connect_addr.addr[1] = remote_addr->addr[1];
+    connect_addr.addr[0] = remote_addr->addr[0];
     printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 
 }
@@ -1639,7 +1647,15 @@ uint8_t shell_parse(uint8_t *shell_string)
 #endif
 
 #if BT_BLE_ENABLE > 0
+	if(hw_strncmp(BT_SMP_SEC_REQ_CMD,(const char*)shell_string,hw_strlen(BT_SMP_SEC_REQ_CMD)) == 0)
+    {
 
+        HW_DEBUG("SHELL:BT_SMP_SEC_REQ_CMD\n");
+        bt_smp_security_request(&connect_addr);
+
+        return HW_ERR_OK;
+    }
+	
     if(hw_strncmp(BT_GATTC_MTU_REQ_CMD,(const char*)shell_string,hw_strlen(BT_GATTC_MTU_REQ_CMD)) == 0)
     {
 

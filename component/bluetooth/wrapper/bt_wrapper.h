@@ -296,6 +296,7 @@ uint8_t bt_pbap_client_download_abort(struct bd_addr_t *addr);
 #endif
 
 #if BT_BLE_ENABLE
+uint8_t bt_smp_security_request(struct bd_addr_t *remote_addr);
 uint8_t bt_gatt_client_exchange_mtu(struct bd_addr_t *remote_addr,uint16_t mtu);
 uint8_t bt_gatt_client_discovery_pri_service(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle);
 uint8_t bt_gatt_client_discovery_pri_service_uuid(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle,uint16_t uuid16,uint8_t *uuid128);

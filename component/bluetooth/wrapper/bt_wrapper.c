@@ -1630,6 +1630,13 @@ uint8_t bt_pbap_client_download_abort(struct bd_addr_t *addr)
 
 #if BT_BLE_ENABLE
 
+uint8_t bt_smp_security_request(struct bd_addr_t *remote_addr)
+{
+	smp_security_request(remote_addr);
+	
+	return 0;
+}
+
 uint8_t bt_gatt_client_exchange_mtu(struct bd_addr_t *remote_addr,uint16_t mtu)
 {
 	gatt_client_exchange_mtu(remote_addr,mtu);

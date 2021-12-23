@@ -189,6 +189,7 @@ static err_t smp_send_enc_info(smp_pcb_t *smp_pcb,uint8_t ltk[16]);
 static err_t smp_send_master_id(smp_pcb_t *smp_pcb,uint16_t ediv,uint8_t rand[8]);
 static err_t smp_send_id_info(smp_pcb_t *smp_pcb,uint8_t irk[16]);
 static err_t smp_send_id_addr_info(smp_pcb_t *smp_pcb,uint8_t addr_type,uint8_t addr[6]);
+static err_t smp_send_security_request(smp_pcb_t *smp_pcb);
 static err_t smp_handle_pairing_req(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p);
 static err_t smp_handle_pairing_confirm(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p);
 static err_t smp_handle_pairing_random(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p);
@@ -258,7 +259,25 @@ static void smp_pcb_close(smp_pcb_t *pcb)
     }
 }
 
+static err_t smp_ass_authreq(uint8_t *auth_req)
+{
+	BT_SMP_TRACE_DEBUG("smp_ass_authreq hci_version(0x%x)\n",hci_get_version());
 
+	*auth_req = 0;
+    *auth_req |= SMP_BONDING;
+
+	if(SMP_PAIR_MIMT == 1)
+    	*auth_req |= SMP_AUTH_MIMT_BIT;
+    if(hci_get_version() >= HCI_PROTO_VERSION_4_2)
+    {
+        *auth_req |= SMP_SC_SUPPORT_BIT;
+
+        if(hci_get_version() >= HCI_PROTO_VERSION_5_0)
+            *auth_req |= SMP_H7_SUPPORT_BIT;
+    }
+
+	return BT_ERR_OK;
+}
 
 err_t l2cap_smp_connect(void *arg, l2cap_pcb_t *l2cap_pcb, err_t err)
 {
@@ -436,6 +455,26 @@ err_t smp_init(smp_cbs_t *cb)
     return BT_ERR_OK;
 
 }
+
+err_t smp_security_request(struct bd_addr_t *remote_addr)
+{
+	smp_pcb_t *smp_pcb = smp_get_active_pcb(remote_addr);
+    BT_SMP_TRACE_DEBUG("smp_security_request\n");
+    bt_addr_dump((uint8_t *)remote_addr);
+
+    if(!smp_pcb)
+    {
+        BT_SMP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] smp_pcb is NULL\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_CONN;
+    }
+
+	smp_ass_authreq(&smp_pcb->local_auth_req);
+
+	smp_send_security_request(smp_pcb);
+
+	return BT_ERR_OK;
+}
+
 
 static err_t smp_send_pair_rsp(smp_pcb_t *smp_pcb)
 {
@@ -620,6 +659,24 @@ static err_t smp_send_id_addr_info(smp_pcb_t *smp_pcb,uint8_t addr_type,uint8_t 
     return BT_ERR_OK;
 }
 
+static err_t smp_send_security_request(smp_pcb_t *smp_pcb)
+{
+	struct bt_pbuf_t *send_pbuf;
+    if((send_pbuf = bt_pbuf_alloc(BT_PBUF_RAW, SMP_SECURITY_REQ_PLEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_SMP_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+
+        return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
+    }
+
+    ((uint8_t *)send_pbuf->payload)[0] = SMP_OPCODE_SEC_REQ;
+    ((uint8_t *)send_pbuf->payload)[1] = smp_pcb->local_auth_req;
+
+    smp_send_data(smp_pcb,send_pbuf);
+    bt_pbuf_free(send_pbuf);
+
+    return BT_ERR_OK;
+}
 
 
 static err_t smp_send_pair_fail(smp_pcb_t *smp_pcb,uint8_t reason)
@@ -655,10 +712,7 @@ static err_t smp_send_data(smp_pcb_t *smp_pcb,struct bt_pbuf_t *p)
 
 static err_t smp_handle_pairing_req(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p)
 {
-    uint8_t hci_version = hci_get_version();
     BT_SMP_TRACE_DEBUG("smp_handle_pairing_req\n");
-
-    BT_SMP_TRACE_DEBUG("hci_get_version(0x%x)\n",hci_version);
 
     memcpy(smp_pcb->pair_req_buf,p->payload,SMP_PAIR_REQ_PACK_LEN);
     smp_pcb->remote_io_cap = ((uint8_t *)p->payload)[1];
@@ -684,20 +738,7 @@ static err_t smp_handle_pairing_req(smp_pcb_t *smp_pcb, struct bt_pbuf_t *p)
     smp_pcb->local_i_key = 0x03;
     smp_pcb->local_r_key = 0x03;
 
-    smp_pcb->local_auth_req |= SMP_BONDING;
-    smp_pcb->local_auth_req |= SMP_AUTH_MIMT_BIT;
-    if(hci_version >= HCI_PROTO_VERSION_4_2)
-    {
-        smp_pcb->local_auth_req |= SMP_SC_SUPPORT_BIT;
-
-        if(hci_version >= HCI_PROTO_VERSION_5_0)
-            smp_pcb->local_auth_req |= SMP_H7_SUPPORT_BIT;
-    }
-    else
-    {
-        smp_pcb->local_auth_req &= ~SMP_SC_SUPPORT_BIT;
-        smp_pcb->local_auth_req &= ~SMP_H7_SUPPORT_BIT;
-    }
+	smp_ass_authreq(&smp_pcb->local_auth_req);
 
     smp_pcb->pairing_method = smp_select_pairing_method(smp_pcb);
     BT_SMP_TRACE_DEBUG("pairing_method(%d)\n",smp_pcb->pairing_method);

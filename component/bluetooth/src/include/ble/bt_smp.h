@@ -96,6 +96,7 @@
 #define SMP_MASTER_ID_PACK_LEN 11
 #define SMP_ID_INFO_PACK_LEN 17
 #define SMP_ID_ADDR_INFO_PACK_LEN 8
+#define SMP_SECURITY_REQ_PLEN 2
 
 
 typedef struct _smp_pcb_t
@@ -154,6 +155,7 @@ typedef struct
 
 
 err_t smp_init(smp_cbs_t *cb);
+err_t smp_security_request(struct bd_addr_t *remote_addr);
 
 
 #endif
