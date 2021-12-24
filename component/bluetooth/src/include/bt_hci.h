@@ -772,6 +772,12 @@ typedef enum
 #define HCI_LINK_TYPE_ACL 1
 #define HCI_LINK_TYPE_ESCO 2
 
+#define HCI_ADDR_LE_PUBLIC       0x00 /* Public Device Address */
+#define HCI_ADDR_LE_RANDOM       0x01 /* Random Device Address */
+#define HCI_ADDR_LE_PUBLIC_ID    0x02 /* Public Identity Address (Corresponds to Resolved Private Address) */
+#define HCI_ADDR_LE_RANDOM_ID    0x03 /* Random (Static) Identity Address (Corresponds to Resolved PrivateAddress) */
+
+
 typedef struct _hci_link_t
 {
     struct _hci_link_t *next; /* For the linked list */

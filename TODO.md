@@ -9,6 +9,8 @@
 |      | 底层rx需要处理，避免多层数据copy |      | 0%   |          |
 |      | 底层tx需要处理，避免多层数据copy |      | 0%   |          |
 |      | 增加OS macro定义，支持多线程     |      | 0%   |          |
+|      | UART 架构调整                    |      |      |          |
+|      | API支持多线程                    |      |      |          |
 
 ## HFP HF TODO
 
@@ -56,3 +58,22 @@
 |                                     | Write Characteristic Descriptors                    |           |                |           |               |      |
 |                                     | Write Long Characteristic Descriptors               |           |                |           |               |      |
 
+
+
+## SMP TODO
+
+| 标题               | Sub Feature                                                  | SMP API | SMP Callback | 备注 |
+| ------------------ | ------------------------------------------------------------ | ------- | ------------ | ---- |
+| 版本               | SMP core 5.3                                                 | /       | /            |      |
+| SMP legecy pairing | SMP交互地址不能写死                                          |         |              |      |
+|                    | 写代码的时候补充excel算法的数据类型，比如random是16byte的值  |         |              |      |
+|                    | 使用的HCI command要根据是否支持来走HCI还是软件算法(public key/dhkey) |         |              |      |
+|                    | Initiator just work                                          |         |              |      |
+|                    | Initiator passkey entry                                      |         |              |      |
+|                    | Initiator passkey oob                                        |         |              |      |
+|                    | response passkey oob                                         |         |              |      |
+|                    |                                                              |         |              |      |
+|                    |                                                              |         |              |      |
+|                    |                                                              |         |              |      |
+|                    |                                                              |         |              |      |
+|                    |                                                              |         |              |      |
