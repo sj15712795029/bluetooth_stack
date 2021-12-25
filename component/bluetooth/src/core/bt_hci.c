@@ -1405,10 +1405,12 @@ void hci_event_input(struct bt_pbuf_t *p)
 {
     hci_evt_hdr_t *evhdr = p->payload;;
 
+#if 0
 	BT_HCI_TRACE_DEBUG("-------------------------\n");
 	BT_HCI_TRACE_DEBUG("DEBUG:BT RX EVENT LEN:%d\n",evhdr->len);
     bt_hex_dump(p->payload,evhdr->len + HCI_ACL_HDR_LEN);
 	BT_HCI_TRACE_DEBUG("-------------------------\n\n");
+#endif
 
     if(hci_pcb->init_status == BLUETOOTH_INITING)
     {
@@ -1598,14 +1600,16 @@ uint16_t hci_pdu_maxsize(void)
 
 void hci_acl_input(struct bt_pbuf_t *p)
 {
-    hci_acl_hdr_t *aclhdr;
-    hci_link_t *link = NULL;
     uint16_t conhdl;
+    hci_link_t *link = NULL;  
+	hci_acl_hdr_t *aclhdr = p->payload;
 
-    aclhdr = p->payload;
-
+#if 0
+	BT_HCI_TRACE_DEBUG("-------------------------\n");
     BT_HCI_TRACE_DEBUG("DEBUG:BT RX ACL LEN:%d\n",aclhdr->len);
     bt_hex_dump(p->payload,aclhdr->len + HCI_ACL_HDR_LEN);
+	BT_HCI_TRACE_DEBUG("-------------------------\n\n");
+#endif
 
     //bt_pbuf_header(p, -HCI_ACL_HDR_LEN);
 

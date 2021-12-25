@@ -64,6 +64,7 @@
 			BT_TRACE_LEVEL_WARNING->2   BT_TRACE_LEVEL_DEBUG->3
 ******************************************************************************/
 #define BT_DEBUG printf
+#define BT_HEX_TRACE_COLOR 0
 #define BT_HEX_TRACE_LEVEL 1
 #define BT_PBUF_TRACE_LEVEL 0
 #define BT_MEMORY_TRACE_LEVEL 0

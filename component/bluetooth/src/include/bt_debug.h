@@ -9,11 +9,19 @@
 #define BT_DEBUG_H_H_H
 #include "bt_config.h"
 
+#if BT_HEX_TRACE_COLOR > 0
 #define LOG_COLOR_YELLOW "\033[40;33m"
 #define LOG_COLOR_RED "\033[40;31m"
 #define LOG_COLOR_BLUE "\033[40;36m"
 #define LOG_COLOR_PURPLE "\033[40;35m"
 #define LOG_COLOR_RESET "\033[0m"
+#else
+#define LOG_COLOR_YELLOW 
+#define LOG_COLOR_RED 
+#define LOG_COLOR_BLUE 
+#define LOG_COLOR_PURPLE 
+#define LOG_COLOR_RESET 
+#endif
 
 
 /* Define trace levels */
@@ -28,6 +36,7 @@
     if (BT_HEX_TRACE_LEVEL > BT_TRACE_LEVEL_NONE)               \
       BT_DEBUG(fmt,##__VA_ARGS__); \
   }
+
 
 #define BT_PBUF_TRACE_ERROR(fmt,...)                                      \
   {                                                                \
@@ -504,9 +513,6 @@
     if (BT_BAS_TRACE_LEVEL >= BT_TRACE_LEVEL_DEBUG)               \
       BT_DEBUG(LOG_COLOR_BLUE"[ BAS ] "LOG_COLOR_RESET fmt,##__VA_ARGS__); \
   }
-
-
-
 
 
 
