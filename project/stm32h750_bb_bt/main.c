@@ -1920,7 +1920,7 @@ extern struct phybusif_cb uart_if;
 int main()
 {
     board_init();
-
+	show_usage();
     while(1)
     {
 

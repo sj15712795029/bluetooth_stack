@@ -1403,7 +1403,12 @@ static err_t _hci_init_process(struct bt_pbuf_t *p)
 
 void hci_event_input(struct bt_pbuf_t *p)
 {
-    hci_evt_hdr_t *evhdr;
+    hci_evt_hdr_t *evhdr = p->payload;;
+
+	BT_HCI_TRACE_DEBUG("-------------------------\n");
+	BT_HCI_TRACE_DEBUG("DEBUG:BT RX EVENT LEN:%d\n",evhdr->len);
+    bt_hex_dump(p->payload,evhdr->len + HCI_ACL_HDR_LEN);
+	BT_HCI_TRACE_DEBUG("-------------------------\n\n");
 
     if(hci_pcb->init_status == BLUETOOTH_INITING)
     {
@@ -1411,9 +1416,7 @@ void hci_event_input(struct bt_pbuf_t *p)
         return;
     }
 
-    evhdr = p->payload;
     bt_pbuf_header(p, -HCI_EVT_HDR_LEN);
-
 
     switch(evhdr->code)
     {

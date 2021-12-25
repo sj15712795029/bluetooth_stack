@@ -43,6 +43,7 @@ DMA_InitTypeDef DMA_UART2;
 ******************************************************************************/
 uint8_t hw_uart_bt_init(uint32_t baud_rate)
 {	
+	HAL_UART_DeInit(&huart2);
     __HAL_RCC_DMA1_CLK_ENABLE();
 
     /* USER CODE BEGIN USART1_Init 0 */
@@ -208,8 +209,10 @@ void phybusif_output(struct bt_pbuf_t *p, uint16_t len,uint8_t packet_type)
     uint8_t *tx_buffer = bt_get_tx_buffer();
     bt_pbuf_copy_partial(p, tx_buffer, p->tot_len, 0);
 
+	BT_TRANSPORT_TRACE_DEBUG("-------------------------\n");
     BT_TRANSPORT_TRACE_DEBUG("BT TX LEN:totol len:%d, len:%d\n",p->tot_len,len);
     bt_hex_dump(tx_buffer,len+1);
+	BT_TRANSPORT_TRACE_DEBUG("-------------------------\n\n");
 
     uart_bt_send(tx_buffer,len+1);
 }

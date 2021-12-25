@@ -68,7 +68,7 @@
 #define BT_PBUF_TRACE_LEVEL 0
 #define BT_MEMORY_TRACE_LEVEL 0
 #define BT_SNOOP_TRACE_LEVEL 0
-#define BT_TRANSPORT_TRACE_LEVEL 0
+#define BT_TRANSPORT_TRACE_LEVEL 3
 #define BT_VENDOR_TRACE_LEVEL 0
 #define BT_HCI_TRACE_LEVEL 3
 #define BT_L2CAP_TRACE_LEVEL 0
@@ -81,15 +81,15 @@
 #define BT_MAP_TRACE_LEVEL 0
 #define BT_DID_TRACE_LEVEL 0
 #define BT_SPP_TRACE_LEVEL 0
-#define BT_AVDTP_TRACE_LEVEL 3
-#define BT_AVCTP_TRACE_LEVEL 3
-#define BT_A2DP_TRACE_LEVEL 3
-#define BT_AVRCP_TRACE_LEVEL 3
-#define BT_HID_TRACE_LEVEL 3
-#define BT_SMP_TRACE_LEVEL 3
-#define BT_ATT_TRACE_LEVEL 3
-#define BT_GATT_TRACE_LEVEL 3
-#define BT_BAS_TRACE_LEVEL 3
+#define BT_AVDTP_TRACE_LEVEL 0
+#define BT_AVCTP_TRACE_LEVEL 0
+#define BT_A2DP_TRACE_LEVEL 0
+#define BT_AVRCP_TRACE_LEVEL 0
+#define BT_HID_TRACE_LEVEL 0
+#define BT_SMP_TRACE_LEVEL 0
+#define BT_ATT_TRACE_LEVEL 0
+#define BT_GATT_TRACE_LEVEL 0
+#define BT_BAS_TRACE_LEVEL 0
 /******************************************************************************************************************************/
 
 
