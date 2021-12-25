@@ -58,8 +58,7 @@ uint8_t hw_uart_bt_init(uint32_t baud_rate)
   huart2.Init.StopBits = UART_STOPBITS_1;
   huart2.Init.Parity = UART_PARITY_NONE;
   huart2.Init.Mode = UART_MODE_TX_RX;
-  //huart2.Init.HwFlowCtl = UART_HWCONTROL_RTS_CTS;
-  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_RTS_CTS;
   huart2.Init.OverSampling = UART_OVERSAMPLING_16;
   huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
   huart2.Init.ClockPrescaler = UART_PRESCALER_DIV1;
@@ -112,7 +111,6 @@ void uart_bt_send(uint8_t *buf,uint16_t len)
 }
 
 
-
 /******************************************************************************
  * func name   : USART2_IRQHandler
  * para        : NULL
@@ -132,14 +130,8 @@ void USART2_IRQHandler(void)
 
         recv_len = BT_DMA_BUF_SIZE - __HAL_DMA_GET_COUNTER(huart2.hdmarx);
 
-		printf("recv data len:%d\n",recv_len);
         if(recv_len > 0)
         {
-#if 1
-        	printf("recv data:%s\n",bt_dma_rx_buf);
-			memset(bt_dma_rx_buf,0,sizeof(bt_dma_rx_buf));
-
-#else
             if(ringbuffer_space_left(&bt_ring_buf) < recv_len)
             {
                 HW_DEBUG("+++++++++++++++ring buffer is full,recv_len %d,left %d\n",recv_len,ringbuffer_space_left(&bt_ring_buf));
@@ -147,14 +139,15 @@ void USART2_IRQHandler(void)
             else
             {
                 ringbuffer_put(&bt_ring_buf,bt_dma_rx_buf,recv_len);
-            }
-#endif
-            HAL_UART_Receive_DMA(&huart2,bt_dma_rx_buf,BT_DMA_BUF_SIZE);
+            }      
         }
+
+		HAL_UART_Receive_DMA(&huart2,bt_dma_rx_buf,BT_DMA_BUF_SIZE);
     }
 
     HAL_UART_IRQHandler(&huart2);
 }
+
 
 /******************************************************************************
  * func name   : bt_uart_test
