@@ -442,6 +442,7 @@
 #define HCI_LE_SET_SCAN 0x0c
 #define HCI_LE_CREATE_CON 0x0d
 #define HCI_LE_LTK_REQ_REPLY 0x1a
+#define HCI_LE_LTK_REQ_NEG_REPLAY 0x1b
 #define HCI_LE_READ_LOCAL_P256_PUBLIC_KEY 0x25
 #define HCI_LE_GENERATE_DHKEY 0x26
 
@@ -623,6 +624,7 @@
 #define HCI_SET_LE_ADV_DATA_PLEN 35
 #define HCI_SET_LE_ADV_ENABLE_PLEN 4
 #define HCI_LTK_REQ_REPLY_PLEN 21
+#define HCI_LTK_REQ_NEG_REPLAY_PLEN 5
 #define HCI_READ_LOCAL_P256_PUBLIC_KEY_PLEN 3
 #define HCI_GENERATE_DHKEY_PLEN 67
 
@@ -1007,6 +1009,7 @@ err_t hci_le_set_adv_enable(uint8_t enable);
 err_t hci_le_create_connection(void);
 
 err_t hci_le_ltk_req_reply(struct bd_addr_t *bdaddr,uint8_t *ltk);
+err_t hci_le_ltk_req_neg_replay(struct bd_addr_t *bdaddr);
 err_t hci_le_read_p256_public_key(void);
 err_t hci_le_generate_dhkey(uint8_t *remote_public_key);
 

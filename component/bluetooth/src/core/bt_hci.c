@@ -3481,6 +3481,38 @@ err_t hci_le_ltk_req_reply(struct bd_addr_t *bdaddr,uint8_t *ltk)
     return BT_ERR_OK;
 }
 
+err_t hci_le_ltk_req_neg_replay(struct bd_addr_t *bdaddr)
+{
+	struct bt_pbuf_t *p;
+    hci_link_t *link;
+
+    /* Check if an ACL connection exists */
+    link = _hci_get_link_by_addr(bdaddr);
+
+    if(link == NULL)
+    {
+        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] Connection does not existl\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_CONN;
+    }
+
+    if( (p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_LTK_REQ_NEG_REPLAY_PLEN, BT_PBUF_RAM)) == NULL)   /* Alloc len of packet */
+    {
+        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+
+        return BT_ERR_MEM;
+    }
+    /* Assembling command packet */
+    p = hci_cmd_ass(p, HCI_LE_LTK_REQ_NEG_REPLAY, HCI_LE, HCI_LTK_REQ_NEG_REPLAY_PLEN);
+
+    /* Assembling cmd prameters */
+    bt_le_store_16((uint8_t *)p->payload,3,link->conhdl);
+
+    phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
+    bt_pbuf_free(p);
+    return BT_ERR_OK;
+}
+
+
 err_t hci_le_read_p256_public_key(void)
 {
 	struct bt_pbuf_t *p;

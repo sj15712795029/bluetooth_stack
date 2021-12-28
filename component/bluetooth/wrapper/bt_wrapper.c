@@ -10,6 +10,9 @@ uint16_t bt_profile_mask = 0;
 uint8_t bt_sco_connected = 0;
 uint8_t bt_call_active = 0;
 
+smp_device_info_t le_device_instance = {0};
+
+
 static err_t bt_inquiry_complete(uint16_t result);
 static err_t bt_inquiry_result(hci_inq_res_t *inqres);
 #if BT_BLE_ENABLE > 0
@@ -996,7 +999,7 @@ void gatt_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
     printf("WRAPPER << PROFILE:gattc_connect_set_up,address is :\n");
     bt_addr_dump(remote_addr->addr);
 
-	if(bt_wrapper_cb && bt_wrapper_cb->app_gatt_cb && bt_wrapper_cb->app_gatt_cb->bt_gatt_connect_set_up)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_gatt_cb && bt_wrapper_cb->app_gatt_cb->bt_gatt_connect_set_up)
     {
         bt_wrapper_cb->app_gatt_cb->bt_gatt_connect_set_up(remote_addr,status);
     }
@@ -1007,7 +1010,7 @@ void gatt_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
     printf("WRAPPER << PROFILE:gattc_connect_realease,address is :\n");
     bt_addr_dump(remote_addr->addr);
 
-	if(bt_wrapper_cb && bt_wrapper_cb->app_gatt_cb && bt_wrapper_cb->app_gatt_cb->bt_gatt_connect_realease)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_gatt_cb && bt_wrapper_cb->app_gatt_cb->bt_gatt_connect_realease)
     {
         bt_wrapper_cb->app_gatt_cb->bt_gatt_connect_realease(remote_addr,status);
     }
@@ -1015,10 +1018,10 @@ void gatt_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
 
 void gattc_mtu_value(struct bd_addr_t *remote_addr,uint16_t mtu)
 {
-	printf("WRAPPER << PROFILE:gattc_mtu_value,mtu(%d) address is :\n",mtu);
+    printf("WRAPPER << PROFILE:gattc_mtu_value,mtu(%d) address is :\n",mtu);
     bt_addr_dump(remote_addr->addr);
 
-	if(bt_wrapper_cb && bt_wrapper_cb->app_gatt_cb && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs->bt_gatt_mtu_value)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_gatt_cb && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs->bt_gatt_mtu_value)
     {
         bt_wrapper_cb->app_gatt_cb->gatt_client_cbs->bt_gatt_mtu_value(remote_addr,mtu);
     }
@@ -1026,11 +1029,11 @@ void gattc_mtu_value(struct bd_addr_t *remote_addr,uint16_t mtu)
 
 void gattc_discovery_primary_service(struct bd_addr_t *remote_addr,gatt_client_pri_service_t *pri_service,uint16_t count)
 {
-	printf("WRAPPER << PROFILE:gattc_discovery_primary_service,count(%d) address is :\n",count);
+    printf("WRAPPER << PROFILE:gattc_discovery_primary_service,count(%d) address is :\n",count);
     bt_addr_dump(remote_addr->addr);
-	
 
-	if(bt_wrapper_cb && bt_wrapper_cb->app_gatt_cb && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs->bt_gattc_discovery_primary_service)
+
+    if(bt_wrapper_cb && bt_wrapper_cb->app_gatt_cb && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs->bt_gattc_discovery_primary_service)
     {
         bt_wrapper_cb->app_gatt_cb->gatt_client_cbs->bt_gattc_discovery_primary_service(remote_addr,pri_service,count);
     }
@@ -1039,10 +1042,10 @@ void gattc_discovery_primary_service(struct bd_addr_t *remote_addr,gatt_client_p
 
 void gattc_discovery_uuid_primary_service(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle)
 {
-	printf("WRAPPER << PROFILE:gattc_discovery_uuid_primary_service,start_handle(%d) end_handle(%d) address is :\n",start_handle,end_handle);
+    printf("WRAPPER << PROFILE:gattc_discovery_uuid_primary_service,start_handle(%d) end_handle(%d) address is :\n",start_handle,end_handle);
     bt_addr_dump(remote_addr->addr);
 
-	if(bt_wrapper_cb && bt_wrapper_cb->app_gatt_cb && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs->bt_gattc_discovery_uuid_primary_service)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_gatt_cb && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs->bt_gattc_discovery_uuid_primary_service)
     {
         bt_wrapper_cb->app_gatt_cb->gatt_client_cbs->bt_gattc_discovery_uuid_primary_service(remote_addr,start_handle,end_handle);
     }
@@ -1051,10 +1054,10 @@ void gattc_discovery_uuid_primary_service(struct bd_addr_t *remote_addr,uint16_t
 
 void gattc_discovery_char(struct bd_addr_t *remote_addr,uint16_t attribute_handle,uint16_t char_value_handle,uint8_t properties,uint16_t uuid16,uint8_t *uuid128)
 {
-	printf("WRAPPER << PROFILE:gattc_discovery_char,attribute_handle(%d) char_value_handle(%d) properties(0x%x) uuid16(0x%x) address is :\n",attribute_handle,char_value_handle,properties,uuid16);
+    printf("WRAPPER << PROFILE:gattc_discovery_char,attribute_handle(%d) char_value_handle(%d) properties(0x%x) uuid16(0x%x) address is :\n",attribute_handle,char_value_handle,properties,uuid16);
     bt_addr_dump(remote_addr->addr);
 
-	if(bt_wrapper_cb && bt_wrapper_cb->app_gatt_cb && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs->bt_gattc_discovery_char)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_gatt_cb && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs && bt_wrapper_cb->app_gatt_cb->gatt_client_cbs->bt_gattc_discovery_char)
     {
         bt_wrapper_cb->app_gatt_cb->gatt_client_cbs->bt_gattc_discovery_char(remote_addr,attribute_handle,char_value_handle,properties,uuid16,uuid128);
     }
@@ -1064,17 +1067,17 @@ void gattc_discovery_char(struct bd_addr_t *remote_addr,uint16_t attribute_handl
 gatt_client_cbs_t gattc_wrapper_cb =
 {
     gattc_mtu_value,
-	gattc_discovery_primary_service,
-	gattc_discovery_uuid_primary_service,
-	gattc_discovery_char,
+    gattc_discovery_primary_service,
+    gattc_discovery_uuid_primary_service,
+    gattc_discovery_char,
 };
 
 void gatts_mtu_value(struct bd_addr_t *remote_addr,uint16_t mtu)
 {
-	printf("WRAPPER << PROFILE:gatts_mtu_value,mtu(%d) address is :\n",mtu);
+    printf("WRAPPER << PROFILE:gatts_mtu_value,mtu(%d) address is :\n",mtu);
     bt_addr_dump(remote_addr->addr);
 
-	if(bt_wrapper_cb && bt_wrapper_cb->app_gatt_cb && bt_wrapper_cb->app_gatt_cb->gatt_server_cbs && bt_wrapper_cb->app_gatt_cb->gatt_server_cbs->bt_gatt_mtu_value)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_gatt_cb && bt_wrapper_cb->app_gatt_cb->gatt_server_cbs && bt_wrapper_cb->app_gatt_cb->gatt_server_cbs->bt_gatt_mtu_value)
     {
         bt_wrapper_cb->app_gatt_cb->gatt_server_cbs->bt_gatt_mtu_value(remote_addr,mtu);
     }
@@ -1083,15 +1086,15 @@ void gatts_mtu_value(struct bd_addr_t *remote_addr,uint16_t mtu)
 
 gatt_server_cbs_t gatts_wrapper_cb =
 {
-  gatts_mtu_value,
+    gatts_mtu_value,
 };
 
 
 
 static gatt_cbs_t gatt_wrapper_cb =
 {
-	gatt_connect_set_up,
-	gatt_connect_realease,
+    gatt_connect_set_up,
+    gatt_connect_realease,
     &gattc_wrapper_cb,
     &gatts_wrapper_cb,
 };
@@ -1102,7 +1105,7 @@ void sm_connect_set_up(struct bd_addr_t *remote_addr,uint8_t status)
     printf("WRAPPER << PROFILE:sm_connect_set_up,address is :\n");
     bt_addr_dump(remote_addr->addr);
 
-	if(bt_wrapper_cb && bt_wrapper_cb->app_smp_cb && bt_wrapper_cb->app_smp_cb->bt_smp_connect_set_up)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_smp_cb && bt_wrapper_cb->app_smp_cb->bt_smp_connect_set_up)
     {
         bt_wrapper_cb->app_smp_cb->bt_smp_connect_set_up(remote_addr,status);
     }
@@ -1113,7 +1116,7 @@ void sm_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
     printf("WRAPPER << PROFILE:sm_connect_realease,address is :\n");
     bt_addr_dump(remote_addr->addr);
 
-	if(bt_wrapper_cb && bt_wrapper_cb->app_smp_cb && bt_wrapper_cb->app_smp_cb->bt_smp_connect_realease)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_smp_cb && bt_wrapper_cb->app_smp_cb->bt_smp_connect_realease)
     {
         bt_wrapper_cb->app_smp_cb->bt_smp_connect_realease(remote_addr,status);
     }
@@ -1122,10 +1125,10 @@ void sm_connect_realease(struct bd_addr_t *remote_addr,uint8_t status)
 
 void smp_passkey_display(struct bd_addr_t *remote_addr,uint32_t passkey)
 {
-	printf("WRAPPER << PROFILE:smp_passkey_display passkey(%d),address is :\n",passkey);
-    bt_addr_dump(remote_addr->addr);	
+    printf("WRAPPER << PROFILE:smp_passkey_display passkey(%d),address is :\n",passkey);
+    bt_addr_dump(remote_addr->addr);
 
-	if(bt_wrapper_cb && bt_wrapper_cb->app_smp_cb && bt_wrapper_cb->app_smp_cb->bt_smp_passkey_display)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_smp_cb && bt_wrapper_cb->app_smp_cb->bt_smp_passkey_display)
     {
         bt_wrapper_cb->app_smp_cb->bt_smp_passkey_display(remote_addr,passkey);
     }
@@ -1133,22 +1136,53 @@ void smp_passkey_display(struct bd_addr_t *remote_addr,uint32_t passkey)
 
 void smp_passkey_input(struct bd_addr_t *remote_addr,uint32_t *passkey)
 {
-	printf("WRAPPER << PROFILE:smp_passkey_input address is :\n");
-    bt_addr_dump(remote_addr->addr);	
+    printf("WRAPPER << PROFILE:smp_passkey_input address is :\n");
+    bt_addr_dump(remote_addr->addr);
 
-	if(bt_wrapper_cb && bt_wrapper_cb->app_smp_cb && bt_wrapper_cb->app_smp_cb->bt_smp_passkey_input)
+    if(bt_wrapper_cb && bt_wrapper_cb->app_smp_cb && bt_wrapper_cb->app_smp_cb->bt_smp_passkey_input)
     {
         bt_wrapper_cb->app_smp_cb->bt_smp_passkey_input(remote_addr,passkey);
     }
 }
 
-
-static smp_cbs_t smp_wrapper_cb = 
+void smp_ltk_generate(smp_device_info_t *device_info)
 {
-	sm_connect_set_up,
-	sm_connect_realease,
-	smp_passkey_display,
-	smp_passkey_input,
+    printf("WRAPPER << PROFILE:smp_ltk_generate address is :\n");
+    bt_addr_dump((uint8_t *)&device_info->remote_addr);
+    printf("ltk:\n");
+    bt_hex_dump(device_info->ltk,16);
+	le_device_instance.is_sc = device_info->is_sc;
+    bd_addr_set(&(le_device_instance.remote_addr),&device_info->remote_addr);
+    memcpy(&(le_device_instance.ltk),device_info->ltk,16);
+}
+
+void smp_ltk_request(smp_device_info_t *device_info,uint8_t *has_device)
+{
+    printf("WRAPPER << PROFILE:smp_ltk_request address is :\n");
+    bt_addr_dump((uint8_t *)&device_info->remote_addr);
+
+	if(bd_addr_cmp(&(le_device_instance.remote_addr),&device_info->remote_addr))
+    {
+    	device_info->is_sc = le_device_instance.is_sc;
+		memcpy(device_info->ltk,le_device_instance.ltk,16);
+    	*has_device = 1;
+    }
+    else
+    {
+        *has_device = 0;
+    }
+
+}
+
+
+static smp_cbs_t smp_wrapper_cb =
+{
+    sm_connect_set_up,
+    sm_connect_realease,
+    smp_passkey_display,
+    smp_passkey_input,
+    smp_ltk_generate,
+    smp_ltk_request,
 };
 #endif
 
@@ -1166,7 +1200,7 @@ err_t bt_stack_worked(void *arg)
                           HFP_HFSF_HF_INDICATORS |HFP_HFSF_ESCO_S4;
 #endif
 
-	l2cap_init();
+    l2cap_init();
     sdp_init();
     rfcomm_init();
     /* bluetooth classical profile init */
@@ -1203,15 +1237,15 @@ err_t bt_stack_worked(void *arg)
 
 #if BT_BLE_ENABLE > 0
     gatt_init(&gatt_wrapper_cb);
-	smp_init(&smp_wrapper_cb);
+    smp_init(&smp_wrapper_cb);
     gatt_server_init();
 #if PROFILE_BAS_ENABLE > 0
     bas_init(100);
 #endif
 #endif
 
-	if(hci_get_version() >= HCI_PROTO_VERSION_4_2)
-		hci_le_read_p256_public_key();
+    if(hci_get_version() >= HCI_PROTO_VERSION_4_2)
+        hci_le_read_p256_public_key();
 
 
     bt_ass_eir_data();
@@ -1632,58 +1666,58 @@ uint8_t bt_pbap_client_download_abort(struct bd_addr_t *addr)
 
 uint8_t bt_smp_security_request(struct bd_addr_t *remote_addr)
 {
-	smp_security_request(remote_addr);
-	
-	return 0;
+    smp_security_request(remote_addr);
+
+    return 0;
 }
 
 uint8_t bt_gatt_client_exchange_mtu(struct bd_addr_t *remote_addr,uint16_t mtu)
 {
-	gatt_client_exchange_mtu(remote_addr,mtu);
-	
-	return 0;
+    gatt_client_exchange_mtu(remote_addr,mtu);
+
+    return 0;
 }
 
 uint8_t bt_gatt_client_discovery_pri_service(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle)
 {
-	gatt_client_discovery_pri_service(remote_addr,start_handle,end_handle);
-	
-	return 0;
+    gatt_client_discovery_pri_service(remote_addr,start_handle,end_handle);
+
+    return 0;
 }
 
 uint8_t bt_gatt_client_discovery_pri_service_uuid(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle,uint16_t uuid16,uint8_t *uuid128)
 {
-	gatt_client_discovery_pri_service_uuid(remote_addr,start_handle,end_handle,uuid16,uuid128);
+    gatt_client_discovery_pri_service_uuid(remote_addr,start_handle,end_handle,uuid16,uuid128);
 
-	return 0;
+    return 0;
 }
 
 uint8_t bt_gatt_client_find_include(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle)
 {
-	gatt_client_find_include(remote_addr,start_handle,end_handle);
+    gatt_client_find_include(remote_addr,start_handle,end_handle);
 
-	return 0;
+    return 0;
 }
 
 uint8_t bt_gatt_client_discovery_characteristics(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle)
 {
-	gatt_client_discovery_characteristics(remote_addr,start_handle,end_handle);
+    gatt_client_discovery_characteristics(remote_addr,start_handle,end_handle);
 
-	return 0;
+    return 0;
 }
 
 uint8_t bt_gatt_client_discovery_char_des(struct bd_addr_t *remote_addr,uint16_t start_handle,uint16_t end_handle)
 {
-	gatt_client_discovery_char_des(remote_addr,start_handle,end_handle);
+    gatt_client_discovery_char_des(remote_addr,start_handle,end_handle);
 
-	return 0;
+    return 0;
 }
 
 uint8_t bt_gatt_client_read_char_value(struct bd_addr_t *remote_addr,uint16_t handle)
 {
-	gatt_client_read_char_value(remote_addr,handle);
+    gatt_client_read_char_value(remote_addr,handle);
 
-	return 0;
+    return 0;
 }
 
 

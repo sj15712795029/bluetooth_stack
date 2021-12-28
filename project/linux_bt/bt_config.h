@@ -31,11 +31,11 @@
 #define BT_BAUDRATE_1 115200
 #define BT_BAUDRATE_2 921600
 /* CHIP select,!!!must select one(only) */
-#define BT_VENDOR_CSR8X11_SUPPORT 0
+#define BT_VENDOR_CSR8X11_SUPPORT 1
 #define BT_VENDOR_BCM43430A1_SUPPORT 0
 #define BT_VENDOR_BCM4345C5_SUPPORT 0
 #define BT_VENDOR_CYW43438_SUPPORT 0
-#define BT_VENDOR_CYW54591_SUPPORT 1
+#define BT_VENDOR_CYW54591_SUPPORT 0
 
 #define PROFILE_DID_ENABLE 1
 #define PROFILE_HFP_HF_ENABLE 1
@@ -236,7 +236,7 @@ typedef uintptr_t mem_ptr_t;
 /***********   SMP protocol config ********************************************************************************************/
 #define SMP_MAX_ENC_KEY_SIZE 16
 /* SMP_IO_CAP_DISPLAY_ONLY->0 SMP_IO_CAP_DISPLAY_YESNO->1 SMP_IO_CAP_KEYBORAD_ONLY->2 SMP_IO_CAP_NOIO->3 SMP_IO_CAP_KBDISP->4 */
-#define SMP_IO_CAP_CONF 1
+#define SMP_IO_CAP_CONF 3
 #define SMP_PAIR_MIMT 1
 #define SMP_OOB_PRESENT_CONF 0
 /******************************************************************************************************************************/

@@ -98,38 +98,32 @@
 #define SMP_ID_ADDR_INFO_PACK_LEN 8
 #define SMP_SECURITY_REQ_PLEN 2
 
+#define SMP_FLAG_PAIRING (1<<0)
+
+
+typedef struct 
+{
+	uint8_t is_sc;
+	struct bd_addr_t remote_addr;
+	uint8_t ltk[16];
+}smp_device_info_t;
+
 
 typedef struct _smp_pcb_t
 {
     struct _smp_pcb_t *next; /* For the linked list */
     struct bd_addr_t remote_addr;
     l2cap_pcb_t*l2cappcb;
-
+	
+	smp_device_info_t device_info;
+	
+	uint8_t flag;
+	
+	/* SMP pairing phase 1 step */
 	uint8_t pair_req_buf[SMP_PAIR_REQ_PACK_LEN];
 	uint8_t pair_rsp_buf[SMP_PAIR_RSP_PACK_LEN];
-	uint8_t use_sc;
-	uint8_t pairing_method;
-
-	uint8_t sc_mackey[16];
-	uint8_t sc_tk[16];
-	uint8_t remote_dhkey_check[16];
-
-	uint8_t sc_na[16];
-	uint8_t sc_nb[16];
-	uint32_t sc_vb;
-
-	uint8_t sc_local_dhkey[32];
-	uint8_t local_random[16];
-	uint8_t remote_random[16];
-	uint8_t remote_confirm[16];
-
-	uint8_t tk[16];
-	uint8_t stk[16];
-
-	uint8_t local_sc_public_key[64];
-	uint8_t remote_sc_public_key[64];
-
-    uint8_t remote_io_cap;
+	
+	uint8_t remote_io_cap;
     uint8_t remote_oob_flag;
     uint8_t remote_auth_req;
     uint8_t remote_enc_size;
@@ -142,6 +136,34 @@ typedef struct _smp_pcb_t
     uint8_t local_enc_size;
     uint8_t local_i_key;
     uint8_t local_r_key;
+	
+	uint8_t use_sc;
+	uint8_t pairing_method;
+
+	/* SMP pairing phase 2 step:legacy */	
+	uint8_t tk[16];					/* Legacy pairing tk */
+	uint8_t local_random[16];		/* Legacy pairing local random */
+	uint8_t local_confirm[16]; 	/* Legacy pairing local confirm */
+	uint8_t remote_random[16];	/* Legacy pairing remote random */
+	uint8_t remote_confirm[16]; /* Legacy pairing remote confirm */
+	uint8_t stk[16];					/* Legacy pairing short term key */
+	uint8_t ltk[16];					/* Legacy pairing long term key */
+
+	/* SMP pairing phase 2 step:security connection */	
+	uint8_t local_sc_public_key[64];
+	uint8_t remote_sc_public_key[64];
+
+	uint32_t sc_passkey;
+	uint8_t sc_mackey[16];
+	uint8_t sc_ltk[16];
+	uint8_t remote_dhkey_check[16];
+
+	uint8_t sc_na[16];
+	uint8_t sc_nb[16];
+	uint32_t sc_vb;
+
+	uint8_t sc_local_dhkey[32];
+	
 } smp_pcb_t;
 
 
@@ -151,6 +173,8 @@ typedef struct
     void (*smp_connect_realease)(struct bd_addr_t *remote_addr,uint8_t status);
 	void (*smp_passkey_display)(struct bd_addr_t *remote_addr,uint32_t passkey);
 	void (*smp_passkey_input)(struct bd_addr_t *remote_addr,uint32_t *passkey);
+	void (*smp_ltk_generate)(smp_device_info_t *device_info);
+	void (*smp_ltk_request)(smp_device_info_t *device_info,uint8_t *has_device);
 } smp_cbs_t;
 
 
