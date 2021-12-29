@@ -3552,6 +3552,165 @@ err_t hci_le_generate_dhkey(uint8_t *remote_public_key)
     return BT_ERR_OK;
 }
 
+err_t hci_le_add_dev_resolv_list(uint8_t peer_iat,uint8_t peer_ia[6],uint8_t peer_irk[16],uint8_t local_irk[16])
+{
+	uint8_t offset = 0;
+	struct bt_pbuf_t *p;
+
+    if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_ADD_DEV_RESOLV_LIST_PLEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_MEM;
+    }
+
+    /* Assembling command packet */
+    p = hci_cmd_ass(p, HCI_LE_ADD_DEV_RESOLVING_LIST, HCI_LE, HCI_ADD_DEV_RESOLV_LIST_PLEN);
+	offset += 3;
+    ((uint8_t *)p->payload)[offset] = peer_iat;
+	offset += 1;
+	memcpy(((uint8_t *)p->payload)+offset, peer_ia, 6);
+	offset += 6;
+	memcpy(((uint8_t *)p->payload)+offset, peer_irk, 16);
+	offset += 16;
+	memcpy(((uint8_t *)p->payload)+offset, local_irk, 16);
+
+    phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
+    bt_pbuf_free(p);
+
+    return BT_ERR_OK;
+}
+
+err_t hci_le_rm_dev_resolv_list(uint8_t peer_iat,uint8_t peer_ia[6])
+{
+	uint8_t offset = 0;
+	struct bt_pbuf_t *p;
+
+    if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_RM_DEV_RESOLV_LIST_PLEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_MEM;
+    }
+
+    /* Assembling command packet */
+    p = hci_cmd_ass(p, HCI_LE_RM_DEV_RESOLVING_LIST, HCI_LE, HCI_RM_DEV_RESOLV_LIST_PLEN);
+	offset += 3;
+    ((uint8_t *)p->payload)[offset] = peer_iat;
+	offset += 1;
+	memcpy(((uint8_t *)p->payload)+offset, peer_ia, 6);
+	offset += 6;
+
+    phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
+    bt_pbuf_free(p);
+
+    return BT_ERR_OK;
+}
+
+err_t hci_le_clear_resolv_list(void)
+{
+	struct bt_pbuf_t *p;
+
+    if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_CLEAR_RESOLV_LIST_PLEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_MEM;
+    }
+
+    /* Assembling command packet */
+    p = hci_cmd_ass(p, HCI_LE_CLEAR_RESOLVING_LIST, HCI_LE, HCI_CLEAR_RESOLV_LIST_PLEN);
+
+    phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
+    bt_pbuf_free(p);
+
+    return BT_ERR_OK;
+}
+
+err_t hci_le_read_resolv_list_size(void)
+{
+	struct bt_pbuf_t *p;
+
+    if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_READ_RESOLV_LIST_PLEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_MEM;
+    }
+
+    /* Assembling command packet */
+    p = hci_cmd_ass(p, HCI_LE_READ_RESOLV_SIZE, HCI_LE, HCI_READ_RESOLV_LIST_PLEN);
+
+    phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
+    bt_pbuf_free(p);
+
+    return BT_ERR_OK;
+}
+
+err_t hci_le_read_peer_resolv_addr(uint8_t peer_iat,uint8_t peer_ia[6])
+{
+	uint8_t offset = 0;
+	struct bt_pbuf_t *p;
+
+    if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_READ_PEER_RESOLV_ADDR_PLEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_MEM;
+    }
+
+    /* Assembling command packet */
+    p = hci_cmd_ass(p, HCI_LE_READ_PEER_RESOLV_ADDR, HCI_LE, HCI_READ_PEER_RESOLV_ADDR_PLEN);
+	offset += 3;
+    ((uint8_t *)p->payload)[offset] = peer_iat;
+	offset += 1;
+	memcpy(((uint8_t *)p->payload)+offset, peer_ia, 6);
+
+    phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
+    bt_pbuf_free(p);
+
+    return BT_ERR_OK;
+}
+
+err_t hci_le_read_local_resolv_addr(uint8_t peer_iat,uint8_t peer_ia[6])
+{
+	uint8_t offset = 0;
+	struct bt_pbuf_t *p;
+
+    if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_READ_LOCAL_RESOLV_ADDR_PLEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_MEM;
+    }
+
+    /* Assembling command packet */
+    p = hci_cmd_ass(p, HCI_LE_READ_LOCAL_RESOLV_ADDR, HCI_LE, HCI_READ_LOCAL_RESOLV_ADDR_PLEN);
+	offset += 3;
+    ((uint8_t *)p->payload)[offset] = peer_iat;
+	offset += 1;
+	memcpy(((uint8_t *)p->payload)+offset, peer_ia, 6);
+
+    phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
+    bt_pbuf_free(p);
+
+    return BT_ERR_OK;
+}
+
+err_t hci_le_set_addr_resolution_enable(uint8_t enable)
+{
+	struct bt_pbuf_t *p;
+
+    if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_SET_ADDR_RESOLUTION_ENABLE_PLEN, BT_PBUF_RAM)) == NULL)
+    {
+        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+        return BT_ERR_MEM;
+    }
+
+    /* Assembling command packet */
+    p = hci_cmd_ass(p, HCI_LE_SET_ADDR_RESOLUTION_ENABLE, HCI_LE, HCI_SET_ADDR_RESOLUTION_ENABLE_PLEN);
+    ((uint8_t *)p->payload)[3] = enable;
+
+    phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
+    bt_pbuf_free(p);
+
+    return BT_ERR_OK;
+}
+
 
 #endif
 

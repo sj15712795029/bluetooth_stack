@@ -445,7 +445,13 @@
 #define HCI_LE_LTK_REQ_NEG_REPLAY 0x1b
 #define HCI_LE_READ_LOCAL_P256_PUBLIC_KEY 0x25
 #define HCI_LE_GENERATE_DHKEY 0x26
-
+#define HCI_LE_ADD_DEV_RESOLVING_LIST 0x27
+#define HCI_LE_RM_DEV_RESOLVING_LIST 0x28
+#define HCI_LE_CLEAR_RESOLVING_LIST 0x29
+#define HCI_LE_READ_RESOLV_SIZE 0x2a
+#define HCI_LE_READ_PEER_RESOLV_ADDR 0x2b
+#define HCI_LE_READ_LOCAL_RESOLV_ADDR 0x2c
+#define HCI_LE_SET_ADDR_RESOLUTION_ENABLE 0x2d
 
 /* Possible event codes */
 #define HCI_INQUIRY_COMPLETE 0x01
@@ -627,6 +633,13 @@
 #define HCI_LTK_REQ_NEG_REPLAY_PLEN 5
 #define HCI_READ_LOCAL_P256_PUBLIC_KEY_PLEN 3
 #define HCI_GENERATE_DHKEY_PLEN 67
+#define HCI_ADD_DEV_RESOLV_LIST_PLEN 42
+#define HCI_RM_DEV_RESOLV_LIST_PLEN 10
+#define HCI_CLEAR_RESOLV_LIST_PLEN 3
+#define HCI_READ_RESOLV_LIST_PLEN 3
+#define HCI_READ_PEER_RESOLV_ADDR_PLEN 10
+#define HCI_READ_LOCAL_RESOLV_ADDR_PLEN 10
+#define HCI_SET_ADDR_RESOLUTION_ENABLE_PLEN 4
 
 
 
@@ -1012,6 +1025,13 @@ err_t hci_le_ltk_req_reply(struct bd_addr_t *bdaddr,uint8_t *ltk);
 err_t hci_le_ltk_req_neg_replay(struct bd_addr_t *bdaddr);
 err_t hci_le_read_p256_public_key(void);
 err_t hci_le_generate_dhkey(uint8_t *remote_public_key);
+err_t hci_le_add_dev_resolv_list(uint8_t peer_iat,uint8_t peer_ia[6],uint8_t peer_irk[16],uint8_t local_irk[16]);
+err_t hci_le_rm_dev_resolv_list(uint8_t peer_iat,uint8_t peer_ia[6]);
+err_t hci_le_clear_resolv_list(void);
+err_t hci_le_read_resolv_list_size(void);
+err_t hci_le_read_peer_resolv_addr(uint8_t peer_iat,uint8_t peer_ia[6]);
+err_t hci_le_read_local_resolv_addr(uint8_t peer_iat,uint8_t peer_ia[6]);
+err_t hci_le_set_addr_resolution_enable(uint8_t enable);
 
 #endif
 
