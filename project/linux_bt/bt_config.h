@@ -18,8 +18,8 @@
 /***********   bluetooth function option *************************************************************************************/
 #define BT_CLASSICAL_ENABLE 1
 #define BT_BLE_ENABLE 1
+#define BT_ENABLE_SNOOP 0
 /** BT_PBUF_TRANSPORT_H2 = 0x01,BT_PBUF_TRANSPORT_H4 = 0x02,BT_PBUF_TRANSPORT_H5 = 0x03,BT_PBUF_TRANSPORT_BCSP = 0x04,*/
-#define BT_ENABLE_SNOOP 1
 #define BT_TRANSPORT_TYPE 0x02
 #define BT_ENABLE_SSP 0
 #define BT_PAGE_TIMEOUT 0x4000 /* value*0.625ms */
@@ -126,7 +126,6 @@
 #define MEM_ALIGNMENT 4
 #define MEM_LIBC_MALLOC 1
 #define PBUF_POOL_BUFSIZE               MEM_ALIGN_SIZE(1024)
-#define BT_PACK_END	__attribute__ ((packed))
 typedef uintptr_t mem_ptr_t;
 /******************************************************************************************************************************/
 

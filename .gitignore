@@ -16,3 +16,5 @@ project/stm32h750_bb_bt/SI*
 /project/stm32f412_bb_bt/Objects
 /project/stm32h750_bb_bt/Objects
 /project/stm32h750_bb_bt/DebugConfig
+/project/windows_bt/Debug
+project/windows_bt/windows_bt/Debug

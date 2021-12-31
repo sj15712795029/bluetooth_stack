@@ -192,24 +192,28 @@
 #define L2CAP_CFG_OUT_SUCCESS 0x04
 #define L2CAP_CFG_OUT_REQ 0x08
 
+#pragma pack (1) 
+
 typedef struct 
 {
     uint16_t len;
     uint16_t cid;
-} BT_PACK_END l2cap_hdr_t;
+}l2cap_hdr_t;
 
 typedef struct 
 {
     uint8_t code;
     uint8_t id;
     uint16_t len;
-} BT_PACK_END l2cap_sig_hdr_t;
+}l2cap_sig_hdr_t;
 
 typedef struct 
 {
     uint8_t type;
     uint8_t len;
-} BT_PACK_END l2cap_cfgopt_hdr_t;
+}l2cap_cfgopt_hdr_t;
+#pragma pack () 
+
 
 enum l2cap_state_e
 {

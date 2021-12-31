@@ -7,7 +7,9 @@
 | STM32F103  | √ | × | × | × |
 | STM32F407  | √ | × | × | × |
 | STM32F412  | √ | × | × | × |
+| STM32H750 | √ | × | × | × |
 | Linux | √ | √ | √ | √ |
+| Windows | × | × | × | × |
 | 购买连接： | [**购买开发板连接(点击我)**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.18.5aeb41f9OvIVgA&id=622836061708) | 暂未上线 | 暂未上线 | 暂未上线 |
 
 
@@ -30,9 +32,13 @@
 | project     | stm32f10x_bb_bt                 | STM32F103裸机(BB:bare board)蓝牙工程                   |
 |             | stm32f407_bb_bt                 | STM32F407裸机(BB:bare board)蓝牙工程                   |
 |             | stm32f412_bb_bt                 | STM32F412裸机(BB:bare board)蓝牙工程                   |
+|             | stm32h750_bb_bt                 | STM32H750裸机(BB:bare board)蓝牙工程                   |
 |             | linux_bt                        | Linux 蓝牙工程                                         |
+|             | windows_bt                      | Windows蓝牙工程                                        |
 | python_tool | convert_binayr_file_to_array.py | 把二进制文档转换为数据的python工具                     |
 |             | corvert_opcode_to_ogf_ocf.py    | 把HCI opcode转换为OGF,OCF                              |
+
+
 
 
 
@@ -51,6 +57,8 @@
 ### Linux下使用
 
 前提条件:<br>
+
+1)安装alsa工具:sudo apt install alsa
 
 1)USB转UART工具(H4 transport需要硬件流控)并且接线正确，根据丝印TX接TX,RX接RX,CTS接CTS,RTS接RTS,VCC5V,GND<br>
 

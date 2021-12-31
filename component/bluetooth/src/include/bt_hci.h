@@ -722,23 +722,28 @@
 #define HCI_SUBEVENT_LE_ENHANCED_CONN_COMPLETE       0x0A
 #define HCI_SUBEVENT_LE_DIRECT_AD_REPORT          0x0B
 
+#pragma pack (1) 
+
 typedef struct
 {
 	uint16_t opcode;
 	uint8_t len;
-}BT_PACK_END hci_cmd_hdr_t;
+}hci_cmd_hdr_t;
 
 typedef struct 
 {
     uint8_t code; /* Event code */
     uint8_t len;  /* Parameter total length */
-}BT_PACK_END hci_evt_hdr_t;
+}hci_evt_hdr_t;
 
 typedef struct 
 {
     uint16_t conhdl_pb_bc; /* Connection handle, packet boundary and broadcast flag flag */
     uint16_t len; /* length of data */
-} BT_PACK_END hci_acl_hdr_t;
+} hci_acl_hdr_t;
+
+#pragma pack () 
+
 
 typedef struct _hci_inq_res_t
 {

@@ -21,6 +21,8 @@
 int bt_snoop_file = -1;
 
 
+#pragma pack (1) 
+
 /* Android btsnoop packet format */
 typedef struct
 {
@@ -30,7 +32,8 @@ typedef struct
     uint32_t dropped_packets;
     uint64_t timestamp;
     uint8_t type;
-} BT_PACK_END btsnoop_header_t;
+} btsnoop_header_t;
+#pragma pack () 
 
 static const uint64_t BTSNOOP_EPOCH_DELTA = 0x00dcddb30f2f8000ULL;
 

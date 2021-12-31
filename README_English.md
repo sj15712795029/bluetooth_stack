@@ -9,7 +9,9 @@ This is a protocol stack that includes traditional Bluetooth and low-power Bluet
 | STM32F103     | √                                                            | ×        | ×                        | ×                       |
 | STM32F407     | √                                                            | ×        | ×                        | ×                       |
 | STM32F412     | √                                                            | ×        | ×                        | ×                       |
+| STM32H750     | √                                                            | ×        | ×                        | ×                       |
 | Linux         | √                                                            | √        | √                        | √                       |
+| Windows       | ×                                                            | ×        | ×                        | ×                       |
 | Purchase page | [**Buy (click on me)**](https://item.taobao.com/item.htm?spm=a1z10.5-c-s.w4002-22329603914.14.6d987dbeJT61MT&id=622837949775) | 暂未上线 | 暂未上线                 | 暂未上线                |
 
 
@@ -32,7 +34,9 @@ This is a protocol stack that includes traditional Bluetooth and low-power Bluet
 | project     | stm32f10x_bb_bt                 | STM32F103 bare board bluetooth project |
 |             | stm32f407_bb_bt                 | STM32F407 bare board bluetooth project |
 |             | stm32f412_bb_bt                 | STM32F412 bare board bluetooth project |
+|             | stm32h750_bb_bt                 | STM32H750 bare board bluetooth project |
 |             | linux_bt                        | Linux bluetooth project                |
+|             | windows_bt                      | Windows bluetooth project              |
 | python_tool | convert_binayr_file_to_array.py |                                        |
 |             | corvert_opcode_to_ogf_ocf.py    |                                        |
 

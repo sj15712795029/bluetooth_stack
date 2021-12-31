@@ -125,7 +125,6 @@
 #define MEM_ALIGNMENT 4
 #define MEM_LIBC_MALLOC 1
 #define PBUF_POOL_BUFSIZE               MEM_ALIGN_SIZE(1024)
-#define BT_PACK_END	__attribute__ ((packed))
 typedef uintptr_t mem_ptr_t;
 /******************************************************************************************************************************/
 

@@ -22,4 +22,4 @@
  *
  */
 
-#define SBC_EXPORT __attribute__ ((visibility("default")))
+#define SBC_EXPORT //__attribute__ ((visibility("default")))

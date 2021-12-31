@@ -102,6 +102,8 @@ enum rfcomm_state_e
     W4_RFCOMM_DISC_RSP
 };
 
+#pragma pack (1) 
+
 /* The RFCOMM frame header */
 typedef struct
 {
@@ -109,13 +111,13 @@ typedef struct
     uint8_t ctrl;
     uint16_t len;
     uint8_t k;
-} BT_PACK_END rfcomm_hdr_t;
+}  rfcomm_hdr_t;
 
 typedef struct
 {
     uint8_t type;
     uint8_t len;
-} BT_PACK_END rfcomm_msg_hdr_t;
+}  rfcomm_msg_hdr_t;
 
 typedef struct
 {
@@ -126,13 +128,13 @@ typedef struct
     uint16_t n; /* Maximum frame size */
     uint8_t na; /* Maximum number of retransmissions */
     uint8_t k; /* Initial credit value */
-} BT_PACK_END rfcomm_pn_msg_t;
+}  rfcomm_pn_msg_t;
 
 typedef struct
 {
     uint8_t dlci; /* Data link connection id */
     uint8_t rs232; /* RS232 control signals */
-} BT_PACK_END rfcomm_msc_msg_t;
+}  rfcomm_msc_msg_t;
 
 typedef struct
 {
@@ -143,7 +145,8 @@ typedef struct
     uint8_t xon;
     uint8_t xoff;
     uint16_t mask;
-} BT_PACK_END rfcomm_rpn_msg_t;
+}  rfcomm_rpn_msg_t;
+#pragma pack () 
 
 
 struct _rfcomm_pcb_t;

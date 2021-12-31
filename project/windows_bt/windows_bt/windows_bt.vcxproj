@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{7bbdde1c-6e36-41b9-be52-a8a3f63bb514}</ProjectGuid>
+    <RootNamespace>windowsbt</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>D:\project\wlink\！！！！产品发布资料\STM32_UBUNTU_BLUETOOTH\0-系统源码\1-BLUETOOTH_source_tree\component\bluetooth\src\include;D:\project\wlink\！！！！产品发布资料\STM32_UBUNTU_BLUETOOTH\0-系统源码\1-BLUETOOTH_source_tree\component\bluetooth\src\include\classical;D:\project\wlink\！！！！产品发布资料\STM32_UBUNTU_BLUETOOTH\0-系统源码\1-BLUETOOTH_source_tree\component\bluetooth\src\include\ble;D:\project\wlink\！！！！产品发布资料\STM32_UBUNTU_BLUETOOTH\0-系统源码\1-BLUETOOTH_source_tree\component\bluetooth\vendor;D:\project\wlink\！！！！产品发布资料\STM32_UBUNTU_BLUETOOTH\0-系统源码\1-BLUETOOTH_source_tree\component\bluetooth\wrapper;D:\project\wlink\！！！！产品发布资料\STM32_UBUNTU_BLUETOOTH\0-系统源码\1-BLUETOOTH_source_tree\component\ringbuffer;D:\project\wlink\！！！！产品发布资料\STM32_UBUNTU_BLUETOOTH\0-系统源码\1-BLUETOOTH_source_tree\component\bluetooth\third_party_lib\sbc\sbc;D:\project\wlink\！！！！产品发布资料\STM32_UBUNTU_BLUETOOTH\0-系统源码\1-BLUETOOTH_source_tree\component\bluetooth\third_party_lib\crypto\include;D:\project\wlink\！！！！产品发布资料\STM32_UBUNTU_BLUETOOTH\0-系统源码\1-BLUETOOTH_source_tree\project\windows_bt\windows_bt;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\ble\bt_att.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\ble\bt_bas.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\ble\bt_gatt.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\ble\bt_smp.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\ble\bt_smp_key.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\bt_common.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\bt_hci.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\bt_l2cap.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\bt_mem.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\bt_memp.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\bt_pbuf.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\bt_snoop.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\bt_timer.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_a2dp_sink.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_avctp.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_avdtp.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_avrcp_controller.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_did.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_fcs.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_hfp_hf.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_hid_device.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_map_client.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_obex_client.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_pbap_client.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_rfcomm.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_sdp.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_spp.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\aes_decrypt.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\aes_encrypt.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\cbc_mode.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\ccm_mode.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\cmac_mode.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\ctr_mode.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\ctr_prng.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\ecc.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\ecc_dh.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\ecc_dsa.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\ecc_platform_specific.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\hmac.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\hmac_prng.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\sha256.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\utils.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\sbc\sbc\sbc.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\sbc\sbc\sbc_primitives.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\vendor\bt_vendor_bcm43430a1.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\vendor\bt_vendor_bcm4345c5.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\vendor\bt_vendor_csr8x11.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\vendor\bt_vendor_cyw43438.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\vendor\bt_vendor_cyw54591.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\vendor\bt_vendor_manager.c" />
+    <ClCompile Include="..\..\..\component\bluetooth\wrapper\bt_wrapper.c" />
+    <ClCompile Include="..\..\..\component\ringbuffer\ringbuffer.c" />
+    <ClCompile Include="bt_a2dp_playback.c" />
+    <ClCompile Include="bt_phybusif_h4.c" />
+    <ClCompile Include="main.c" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

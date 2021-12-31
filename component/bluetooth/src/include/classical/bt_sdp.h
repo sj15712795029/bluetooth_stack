@@ -71,13 +71,16 @@
 /**/
 #define SDP_MAX_SRHDLS 12
 
+#pragma pack (1) 
 
 typedef struct  
 {
   uint8_t pdu;
   uint16_t id;
   uint16_t len;
-}BT_PACK_END sdp_hdr_t;
+} sdp_hdr_t;
+#pragma pack () 
+
 
 struct _sdp_pcb_t;
 typedef void (* sdp_service_searched_cb)(void *arg, struct _sdp_pcb_t *pcb, uint16_t tot_src, uint16_t curr_src, uint32_t *rhdls);

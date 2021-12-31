@@ -152,11 +152,14 @@ struct avdtp_sep_t
     avdtp_capabilities_t cap;
 };
 
+#pragma pack (1) 
 struct service_category_hdr
 {
     uint8_t service_category;
 	uint8_t losc;
-}BT_PACK_END;
+};
+#pragma pack () 
+
 
 typedef err_t (*avdtp_event_handle)(struct avdtp_pcb_t *avdtp_pcb,uint32_t msg_id,struct bt_pbuf_t *p);
 typedef err_t (*avdtp_media_handle)(struct avdtp_pcb_t *avdtp_pcb,struct bt_pbuf_t *p);

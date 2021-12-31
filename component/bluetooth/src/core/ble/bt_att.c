@@ -172,7 +172,7 @@ err_t att_err_rsp(uint8_t req_op,uint16_t handle,uint8_t err_code)
 err_t att_parse_mtu_req(struct bt_pbuf_t *p,uint16_t *client_mtu)
 {
     uint8_t *data = p->payload;
-    uint8_t data_len = p->len;
+    uint16_t data_len = p->len;
 
     BT_ATT_TRACE_DEBUG("att_parse_mtu_req data_len(%d)\n",data_len);
     *client_mtu = bt_le_read_16(data,1);
@@ -204,7 +204,7 @@ err_t att_mtu_rsp(uint16_t server_mtu)
 err_t att_parse_find_info_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e_handle)
 {
     uint8_t *data = p->payload;
-    uint8_t data_len = p->len;
+    uint16_t data_len = p->len;
 
     BT_ATT_TRACE_DEBUG("att_parse_find_info_req data_len(%d)\n",data_len);
     *s_handle = bt_le_read_16(data,1);
@@ -415,7 +415,7 @@ err_t att_indication(uint16_t handle,uint8_t *att_value,uint8_t att_value_len)
 err_t att_parse_read_req(struct bt_pbuf_t *p,uint16_t *handle)
 {
     uint8_t *data = p->payload;
-    uint8_t data_len = p->len;
+    uint16_t data_len = p->len;
 
     BT_ATT_TRACE_DEBUG("att_parse_read_req data_len(%d)\n",data_len);
     *handle = bt_le_read_16(data,1);
@@ -429,7 +429,7 @@ err_t att_parse_read_req(struct bt_pbuf_t *p,uint16_t *handle)
 err_t att_parse_find_info_type_value_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e_handle,uint16_t *att_type,uint8_t *value,uint8_t *value_len)
 {
     uint8_t *data = p->payload;
-    uint8_t data_len = p->len;
+    uint16_t data_len = p->len;
 
     BT_ATT_TRACE_DEBUG("att_parse_find_info_type_value_req data_len(%d)\n",data_len);
     *s_handle = bt_le_read_16(data,1);
@@ -448,7 +448,7 @@ err_t att_parse_find_info_type_value_req(struct bt_pbuf_t *p,uint16_t *s_handle,
 err_t att_parse_read_group_type_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e_handle,uint16_t *uuid)
 {
     uint8_t *data = p->payload;
-    uint8_t data_len = p->len;
+    uint16_t data_len = p->len;
 
     BT_ATT_TRACE_DEBUG("att_parse_read_group_type_req data_len(%d)\n",data_len);
     *s_handle = bt_le_read_16(data,1);
@@ -468,7 +468,7 @@ err_t att_parse_read_group_type_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint1
 err_t att_parse_write_req(struct bt_pbuf_t *p,uint16_t *handle,uint8_t *att_value,uint8_t *value_len)
 {
     uint8_t *data = p->payload;
-    uint8_t data_len = p->len;
+    uint16_t data_len = p->len;
 
     BT_ATT_TRACE_DEBUG("att_parse_write_req data_len(%d)\n",data_len);
     *handle = bt_le_read_16(data,1);
@@ -485,7 +485,7 @@ err_t att_parse_write_req(struct bt_pbuf_t *p,uint16_t *handle,uint8_t *att_valu
 err_t att_parse_write_cmd(struct bt_pbuf_t *p,uint16_t *handle,uint8_t *att_value,uint8_t *value_len)
 {
     uint8_t *data = p->payload;
-    uint8_t data_len = p->len;
+    uint16_t data_len = p->len;
 
     BT_ATT_TRACE_DEBUG("att_parse_write_cmd data_len(%d)\n",data_len);
     *handle = bt_le_read_16(data,1);
@@ -527,7 +527,7 @@ err_t att_parse_read_type_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e
                               uint8_t *uuid_format,uint16_t *uuid,uint8_t **uuid128)
 {
     uint8_t *data = p->payload;
-    uint8_t data_len = p->len;
+    uint16_t data_len = p->len;
 
     BT_ATT_TRACE_DEBUG("att_parse_read_type_req data_len(%d)\n",data_len);
     *s_handle = bt_le_read_16(data,1);
@@ -551,7 +551,7 @@ err_t att_parse_read_type_req(struct bt_pbuf_t *p,uint16_t *s_handle,uint16_t *e
 err_t att_parse_read_blob_req(struct bt_pbuf_t *p,uint16_t *handle,uint16_t *offset)
 {
     uint8_t *data = p->payload;
-    uint8_t data_len = p->len;
+    uint16_t data_len = p->len;
 
     BT_ATT_TRACE_DEBUG("att_parse_read_blob_req data_len(%d)\n",data_len);
     *handle = bt_le_read_16(data,1);
@@ -626,7 +626,7 @@ err_t att_find_info_req(uint16_t start_handle,uint16_t end_handle)
 err_t att_parse_mtu_rsp(struct bt_pbuf_t *p,uint16_t *server_mtu)
 {
     uint8_t *data = p->payload;
-    uint8_t data_len = p->len;
+    uint16_t data_len = p->len;
 
     BT_ATT_TRACE_DEBUG("att_parse_mtu_rsp data_len(%d)\n",data_len);
     *server_mtu = bt_le_read_16(data,1);
@@ -638,7 +638,7 @@ err_t att_parse_mtu_rsp(struct bt_pbuf_t *p,uint16_t *server_mtu)
 err_t att_parse_read_type_rsp(struct bt_pbuf_t *p,uint8_t *each_len,uint8_t *data_num,uint8_t **data_list,uint8_t *uuid_type)
 {
     uint8_t *data = p->payload;
-    uint8_t data_len = p->len;
+    uint16_t data_len = p->len;
 
 	BT_ATT_TRACE_DEBUG("att_parse_read_type_rsp data_len(%d)\n",data_len);
 	
@@ -662,7 +662,7 @@ err_t att_parse_read_type_rsp(struct bt_pbuf_t *p,uint8_t *each_len,uint8_t *dat
 err_t att_parse_read_group_type_rsp(struct bt_pbuf_t *p,uint8_t *each_len,uint8_t *data_num,uint8_t **data_list,uint8_t *uuid_type)
 {
     uint8_t *data = p->payload;
-    uint8_t data_len = p->len;
+    uint16_t data_len = p->len;
     *each_len = data[1];
 
     BT_ATT_TRACE_DEBUG("att_parse_read_group_type_rsp data_len(%d)\n",data_len);
@@ -681,7 +681,7 @@ err_t att_parse_read_group_type_rsp(struct bt_pbuf_t *p,uint8_t *each_len,uint8_
 err_t att_parse_find_type_value_rsp(struct bt_pbuf_t *p,uint8_t *info_num,uint8_t **info_list)
 {
     uint8_t *data = p->payload;
-    uint8_t data_len = p->len;
+    uint16_t data_len = p->len;
 
     *info_num = (data_len-1)/4;
     *info_list = data+1;

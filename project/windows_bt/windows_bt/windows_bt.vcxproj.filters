@@ -1,0 +1,190 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="源文件\btstack">
+      <UniqueIdentifier>{5653fee5-eb31-4e63-ac30-4f3f2674c866}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\app">
+      <UniqueIdentifier>{1252a297-d659-42ad-ac0d-cc519e42d286}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="bt_a2dp_playback.c">
+      <Filter>源文件\app</Filter>
+    </ClCompile>
+    <ClCompile Include="main.c">
+      <Filter>源文件\app</Filter>
+    </ClCompile>
+    <ClCompile Include="bt_phybusif_h4.c">
+      <Filter>源文件\app</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\aes_decrypt.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\aes_encrypt.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_a2dp_sink.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\ble\bt_att.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_avctp.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_avdtp.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_avrcp_controller.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\ble\bt_bas.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\bt_common.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_did.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_fcs.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\ble\bt_gatt.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\bt_hci.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_hfp_hf.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_hid_device.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\bt_l2cap.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_map_client.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\bt_mem.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\bt_memp.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_obex_client.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_pbap_client.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\bt_pbuf.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_rfcomm.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_sdp.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\ble\bt_smp.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\ble\bt_smp_key.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\bt_snoop.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\classical\bt_spp.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\src\core\bt_timer.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\vendor\bt_vendor_bcm4345c5.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\vendor\bt_vendor_bcm43430a1.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\vendor\bt_vendor_csr8x11.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\vendor\bt_vendor_cyw43438.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\vendor\bt_vendor_cyw54591.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\vendor\bt_vendor_manager.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\wrapper\bt_wrapper.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\cbc_mode.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\ccm_mode.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\cmac_mode.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\ctr_mode.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\ctr_prng.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\ecc.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\ecc_dh.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\ecc_dsa.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\ecc_platform_specific.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\hmac.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\hmac_prng.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\ringbuffer\ringbuffer.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\sbc\sbc\sbc.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\sbc\sbc\sbc_primitives.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\sha256.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\component\bluetooth\third_party_lib\crypto\source\utils.c">
+      <Filter>源文件\btstack</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

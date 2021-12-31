@@ -1100,7 +1100,7 @@ static err_t _hci_init_cmd_compl_process(uint8_t *payload,uint16_t payload_len)
     case HCI_OP_WRITE_CLASS_OF_DEVICE:
     {
         BT_HCI_TRACE_DEBUG("Init recv HCI_OP_WRITE_CLASS_OF_DEVICE\n");
-        hci_write_local_name((uint8_t *)hci_pcb->local_name, strlen((const char*)hci_pcb->local_name));
+        hci_write_local_name((uint8_t *)hci_pcb->local_name, (uint8_t)strlen((const char*)hci_pcb->local_name));
         break;
     }
     case HCI_OP_CHANGE_LOCAL_NAME:
@@ -1353,7 +1353,7 @@ static err_t _hci_reset_cmd_timeout(void *para)
 
 static err_t _hci_pin_req_handle(void *arg, struct bd_addr_t *bdaddr)
 {
-    return hci_pin_code_request_reply(bdaddr, strlen((const char*)hci_pcb->pincode), hci_pcb->pincode);
+    return hci_pin_code_request_reply(bdaddr, (uint8_t)strlen((const char*)hci_pcb->pincode), hci_pcb->pincode);
 }
 
 static err_t _hci_set_chip_name(uint8_t *name)
