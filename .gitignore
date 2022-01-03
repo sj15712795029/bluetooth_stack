@@ -25,3 +25,5 @@ project/windows_bt/Debug
 project/windows_bt/x64/Debug
 project/windows_bt/windows_bt/x64/Debug
 project/windows_bt/windows_bt/Debug
+project/windows_bt/.vs/windows_bt/v16/Browse.VC.db
+project/windows_bt/.vs/windows_bt/v16/ipch
