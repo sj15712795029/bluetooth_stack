@@ -154,7 +154,7 @@
           <Type>0</Type>
           <LineNumber>1923</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134285032</Address>
+          <Address>134299956</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -168,18 +168,18 @@
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>270</LineNumber>
+          <LineNumber>1295</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134243658</Address>
+          <Address>134318984</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>D:\project\wlink\锛侊紒锛侊紒浜у搧鍙戝竷璧勬枡\STM32_UBUNTU_BLUETOOTH\0-绯荤粺婧愮爜\1-BLUETOOTH_source_tree\board\stm32h750\hw_uart.c</Filename>
+          <Filename>D:\project\wlink\锛侊紒锛侊紒浜у搧鍙戝竷璧勬枡\STM32_UBUNTU_BLUETOOTH\0-绯荤粺婧愮爜\1-BLUETOOTH_source_tree\project\stm32h750_bb_bt\main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\stm32h750_bt\../../board/stm32h750/hw_uart.c\270</Expression>
+          <Expression>\\stm32h750_bt\main.c\1295</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -248,7 +248,6 @@
       <pMultCmdsp></pMultCmdsp>
       <DebugDescription>
         <Enable>1</Enable>
-        <EnableFlashSeq>0</EnableFlashSeq>
         <EnableLog>0</EnableLog>
         <Protocol>2</Protocol>
         <DbgClock>10000000</DbgClock>

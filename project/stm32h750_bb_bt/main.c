@@ -1922,19 +1922,7 @@ int main()
     board_init();
 	show_usage();
 
-	while (1)
-  {
-    /* USER CODE END WHILE */
 
-    /* USER CODE BEGIN 3 */
-	static uint16_t count = 0;
-	if(count % 2)
-		bsp_lcd_fill_color(0,0,LCD_W,LCD_H,RED);
-	else
-		bsp_lcd_fill_color(0,0,LCD_W,LCD_W,GREEN);
-	count++;
-	printf("show srceen\n");
-  }
     while(1)
     {
 
