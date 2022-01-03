@@ -13,6 +13,7 @@
 #include "bt_pbuf.h"
 #include "bt_common.h"
 #include "bt_hci.h"
+#include <windows.h>
 
 
 #define PHYBUSIF_PACKET_TYPE_CMD  0x01
@@ -47,7 +48,7 @@ enum phybusif_state
 /* The physical bus interface control block */
 struct phybusif_cb
 {
-	int phyuart_fd;
+	HANDLE phyuart_fd;
     enum phybusif_state state;
 
     uint32_t offset;

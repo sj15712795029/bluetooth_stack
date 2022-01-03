@@ -14,8 +14,9 @@
 #include "ringbuffer.h"
 #include <stdio.h>
 #include "bt_snoop.h"
+#include <windows.h>
 
-#define PHYBUSIF_NAME "/dev/ttyUSB0"
+#define PHYBUSIF_NAME "\\\\.\\COM17"
 
 struct phybusif_cb uart_if;
 
@@ -38,7 +39,33 @@ uint8_t* bt_get_tx_buffer()
 
 uint8_t hw_uart_bt_init(uint32_t baud_rate)
 {
-    
+    uart_if.phyuart_fd = CreateFile(TEXT(PHYBUSIF_NAME),GENERIC_READ|GENERIC_WRITE,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+	if(uart_if.phyuart_fd == INVALID_HANDLE_VALUE)
+	{
+		printf("ERROR:Unable to open port %s\n",PHYBUSIF_NAME);
+		return FALSE;
+	}
+
+	DCB dcb;
+    GetCommState(uart_if.phyuart_fd, &dcb);
+    dcb.BaudRate = baud_rate;
+    dcb.ByteSize = 8;
+    dcb.Parity = NOPARITY;
+    dcb.StopBits = 1;
+    dcb.fBinary = TRUE;
+    dcb.fParity = TRUE;
+	dcb.fOutxCtsFlow = 1;
+	dcb.fRtsControl = RTS_CONTROL_HANDSHAKE;
+    SetCommState(uart_if.phyuart_fd, &dcb);
+
+    COMMTIMEOUTS ct;
+    ct.ReadIntervalTimeout = MAXDWORD;
+    ct.ReadTotalTimeoutConstant = 500;
+    ct.ReadTotalTimeoutMultiplier = 0;
+    SetCommTimeouts(uart_if.phyuart_fd, &ct);
+
+    SetupComm(uart_if.phyuart_fd, 1024, 1024);
+    PurgeComm(uart_if.phyuart_fd, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);
 
     return BT_ERR_OK;
 
@@ -47,6 +74,8 @@ uint8_t hw_uart_bt_init(uint32_t baud_rate)
 
 void uart_bt_send(uint8_t *buf,uint16_t len)
 {
+	DWORD bytes_written;
+	WriteFile(uart_if.phyuart_fd, buf, len, &bytes_written, NULL);
 
 }
 
@@ -81,16 +110,26 @@ err_t phybusif_reset(struct phybusif_cb *cb)
     return BT_ERR_OK;
 }
 
-
-void *uart_rx_thread(void *data)
+DWORD WINAPI uart_rx_thread(LPVOID p)
 {
+    DWORD bytes_read;
     while(uart_thread_process)
     {
-        
+        ReadFile(uart_if.phyuart_fd, (void*)bt_dma_rx_buf, BT_DMA_BUF_SIZE, &bytes_read, NULL);
+
+        if(bytes_read > 0)
+        {
+            if (ringbuffer_space_left(&bt_ring_buf) > bytes_read)
+                ringbuffer_put(&bt_ring_buf, bt_dma_rx_buf, bytes_read);
+            else
+                BT_TRANSPORT_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] ring buffer left %d < %d\n", __FILE__, __FUNCTION__, __LINE__, ringbuffer_space_left(&bt_ring_buf), bytes_read);
+
+        }
     }
 
 }
 
+DWORD thread_rx_id;
 
 void phybusif_open(uint32_t baud_rate)
 {
@@ -98,22 +137,51 @@ void phybusif_open(uint32_t baud_rate)
 	ringbuffer_init(&bt_ring_buf,bt_rx_buf,BT_RX_BUF_SIZE);
     hw_uart_bt_init(baud_rate);
 
+    CreateThread(NULL, 0, uart_rx_thread, 0, 0, &thread_rx_id);
 }
 
 void phybusif_reopen(uint32_t baud_rate)
 {
+    DWORD exitCode = 0;
 	uart_thread_process = 0;
+    while (1) 
+    {
+        GetExitCodeThread(thread_rx_id, &exitCode);
+        if (STILL_ACTIVE != exitCode)
+            break;
+    }
 
+	DCB dcb;
+    GetCommState(uart_if.phyuart_fd, &dcb);
+    dcb.BaudRate = baud_rate;
+    dcb.ByteSize = 8;
+    dcb.Parity = NOPARITY;
+    dcb.StopBits = 1;
+    dcb.fBinary = TRUE;
+    dcb.fParity = TRUE;
+	dcb.fOutxCtsFlow = 1;
+	dcb.fRtsControl = RTS_CONTROL_HANDSHAKE;
+    SetCommState(uart_if.phyuart_fd, &dcb);
+    
 	ringbuffer_reset(&bt_ring_buf);
 
-    phybusif_open(baud_rate);
+	uart_thread_process = 1;
+    CreateThread(NULL, 0, uart_rx_thread, 0, 0, &thread_rx_id);
+	
 	
 }
 
 void phybusif_close(void)
 {
+    DWORD exitCode = 0;
 	uart_thread_process = 0;
-
+    while (1)
+    {
+        GetExitCodeThread(thread_rx_id, &exitCode);
+        if (STILL_ACTIVE != exitCode)
+            break;
+    }
+    CloseHandle(uart_if.phyuart_fd);
 	ringbuffer_reset(&bt_ring_buf);
 }
 
@@ -132,6 +200,8 @@ void phybusif_output(struct bt_pbuf_t *p, uint16_t len,uint8_t packet_type)
 #if BT_ENABLE_SNOOP > 0
     bt_snoop_write(packet_type,0,tx_buffer+1,len);
 #endif
+
+	uart_bt_send(tx_buffer,len+1);
 
 }
 
