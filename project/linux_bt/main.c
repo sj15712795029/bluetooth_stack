@@ -65,6 +65,8 @@ uint32_t last_sys_time = 0;
 #define BT_START_DES "Start bluetooth stack"
 #define BT_STOP_CMD "BT_STOP"
 #define BT_STOP_DES "Stop blueooth stack"
+#define BT_WRITE_IAC_CMD "BT_W_IAC"
+#define BT_WRITE_IAC_DES "Write current iac lap"
 #define BT_INQUIRY_CMD "BT_INQUIRY"
 #define BT_INQUIRY_DES "Inquiry device"
 #define BT_CANCEL_INQUIRY_CMD "BT_CANCEL_INQUIRY"
@@ -175,6 +177,7 @@ cmd_desctiption_t cmd_usage[] =
 {
     {(uint8_t *)BT_START_CMD,(uint8_t *)BT_START_DES},
     {(uint8_t *)BT_STOP_CMD,(uint8_t *)BT_STOP_DES},
+    {(uint8_t *)BT_WRITE_IAC_CMD,(uint8_t *)BT_WRITE_IAC_DES},
     {(uint8_t *)BT_INQUIRY_CMD,(uint8_t *)BT_INQUIRY_CMD},
     {(uint8_t *)BT_CANCEL_INQUIRY_CMD,(uint8_t *)BT_CANCEL_INQUIRY_DES},
     {(uint8_t *)BT_PERIOID_INQUIRY_CMD,(uint8_t *)BT_PERIOID_INQUIRY_DES},
@@ -295,12 +298,10 @@ void bt_app_inquiry_status(uint8_t status)
 void bt_app_inquiry_result(struct bd_addr_t *address,uint8_t dev_type,uint8_t *name)
 {
     printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
-    printf("-----------inquiry result ----------\n");
     printf("address:0x%x:0x%x:0x%x:0x%x:0x%x:0x%x\n",address->addr[0],address->addr[1],address->addr[2],\
            address->addr[3],address->addr[4],address->addr[5]);
     printf("type %d\n",dev_type);
     printf("name %s\n",name);
-    printf("----------------------- ----------\n");
     printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
@@ -318,7 +319,6 @@ void bt_app_le_inquiry_result(struct bd_addr_t *address,int8_t rssi,uint8_t adv_
 {
     printf(APP_LOG_COLOR_BLUE"%s\n",BT_SPLIT_NAME);
     bt_le_adv_parse_t bt_le_adv_parse = {0};
-    printf("-----------le inquiry result ----------\n");
     printf("address:0x%x:0x%x:0x%x:0x%x:0x%x:0x%x\n",address->addr[0],address->addr[1],address->addr[2],\
            address->addr[3],address->addr[4],address->addr[5]);
     printf("adv type %d\n",adv_type);
@@ -356,7 +356,6 @@ void bt_app_le_inquiry_result(struct bd_addr_t *address,int8_t rssi,uint8_t adv_
             break;
         }
     }
-    printf("----------------------- ----------\n");
     printf("%s"APP_LOG_COLOR_RESET"\n",BT_SPLIT_NAME);
 }
 
@@ -1116,6 +1115,15 @@ uint8_t shell_parse(uint8_t *shell_string)
     {
         HW_DEBUG("SHELL:operate bt stop\n");
         bt_stop();
+        return HW_ERR_OK;
+    }
+
+	if(hw_strncmp(BT_WRITE_IAC_CMD,(const char*)shell_string,hw_strlen(BT_WRITE_IAC_CMD)) == 0)
+    {
+    	uint32_t iac[2] = {BT_INQUIRY_LIAC,BT_INQUIRY_LIAC+1};
+        HW_DEBUG("SHELL:operate bt write iac\n");
+		
+        bt_write_current_iac(sizeof(iac)/sizeof(uint32_t),iac);
         return HW_ERR_OK;
     }
 

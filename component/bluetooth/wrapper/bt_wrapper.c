@@ -1295,9 +1295,17 @@ uint8_t bt_stop(void)
     return 0;
 }
 
+uint8_t bt_write_current_iac(uint8_t iac_num,uint32_t *iac)
+{
+	hci_write_current_iac_lap(iac_num,iac);
+
+	return 0;
+}
+
+
 uint8_t bt_start_inquiry(uint8_t inquiry_len,uint8_t max_dev)
 {
-    uint32_t lap =  0x9E8B33;    /* GIAC */
+    uint32_t lap =  INQUIRY_GIAC;
 
     if(bt_wrapper_cb && bt_wrapper_cb->app_common_cb && bt_wrapper_cb->app_common_cb->bt_inquiry_status)
     {

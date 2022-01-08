@@ -65,6 +65,9 @@ struct link_key_record
 #define BT_LE_INQUIRY_START 0
 #define BT_LE_INQUIRY_COMPLETE 1
 
+#define BT_INQUIRY_GIAC 0x9e8b33
+#define BT_INQUIRY_LIAC 0x9e8b00
+
 
 #define BT_PROFILE_HFP_HF_MASK (1<<0)
 #define BT_PROFILE_HFP_AG_MASK (1<<1)
@@ -227,6 +230,7 @@ typedef struct
 /*********************** COMMON API ***********************/
 uint8_t bt_start(bt_app_cb_t *app_cb);
 uint8_t bt_stop(void);
+uint8_t bt_write_current_iac(uint8_t iac_num,uint32_t *iac);
 uint8_t bt_start_inquiry(uint8_t inquiry_len,uint8_t max_dev);
 uint8_t bt_stop_inquiry(void);
 uint8_t bt_start_periodic_inquiry(uint16_t min_length,uint16_t max_length,uint8_t inquiry_len,uint8_t max_dev);

@@ -640,7 +640,7 @@
 #define HCI_READ_PEER_RESOLV_ADDR_PLEN 10
 #define HCI_READ_LOCAL_RESOLV_ADDR_PLEN 10
 #define HCI_SET_ADDR_RESOLUTION_ENABLE_PLEN 4
-
+#define HCI_WRITE_IAC_LAP_HDR_PLEN 3
 
 
 /* Set Event Filter params */
@@ -675,6 +675,8 @@
 #define INQUIRY_MODE_RSSI 1
 #define INQUIRY_MODE_EIR 2
 
+#define INQUIRY_GIAC 0x9e8b33
+#define INQUIRY_LIAC 0x9e8b00
 
 // Numeric comparison with automatic accept allowed.
 #define SSP_IO_AUTHREQ_MITM_PROTECTION_NOT_REQUIRED_NO_BONDING 0x00
@@ -755,7 +757,6 @@ typedef struct _hci_inq_res_t
     uint8_t psm; /* Page scan mode */
     uint16_t co; /* Clock offset */
     int8_t rssi;
-    uint8_t support_carplay;
     uint8_t remote_name[HCI_REMOTE_NAME_LEN];
 }hci_inq_res_t;
 
@@ -967,8 +968,8 @@ err_t hci_reject_sco_req(struct bd_addr_t *bdaddr,uint8_t reason);
 err_t hci_io_cap_req_replay(struct bd_addr_t *bdaddr,uint8_t io_cap,uint8_t oob,uint8_t auth_req);
 err_t hci_user_confirm_req_reply(struct bd_addr_t *bdaddr);
 err_t hci_user_confirm_req_neg_reply(struct bd_addr_t *bdaddr);
-err_t hci_user_passkey_req_repy(struct bd_addr_t *bdaddr,uint32_t num_value);
-err_t hci_user_passkey_req_neg_repy(struct bd_addr_t *bdaddr);
+err_t hci_user_passkey_req_reply(struct bd_addr_t *bdaddr,uint32_t num_value);
+err_t hci_user_passkey_req_neg_reply(struct bd_addr_t *bdaddr);
 err_t hci_io_cap_req_neg_reply(struct bd_addr_t *bdaddr,uint8_t reason);
 /* OGF = 0x02 LINK POLICY COMMANDS */
 err_t hci_hold_mode(struct bd_addr_t *bdaddr, uint16_t max_interval, uint16_t min_interval);
@@ -996,6 +997,7 @@ err_t hci_write_flush_timeout(struct bd_addr_t *bdaddr, uint16_t flushto);
 err_t hci_set_hc_to_h_fc(void);
 err_t hci_host_buffer_size(void);
 err_t hci_host_num_comp_packets(uint16_t conhdl, uint16_t num_complete);
+err_t hci_write_current_iac_lap(uint8_t iac_num,uint32_t *iac);
 err_t hci_write_inquiry_mode(uint8_t inquiry_mode);
 err_t hci_write_eir(uint8_t *eir_data);
 err_t hci_write_ssp_mode(uint8_t ssp_mode);

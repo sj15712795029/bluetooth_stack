@@ -373,12 +373,9 @@ static err_t _hci_inq_result_evt_process(uint8_t evt_code,uint8_t *payload,uint1
     for(index=0; index<payload[0]; index++)
     {
         resp_offset = index*14;
-        BT_HCI_TRACE_DEBUG("hci_event_input: Inquiry result %d\nBD_ADDR: 0x",index);
-        for(index = 0; index < BD_ADDR_LEN; index++)
-        {
-            BT_HCI_TRACE_DEBUG("%x",payload[1+resp_offset+index]);
-        }
-        BT_HCI_TRACE_DEBUG("\n");
+        BT_HCI_TRACE_DEBUG("hci_event_input: Inquiry index %d\n",index);
+
+		bt_addr_dump(payload+1+resp_offset+index);
 
         BT_HCI_TRACE_DEBUG("Page_Scan_Rep_Mode: 0x%x\n",payload[7+resp_offset]);
 
@@ -395,19 +392,15 @@ static err_t _hci_inq_result_evt_process(uint8_t evt_code,uint8_t *payload,uint1
 
             if(evt_code == HCI_EXT_INQ_RESULT)
             {
-                uint8_t temp_rssi = payload[14+resp_offset];
                 uint8_t *eir_data = payload + 15;
                 uint8_t *temp_eir_data = eir_data;
 
                 inqres->cod[2] = payload[9+resp_offset];
                 inqres->cod[1] = payload[10+resp_offset];
                 inqres->cod[0] = payload[11+resp_offset];
-                //memcpy(inqres->cod, ((uint8_t *)p->payload)+9+resp_offset, 3);
                 inqres->co = *((uint16_t *)(payload+12+resp_offset));
-                if(temp_rssi & 0x80) /* negative rssi */
-                    inqres->rssi = ((int8_t)(temp_rssi & (~0x80)) -128)&0xff;
-                else
-                    inqres->rssi = temp_rssi;
+
+				inqres->rssi = payload[14+resp_offset];
 
                 while(temp_eir_data[0] != 0)
                 {
@@ -2319,7 +2312,7 @@ err_t hci_user_confirm_req_neg_reply(struct bd_addr_t *bdaddr)
     return BT_ERR_OK;
 }
 
-err_t hci_user_passkey_req_repy(struct bd_addr_t *bdaddr,uint32_t num_value)
+err_t hci_user_passkey_req_reply(struct bd_addr_t *bdaddr,uint32_t num_value)
 {
     struct bt_pbuf_t *p;
     if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_USER_PASSKEY_REQ_REPLY_PLEN, BT_PBUF_RAM)) == NULL)
@@ -2340,7 +2333,7 @@ err_t hci_user_passkey_req_repy(struct bd_addr_t *bdaddr,uint32_t num_value)
     return BT_ERR_OK;
 }
 
-err_t hci_user_passkey_req_neg_repy(struct bd_addr_t *bdaddr)
+err_t hci_user_passkey_req_neg_reply(struct bd_addr_t *bdaddr)
 {
     struct bt_pbuf_t *p;
     if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_USER_PASSKEY_REQ_NEG_REPLY_PLEN, BT_PBUF_RAM)) == NULL)
@@ -2689,21 +2682,21 @@ err_t hci_set_event_filter(uint8_t filter_type, uint8_t filter_cond_type, uint8_
     struct bt_pbuf_t *p;
     switch(filter_type)
     {
-    case 0x00:
+    case HCI_SET_EV_FILTER_CLEAR:
         BT_HCI_TRACE_DEBUG("hci_set_event_filter: Clearing all filters\n");
 
         cond_len = 0x00;
         break;
-    case 0x01:
+    case HCI_SET_EV_FILTER_INQUIRY:
         switch(filter_cond_type)
         {
-        case 0x00:
+        case HCI_SET_EV_FILTER_ALLDEV:
             cond_len = 0x00;
             break;
-        case 0x01:
+        case HCI_SET_EV_FILTER_COD:
             cond_len = 0x06;
             break;
-        case 0x02:
+        case HCI_SET_EV_FILTER_BDADDR:
             cond_len = 0x06;
             break;
         default:
@@ -2712,16 +2705,16 @@ err_t hci_set_event_filter(uint8_t filter_type, uint8_t filter_cond_type, uint8_
             break;
         }
         break;
-    case 0x02:
+    case HCI_SET_EV_FILTER_CONNECTION:
         switch(filter_cond_type)
         {
-        case 0x00:
+        case HCI_SET_EV_FILTER_AUTOACC_OFF:
             cond_len = 0x01;
             break;
-        case 0x01:
+        case HCI_SET_EV_FILTER_AUTOACC_NOROLESW:
             cond_len = 0x07;
             break;
-        case 0x02:
+        case HCI_SET_EV_FILTER_AUTOACC_ROLESW:
             cond_len = 0x07;
             break;
         default:
@@ -3005,6 +2998,32 @@ err_t hci_host_num_comp_packets(uint16_t conhdl, uint16_t num_complete)
     bt_pbuf_free(p);
 
     hci_pcb->host_num_acl += num_complete;
+
+    return BT_ERR_OK;
+}
+
+
+err_t hci_write_current_iac_lap(uint8_t iac_num,uint32_t *iac)
+{
+	uint8_t index = 0;
+	struct bt_pbuf_t *p;
+
+    if((p = bt_pbuf_alloc(BT_TRANSPORT_TYPE, HCI_WRITE_IAC_LAP_HDR_PLEN+1+3*iac_num, BT_PBUF_RAM)) == NULL)
+    {
+        BT_HCI_TRACE_ERROR("ERROR:file[%s],function[%s],line[%d] bt_pbuf_alloc fail\n",__FILE__,__FUNCTION__,__LINE__);
+
+        return BT_ERR_MEM; /* Could not allocate memory for bt_pbuf_t */
+    }
+    /* Assembling command packet */
+    p = hci_cmd_ass(p, HCI_WRITE_CURRENT_IAC, HCI_HOST_C_N_BB, HCI_WRITE_IAC_LAP_HDR_PLEN+1+3*iac_num);
+	/* Assembling cmd prameters */
+	((uint8_t *)p->payload)[3] = iac_num;
+    
+	for(index = 0; index < iac_num; index++)
+    	bt_le_store_24((uint8_t *)p->payload,4+index*3,*(iac+index));
+
+    phybusif_output(p, p->tot_len,PHYBUSIF_PACKET_TYPE_CMD);
+    bt_pbuf_free(p);
 
     return BT_ERR_OK;
 }

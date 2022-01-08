@@ -18,7 +18,7 @@
 /***********   bluetooth function option *************************************************************************************/
 #define BT_CLASSICAL_ENABLE 1
 #define BT_BLE_ENABLE 1
-#define BT_ENABLE_SNOOP 0
+#define BT_ENABLE_SNOOP 1
 /** BT_PBUF_TRANSPORT_H2 = 0x01,BT_PBUF_TRANSPORT_H4 = 0x02,BT_PBUF_TRANSPORT_H5 = 0x03,BT_PBUF_TRANSPORT_BCSP = 0x04,*/
 #define BT_TRANSPORT_TYPE 0x02
 #define BT_ENABLE_SSP 0
@@ -39,7 +39,7 @@
 
 #define PROFILE_DID_ENABLE 1
 #define PROFILE_HFP_HF_ENABLE 1
-#define PROFILE_SPP_ENABLE 0
+#define PROFILE_SPP_ENABLE 1
 #define PROFILE_PBAP_ENABLE 0
 #define PROFILE_A2DP_ENABLE 1
 #define PROFILE_AVRCP_ENABLE 0
@@ -100,7 +100,7 @@
 #define BT_MEMORY_C_LIB 1
 #define MEMP_NUM_HCI_PCB 2
 #define MEMP_NUM_HCI_LINK 7
-#define MEMP_NUM_HCI_INQ 8
+#define MEMP_NUM_HCI_INQ 32
 #define MEMP_NUM_L2CAP_PCB 7
 #define MEMP_NUM_L2CAP_PCB_LISTEN 7
 #define MEMP_NUM_L2CAP_SIG 7
