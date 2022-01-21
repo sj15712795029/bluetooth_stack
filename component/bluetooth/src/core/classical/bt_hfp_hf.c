@@ -1823,10 +1823,20 @@ static err_t hfp_hf_handle_at_cnum(struct hfp_pcb_t *pcb,uint8_t *data,uint16_t 
     uint8_t *name_end;
     uint8_t name_len;
     name_start++;
-    name_end = (uint8_t *)strchr((const char *)name_start+1,'"');
-    name_len = name_end - name_start;
-    BT_HFP_TRACE_DEBUG("hfp_hf_handle_at_cnum: len %d\n", data_len);
-    bt_hex_dump(data,data_len);
+
+	if(*name_start != '"')
+	{
+	    name_end = (uint8_t *)strchr((const char *)name_start+1,'"');
+	    name_len = name_end - name_start;
+	    BT_HFP_TRACE_DEBUG("hfp_hf_handle_at_cnum: len %d\n", data_len);
+	    bt_hex_dump(data,data_len);
+	}
+	else
+	{
+		name_end = name_start;
+		name_len = 0;
+		
+	}
 
     name_end += 1;
     type = bt_atoi_spec_size(name_end,4);
