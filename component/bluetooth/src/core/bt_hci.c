@@ -188,13 +188,16 @@ err_t hci_init(void)
 #endif
 
 #if BT_VENDOR_CYW54591_SUPPORT > 0
-		_hci_set_chip_name((uint8_t *)VENDOR_CYW54591_NAME);
+	_hci_set_chip_name((uint8_t *)VENDOR_CYW54591_NAME);
 #endif
 
 #if BT_VENDOR_CYW43438_SUPPORT > 0
-			_hci_set_chip_name((uint8_t *)VENDOR_CYW43438_NAME);
+	_hci_set_chip_name((uint8_t *)VENDOR_CYW43438_NAME);
 #endif
 
+#if BT_VENDOR_COMMON_NO_FW_SUPPORT > 0
+	_hci_set_chip_name((uint8_t *)VENDOR_H4_NO_FW_NAME);
+#endif
 
 
     return BT_ERR_OK;

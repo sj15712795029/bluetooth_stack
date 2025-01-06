@@ -14,7 +14,7 @@ extern chip_mgr_t * bcm43430a1_instance(void);
 extern chip_mgr_t * bcm4345c5_instance(void);
 extern chip_mgr_t * cyw54591_instance(void);
 extern chip_mgr_t * cyw43438_instance(void);
-
+extern chip_mgr_t * h4_no_fw_instance(void);
 
 chip_mgr_t * bt_vendor_get_chip_mrg(const uint8_t *name)
 {
@@ -52,6 +52,14 @@ chip_mgr_t * bt_vendor_get_chip_mrg(const uint8_t *name)
 		return cyw43438_instance();
 #endif
 	}
+
+	if(strcmp(VENDOR_H4_NO_FW_NAME,(const char*)name) == 0)
+	{
+#if BT_VENDOR_COMMON_NO_FW_SUPPORT > 0
+		return h4_no_fw_instance();
+#endif
+	}
+
 
 	return NULL;
 }

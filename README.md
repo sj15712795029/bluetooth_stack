@@ -2,15 +2,15 @@
 这是一个包含传统蓝牙跟低功耗蓝牙的协议栈，属于超轻量级蓝牙协议栈，用作学习蓝牙协议栈的人使用
 <br>
 
-|     |  CSR8311 | CYW54591 | BCM43430A<br />(AP6212A) | BCM4345C5<br />(AP6256) |
-|  ----  | ----  | ---- | ---- |  ----  |
-| STM32F103  | √ | × | × | × |
-| STM32F407  | √ | × | × | × |
-| STM32F412  | √ | × | × | × |
-| STM32H750 | √ | × | × | × |
-| Linux | √ | √ | √ | √ |
-| Windows | × | × | × | × |
-| 购买连接： | [**购买开发板连接(点击我)**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.18.5aeb41f9OvIVgA&id=622836061708) | 暂未上线 | 暂未上线 | 暂未上线 |
+|     |  CSR8311 | CYW54591 | BCM43430A<br />(AP6212A) | BCM4345C5<br />(AP6256) | ESP32 |
+|  ----  | ----  | ---- | ---- |  ----  |  ----  |
+| STM32F103  | √ | × | × | × | x |
+| STM32F407  | √ | × | × | × | x |
+| STM32F412  | √ | × | × | × | x |
+| STM32H750 | √ | × | × | × | x |
+| Linux | √ | √ | √ | √ | √ |
+| Windows | × | × | × | × | x |
+| 购买连接： | [**购买开发板连接(点击我)**](https://item.taobao.com/item.htm?spm=a1z10.1-c-s.w4004-22329603896.18.5aeb41f9OvIVgA&id=622836061708) | 暂未上线 | 暂未上线 | 暂未上线 | [**购买开发板连接(点击我)**](https://item.taobao.com/item.htm?id=672388903856&pisk=gBsjfyVNPjcjhWclnSeyOVKJPVx_U1ZUlA9OKOnqBnKv6A1RBdp9XcKJ2pvj6Fdao1T1__YO0nWVNxj5Oco4irXtfh-TTWrUYt2DjhFU2R_gNjvDdqEwHE3JmdPisrvuYtXDshFUTkrE15BiBV3961KReppHXdd968tJIpttDFnxybdkBhK9kq382ppE6fL9B8gJpdox6c3AeQpDdVK9X1d8Fdc_4Y9TlIXbhxocZjipptdSXcIYjEOCbVosf9vvlGBDNa7PVKTX9U8TURjAaOIVmU4t5hXPR1_O97u2Mw9CNe7bOm1CidB6BsZndQIfCgTczvoCFT6O8UszpkxXDIQwmOkQgTsfgtj5QA3Jcn7WRitLxjdNz9s6CGVgV66OKNL5fjszADRCxz3sFem6FBy7FV0MUFvqTeHY4bYvEKaUF8GASEpkFBy7FjQMkLvba8wSMNf..&spm=a21xtw.29178619.product_shelf.7.475441f9RoWgEV) |
 
 
 
@@ -73,7 +73,7 @@
 
 
 ## 视频教程：
-[**CSDN学院教程-蓝牙协议栈教程（点击我）**](https://edu.csdn.net/lecturer/5352?spm=1002.2001.3001.4144)
+[**蓝牙协议栈教程（点击我）**](https://item.taobao.com/item.htm?id=693788592796&pisk=g3OoXWYQOLWSO_xT2n5SCaQr-1MYNz1CxHFdv6IE3iSbwHCR9tWVRa7PzMyzuKY6xg3IF_pcxn-c4HYIPwSeYHjpexh9PU1CTcCn6fLSbGARaHXPYs82lNeP8xBPjrpYIcnt6XDzu6moX3EReiyVSN5Fz6Pz0qbh7W5FUT8qow7L4JPyYEuccw4zL8Pz3r75JJ5F88S40a_zUzWUajyVcw5FYH5EssVPbBRXgmjCILUDO8dlrTjwzg8JyIolF8T5mfh6iKXcbcI0TWRcrE6l6MPipGJ12OIy0jFltE7HmOpoj7xH8F9FnBqryh-2KH7XhD2hjp8JCIBY8VSwNER1gthZSERX2UODJylFkhI2PQ5n_V1lag5clBnbaMv2LQB5OuohAIY2apjzU-yavlPCu2d4dJ6PlZjtFVZPd22CLg3moR1CUZ_-Xq00dJ6Plantoq26VT7fycC..&spm=a21xtw.29178619.product_shelf.9.475441f9RoWgEV&sku_properties=14829532%3A72110507)
 
 ## 平台介绍：
 **目前我们的蓝牙协议栈可以在STM32F103以及在Linux跑起来,蓝牙芯片是CSR8311,支持<br>PROTOCOL：HCI L2CAP RFCOMM SDP AVDTP AVCTP ATT SMP<br>PROFILE: HFP A2DP AVRCP PBAP SPP GATT<br>

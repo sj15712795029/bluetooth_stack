@@ -4,15 +4,15 @@ This is a protocol stack that includes traditional Bluetooth and low-power Bluet
 这是一个包含传统蓝牙跟低功耗蓝牙的协议栈，属于超轻量级蓝牙协议栈，用作学习蓝牙协议栈的人使用
 <br>
 
-|               | CSR8311                                                      | CYW54591 | BCM43430A<br />(AP6212A) | BCM4345C5<br />(AP6256) |
-| ------------- | ------------------------------------------------------------ | -------- | ------------------------ | ----------------------- |
-| STM32F103     | √                                                            | ×        | ×                        | ×                       |
-| STM32F407     | √                                                            | ×        | ×                        | ×                       |
-| STM32F412     | √                                                            | ×        | ×                        | ×                       |
-| STM32H750     | √                                                            | ×        | ×                        | ×                       |
-| Linux         | √                                                            | √        | √                        | √                       |
-| Windows       | ×                                                            | ×        | ×                        | ×                       |
-| Purchase page | [**Buy (click on me)**](https://item.taobao.com/item.htm?spm=a1z10.5-c-s.w4002-22329603914.14.6d987dbeJT61MT&id=622837949775) | 暂未上线 | 暂未上线                 | 暂未上线                |
+|               | CSR8311                                                      | CYW54591 | BCM43430A<br />(AP6212A) | BCM4345C5<br />(AP6256) | ESP32                                                        |
+| ------------- | ------------------------------------------------------------ | -------- | ------------------------ | ----------------------- | ------------------------------------------------------------ |
+| STM32F103     | √                                                            | ×        | ×                        | ×                       |                                                              |
+| STM32F407     | √                                                            | ×        | ×                        | ×                       |                                                              |
+| STM32F412     | √                                                            | ×        | ×                        | ×                       |                                                              |
+| STM32H750     | √                                                            | ×        | ×                        | ×                       |                                                              |
+| Linux         | √                                                            | √        | √                        | √                       |                                                              |
+| Windows       | ×                                                            | ×        | ×                        | ×                       |                                                              |
+| Purchase page | [**Buy (click on me)**](https://item.taobao.com/item.htm?spm=a1z10.5-c-s.w4002-22329603914.14.6d987dbeJT61MT&id=622837949775) | 暂未上线 | 暂未上线                 | 暂未上线                | [**Buy (click on me)**](https://item.taobao.com/item.htm?id=672388903856&pisk=gN0nfLc5PDrIBPMApAzBcWFeZrtOd6a7EYQ8ezeybRy1JYULylraNWPUT8SF_ccjEJdWAyngEAkgLYcWO7yrUY2-vhLxOXa7zKUkkEhB3-0L8vbzL5Rzi7jy6kJG6VIYzKpvrGCaApUrpeEL9GSaGRPUUw7eslPbgzPUYuRgQ7Vf49kzzCAgwWjPTwPP_1PuMzSP8uyN_WN3Uw7zTGRgNRyzzzlG_wyqzVgwI8Zmv12wZqV3x-lULXhK7EZCAfyGBOgijl22HRbPzVVn1k4YUZx83mwLDJkwWw4o_7DgDDvc-YcrG0rir9RK3AooU5i6Eg2m4XnjWlCyg-uI_qaaXERm_VMKOVcRaUPtHRlI8zY2Gy4ULPVsyd_UEcorJka5LL2SSfuEqgJPbiWR3aNwwVS5VkP_s-KBG9rWZgZzpCAGczZU1WpvsCj5VkP_9KdMsiMQY5NpH&spm=a21xtw.29178619.product_shelf.7.475441f9RoWgEV) |
 
 
 
